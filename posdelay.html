@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PosDelay Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(180deg,#1A1A30,#121225);color:#E0E0EC;min-height:100vh;padding:10px;font-size:13px;}
+.card{background:linear-gradient(180deg,#242444,#1A1A35);border:1px solid #2E2E52;border-radius:12px;padding:12px;margin-bottom:8px;}
+.row{display:flex;align-items:center;gap:6px;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.dg{background:#2ECC71;}.do{background:#E67E22;}.dr{background:#E74C3C;}.dd{background:#707088;}
+.gauge{display:flex;gap:1px;height:36px;margin-bottom:2px;}
+.gc{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#FFF;border-radius:2px;opacity:.85;cursor:pointer;}
+.gc.act{opacity:1;box-shadow:inset 0 0 0 2px #FFF;}
+.btn{padding:3px 10px;border-radius:5px;border:none;font-size:12px;font-weight:600;cursor:pointer;color:#FFF;touch-action:manipulation;}
+.bs{padding:10px 14px;font-size:11px;}
+.bg{background:#2ECC71;}.bred{background:#E74C3C;}.bor{background:#E67E22;}.bn{background:#2A2A45;color:#E0E0EC;}.bb{background:#2AC1BC;}.bcp{background:#FFD700;color:#1A1A30;}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #2A2A45;}
+.sr:last-child{border-bottom:none;}
+.sl{font-size:12px;color:#A0A0BC;}
+.sv{display:flex;align-items:center;gap:4px;}
+input[type=number]{width:48px;background:#1A1A30;border:1px solid #2E2E52;border-radius:4px;color:#FFF;padding:4px 4px;text-align:center;font-size:14px;font-weight:bold;-moz-appearance:textfield;}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=time]{background:#2A2A45;border:1px solid #2E2E52;color:#FFF;padding:3px 6px;border-radius:4px;font-size:12px;}
+.tog{width:44px;height:28px;border-radius:14px;background:#E74C3C;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.tog.on{background:#2ECC71;}.tog::after{content:'';width:22px;height:22px;border-radius:50%;background:#FFF;position:absolute;top:3px;left:3px;transition:left .2s;}.tog.on::after{left:19px;}
+.ch{cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.cb{display:none;}.cb.open{display:block;}
+.logbox{background:#1A1A30;border:1px solid #2A2A45;border-radius:6px;padding:6px;max-height:180px;overflow-y:auto;font-family:monospace;font-size:10px;color:#9898B0;white-space:pre-wrap;word-break:break-all;}
+canvas{width:100%;height:100px;display:block;margin-top:6px;}
+.tabs{display:flex;gap:3px;margin-bottom:6px;}
+.tab{padding:8px 12px;border-radius:5px;font-size:11px;cursor:pointer;background:#2A2A45;color:#A0A0BC;}.tab.active{background:#2AC1BC;color:#FFF;}
+.sec{font-size:12px;font-weight:600;padding:5px 0;border-bottom:1px solid #2A2A45;margin-top:6px;}
+.nbtn{width:100%;padding:8px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;color:#FFF;margin-top:6px;touch-action:manipulation;}
+.alert{padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;display:none;}
+.alert.warn{background:#E74C3C33;border:1px solid #E74C3C;color:#E74C3C;display:block;}
+.alert.ok{background:#2ECC7133;border:1px solid #2ECC71;color:#2ECC71;display:block;}
+.conn{font-size:10px;text-align:right;margin-bottom:4px;}
+.sync-row{display:flex;gap:4px;font-size:10px;flex-wrap:wrap;}
+.sync-item{display:flex;align-items:center;gap:2px;}
+.tbtn{padding:8px 12px;border-radius:4px;border:1px solid #2E2E52;font-size:10px;font-weight:600;cursor:pointer;background:#2A2A45;color:#E0E0EC;touch-action:manipulation;}
+.tbtn.on{border-color:#2ECC71;color:#2ECC71;}
+.tbtn.off{border-color:#E74C3C;color:#E74C3C;}
+.ck-row{transition:opacity 0.3s;}
+.ck-dying{opacity:0.3 !important;text-decoration:line-through;}
+.cd-wrap{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+.cd-wrap .cd-label{font-size:8px;font-weight:700;color:#9898B0;writing-mode:vertical-rl;letter-spacing:-1px;}
+.cd-wrap.active .cd-label{color:#E0E0EC;}
+.cd-ring{position:relative;width:44px;height:44px;flex-shrink:0;}
+.cd-ring svg{transform:rotate(-90deg);}
+.cd-ring .cd-txt{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#9898B0;}
+.cd-wrap.active .cd-txt{color:#FFF;}
+</style>
+</head>
+<body>
+
+<div style="position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#1A1A30,#121225);padding:4px 10px 2px;margin:-10px -10px 0">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div class="conn" style="margin:0"><span class="dot dd" id="cD"></span> <span id="cT" style="color:#9898B0">...</span><span id="appVer" style="font-size:9px;color:#888;margin-left:6px"></span></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <span onclick="doCapture()" style="color:#9898B0;font-size:18px;padding:8px;cursor:pointer">&#128247;</span>
+      <button onclick="location.reload()" style="background:#2A2A45;border:1px solid #2E2E52;border-radius:4px;color:#A0A0BC;font-size:12px;padding:8px 12px;cursor:pointer">&#8635;</button>
+    </div>
+  </div>
+  <div id="pullInd" style="text-align:center;color:#9898B0;font-size:11px;height:0;overflow:hidden;transition:height .2s">&#8595; 새로고침</div>
+  <div class="alert" id="alertB"></div>
+  <div class="alert" id="anomalyB"></div>
+</div>
+
+<!-- ═══ 1. 모니터링 ═══ -->
+<div class="card">
+  <div class="row" style="justify-content:space-between;margin-bottom:6px">
+    <div class="row" style="gap:8px">
+      <span style="color:#A0A0BC;font-size:12px">처리중</span>
+      <span id="mCount" style="font-size:30px;font-weight:bold;color:#FFF">--</span>
+      <span style="color:#A0A0BC;font-size:12px">건</span>
+    </div>
+    <span id="mStatus" style="font-size:14px;font-weight:600;color:#2ECC71">정상</span>
+  </div>
+  <div class="row" style="justify-content:space-between;padding:4px 0;border-top:1px solid #2A2A45;border-bottom:1px solid #2A2A45">
+    <div class="row" style="gap:4px">
+      <span style="color:#2AC1BC;font-size:12px;font-weight:600">배민</span>
+      <span class="dot dd" id="mBd"></span>
+      <span id="mBv" style="font-size:12px;font-weight:600;color:#2AC1BC">-</span>
+      <div class="cd-wrap" id="cdBaemin"><span class="cd-label">배</span><div class="cd-ring"><svg viewBox="0 0 44 44" width="44" height="44"><circle cx="22" cy="22" r="17" fill="none" stroke="#2A2A45" stroke-width="4"/><circle id="cdBaeminArc" cx="22" cy="22" r="17" fill="none" stroke="#2AC1BC" stroke-width="4" stroke-linecap="round" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg><div class="cd-txt" id="cdBaeminTxt">--</div></div></div>
+    </div>
+    <div class="row" style="gap:4px">
+      <div class="cd-wrap" id="cdCoupang"><div class="cd-ring"><svg viewBox="0 0 44 44" width="44" height="44"><circle cx="22" cy="22" r="17" fill="none" stroke="#2A2A45" stroke-width="4"/><circle id="cdCoupangArc" cx="22" cy="22" r="17" fill="none" stroke="#FFD700" stroke-width="4" stroke-linecap="round" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg><div class="cd-txt" id="cdCoupangTxt">--</div></div><span class="cd-label">쿠</span></div>
+      <span style="color:#FFD700;font-size:12px;font-weight:600">쿠팡</span>
+      <span class="dot dd" id="mCd"></span>
+      <span id="mCv" style="font-size:12px;font-weight:600;color:#FFD700">-</span>
+    </div>
+  </div>
+  <div style="padding:4px 0;border-bottom:1px solid #2A2A45">
+    <div class="sync-row">
+      <div class="sync-item"><span class="dot dd" id="sKd"></span><span id="sKt" style="color:#9898B0">KDS --</span></div>
+    </div>
+    <div class="row" style="gap:4px;margin-top:4px">
+      <button class="tbtn on" id="tK" onclick="togSource('kds')">K가동</button>
+      <span style="flex:1"></span>
+      <span id="mRefresh" style="font-size:10px;color:#9898B0">수집 --</span>
+    </div>
+  </div>
+  <div id="delayPred" style="padding:4px 0;border-bottom:1px solid #2A2A45;display:none">
+    <div class="row" style="justify-content:space-between">
+      <span style="font-size:11px;color:#A0A0BC">조리속도</span>
+      <span id="dpSpeed" style="font-size:11px;color:#FFF;font-weight:600">-</span>
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <span style="font-size:11px;color:#2AC1BC">배민 예상지연</span>
+      <span id="dpBaemin" style="font-size:11px;font-weight:600">-</span>
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <span style="font-size:11px;color:#FFD700">쿠팡 예상지연</span>
+      <span id="dpCoupang" style="font-size:11px;font-weight:600">-</span>
+    </div>
+  </div>
+  <div class="row" style="justify-content:space-between;padding-top:4px">
+    <span id="mLast" style="font-size:10px;color:#9898B0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">마지막: --</span>
+    <div class="row" style="gap:3px">
+      <button class="btn bs bb" onclick="doCheck('baemin')">배민</button>
+      <button class="btn bs bcp" onclick="doCheck('coupang')">쿠팡</button>
+      <button class="btn bs bn" onclick="doCheck('refresh')">정정</button>
+      <button class="btn bs bg" onclick="doForceRefresh()" style="font-size:12px">&#8635;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 1.5 조리모드 (모니터링 바로 아래) ═══ -->
+<div class="card" id="cookCard">
+  <div class="ch" onclick="togSec('ckB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#A0A0BC">조리모드</span>
+      <div class="tog" id="tog_cook_mode" onclick="event.stopPropagation();togCookMode()"></div>
+      <span id="ckStatus" style="font-size:11px;font-weight:600;color:#2ECC71"></span>
+    </div>
+    <span id="ckA" style="color:#A0A0BC">&#9660;</span>
+  </div>
+  <div class="cb open" id="ckB">
+    <div class="sr"><span class="sl" style="color:#2ECC71">전체</span><div class="sv"><button class="btn bs bn" onclick="adjCk('target',-10)">-</button><span id="ck_target_disp" style="color:#FFF;font-size:13px;font-weight:bold;min-width:44px;text-align:center">25:00</span><button class="btn bs bn" onclick="adjCk('target',10)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:#E67E22">조리</span><div class="sv"><button class="btn bs bn" onclick="adjCk('mid',-10)">-</button><span id="ck_mid_disp" style="color:#FFF;font-size:13px;font-weight:bold;min-width:44px;text-align:center">17:00</span><button class="btn bs bn" onclick="adjCk('mid',10)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:#E74C3C">포장</span><div class="sv"><button class="btn bs bn" onclick="adjCk('finish',-10)">-</button><span id="ck_finish_disp" style="color:#FFF;font-size:13px;font-weight:bold;min-width:44px;text-align:center">4:00</span><button class="btn bs bn" onclick="adjCk('finish',10)">+</button></div></div>
+    <input type="hidden" id="ck_target" value="1500"><input type="hidden" id="ck_mid" value="1020"><input type="hidden" id="ck_finish" value="240">
+    <div id="cookQ" style="margin-top:6px;font-size:12px;color:#9898B0">대기중</div>
+  </div>
+  <!-- 실시간 리스트 (설정 접힘과 무관하게 항상 표시) -->
+  <div id="cookListArea" style="display:none;margin-top:6px;border-top:1px solid #2A2A45;padding-top:6px">
+    <div id="cookList"></div>
+  </div>
+</div>
+
+<!-- ═══ 2. 게이지 ═══ -->
+<div class="card">
+  <div style="margin-bottom:8px">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <div class="row" style="gap:6px">
+        <span style="color:#FFD700;font-size:12px;font-weight:600">쿠팡</span>
+        <span id="cSt" style="font-size:11px"></span>
+      </div>
+      <div class="row" style="gap:6px">
+        <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
+        <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
+      </div>
+    </div>
+    <div class="gauge" id="cG"></div>
+  </div>
+  <div style="border-top:1px solid #2A2A45;padding-top:8px">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <div class="row" style="gap:6px">
+        <span style="color:#2AC1BC;font-size:12px;font-weight:600">배민</span>
+        <span id="bSt" style="font-size:11px"></span>
+      </div>
+      <div class="row" style="gap:6px">
+        <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
+        <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
+        <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
+      </div>
+    </div>
+    <div class="gauge" id="bG"></div>
+  </div>
+  <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid #2A2A45;margin-top:4px"></div>
+</div>
+
+<!-- ═══ 3. 광고 설정 ═══ -->
+<div class="card">
+  <div class="row" style="justify-content:space-between;margin-bottom:6px">
+    <div class="ch" onclick="togSec('adB')" style="flex:1">
+      <span style="font-size:13px;font-weight:600;color:#A0A0BC">광고 설정</span>
+      <span id="adA" style="color:#A0A0BC">&#9660;</span>
+    </div>
+    <div class="row" style="gap:3px">
+      <button class="btn bs bg" onclick="saveAll()" style="font-size:12px;padding:8px 12px">저장</button>
+      <button class="btn bs bn" onclick="restoreAll()" style="font-size:12px;padding:8px 12px">복원</button>
+    </div>
+  </div>
+  <div class="cb open" id="adB">
+    <div class="sec" style="color:#2AC1BC">배민 금액</div>
+    <div class="sr"><span class="sl" style="color:#2ECC71">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:#E67E22">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:#E74C3C">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-50)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',50)">+</button></div></div>
+    <div class="sec">토글</div>
+    <div class="sr"><span class="sl" style="font-weight:bold;color:#FFD700">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
+    <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
+    <div class="sr"><span class="sl">건수 자동</span><div class="tog" id="tog_order_auto_off_enabled" onclick="togS('order_auto_off_enabled')"></div></div>
+    <div class="sr"><span class="sl">쿠팡 자동</span><div class="tog" id="tog_coupang_auto_enabled" onclick="togS('coupang_auto_enabled')"></div></div>
+    <div class="sr"><span class="sl">배민 자동</span><div class="tog" id="tog_baemin_auto_enabled" onclick="togS('baemin_auto_enabled')"></div></div>
+    <div class="sec">스케줄</div>
+    <div class="sr">
+      <div class="row" style="gap:4px">
+        <div class="tog" id="tog_schedule_enabled2" onclick="togS('schedule_enabled')"></div>
+        <span class="dot dr" id="schDot2"></span>
+      </div>
+      <div class="row" style="gap:4px">
+        <span id="schOnDisp" style="font-size:14px;font-weight:bold;color:#FFF;cursor:pointer" onclick="pickTime('on')">--:--</span>
+        <span style="color:#9898B0;font-size:12px">~</span>
+        <span id="schOffDisp" style="font-size:14px;font-weight:bold;color:#FFF;cursor:pointer" onclick="pickTime('off')">--:--</span>
+      </div>
+    </div>
+    <input type="time" id="schTimePicker" style="position:absolute;opacity:0;pointer-events:none">
+  </div>
+</div>
+
+<!-- ═══ 4. 지연 설정 ═══ -->
+<div class="card">
+  <div class="ch" onclick="togSec('dlB')">
+    <span style="font-size:13px;font-weight:600;color:#A0A0BC">지연 설정</span>
+    <span id="dlA" style="color:#A0A0BC">&#9660;</span>
+  </div>
+  <div class="cb open" id="dlB">
+    <div style="font-size:10px;color:#9898B0;padding:4px 0">지연 = max(0, 건수 × 완료간격 + 고정조리 - 목표)</div>
+    <div class="sec" style="color:#2AC1BC">배민</div>
+    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_target_time',-1)">-</button><input type="number" id="set_baemin_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('baemin_target_time',1)">+</button><span style="color:#9898B0;font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',-1)">-</button><input type="number" id="set_baemin_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',1)">+</button><span style="color:#9898B0;font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',-1)">-</button><input type="number" id="set_baemin_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',1)">+</button><span style="color:#9898B0;font-size:10px">건</span></div></div>
+    <div class="sec" style="color:#FFD700">쿠팡</div>
+    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_target_time',-1)">-</button><input type="number" id="set_coupang_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('coupang_target_time',1)">+</button><span style="color:#9898B0;font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',-1)">-</button><input type="number" id="set_coupang_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',1)">+</button><span style="color:#9898B0;font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',-1)">-</button><input type="number" id="set_coupang_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',1)">+</button><span style="color:#9898B0;font-size:10px">건</span></div></div>
+  </div>
+</div>
+
+<!-- ═══ 5. 차트 ═══ -->
+<div class="card">
+  <div class="ch" onclick="togSec('chB')">
+    <span style="font-size:13px;font-weight:600;color:#A0A0BC">건수 변동 (2시간)</span>
+    <span id="chA" style="color:#A0A0BC">&#9660;</span>
+  </div>
+  <div class="cb open" id="chB"><canvas id="hChart"></canvas></div>
+</div>
+
+<!-- ═══ 6. 로그 ═══ -->
+<div class="card">
+  <div class="ch" onclick="togSec('lgB')">
+    <span style="font-size:13px;font-weight:600;color:#A0A0BC">로그</span>
+    <span id="lgA" style="color:#A0A0BC">&#9660;</span>
+  </div>
+  <div class="cb open" id="lgB">
+    <div class="tabs">
+      <div class="tab active" onclick="sLt('kds',this)">KDS</div>
+      <div class="tab" onclick="sLt('posdelay',this)">PosDelay</div>
+      <div class="tab" onclick="sLt('dump',this)">Dump</div>
+    </div>
+    <div class="logbox" id="logC">...</div>
+  </div>
+</div>
+
+<!-- ═══ 7. 권한 ═══ -->
+<div class="card" id="permCard" style="display:none">
+  <div style="font-size:13px;font-weight:600;color:#A0A0BC;margin-bottom:6px">권한 / 앱 설정</div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pdD"></span><span class="sl" style="margin-left:4px">지연 접근성</span></div><button class="btn bs bb" onclick="nb('openAccessibilitySettings')">설정</button></div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pkD"></span><span class="sl" style="margin-left:4px">KDS 접근성</span></div><button class="btn bs bb" onclick="nb('openAccessibilitySettings')">설정</button></div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pnD"></span><span class="sl" style="margin-left:4px">알림 리스너</span></div><button class="btn bs bb" onclick="nb('openNotificationSettings')">설정</button></div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pbD"></span><span class="sl" style="margin-left:4px">배터리 최적화 면제</span></div><button class="btn bs bb" onclick="nb('openBatterySettings')">설정</button></div>
+  <div class="sr"><span class="sl">앱 버전</span><span id="appVer" style="color:#FFF;font-size:12px">-</span></div>
+  <div class="row" style="gap:4px;margin-top:6px">
+    <button class="btn bb" onclick="nb('showLoginDialog','baemin')" style="flex:1">배민 로그인</button>
+    <button class="btn bcp" onclick="nb('showLoginDialog','coupang')" style="flex:1">쿠팡 로그인</button>
+  </div>
+  <button class="nbtn bn" onclick="nb('openAppSettings')">앱 정보 (제한해제)</button>
+</div>
+
+<div style="text-align:center;color:#9898B0;font-size:10px;padding:12px 0;">PosDelay Dashboard v3.4</div>
+
+<script>
+const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
+let S={},aS={},kS={},stS={},hD=[],oT={},cLt='kds';
+let aTS=0;let sseLoaded=false;
+let _kdsLastChange=Date.now(),_kdsLastCount=-1; // 30분 강제보정용
+let lastKdsTime=0; // KDS가 마지막으로 보낸 시각 (epoch ms)
+let avgInterval=3.0,avgCookDur=0; // avgCookDur: 실제 완료 기록 기반 평균 조리시간(ms)
+let cookLog=[]; // 완료 기록: {num, t, doneAt, cookDur}
+const isApp=typeof NativeBridge!=='undefined';
+// null-safe getter: 0도 유효한 값으로 처리
+function g(obj,key,def){const v=obj[key];return v!=null?v:def;}
+
+function doCapture(){if(!window.NativeBridge)return;var h=Math.min(document.body.scrollHeight,4096);try{NativeBridge.captureScreen(h);}catch(e){try{NativeBridge.captureScreen();}catch(e2){}}}
+
+function nb(fn,...args){
+  if(!isApp)return;
+  try{
+    if(fn==='executeAd')NativeBridge.executeAd(args[0],args[1]??0);
+    else if(fn==='showLoginDialog')NativeBridge.showLoginDialog(args[0]);
+    else if(fn==='refreshAndCorrect')NativeBridge.refreshAndCorrect();
+    else if(fn==='forceRefresh')NativeBridge.forceRefresh();
+    else if(fn==='openAccessibilitySettings')NativeBridge.openAccessibilitySettings();
+    else if(fn==='openNotificationSettings')NativeBridge.openNotificationSettings();
+    else if(fn==='openAppSettings')NativeBridge.openAppSettings();
+    else if(fn==='trackUsage')NativeBridge.trackUsage(args[0]);
+  }catch(e){}
+}
+
+if(isApp){
+  document.getElementById('permCard').style.display='block';
+  try{document.getElementById('appVer').textContent='v'+NativeBridge.getAppVersion();}catch(e){}
+  setInterval(()=>{try{
+    const p=JSON.parse(NativeBridge.getPermissions());
+    document.getElementById('pdD').className='dot '+(p.delay?'dg':'dr');
+    document.getElementById('pkD').className='dot '+(p.kds?'dg':'dr');
+    document.getElementById('pnD').className='dot '+(p.notification?'dg':'dr');
+    document.getElementById('pbD').className='dot '+(p.battery?'dg':'dr');
+  }catch(e){}},3000);
+}
+
+// === SSE (generation counter로 백그라운드 복귀 시 중복 방지) ===
+let _sseConns=[],_sseGen=0;
+function sse(path,cb){
+  const gen=_sseGen;
+  const es=new EventSource(FB+path);
+  _sseConns.push({es,path,cb,gen});
+  es.onopen=()=>{document.getElementById('cD').className='dot dg';const t=document.getElementById('cT');t.textContent='실시간';t.style.color='#2ECC71';}; // UI만 갱신, _sseOk는 데이터 도착 시
+  es.onerror=()=>{updC(false);es.close();_sseConns=_sseConns.filter(s=>s.es!==es);if(gen===_sseGen)setTimeout(()=>{if(gen===_sseGen)sse(path,cb);},10000);};
+  es.addEventListener('put',e=>{_sseOk=true;cb(JSON.parse(e.data));});
+  es.addEventListener('patch',e=>{_sseOk=true;cb(JSON.parse(e.data));});
+}
+function updC(ok){
+  document.getElementById('cD').className='dot '+(ok?'dg':'dr');
+  const t=document.getElementById('cT');t.textContent=ok?'실시간':'폴링';t.style.color=ok?'#2ECC71':'#E67E22';
+  if(!ok)_sseOk=false; // 에러 시만 해제, true는 데이터 도착 시 설정
+}
+
+// === Data Handlers ===
+function hKds(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/'){kS={...m.data};if(!Array.isArray(kS.orders))kS.orders=[];}
+  else kS[m.path.slice(1)]=m.data;
+  if(!Array.isArray(kS.orders))kS.orders=[];
+  // 30분 강제보정: orders 없이 건수 변동 없으면 30분 후 0
+  if(kS.count!==_kdsLastCount){_kdsLastCount=kS.count;_kdsLastChange=Date.now();}
+  else if(kS.count>0&&!Array.isArray(kS.orders)&&(Date.now()-_kdsLastChange)>=1800000){kS.count=0;_kdsLastCount=0;}
+  // KDS time 파싱 → lastKdsTime 저장 (접수시간 fallback용)
+  if(kS.time){const p=new Date(kS.time.replace(' ','T')+'+09:00');if(!isNaN(p))lastKdsTime=p.getTime();}
+  // KDS 건수 즉시 반영 (교차보정/안정화 없음)
+  updMonitor();
+}
+function hSet(m){
+  if(!m.data||m.data==='null')return;
+  if(Date.now()<_localEditUntil)return; // 로컬 변경 후 3초간 SSE 에코 차단
+  if(m.path==='/')Object.assign(S,m.data);else S[m.path.slice(1)]=m.data;
+  sseLoaded=true;updSetUI();updMonitor();
+}
+function hASt(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/')Object.assign(aS,m.data);else aS[m.path.slice(1)]=m.data;
+  updMonitor();
+}
+function hStatus(m){
+  if(!m.data||m.data==='null')return;
+  if(Date.now()<_localEditUntil)return; // 로컬 변경 중 SSE 무시
+  if(m.path==='/')Object.assign(stS,m.data);else stS[m.path.slice(1)]=m.data;
+  updSyncStatus();updMonitor();
+}
+function hHist(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/'&&m.data.entries)hD=m.data.entries;
+  calcAvgInterval();drawChart();updDelayPred();
+}
+
+// === 건수: KDS 단일 소스 ===
+function getActiveCount(){
+  if(!stS.kds_paused&&kS.count!=null)return kS.count;
+  if(stS.order_count!=null)return stS.order_count;
+  return kS.count;
+}
+
+// === 모니터링 ===
+function updMonitor(){
+  const c=getActiveCount();
+  document.getElementById('mCount').textContent=c!=null?c:'--';
+  const st=document.getElementById('mStatus');
+  if(c!=null){
+    const ci=Math.min(c,10);
+    const cz=getZones('coupang'),bz=getZones('baemin');
+    const cState=cz[ci],bState=bz[ci];
+    if(cState===2||bState===3){st.textContent='끄기/최소';st.style.color='#E74C3C';}
+    else if(bState===2){st.textContent='중간';st.style.color='#E67E22';}
+    else if(cState===1||bState===1){st.textContent='정상';st.style.color='#2ECC71';}
+    else{st.textContent='유지';st.style.color='#A0A0BC';}
+  }
+  const b=aS.baemin_current_bid;
+  document.getElementById('mBv').textContent=b!=null&&b>0?b+'원':'-';
+  document.getElementById('mBd').className='dot '+(b>0?(b>=g(S,'baemin_amount',200)?'dg':b>=g(S,'baemin_mid_amount',100)?'do':'dr'):'dd');
+  const co2=aS.coupang_current_on;
+  document.getElementById('mCv').textContent=co2===true?'ON':co2===false?'OFF':'-';
+  document.getElementById('mCd').className='dot '+(co2===true?'dg':co2===false?'dr':'dd');
+  document.getElementById('mLast').textContent='마지막: '+(aS.last_ad_action??'--');
+  updCooldown();
+  updCkQueue();updGauges(c);updDelayPred();chkAlert(c);
+}
+
+// === 쿨타임 게이지 (상시 모니터링) ===
+const CD_TOTAL=60000; // 1분
+function updCooldown(){
+  const now=Date.now();
+  // 배민: 금액 변경 쿨다운
+  const bEnd=aS.cooldown_end_baemin||0;
+  _updRing('cdBaemin','cdBaeminArc','cdBaeminTxt',bEnd,now);
+  // 쿠팡: ON/OFF 중 더 늦게 끝나는 쿨다운
+  const cOnEnd=aS.cooldown_end_coupang_on||0;
+  const cOffEnd=aS.cooldown_end_coupang_off||0;
+  const cEnd=Math.max(cOnEnd,cOffEnd);
+  _updRing('cdCoupang','cdCoupangArc','cdCoupangTxt',cEnd,now);
+}
+function _updRing(wrId,arcId,txtId,endMs,now){
+  const wr=document.getElementById(wrId);
+  const remain=endMs-now;
+  const circ=106.8; // 2*PI*17
+  if(!endMs||remain<=0){
+    // 쿨다운 없음 = 비활성 상태 (상시표시)
+    wr.classList.remove('active');
+    document.getElementById(arcId).setAttribute('stroke-dashoffset',circ);
+    document.getElementById(txtId).textContent='--';
+    return;
+  }
+  wr.classList.add('active');
+  const ratio=Math.min(remain/CD_TOTAL,1);
+  document.getElementById(arcId).setAttribute('stroke-dashoffset',circ*(1-ratio));
+  const sec=Math.ceil(remain/1000);
+  document.getElementById(txtId).textContent=sec>=60?Math.floor(sec/60)+':'+(('0'+(sec%60)).slice(-2)):sec+'s';
+}
+setInterval(updCooldown,1000);
+
+// === 동기화 상태 ===
+function updSyncStatus(){
+  updSyncItem('sKd','sKt','KDS',stS.kds_sync);
+  const tK=document.getElementById('tK');
+  const kp=stS.kds_paused;
+  tK.className='tbtn '+(kp?'off':'on');tK.textContent=kp?'K정지':'K가동';
+}
+function updSyncItem(dotId,txtId,label,ts){
+  const d=document.getElementById(dotId),t=document.getElementById(txtId);
+  if(!ts||ts===0){d.className='dot dd';t.textContent=label+' --';t.style.color='#9898B0';return;}
+  const ago=Math.floor((Date.now()-ts)/1000);
+  const agoStr=ago<60?ago+'초':ago<3600?Math.floor(ago/60)+'분':Math.floor(ago/3600)+'시간';
+  const tm=new Date(ts);
+  const tmStr=tm.getHours()+':'+String(tm.getMinutes()).padStart(2,'0')+':'+String(tm.getSeconds()).padStart(2,'0');
+  t.textContent=label+' '+tmStr+' ('+agoStr+')';
+  if(ago<180){d.className='dot dg';t.style.color='#2ECC71';}
+  else if(ago<600){d.className='dot do';t.style.color='#E67E22';}
+  else{d.className='dot dr';t.style.color='#E74C3C';}
+}
+function togSource(src){
+  const key=src+'_paused';
+  stS[key]=!stS[key];
+  updSyncStatus();
+  _localEditUntil=Date.now()+3000;
+  if(isApp){
+    try{NativeBridge.toggleSource(src);}catch(e){}
+    nb('trackUsage','toggle_'+src);
+    setTimeout(()=>{try{
+      const st=JSON.parse(NativeBridge.getSourceStatus());
+      stS.kds_paused=st.kds_paused;
+      updSyncStatus();
+    }catch(e){}},300);
+  }else{
+    sendCmd('TOGGLE_'+src.toUpperCase());
+  }
+}
+
+// === 게이지 (셀 배열 기반) ===
+// 쿠팡: 0=hold, 1=on(초록), 2=off(빨강)
+// 배민: 0=hold, 1=max(초록), 2=mid(주황), 3=min(빨강)
+const CZ_DEF=[1,1,1,0,0,2,2,2,2,2,2]; // 쿠팡 기본
+const BZ_DEF=[1,1,1,0,2,2,0,3,3,3,3]; // 배민 기본
+const CZ_COLORS={'0':'#2A2A45','1':'#2ECC71','2':'#E74C3C'};
+const BZ_COLORS={'0':'#2A2A45','1':'#2ECC71','2':'#E67E22','3':'#E74C3C'};
+const CZ_NEXT={'0':1,'1':2,'2':0}; // 순환: hold→on→off→hold
+const BZ_NEXT={'0':1,'1':2,'2':3,'3':0}; // hold→max→mid→min→hold
+
+function getZones(platform){
+  const key=platform==='coupang'?'coupang_zones':'baemin_zones';
+  const def=platform==='coupang'?CZ_DEF:BZ_DEF;
+  let z=S[key];
+  if(!z||!Array.isArray(z)||z.length!==11){
+    return def.slice();
+  }
+  return z.slice();
+}
+function setZones(platform,zones){
+  const key=platform==='coupang'?'coupang_zones':'baemin_zones';
+  S[key]=zones;
+  updGauges(getActiveCount());
+  _lastSaveKeys=[key];_autoSave();
+}
+function tapGauge(platform,idx){
+  nb('trackUsage','gauge_paint_'+platform+'_'+idx);
+  const zones=getZones(platform);
+  const next=platform==='coupang'?CZ_NEXT:BZ_NEXT;
+  zones[idx]=next[zones[idx]]??0;
+  setZones(platform,zones);
+}
+
+function updGauges(c){
+  const cz=getZones('coupang'), bz=getZones('baemin');
+  // 조리모드 구간 예상: 현재 건수 + 조리속도 기반
+  let ckMidIdx=-1,ckFinIdx=-1; // 조리시작/포장시작 건수
+  if(ckOn&&c!=null&&avgInterval>0){
+    const tgtMin=(parseInt(document.getElementById('ck_target').value)||1500)/60;
+    const midMin=(parseInt(document.getElementById('ck_mid').value)||1020)/60;
+    const finMin=(parseInt(document.getElementById('ck_finish').value)||240)/60;
+    ckMidIdx=Math.ceil((tgtMin-midMin)/avgInterval);
+    ckFinIdx=Math.ceil((tgtMin-finMin)/avgInterval);
+  }
+  function cellMark(i){
+    if(!ckOn||ckMidIdx<0)return '';
+    if(i>=ckFinIdx)return '<span style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#E74C3C;opacity:.8"></span>';
+    if(i>=ckMidIdx)return '<span style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#E67E22;opacity:.8"></span>';
+    return '';
+  }
+  let h='';
+  for(let i=0;i<=10;i++){
+    h+=`<div class="gc${c!=null&&i===c?' act':''}" style="background:${CZ_COLORS[cz[i]]};position:relative" onclick="tapGauge('coupang',${i})">${i}${cellMark(i)}</div>`;
+  }
+  document.getElementById('cG').innerHTML=h;
+  if(c!=null){
+    const cs=cz[c];
+    document.getElementById('cSt').innerHTML=cs===2?'<span style="color:#E74C3C">OFF</span>':cs===1?'<span style="color:#2ECC71">ON</span>':'<span style="color:#A0A0BC">유지</span>';
+  }
+  h='';
+  for(let i=0;i<=10;i++){
+    h+=`<div class="gc${c!=null&&i===c?' act':''}" style="background:${BZ_COLORS[bz[i]]};position:relative" onclick="tapGauge('baemin',${i})">${i}${cellMark(i)}</div>`;
+  }
+  document.getElementById('bG').innerHTML=h;
+  const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
+  if(c!=null){
+    const bs2=bz[c];
+    document.getElementById('bSt').innerHTML=bs2===3?`<span style="color:#E74C3C">최소 ${bra}원</span>`:bs2===2?`<span style="color:#E67E22">중간 ${bma}원</span>`:bs2===1?`<span style="color:#2ECC71">최대 ${ba}원</span>`:'<span style="color:#A0A0BC">유지</span>';
+  }
+  // 게이지 아래 조리구간 범례
+  const lgEl=document.getElementById('gaugeLegend');
+  if(lgEl){
+    if(ckOn&&ckMidIdx>=0){
+      lgEl.style.display='flex';
+      const avgDurStr=avgCookDur>0?` 평균${Math.floor(avgCookDur/60000)}:${String(Math.floor((avgCookDur%60000)/1000)).padStart(2,'0')}`:'';
+      lgEl.innerHTML=`<span style="color:#2ECC71;font-size:9px">대기 0~${ckMidIdx-1}</span><span style="color:#E67E22;font-size:9px">조리 ${ckMidIdx}~${ckFinIdx-1}</span><span style="color:#E74C3C;font-size:9px">포장 ${ckFinIdx}+</span><span style="color:#9898B0;font-size:9px">(${avgInterval.toFixed(1)}분/건)</span><span style="color:#2AC1BC;font-size:9px">${avgDurStr}</span>`;
+    }else{lgEl.style.display='none';}
+  }
+}
+
+// === Firebase 명령 전송 (웹→Firebase→앱) ===
+function sendCmd(action,amount){
+  const cmd={action:action,amount:amount||0,time:Date.now(),source:'web'};
+  fetch(FB+'/posdelay/command.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cmd)})
+    .then(()=>toast(action.replace(/_/g,' ')+' 전송'))
+    .catch(()=>toast('전송 실패'));
+}
+function doCheck(what){
+  if(isApp){
+    if(what==='refresh')nb('refreshAndCorrect');
+    else if(what==='baemin')nb('executeAd','BAEMIN_CHECK',0);
+    else nb('executeAd','COUPANG_CHECK',0);
+  }else{
+    if(what==='refresh')sendCmd('REFRESH_CORRECT');
+    else if(what==='baemin')sendCmd('BAEMIN_CHECK');
+    else sendCmd('COUPANG_CHECK');
+  }
+}
+function doForceRefresh(){
+  if(isApp){nb('forceRefresh');}
+  else{
+    // 웹에서는 SSE 재연결 + 전체 데이터 새로 가져오기
+    _sseOk=false;pollAll(true);toast('새로고침...');
+  }
+}
+
+// === 실행 버튼 ===
+function exAd(platform,action){
+  const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
+  if(isApp){
+    nb('trackUsage','exec_'+platform+'_'+action);
+    if(platform==='coupang'){
+      if(action==='on')nb('executeAd','COUPANG_AD_ON',0);
+      else nb('executeAd','COUPANG_AD_OFF',0);
+    }else{
+      if(action==='max')nb('executeAd','BAEMIN_SET_AMOUNT',ba);
+      else if(action==='mid')nb('executeAd','BAEMIN_SET_AMOUNT',bma);
+      else nb('executeAd','BAEMIN_SET_AMOUNT',bra);
+    }
+  }else{
+    if(platform==='coupang'){
+      sendCmd(action==='on'?'COUPANG_AD_ON':'COUPANG_AD_OFF');
+    }else{
+      const amounts={max:ba,mid:bma,min:bra};
+      sendCmd('BAEMIN_SET_AMOUNT',amounts[action]);
+    }
+  }
+}
+
+// === 조리 속도 ===
+function calcAvgInterval(){
+  if(!hD||hD.length<3)return;
+  const ct=[];
+  for(let i=1;i<hD.length;i++){
+    if(hD[i].count<hD[i-1].count){
+      const d=(hD[i].time-hD[i-1].time)/60000;
+      ct.push(Math.max(2,Math.min(4,d)));
+    }
+  }
+  if(ct.length>=2){const r=ct.slice(-10);avgInterval=r.reduce((a,b)=>a+b,0)/r.length;}
+}
+
+// === 실제 완료 기록 기반 조리속도 ===
+function calcCookSpeed(){
+  if(cookLog.length<1)return;
+  // 평균 조리시간 (1.5~5분만 유효, 나머지 오차 무시)
+  const valid=cookLog.filter(o=>o.cookDur>=90000&&o.cookDur<=300000);
+  if(valid.length>0){
+    const recent=valid.slice(-10);
+    avgCookDur=recent.reduce((s,o)=>s+o.cookDur,0)/recent.length;
+  }
+  // 완료 간격 기반 avgInterval (1.5~5분만 유효)
+  if(cookLog.length>=2){
+    const sorted=[...cookLog].sort((a,b)=>a.doneAt-b.doneAt);
+    const intervals=[];
+    for(let i=1;i<sorted.length;i++){
+      const d=(sorted[i].doneAt-sorted[i-1].doneAt)/60000;
+      if(d>=1.5&&d<=5)intervals.push(d);
+    }
+    if(intervals.length>=2){
+      const r=intervals.slice(-10);
+      avgInterval=r.reduce((a,b)=>a+b,0)/r.length;
+    }
+  }
+}
+
+// === 지연 예측 ===
+function updDelayPred(){
+  const c=kS.count;
+  const dp=document.getElementById('delayPred');
+  if(c==null||c<1){dp.style.display='none';return;}
+  dp.style.display='block';
+  document.getElementById('dpSpeed').textContent=avgInterval.toFixed(1)+'분/건';
+  const btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
+  const bDelay=Math.max(0,Math.round(c*avgInterval+bfc-btt));
+  const bEl=document.getElementById('dpBaemin');
+  if(bDelay>0){bEl.textContent=bDelay+'분';bEl.style.color='#E74C3C';}
+  else{bEl.textContent='0분';bEl.style.color='#2ECC71';}
+  const ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
+  const cDelay=Math.max(0,Math.round(c*avgInterval+cfc-ctt));
+  const cEl=document.getElementById('dpCoupang');
+  if(cDelay>0){cEl.textContent=cDelay+'분';cEl.style.color='#E74C3C';}
+  else{cEl.textContent='0분';cEl.style.color='#2ECC71';}
+}
+
+// === 설정 UI ===
+function updSetUI(){
+  const fields=['baemin_amount','baemin_mid_amount','baemin_reduced_amount','baemin_target_time','baemin_fixed_cook_time','baemin_delay_threshold','coupang_target_time','coupang_fixed_cook_time','coupang_delay_threshold'];
+  fields.forEach(f=>{const e=document.getElementById('set_'+f);if(e&&S[f]!=null)e.value=S[f];});
+  updSchDisp();
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled'].forEach(f=>{
+    const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
+  });
+  const se2=document.getElementById('tog_schedule_enabled2');if(se2)se2.className='tog'+(S.schedule_enabled?' on':'');
+  const sd2=document.getElementById('schDot2');if(sd2)sd2.className='dot '+(S.schedule_enabled?'dg':'dr');
+  const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
+  updGauges(getActiveCount());
+}
+
+// 설정 변경 → NativeBridge로 직접 SharedPreferences 저장 (Firebase 경유 없음)
+let _localEditUntil=0;
+let _lastSaveKeys=[];
+function _autoSave(){
+  _localEditUntil=Date.now()+3000;
+  if(!isApp)return; // PC 브라우저에서는 무시
+  // 변경된 키만 NativeBridge로 전달
+  _lastSaveKeys.forEach(k=>{
+    const v=S[k];
+    try{NativeBridge.setSetting(k,typeof v==='object'?JSON.stringify(v):String(v));}catch(e){}
+  });
+  _lastSaveKeys=[];
+}
+function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;e.value=parseInt(e.value??0)+d;S[k]=parseInt(e.value);_lastSaveKeys=[k];updMonitor();_autoSave();}
+function saveS(k,v){S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
+function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d=document.getElementById('schDot2');if(d)d.className='dot '+(S[k]?'dg':'dr');const t=document.getElementById('tog_schedule_enabled2');if(t)t.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];_autoSave();}
+function togKdsOpen(){
+  const paused=!stS.kds_paused;
+  stS.kds_paused=paused;
+  const e=document.getElementById('tog_kds_open');
+  if(e)e.className='tog'+(paused?'':' on');
+  if(isApp){try{NativeBridge.setSetting('kds_paused',String(paused));}catch(ex){}}
+  updSyncStatus();
+  toast(paused?'영업 종료 (모니터링 중지)':'영업 시작');
+}
+
+// === 스케줄 시간 ===
+let _pickTarget='';
+function pickTime(which){
+  _pickTarget=which;
+  const pk=document.getElementById('schTimePicker');
+  pk.style.pointerEvents='auto';pk.focus();pk.click();
+  pk.onchange=function(){
+    const v=pk.value;if(!v)return;
+    if(_pickTarget==='on'){saveS('ad_on_time',v);document.getElementById('schOnDisp').textContent=v;}
+    else{saveS('ad_off_time',v);document.getElementById('schOffDisp').textContent=v;}
+    pk.style.pointerEvents='none';
+  };
+}
+function updSchDisp(){
+  const on=S.ad_on_time||'';const off=S.ad_off_time||'';
+  document.getElementById('schOnDisp').textContent=on||'--:--';
+  document.getElementById('schOffDisp').textContent=off||'--:--';
+}
+
+// === 저장/복원 ===
+function saveAll(){
+  saveCk();
+  toast('저장 완료');
+}
+function restoreAll(){
+  // NativeBridge에서 로컬 설정 다시 불러오기
+  if(!isApp){toast('앱에서만 가능');return;}
+  try{const d=JSON.parse(NativeBridge.getSettings());Object.assign(S,d);sseLoaded=true;updSetUI();updMonitor();toast('복원 완료');}catch(e){toast('복원 실패');}
+}
+
+// === 알림 ===
+let alertMode='normal';
+let lastAlertTime=0;
+const ALERT_REPEAT=180000;
+
+function chkAlert(c){
+  if(c==null)return;
+  const bdt=g(S,'baemin_delay_threshold',5),cdt=g(S,'coupang_delay_threshold',5);
+  const btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
+  const ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
+  const bn=document.getElementById('alertB');
+  const now=Date.now();
+  let msgs=[];
+  const bDelay=Math.max(0,Math.round(c*avgInterval+bfc-btt));
+  const cDelay=Math.max(0,Math.round(c*avgInterval+cfc-ctt));
+  const bBrk=avgInterval>0?Math.floor((btt-bfc)/avgInterval):0;
+  const cBrk=avgInterval>0?Math.floor((ctt-cfc)/avgInterval):0;
+  if(c>=bdt&&bDelay>0)msgs.push('배민 '+bDelay+'분 '+Math.max(0,c-bBrk)+'건');
+  if(c>=cdt&&cDelay>0)msgs.push('쿠팡 '+cDelay+'분 '+Math.max(0,c-cBrk)+'건');
+  if(msgs.length>0){
+    const timeStr=fmtHM(aTS>0?new Date(aTS):new Date(now));
+    bn.className='alert warn';
+    bn.innerHTML=`&#9888; ${timeStr} 이후 지연 ${msgs.join(', ')}`;
+    if(alertMode!=='delayed'){
+      alertMode='delayed';aTS=now;lastAlertTime=now;
+      sendNotif('주문 지연',`${fmtHM(new Date(now))} 이후 지연 ${msgs.join(', ')}`);
+    }else if(now-lastAlertTime>=ALERT_REPEAT){
+      lastAlertTime=now;
+      const el=Math.floor((now-aTS)/60000);
+      sendNotif('주문 지연 지속',`${timeStr} 이후 지연 ${msgs.join(', ')} (${el}분 경과)`);
+    }
+  }else{
+    if(alertMode==='delayed'){
+      alertMode='normal';
+      const el=Math.floor((now-aTS)/60000);
+      bn.className='alert ok';bn.textContent=`정상 복귀 (${el}분만에)`;
+      sendNotif('정상 복귀',`정상 복귀 (${el}분만에)`);
+      setTimeout(()=>{bn.className='alert';},10000);
+    }
+    aTS=0;
+  }
+}
+function sendNotif(title,body){
+  if('Notification'in window&&Notification.permission==='granted'){
+    new Notification(title,{body:body,tag:'pd-alert'});
+  }
+}
+
+// === 차트 ===
+function drawChart(){
+  const cv=document.getElementById('hChart');if(!cv||!hD||hD.length<2)return;
+  const ctx=cv.getContext('2d');
+  const now=Date.now(),t2h=now-7200000,data=hD.filter(e=>e.time>=t2h);if(data.length<2)return;
+  const W=cv.width=cv.offsetWidth*2,H=cv.height=200;ctx.clearRect(0,0,W,H);
+  const p={t:16,r:8,b:24,l:30},cw=W-p.l-p.r,ch=H-p.t-p.b;
+  const mT=data[0].time,xT=data[data.length-1].time,mC=Math.max(...data.map(d=>d.count),5);
+  const x=t=>p.l+((t-mT)/(xT-mT||1))*cw,y=c2=>p.t+ch-(c2/mC)*ch;
+  ctx.strokeStyle='#2A2A45';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const gy=p.t+(ch/4)*i;ctx.beginPath();ctx.moveTo(p.l,gy);ctx.lineTo(W-p.r,gy);ctx.stroke();ctx.fillStyle='#9898B0';ctx.font='16px sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(mC-(mC/4)*i),p.l-4,gy+4);}
+  ctx.textAlign='center';const ts=(xT-mT)/3;
+  for(let i=0;i<=3;i++){const t=mT+ts*i,d=new Date(t);ctx.fillText(d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'),x(t),H-4);}
+  const co3=g(S,'coupang_off_threshold',5);ctx.strokeStyle='#E74C3C44';ctx.lineWidth=2;ctx.setLineDash([6,3]);ctx.beginPath();ctx.moveTo(p.l,y(co3));ctx.lineTo(W-p.r,y(co3));ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='#2AC1BC';ctx.lineWidth=2;ctx.beginPath();
+  data.forEach((d,i)=>{const px=x(d.time),py=y(d.count);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});ctx.stroke();
+  data.forEach(d=>{ctx.fillStyle=d.count>=co3?'#E74C3C':'#2ECC71';ctx.beginPath();ctx.arc(x(d.time),y(d.count),3,0,Math.PI*2);ctx.fill();});
+}
+
+// === 로그 ===
+function sLt(tab,el){
+  cLt=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');
+  const lc=document.getElementById('logC');lc.textContent='로딩...';
+  const urls={kds:FB+'/kds_log.json',posdelay:FB+'/posdelay/logs.json',dump:FB+'/kds_dump.json'};
+  fetch(urls[tab]).then(r=>r.json()).then(d=>{
+    if(tab==='kds')lc.textContent=typeof d==='string'?d:JSON.stringify(d,null,2);
+    else if(tab==='dump')lc.textContent=d&&d.tree?`[${d.time}] ${d.lines}줄\n${d.tree}`:'덤프 없음';
+    else if(tab==='posdelay')lc.textContent=Array.isArray(d)?d.map(e=>`[${e.time}] ${e.msg}`).join('\n'):(d?JSON.stringify(d,null,2):'로그 없음');
+    lc.scrollTop=lc.scrollHeight;
+  }).catch(()=>{lc.textContent='로드 실패';});
+}
+
+// === 유틸 ===
+function togSec(id){const e=document.getElementById(id),o=e.classList.toggle('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML=o?'&#9660;':'&#9654;';if(id==='chB'&&o)setTimeout(drawChart,100);try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');if(o)delete c[id];else c[id]=1;localStorage.setItem('_collapsed',JSON.stringify(c));}catch(e){}}
+// 수동 접기 복원
+try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');Object.keys(c).forEach(id=>{const e=document.getElementById(id);if(e){e.classList.remove('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML='&#9654;';}});}catch(e){}
+function fmtHM(dt){return dt.getHours()+'시'+String(dt.getMinutes()).padStart(2,'0')+'분';}
+function toast(m){const d=document.createElement('div');d.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#2ECC71;color:#FFF;padding:8px 16px;border-radius:8px;font-size:13px;z-index:9999;';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000);}
+
+// === 풀투리프레시 ===
+let _pY=0,_pulling=false;
+const _pInd=document.getElementById('pullInd');
+document.addEventListener('touchstart',e=>{if(window.scrollY===0)_pY=e.touches[0].clientY;else _pY=0;},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(_pY===0)return;
+  const d=e.touches[0].clientY-_pY;
+  if(d>0&&d<150&&window.scrollY===0){_pulling=true;_pInd.style.height=Math.min(d/2,30)+'px';_pInd.textContent=d>80?'↑ 놓으면 새로고침':'↓ 새로고침';}
+  else{_pulling=false;_pInd.style.height='0';}
+},{passive:true});
+document.addEventListener('touchend',()=>{
+  if(_pulling&&parseInt(_pInd.style.height)>=25){_pInd.textContent='새로고침 중...';_pInd.style.height='24px';setTimeout(()=>location.reload(),300);}
+  else{_pInd.style.height='0';}_pulling=false;_pY=0;
+});
+
+// === 조리모드 (주문번호 기반) ===
+let ckOn=false,ckQ=[]; // ckQ: {num, t, onKds, ma, fa, da}
+
+function togCookMode(){ckOn=!ckOn;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');if(!ckOn){ckQ=[];updCkUI();}saveCk();}
+
+function updCkQueue(){
+  if(!ckOn)return;
+  const orders=kS.orders||[];
+  let changed=false;
+  // 새 주문번호 등장 → 타이머 시작 (Firebase order_tracking 시간 우선)
+  orders.forEach(n=>{
+    const existing=ckQ.find(o=>o.num===n);
+    if(!existing){
+      const fbTime=oT[String(n)];
+      ckQ.push({num:n,t:fbTime||lastKdsTime||Date.now(),onKds:true,ma:false,fa:false,da:false});
+      changed=true;
+    } else {
+      // oT 데이터가 나중에 도착하면 접수시간 업데이트
+      const fbTime=oT[String(n)];
+      if(fbTime && existing.t!==fbTime) existing.t=fbTime;
+    }
+  });
+  // KDS에서 사라진 주문 = 완료. 실제 완료 시점 기록
+  ckQ.forEach(o=>{
+    const was=o.onKds;
+    o.onKds=orders.includes(o.num);
+    if(was && !o.onKds && !o.doneAt){
+      o.doneAt=Date.now();
+      o.cookDur=o.doneAt-o.t;
+      cookLog.push({num:o.num,t:o.t,doneAt:o.doneAt,cookDur:o.cookDur});
+      if(cookLog.length>50)cookLog=cookLog.slice(-30); // 최근 30건 유지
+      changed=true;
+    } else if(was!==o.onKds) changed=true;
+  });
+  if(changed){saveCk();calcCookSpeed();}
+}
+
+let _lastCkCheck=0;
+function chkCkAlerts(){
+  if(!ckOn)return;
+  const tgtS=parseInt(document.getElementById('ck_target').value)||1500;
+  const midS=parseInt(document.getElementById('ck_mid').value)||1020;
+  const finS=parseInt(document.getElementById('ck_finish').value)||240;
+  const tgtMs=tgtS*1000;const cookStartMs=tgtMs-midS*1000;const pkgStartMs=tgtMs-finS*1000;
+  const now=Date.now();
+  // 백그라운드 복귀 감지: 간격 > 3초면 밀린 알림 무시 (네이티브가 처리)
+  const gap=_lastCkCheck>0?now-_lastCkCheck:0;
+  _lastCkCheck=now;
+  const skipAlerts=gap>3000;
+  // 자동 삭제: 완료 후 25분 / 미완료 60분 안전장치 + 탭 삭제 예약
+  const prevLen=ckQ.length;
+  ckQ=ckQ.filter(o=>{
+    if(o.doneAt&&(now-o.doneAt)>=1500000)return false; // 완료 후 25분 삭제
+    if(!o.doneAt&&(now-o.t)>=3600000)return false; // 미완료 60분 안전장치
+    if(o.delAt&&now>=o.delAt)return false; // 탭 2초 후 삭제
+    return true;
+  });
+  if(ckQ.length!==prevLen)saveCk(); // 리스트 변동 시 저장
+  ckQ.forEach(o=>{
+    const elMs=now-o.t;
+    if(isApp&&!o.delAt){
+      if(elMs>=cookStartMs&&!o.ma){o.ma=true;if(!skipAlerts&&o.onKds){try{NativeBridge.speakCook(o.num+'번 조리');}catch(e){}}}
+      if(elMs>=pkgStartMs&&!o.fa){o.fa=true;if(!skipAlerts){try{NativeBridge.speakCook(o.num+'번 포장');}catch(e){}}}
+      if(elMs>=tgtMs&&!o.da){o.da=true;if(!skipAlerts){try{NativeBridge.speakCook(o.num+'번 시간초과');}catch(e){}}}
+    }
+  });
+  updCkQueue(); // zero-stabilization 중에도 onKds 즉시 반영
+  updCkUI();
+}
+
+function updCkUI(){
+  const listArea=document.getElementById('cookListArea');
+  const listEl=document.getElementById('cookList');
+  const settingsEl=document.getElementById('cookQ');
+  const ckStEl=document.getElementById('ckStatus');
+  const cookOrders=ckQ.filter(o=>o.onKds);
+  const pkgOrders=ckQ.filter(o=>!o.onKds&&o.doneAt).sort((a,b)=>a.doneAt-b.doneAt);
+  const activeOrders=cookOrders.length;
+  if(ckStEl){
+    if(!ckOn){ckStEl.textContent='';ckStEl.style.color='#9898B0';}
+    else if(activeOrders===0&&pkgOrders.length===0){ckStEl.textContent='대기';ckStEl.style.color='#A0A0BC';}
+    else{
+      let st=[];
+      if(activeOrders>0)st.push('조리'+activeOrders);
+      if(pkgOrders.length>0)st.push('포장'+pkgOrders.length);
+      ckStEl.textContent=st.join(' ');
+      ckStEl.style.color=activeOrders>3?'#E74C3C':activeOrders>1?'#E67E22':'#2ECC71';
+    }
+  }
+  if(!ckOn||ckQ.length===0){
+    if(listArea)listArea.style.display=ckOn?'block':'none';
+    if(settingsEl)settingsEl.innerHTML='<span style="color:#9898B0">대기중</span>';
+    if(listEl&&ckOn)listEl.innerHTML='<div style="text-align:center;color:#9898B0;font-size:11px;padding:8px">주문 대기중</div>';
+    return;
+  }
+  if(listArea)listArea.style.display='block';
+  const tgtS=parseInt(document.getElementById('ck_target').value)||1500;
+  const midS=parseInt(document.getElementById('ck_mid').value)||1020;
+  const finS=parseInt(document.getElementById('ck_finish').value)||240;
+  const tgtMs=tgtS*1000;const midMs=midS*1000;const finMs=finS*1000;
+  const cookStartMs=tgtMs-midMs;const pkgStartMs=tgtMs-finMs;
+  const now=Date.now();
+  function mmss(ms){const neg=ms<0;const a=Math.abs(ms);const m=Math.floor(a/60000),s=Math.floor((a%60000)/1000);return(neg?'-':'')+m+':'+String(s).padStart(2,'0');}
+  // === 조리중 섹션 ===
+  const urg=o=>{const e=now-o.t;return e>=tgtMs?0:e>=pkgStartMs?1:e>=cookStartMs?2:3;};
+  const sortedCook=[...cookOrders].sort((a,b)=>{const ua=urg(a),ub=urg(b);return ua!==ub?ua-ub:a.t-b.t;});
+  const bTgt=g(S,'baemin_target_time',27),bCook=g(S,'baemin_fixed_cook_time',17);
+  const cTgt=g(S,'coupang_target_time',22),cCook=g(S,'coupang_fixed_cook_time',15);
+  let h='';
+  // === 통합 긴급 배너 (조리+포장 모두) ===
+  const urgOver=[],urgPkg=[],urgCook=[];
+  cookOrders.forEach(o=>{const el=now-o.t;if(el>=tgtMs)urgOver.push(o.num);else if(el>=pkgStartMs)urgPkg.push(o.num);else if(el>=cookStartMs)urgCook.push(o.num);});
+  const pkgOverdue=pkgOrders.filter(o=>(now-o.t)>=tgtMs);
+  const cookFocus=urgCook.length>0&&urgPkg.length===0&&urgOver.length===0;
+  const busyCookFocus=activeOrders>2&&urgCook.length>0&&urgOver.length===0;
+  const hasUrgent=urgOver.length+urgPkg.length+urgCook.length+pkgOverdue.length>0;
+  if(hasUrgent){
+    const isRed=urgOver.length||urgPkg.length||pkgOverdue.length;
+    h+='<div style="padding:5px 8px;font-size:13px;font-weight:bold;border-radius:5px;margin:2px 0;'+(isRed?'background:#E74C3C22':'background:#E67E2218')+'">';
+    if(urgOver.length)h+=`<span style="color:#E74C3C">조리초과 ${urgOver.map(n=>n+'번').join(' ')}</span> `;
+    if(pkgOverdue.length)h+=`<span style="color:#E74C3C">포장초과 ${pkgOverdue.map(n=>n.num+'번').join(' ')}</span> `;
+    if(urgPkg.length)h+=`<span style="color:#E74C3C">포장급함 ${urgPkg.map(n=>n+'번').join(' ')}</span> `;
+    if(cookFocus||busyCookFocus)h+=`<span style="color:#E67E22">조리집중 ${urgCook.map(n=>n+'번').join(' ')}</span>`;
+    else if(urgCook.length&&!cookFocus)h+=`<span style="color:#E67E22">조리중 ${urgCook.map(n=>n+'번').join(' ')}</span>`;
+    h+='</div>';
+  }
+  // === 조리중 섹션 ===
+  if(activeOrders>0||pkgOrders.length===0){
+    h+='<div style="padding:4px 8px;font-size:11px;font-weight:bold;color:#E67E22;border-bottom:1px solid #2A2A45;background:#E67E2208">조리중 '+activeOrders+'건</div>';
+    h+='<div style="display:flex;align-items:center;padding:3px 8px;font-size:10px;color:#9898B0;border-bottom:1px solid #2A2A45"><span style="min-width:48px">주문</span><span style="min-width:42px">접수</span><span style="min-width:42px;text-align:center;color:#2ECC71">경과</span><span style="flex:1"></span><span style="min-width:52px;text-align:center;color:#E67E22;background:#E67E2218;border-radius:3px;padding:1px 0">조리</span><span style="min-width:52px;text-align:center;color:#E74C3C;background:#E74C3C18;border-radius:3px;padding:1px 0">포장</span><span style="min-width:42px;text-align:center;color:#E74C3C">배</span><span style="min-width:42px;text-align:center;color:#E74C3C">쿠</span></div>';
+  }
+  let maxBDelay=0,maxCDelay=0;
+  const activeOldest=sortedCook.slice().sort((a,b)=>a.t-b.t);
+  const posMap={};activeOldest.forEach((x,i)=>{posMap[x.num]=i;});
+  function calcDelay(pos,ai,tgt,cook){if(ai<=0)return 0;const wait=(pos+1)*ai;const d=Math.max(0,wait+cook-tgt);return d>0?Math.ceil(d/5)*5:0;}
+  sortedCook.slice(0,15).forEach(o=>{
+    const elMs=now-o.t;
+    const cookRem=cookStartMs-elMs;
+    const pkgRem=pkgStartMs-elMs;
+    let st,bgCl;
+    if(elMs>=tgtMs){st='초과';bgCl='#E74C3C';}
+    else if(elMs>=pkgStartMs){st='포장';bgCl='#E74C3C';}
+    else if(elMs>=cookStartMs){st='조리';bgCl='#E67E22';}
+    else{st='대기';bgCl='#2ECC71';}
+    const cookCl=cookRem<0?'#E74C3C':cookRem<60000?'#E67E22':'#FFFFFF';
+    const pkgCl=pkgRem<0?'#E74C3C':pkgRem<60000?'#E67E22':'#FFFFFF';
+    const pos=posMap[o.num]??0;
+    const bDelay=calcDelay(pos,avgInterval,bTgt,bCook);
+    const cDelay=calcDelay(pos,avgInterval,cTgt,cCook);
+    if(bDelay>maxBDelay)maxBDelay=bDelay;
+    if(cDelay>maxCDelay)maxCDelay=cDelay;
+    const hasDelay=bDelay>0||cDelay>0;
+    const dying=o.delAt?' ck-dying':'';
+    const oDate=new Date(o.t);
+    const oTime=String(oDate.getHours()).padStart(2,'0')+':'+String(oDate.getMinutes()).padStart(2,'0');
+    const rowBg=hasDelay?'background:#FF6B6B22;':'';
+    const elSec=Math.floor(elMs/1000);const elMin=Math.floor(elSec/60);const elS=elSec%60;const elStr=elMin+':'+String(elS).padStart(2,'0');
+    h+=`<div class="ck-row${dying}" onclick="ckTapDel(${o.num})" style="display:flex;align-items:center;padding:5px 8px;border-bottom:1px solid #2A2A45;font-family:monospace;cursor:pointer;${rowBg}">
+<span style="min-width:48px;font-size:14px;font-weight:bold;color:#E0E0EC">${o.num}번</span>
+<span style="min-width:42px;font-size:11px;color:#A0A0BC">${oTime}</span>
+<span style="min-width:42px;text-align:center;font-size:13px;font-weight:bold;color:#2ECC71">${elStr}</span>
+<span style="flex:1;font-size:11px;font-weight:bold;color:${bgCl}">${st}</span>
+<span style="min-width:52px;text-align:center;font-size:15px;font-weight:bold;color:${cookCl};background:#E67E2215;border-radius:3px;padding:2px 0">${mmss(cookRem)}</span>
+<span style="min-width:52px;text-align:center;font-size:15px;font-weight:bold;color:${pkgCl};background:#E74C3C15;border-radius:3px;padding:2px 0">${mmss(pkgRem)}</span>
+<span style="min-width:42px;text-align:center;font-size:13px;font-weight:bold;color:${bDelay>0?'#E74C3C':'transparent'}">${bDelay>0?bDelay:''}</span>
+<span style="min-width:42px;text-align:center;font-size:13px;font-weight:bold;color:${cDelay>0?'#E74C3C':'transparent'}">${cDelay>0?cDelay:''}</span>
+</div>`;
+  });
+  if(activeOrders===0&&pkgOrders.length>0){h+='<div style="text-align:center;color:#9898B0;font-size:11px;padding:6px">조리 대기중</div>';}
+  // === 포장중 섹션 ===
+  if(pkgOrders.length>0){
+    // 포장 긴급 분석: 전체목표 초과 여부
+    const pkgUrgent=pkgOrders.filter(o=>(now-o.t)>=tgtMs);
+    h+='<div style="padding:4px 8px;font-size:11px;font-weight:bold;color:#E74C3C;border-top:2px solid #E74C3C33;border-bottom:1px solid #2A2A45;margin-top:2px;background:#E74C3C08">포장중 '+pkgOrders.length+'건'+(pkgUrgent.length>0?' <span style="color:#E74C3C">초과'+pkgUrgent.length+'</span>':'')+'</div>';
+    h+='<div style="display:flex;align-items:center;padding:3px 8px;font-size:10px;color:#9898B0;border-bottom:1px solid #2A2A45"><span style="min-width:48px">주문</span><span style="min-width:48px">완료</span><span style="min-width:52px;text-align:center">포장경과</span><span style="flex:1"></span><span style="min-width:70px;text-align:center;color:#E74C3C">남은시간</span></div>';
+    pkgOrders.forEach(o=>{
+      const pkgElMs=now-o.doneAt;
+      const overallRem=(o.t+tgtMs)-now;
+      const doneDate=new Date(o.doneAt);
+      const doneTime=String(doneDate.getHours()).padStart(2,'0')+':'+String(doneDate.getMinutes()).padStart(2,'0');
+      const remCl=overallRem<=0?'#E74C3C':overallRem<120000?'#E67E22':'#2ECC71';
+      const dying=o.delAt?' ck-dying':'';
+      h+=`<div class="ck-row${dying}" onclick="ckTapDel(${o.num})" style="display:flex;align-items:center;padding:5px 8px;border-bottom:1px solid #2A2A45;font-family:monospace;cursor:pointer">
+<span style="min-width:48px;font-size:14px;font-weight:bold;color:#E0E0EC">${o.num}번</span>
+<span style="min-width:48px;font-size:11px;color:#2AC1BC">${doneTime}</span>
+<span style="min-width:52px;text-align:center;font-size:13px;font-weight:bold;color:#A0A0BC">${mmss(pkgElMs)}</span>
+<span style="flex:1"></span>
+<span style="min-width:70px;text-align:center;font-size:16px;font-weight:bold;color:${remCl};background:${remCl}15;border-radius:4px;padding:2px 0">${mmss(overallRem)}</span>
+</div>`;
+    });
+  }
+  if(listEl)listEl.innerHTML=h;
+  const delayMsg=[];if(maxBDelay>0)delayMsg.push('<span style="color:#E74C3C">배'+maxBDelay+'분</span>');if(maxCDelay>0)delayMsg.push('<span style="color:#E74C3C">쿠'+maxCDelay+'분</span>');
+  const avgStr=avgCookDur>0?` <span style="color:#2AC1BC;font-size:10px">평균 ${mmss(avgCookDur)}</span>`:'';
+  let focusMsg='';
+  if(urgOver.length)focusMsg=` <span style="color:#E74C3C;font-weight:bold">초과${urgOver.length}</span>`;
+  else if(urgPkg.length)focusMsg=` <span style="color:#E74C3C;font-weight:bold">포장급함${urgPkg.length}</span>`;
+  else if(cookFocus||busyCookFocus)focusMsg=` <span style="color:#E67E22;font-weight:bold">조리집중</span>`;
+  if(settingsEl)settingsEl.innerHTML=`<span style="color:#9898B0">${activeOrders}건</span>`+(pkgOrders.length>0?` <span style="color:#E74C3C">포장${pkgOrders.length}</span>`:'')+`${focusMsg}${avgStr}`+(delayMsg.length>0?' <span style="font-weight:bold">지연 '+delayMsg.join(' ')+'</span>':'');
+}
+
+function ckDisp(k){const e=document.getElementById('ck_'+k);const d=document.getElementById('ck_'+k+'_disp');if(!e||!d)return;const v=parseInt(e.value)||0;const m=Math.floor(v/60),s=v%60;d.textContent=m+':'+String(s).padStart(2,'0');}
+function adjCk(k,d){const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
+function saveCk(){try{const t=parseInt(document.getElementById('ck_target').value)||1500,m=parseInt(document.getElementById('ck_mid').value)||1020,f=parseInt(document.getElementById('ck_finish').value)||240;localStorage.setItem('ck',JSON.stringify({on:ckOn,t:t,m:m,f:f,q:ckQ,cl:cookLog}));if(isApp)try{NativeBridge.syncCookSettings(ckOn,t,m,f);}catch(e){}}catch(e){}}
+function ckTapDel(num){const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
+function loadCk(){try{const s=JSON.parse(localStorage.getItem('ck'));if(s){ckOn=!!s.on;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');
+  // 구버전 분단위(< 100) → 초단위 자동변환
+  const t=s.t||1500;const m=s.m||1020;const f=s.f||240;
+  document.getElementById('ck_target').value=t<100?t*60:t;
+  document.getElementById('ck_mid').value=m<100?m*60:m;
+  document.getElementById('ck_finish').value=f<100?f*60:f;
+  // 완료 기록 복원
+  if(s.cl&&Array.isArray(s.cl))cookLog=s.cl.slice(-30);
+  // 조리 리스트 복원
+  if(s.q&&Array.isArray(s.q)&&s.q.length>0){ckQ=s.q.filter(o=>o&&o.num&&o.t);calcCookSpeed();updCkUI();}
+  }ckDisp('target');ckDisp('mid');ckDisp('finish');}catch(e){}}
+loadCk();
+try{const v=NativeBridge.getAppVersion();if(v)document.getElementById('appVer').textContent='v'+v;}catch(e){}
+setInterval(chkCkAlerts,1000);
+
+// === 초기화 ===
+if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+// 설정은 NativeBridge에서 직접 로드 (Firebase 경유 없음)
+if(isApp){try{const d=JSON.parse(NativeBridge.getSettings());Object.assign(S,d);sseLoaded=true;updSetUI();updMonitor();}catch(e){}}
+sse('/posdelay/order_tracking.json',m=>{
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/')Object.assign(oT,m.data);else oT[m.path.slice(1)]=m.data;
+});
+sse('/kds_status.json',hKds);
+sse('/posdelay/ad_state.json',hASt);
+sse('/posdelay/status.json',hStatus);
+sse('/kds_history.json',hHist);
+// 이상신호 SSE
+sse('/posdelay/alert.json',m=>{
+  const ab=document.getElementById('anomalyB');
+  if(!m.data||m.data==='null'){ab.className='alert';return;}
+  const d=m.path==='/'?m.data:null;
+  if(!d)return;
+  const ts=d.timestamp||0;
+  if(Date.now()-ts>10*60*1000){ab.className='alert';return;} // 10분 지난 알림 무시
+  ab.className='alert warn';
+  ab.innerHTML='&#9888; ['+d.type+'] '+d.message+' ('+d.time+')';
+  if('Notification'in window&&Notification.permission==='granted'){
+    new Notification('이상신호',{body:d.message,tag:'anomaly'});
+  }
+});
+fetch(FB+'/kds_log.json').then(r=>r.json()).then(d=>{document.getElementById('logC').textContent=typeof d==='string'?d:JSON.stringify(d,null,2);}).catch(()=>{});
+// 10초 폴링 (SSE 백업)
+let _sseOk=false;
+function pollAll(force){
+  if(!force&&_sseOk)return; // SSE 정상+강제아님 → 스킵
+  Promise.all([
+    fetch(FB+'/kds_status.json').then(r=>r.json()),
+    fetch(FB+'/posdelay/ad_state.json').then(r=>r.json()),
+    fetch(FB+'/posdelay/status.json').then(r=>r.json()),
+  ]).then(([k,a,st])=>{
+    if(k){kS={...k};if(!Array.isArray(kS.orders))kS.orders=[];}
+    if(a){Object.assign(aS,a);}
+    if(st)Object.assign(stS,st);
+    updSyncStatus();updMonitor();
+  }).catch(()=>{});
+}
+setInterval(pollAll,10000);
+setTimeout(pollAll,2000); // 2초 후 첫 폴링
+// Gist 교차보정 삭제 — KDS Firebase SSE 단일 소스
+setInterval(()=>{
+  const ls=stS.kds_sync??0;
+  if(ls>0){const ago=Math.floor((Date.now()-ls)/1000);const rem=Math.max(0,90-ago%90);document.getElementById('mRefresh').textContent='수집 '+rem+'초';}
+},1000);
+window.addEventListener('resize',drawChart);
+// 백그라운드→포그라운드 전환: SSE 즉시 재연결 + 조리큐 재동기
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden){
+    // SSE 전부 닫고 재연결 (stale connection 방지)
+    _sseGen++;
+    const prev=_sseConns.map(s=>({path:s.path,cb:s.cb}));
+    _sseConns.forEach(s=>{try{s.es.close();}catch(e){}});
+    _sseConns=[];
+    _sseOk=false;
+    prev.forEach(s=>sse(s.path,s.cb));
+    // 조리큐 즉시 갱신 + 알림 갭 리셋
+    if(ckOn){_lastCkCheck=0;updCkQueue();updCkUI();}
+    // 강제 폴링 (SSE 연결 후 데이터 도착 전 갭 메우기)
+    setTimeout(()=>pollAll(true),500);
+  }
+});
+</script>
+</body>
+</html>
