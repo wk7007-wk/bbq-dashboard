@@ -682,7 +682,7 @@ function buildGroups(txList){
 // 그룹별 필터 상태: {grpName: {days:30, count:0}} — 0=전체
 let grpFilters={};
 const GRP_FILTER_OPTS=[
-  {label:'7일',days:7},{label:'30일',days:30},{label:'90일',days:90},
+  {label:'이번달',month:true},{label:'7일',days:7},{label:'30일',days:30},{label:'90일',days:90},
   {label:'5건',count:5},{label:'10건',count:10},{label:'전체',days:0,count:0}
 ];
 
@@ -712,7 +712,7 @@ function renderGroupView(txList){
     const outAmt=activeTxs.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
     const inAmt=activeTxs.filter(t=>t.type==='입금').reduce((s,t)=>s+(t.amount||0),0);
     const f=grpFilters[g.name]||{};
-    const filterLabel=f.days?f.days+'일':f.count?f.count+'건':'전체';
+    const filterLabel=f.month?'이번달':f.days?f.days+'일':f.count?f.count+'건':'전체';
 
     const isFav=!!grpFavorites[g.name];
     const favStar=isFav?'&#9733;':'&#9734;';
@@ -729,8 +729,8 @@ function renderGroupView(txList){
       <div class="grp-body" id="grpBody${gi}">
         <div class="grp-filters">`;
     GRP_FILTER_OPTS.forEach((opt,fi)=>{
-      const isActive=(f.days&&opt.days===f.days)||( f.count&&opt.count===f.count)||(!f.days&&!f.count&&!opt.days&&!opt.count);
-      html+=`<div class="grp-fbtn${isActive?' active':''}" onclick="setGrpFilter('${g.name}',${opt.days||0},${opt.count||0})">${opt.label}</div>`;
+      const isActive=(f.month&&opt.month)||(f.days&&opt.days===f.days)||(f.count&&opt.count===f.count)||(!f.days&&!f.count&&!f.month&&!opt.days&&!opt.count&&!opt.month);
+      html+=`<div class="grp-fbtn${isActive?' active':''}" onclick="setGrpFilter('${g.name}',${opt.days||0},${opt.count||0},${!!opt.month})">${opt.label}</div>`;
     });
     html+=`</div>`;
     if(outAmt||inAmt){
@@ -758,6 +758,10 @@ function renderGroupView(txList){
 function getActiveTxs(g){
   const f=grpFilters[g.name]||{};
   let txs=g.txs;
+  if(f.month){
+    const now=new Date();const cy=now.getFullYear(),cm=now.getMonth();
+    txs=txs.filter(t=>{const d=new Date(t.ts);return d.getFullYear()===cy&&d.getMonth()===cm;});
+  }
   if(f.days){
     const cutoff=Date.now()-f.days*86400000;
     txs=txs.filter(t=>(t.ts||0)>=cutoff);
@@ -768,8 +772,9 @@ function getActiveTxs(g){
   return txs;
 }
 
-function setGrpFilter(name,days,count){
-  if(!days&&!count){delete grpFilters[name];}
+function setGrpFilter(name,days,count,month){
+  if(!days&&!count&&!month){delete grpFilters[name];}
+  else if(month){grpFilters[name]={month:true};}
   else{grpFilters[name]={days:days||0,count:count||0};}
   renderLedger();
 }
