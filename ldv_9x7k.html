@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>문서 뷰어</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Pretendard','Noto Sans KR',sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh}
+
+/* 잠금 화면 */
+.lock-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a0a0f 0%,#1a1a2e 100%)}
+.lock-box{background:#16162a;border:1px solid #2a2a4a;border-radius:16px;padding:40px;text-align:center;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lock-box h2{color:#7C6FE0;margin-bottom:20px;font-size:18px}
+.lock-box input{width:100%;padding:12px 16px;border:1px solid #333;border-radius:8px;background:#0f0f1a;color:#fff;font-size:16px;text-align:center;letter-spacing:4px;outline:none}
+.lock-box input:focus{border-color:#7C6FE0}
+.lock-box .err{color:#ef5350;font-size:12px;margin-top:8px;min-height:18px}
+.lock-box button{margin-top:16px;padding:10px 32px;background:#7C6FE0;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+
+/* 메인 */
+.app{display:none}
+.header{background:#16162a;border-bottom:1px solid #2a2a4a;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:16px;color:#7C6FE0}
+.header .logout{font-size:12px;color:#666;cursor:pointer;padding:6px 12px;border:1px solid #333;border-radius:6px}
+.header .logout:hover{border-color:#ef5350;color:#ef5350}
+
+/* 탭 */
+.tabs{display:flex;gap:0;background:#12122a;border-bottom:1px solid #2a2a4a;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:10px 16px;font-size:13px;color:#888;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0}
+.tab.active{color:#7C6FE0;border-bottom-color:#7C6FE0;background:#1a1a35}
+
+/* 콘텐츠 */
+.content{padding:20px;max-width:900px;margin:0 auto}
+.doc{white-space:pre-wrap;font-family:'D2Coding','Consolas',monospace;font-size:13px;line-height:1.7;color:#d0d0d0;background:#12122a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;overflow-x:auto}
+.doc .h1{font-size:18px;color:#7C6FE0;font-weight:700;margin:16px 0 8px}
+.doc .h2{font-size:15px;color:#9C8FFF;font-weight:600;margin:12px 0 6px}
+.doc .h3{font-size:14px;color:#B0A0FF;font-weight:500;margin:8px 0 4px}
+.doc .bold{color:#fff;font-weight:600}
+.doc .code{background:#1e1e3a;padding:12px;border-radius:8px;border:1px solid #333;margin:8px 0}
+.doc .table-wrap{overflow-x:auto;margin:8px 0}
+.doc table{border-collapse:collapse;width:100%;font-size:12px}
+.doc th{background:#1e1e3a;color:#7C6FE0;padding:8px 10px;text-align:left;border:1px solid #333}
+.doc td{padding:8px 10px;border:1px solid #2a2a4a}
+.doc .highlight{background:#7C6FE020;border-left:3px solid #7C6FE0;padding:8px 12px;margin:8px 0}
+
+.updated{font-size:11px;color:#555;text-align:right;margin-bottom:8px}
+.loading{text-align:center;padding:60px;color:#555}
+
+/* 인쇄 */
+@media print{
+  .header,.tabs,.logout{display:none!important}
+  body{background:#fff;color:#000}
+  .doc{background:#fff;border:none;color:#000}
+}
+</style>
+</head>
+<body>
+
+<!-- 잠금 화면 -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <h2>접근 코드 입력</h2>
+    <input type="password" id="passInput" maxlength="20" placeholder="••••" autofocus>
+    <div class="err" id="passErr"></div>
+    <button onclick="tryUnlock()">확인</button>
+  </div>
+</div>
+
+<!-- 메인 앱 -->
+<div class="app" id="app">
+  <div class="header">
+    <h1>사건 문서</h1>
+    <span class="logout" onclick="doLock()">잠금</span>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="content" id="content">
+    <div class="loading">불러오는 중...</div>
+  </div>
+</div>
+
+<script>
+const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
+// 해시 기반 비밀번호 검증 (평문 저장 안 함)
+const PASS_HASH='a3c9e2f1'; // 간단 해시
+let docs={};
+let currentTab='';
+
+function simpleHash(s){
+  let h=0;
+  for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}
+  return (h>>>0).toString(16).slice(0,8);
+}
+
+function tryUnlock(){
+  const v=document.getElementById('passInput').value;
+  if(!v){document.getElementById('passErr').textContent='코드를 입력하세요';return;}
+  // Firebase에서 비밀번호 확인
+  fetch(FB+'/packhelper/legal/access_code.json').then(r=>r.json()).then(code=>{
+    if(v===code){
+      sessionStorage.setItem('legal_auth','1');
+      document.getElementById('lockScreen').style.display='none';
+      document.getElementById('app').style.display='block';
+      loadDocs();
+    } else {
+      document.getElementById('passErr').textContent='코드가 틀렸습니다';
+      document.getElementById('passInput').value='';
+    }
+  }).catch(()=>{
+    document.getElementById('passErr').textContent='서버 연결 실패';
+  });
+}
+
+document.getElementById('passInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')tryUnlock();
+});
+
+function doLock(){
+  sessionStorage.removeItem('legal_auth');
+  document.getElementById('app').style.display='none';
+  document.getElementById('lockScreen').style.display='flex';
+  document.getElementById('passInput').value='';
+  document.getElementById('passErr').textContent='';
+}
+
+function loadDocs(){
+  fetch(FB+'/packhelper/legal/docs.json').then(r=>r.json()).then(data=>{
+    if(!data){document.getElementById('content').innerHTML='<div class="loading">문서 없음</div>';return;}
+    docs=data;
+    renderTabs();
+    const keys=Object.keys(docs).sort();
+    if(keys.length)selectTab(keys[0]);
+  });
+}
+
+function renderTabs(){
+  const keys=Object.keys(docs).sort();
+  const labels={
+    '개선_01_증거의견서':'증거의견서',
+    '개선_02_의견서_변론요지서':'의견서',
+    '개선_03_증거신청서':'증거신청서',
+    '개선_04_모두진술문':'모두진술',
+    '종합분석_개선판':'종합분석',
+    '기존_사건분석_전략':'기존분석'
+  };
+  document.getElementById('tabs').innerHTML=keys.map(k=>
+    `<div class="tab${k===currentTab?' active':''}" onclick="selectTab('${k}')">${labels[k]||k}</div>`
+  ).join('');
+}
+
+function selectTab(k){
+  currentTab=k;
+  renderTabs();
+  const d=docs[k];
+  if(!d){document.getElementById('content').innerHTML='';return;}
+  const updated=d.updated?`<div class="updated">업데이트: ${d.updated}</div>`:'';
+  const rendered=renderMarkdown(d.content||'');
+  document.getElementById('content').innerHTML=updated+'<div class="doc">'+rendered+'</div>';
+}
+
+function renderMarkdown(text){
+  // 간단한 마크다운 렌더링
+  let html=escapeHtml(text);
+
+  // 헤더
+  html=html.replace(/^### (.+)$/gm,'<div class="h3">$1</div>');
+  html=html.replace(/^## (.+)$/gm,'<div class="h2">$1</div>');
+  html=html.replace(/^# (.+)$/gm,'<div class="h1">$1</div>');
+
+  // 볼드
+  html=html.replace(/\*\*(.+?)\*\*/g,'<span class="bold">$1</span>');
+
+  // 코드 블록
+  html=html.replace(/```([\s\S]*?)```/g,'<div class="code">$1</div>');
+
+  // 인라인 코드
+  html=html.replace(/`([^`]+)`/g,'<code style="background:#1e1e3a;padding:2px 6px;border-radius:4px">$1</code>');
+
+  // 테이블 (마크다운 테이블 → HTML)
+  html=html.replace(/((?:\|.+\|\n?)+)/g,function(m){
+    const rows=m.trim().split('\n').filter(r=>r.trim());
+    if(rows.length<2)return m;
+    let t='<div class="table-wrap"><table>';
+    rows.forEach((row,i)=>{
+      if(row.match(/^\|[\s\-:|]+\|$/))return; // 구분선 스킵
+      const cells=row.split('|').filter(c=>c.trim()!=='');
+      const tag=i===0?'th':'td';
+      t+='<tr>'+cells.map(c=>`<${tag}>${c.trim()}</${tag}>`).join('')+'</tr>';
+    });
+    t+='</table></div>';
+    return t;
+  });
+
+  // > 인용
+  html=html.replace(/^&gt; (.+)$/gm,'<div class="highlight">$1</div>');
+
+  // --- 구분선
+  html=html.replace(/^---$/gm,'<hr style="border:none;border-top:1px solid #2a2a4a;margin:16px 0">');
+
+  return html;
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// 자동 로그인 체크
+if(sessionStorage.getItem('legal_auth')==='1'){
+  document.getElementById('lockScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadDocs();
+}
+</script>
+</body>
+</html>
