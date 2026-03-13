@@ -73,6 +73,13 @@ body{font-family:-apple-system,sans-serif;background:#121212;color:#e0e0e0;min-h
 .grp-swipe-hint{font-size:10px;color:#7C6FE0;text-align:center;padding:4px;opacity:0;transition:opacity .3s}
 .grp-swipe-hint.show{opacity:1}
 .grp-memo-badge{display:inline-block;font-size:9px;color:#FFD700;background:#FFD70022;padding:1px 6px;border-radius:4px;margin-left:6px}
+.grp-filters{display:flex;gap:4px;padding:8px 0;flex-wrap:wrap;align-items:center}
+.grp-fbtn{padding:4px 10px;border-radius:12px;border:1px solid #333;background:transparent;color:#888;font-size:11px;cursor:pointer;transition:all .15s}
+.grp-fbtn.active{background:#7C6FE0;color:#fff;border-color:#7C6FE0}
+.grp-fbtn:active{opacity:.7}
+.grp-filter-sum{font-size:12px;color:#ef5350;font-weight:700;padding:4px 0;text-align:right}
+.grp-filter-sum .in{color:#4fc3f7}
+.grp-tx.muted{opacity:.25}
 .log-item{padding:6px 0;border-bottom:1px solid #1a1a1a;font-family:monospace;font-size:12px}
 .log-ts{color:#555}
 .log-tag{font-weight:bold;margin:0 4px}
@@ -665,39 +672,67 @@ function buildGroups(txList){
   return result;
 }
 
+// 그룹별 필터 상태: {grpName: {days:30, count:0}} — 0=전체
+let grpFilters={};
+const GRP_FILTER_OPTS=[
+  {label:'7일',days:7},{label:'30일',days:30},{label:'90일',days:90},
+  {label:'5건',count:5},{label:'10건',count:10},{label:'전체',days:0,count:0}
+];
+
 function renderGroupView(txList){
   const sum=document.getElementById('ledgerSummary');
   const el=document.getElementById('ledgerContent');
   if(!txList.length){el.innerHTML='<div class="empty">거래 없음</div>';sum.innerHTML='';return;}
 
-  const total=txList.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
   const groups=buildGroups(txList);
   const memoCount=Object.keys(txSwipeCounts).filter(k=>txSwipeCounts[k]>=3).length;
+
+  // 전체 요약 (필터 적용된 합산)
+  let totalFiltered=0;
+  groups.forEach(g=>{
+    const active=getActiveTxs(g);
+    totalFiltered+=active.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
+  });
   sum.innerHTML=`<div class="summary-row">
     <div class="summary-box"><div class="summary-label">그룹</div><div class="summary-val" style="color:#e0e0e0">${groups.length}개</div></div>
-    <div class="summary-box"><div class="summary-label">총 출금</div><div class="summary-val" style="color:#ef5350">-${fmt(total)}</div></div>
+    <div class="summary-box"><div class="summary-label">필터 합산</div><div class="summary-val" style="color:#ef5350">-${fmt(totalFiltered)}</div></div>
   </div>${memoCount?`<div style="text-align:center;padding:6px;font-size:11px;color:#FFD700">재분류 요청 ${memoCount}건 대기중</div>`:''}`;
 
   let html='';
   groups.forEach((g,gi)=>{
     const memberList=Object.keys(g.members).join(', ');
-    const outAmt=g.txs.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
-    const inAmt=g.txs.filter(t=>t.type==='입금').reduce((s,t)=>s+(t.amount||0),0);
+    const activeTxs=getActiveTxs(g);
+    const outAmt=activeTxs.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
+    const inAmt=activeTxs.filter(t=>t.type==='입금').reduce((s,t)=>s+(t.amount||0),0);
+    const f=grpFilters[g.name]||{};
+    const filterLabel=f.days?f.days+'일':f.count?f.count+'건':'전체';
+
     html+=`<div class="grp-card">
       <div class="grp-header" onclick="toggleGrp(${gi})">
-        <div><div class="grp-name">${g.name}</div><div style="font-size:10px;color:#666;margin-top:2px">${memberList}</div></div>
+        <div><div class="grp-name">${g.name} <span style="font-size:11px;color:#7C6FE0;font-weight:400">${filterLabel}</span></div><div style="font-size:10px;color:#666;margin-top:2px">${memberList}</div></div>
         <div class="grp-meta">${outAmt?`<div class="grp-amount">-${fmt(outAmt)}</div>`:''}${inAmt?`<div style="font-size:13px;color:#4fc3f7">+${fmt(inAmt)}</div>`:''}
-          <div class="grp-cnt">${g.txs.length}건</div>
+          <div class="grp-cnt">${activeTxs.length}/${g.txs.length}건</div>
         </div>
       </div>
       <div class="grp-body" id="grpBody${gi}">
-        <div class="grp-swipe-hint" id="grpHint${gi}">← 스와이프: 그룹에서 제외 →</div>`;
+        <div class="grp-filters">`;
+    GRP_FILTER_OPTS.forEach((opt,fi)=>{
+      const isActive=(f.days&&opt.days===f.days)||( f.count&&opt.count===f.count)||(!f.days&&!f.count&&!opt.days&&!opt.count);
+      html+=`<div class="grp-fbtn${isActive?' active':''}" onclick="setGrpFilter('${g.name}',${opt.days||0},${opt.count||0})">${opt.label}</div>`;
+    });
+    html+=`</div>`;
+    if(outAmt||inAmt){
+      html+=`<div class="grp-filter-sum">${outAmt?'-'+fmt(outAmt):''} ${inAmt?`<span class="in">+${fmt(inAmt)}</span>`:''} (${activeTxs.length}건)</div>`;
+    }
+    html+=`<div class="grp-swipe-hint" id="grpHint${gi}">← 스와이프: 그룹에서 제외 →</div>`;
+    const activeSet=new Set(activeTxs.map(t=>t._id));
     g.txs.forEach(t=>{
       const cp=t.counterparty||t.bank||'';
       const isIn=t.type==='입금';
+      const isMuted=!activeSet.has(t._id);
       const swCnt=txSwipeCounts[t._id]||0;
       const memoBadge=swCnt>=3?'<span class="grp-memo-badge">재분류 대기</span>':'';
-      html+=`<div class="grp-tx" data-txid="${t._id}" data-grp="${g.name}" data-cp="${cp}"
+      html+=`<div class="grp-tx${isMuted?' muted':''}" data-txid="${t._id}" data-grp="${g.name}" data-cp="${cp}"
         ontouchstart="grpSwStart(event)" ontouchend="grpSwEnd(event)">
         <div class="grp-tx-left"><span class="grp-tx-cp">${cp}${memoBadge}</span><span class="grp-tx-time">${dateFmt(t.ts)} ${timeFmt(t.ts)}</span></div>
         <div class="grp-tx-amt" style="color:${isIn?'#4fc3f7':'#ef5350'}">${isIn?'+':'-'}${fmt(t.amount)}</div>
@@ -706,6 +741,25 @@ function renderGroupView(txList){
     html+=`</div></div>`;
   });
   el.innerHTML=html;
+}
+
+function getActiveTxs(g){
+  const f=grpFilters[g.name]||{};
+  let txs=g.txs;
+  if(f.days){
+    const cutoff=Date.now()-f.days*86400000;
+    txs=txs.filter(t=>(t.ts||0)>=cutoff);
+  }
+  if(f.count){
+    txs=txs.slice(0,f.count);
+  }
+  return txs;
+}
+
+function setGrpFilter(name,days,count){
+  if(!days&&!count){delete grpFilters[name];}
+  else{grpFilters[name]={days:days||0,count:count||0};}
+  renderLedger();
 }
 
 function toggleGrp(idx){
