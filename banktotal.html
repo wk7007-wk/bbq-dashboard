@@ -200,8 +200,9 @@ const timeFmt=ts=>{const d=new Date(ts);return`${d.getHours().toString().padStar
 let accounts={},transactions=[],logs=[],settleManual=[],settleAuto=[],aiRules={},sfaDaily={},currentTab='settle',ledgerMode='grp',logFilterTag='all';
 // 그룹 뷰 상태
 let txGroups={},txGroupOverrides={},txSwipeCounts={};
-function loadGroupOverrides(){txGroupOverrides=lsLoad('grp_overrides')||{};txSwipeCounts=lsLoad('grp_swipe_counts')||{};}
-function saveGroupOverrides(){lsCache('grp_overrides',txGroupOverrides);lsCache('grp_swipe_counts',txSwipeCounts);}
+let grpFavorites={};
+function loadGroupOverrides(){txGroupOverrides=lsLoad('grp_overrides')||{};txSwipeCounts=lsLoad('grp_swipe_counts')||{};grpFavorites=lsLoad('grp_favorites')||{};}
+function saveGroupOverrides(){lsCache('grp_overrides',txGroupOverrides);lsCache('grp_swipe_counts',txSwipeCounts);lsCache('grp_favorites',grpFavorites);}
 
 // --- localStorage = 주 데이터 / Firebase = 백업 ---
 const BT_DATA_VER='2';
@@ -665,10 +666,16 @@ function buildGroups(txList){
     groups[key].txs.push(t);
     groups[key].total+=t.amount||0;
   });
-  // 각 그룹 내 최신순 정렬 + 그룹도 최신 거래 기준 정렬
+  // 각 그룹 내 최신순 정렬
   const result=Object.values(groups);
   result.forEach(g=>g.txs.sort((a,b)=>(b.ts||0)-(a.ts||0)));
-  result.sort((a,b)=>(b.txs[0]?.ts||0)-(a.txs[0]?.ts||0));
+  // 즐겨찾기 상단 고정 + 나머지 최신순
+  result.sort((a,b)=>{
+    const aFav=grpFavorites[a.name]?1:0;
+    const bFav=grpFavorites[b.name]?1:0;
+    if(aFav!==bFav)return bFav-aFav;
+    return (b.txs[0]?.ts||0)-(a.txs[0]?.ts||0);
+  });
   return result;
 }
 
@@ -707,10 +714,15 @@ function renderGroupView(txList){
     const f=grpFilters[g.name]||{};
     const filterLabel=f.days?f.days+'일':f.count?f.count+'건':'전체';
 
-    html+=`<div class="grp-card">
-      <div class="grp-header" onclick="toggleGrp(${gi})">
-        <div><div class="grp-name">${g.name} <span style="font-size:11px;color:#7C6FE0;font-weight:400">${filterLabel}</span></div><div style="font-size:10px;color:#666;margin-top:2px">${memberList}</div></div>
-        <div class="grp-meta">${outAmt?`<div class="grp-amount">-${fmt(outAmt)}</div>`:''}${inAmt?`<div style="font-size:13px;color:#4fc3f7">+${fmt(inAmt)}</div>`:''}
+    const isFav=!!grpFavorites[g.name];
+    const favStar=isFav?'&#9733;':'&#9734;';
+    const favColor=isFav?'#FFD700':'#555';
+
+    html+=`<div class="grp-card" style="${isFav?'border-left:3px solid #FFD700':''}">
+      <div class="grp-header">
+        <span onclick="toggleFav('${g.name.replace(/'/g,"\\'")}')" style="font-size:18px;color:${favColor};cursor:pointer;padding:0 6px 0 0;flex-shrink:0">${favStar}</span>
+        <div style="flex:1" onclick="toggleGrp(${gi})"><div class="grp-name">${g.name} <span style="font-size:11px;color:#7C6FE0;font-weight:400">${filterLabel}</span></div><div style="font-size:10px;color:#666;margin-top:2px">${memberList}</div></div>
+        <div class="grp-meta" onclick="toggleGrp(${gi})">${outAmt?`<div class="grp-amount">-${fmt(outAmt)}</div>`:''}${inAmt?`<div style="font-size:13px;color:#4fc3f7">+${fmt(inAmt)}</div>`:''}
           <div class="grp-cnt">${activeTxs.length}/${g.txs.length}건</div>
         </div>
       </div>
@@ -759,6 +771,13 @@ function getActiveTxs(g){
 function setGrpFilter(name,days,count){
   if(!days&&!count){delete grpFilters[name];}
   else{grpFilters[name]={days:days||0,count:count||0};}
+  renderLedger();
+}
+
+function toggleFav(name){
+  if(grpFavorites[name])delete grpFavorites[name];
+  else grpFavorites[name]=true;
+  saveGroupOverrides();
   renderLedger();
 }
 
