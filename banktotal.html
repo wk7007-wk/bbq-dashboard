@@ -798,10 +798,8 @@ function grpSwEnd(e){
       sw.el.style.background='#FFD70022';
       setTimeout(()=>{sw.el.style.background='';},1000);
     } else {
-      // 1~2회: 그룹에서 제외 (원본 이름으로 독립 그룹)
-      txGroupOverrides[cp]=cp+'_독립';
-      saveGroupOverrides();
-      renderLedger();
+      // 1~2회: 다른 그룹 선택 팝업 → 편입
+      showGrpMoveMenu(txId,cp,grpName,sw.el);
     }
   }
 }
@@ -816,6 +814,46 @@ document.addEventListener('touchmove',function(e){
     _grpSw.moved=true;
   }
 },{passive:false});
+
+function showGrpMoveMenu(txId,cp,currentGrp,el){
+  // 현재 그룹 외 다른 그룹 목록
+  const allGroups=buildGroups(transactions.filter(t=>!t._excluded));
+  const others=allGroups.filter(g=>g.name!==currentGrp);
+  if(!others.length){el.style.background='#ef535033';setTimeout(()=>{el.style.background='';},500);return;}
+
+  // 기존 메뉴 제거
+  const old=document.getElementById('grpMoveMenu');if(old)old.remove();
+
+  const menu=document.createElement('div');
+  menu.id='grpMoveMenu';
+  menu.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1e1e30;border-top:2px solid #7C6FE0;border-radius:12px 12px 0 0;padding:12px;z-index:999;max-height:50vh;overflow-y:auto';
+
+  let html=`<div style="font-size:13px;color:#aaa;margin-bottom:8px">"${cp}" → 어디로 편입?</div>`;
+  others.forEach(g=>{
+    const amt=g.txs.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
+    html+=`<div onclick="moveToGrp('${cp.replace(/'/g,"\\'")}','${g.name.replace(/'/g,"\\'")}','${currentGrp.replace(/'/g,"\\'")}')" style="display:flex;justify-content:space-between;padding:12px 8px;border-bottom:1px solid #2a2a3e;cursor:pointer;min-height:44px;align-items:center">
+      <div><div style="font-size:14px;color:#e0e0e0;font-weight:600">${g.name}</div><div style="font-size:10px;color:#666">${Object.keys(g.members).join(', ')}</div></div>
+      <div style="font-size:13px;color:#ef5350;font-weight:700">-${fmt(amt)}</div>
+    </div>`;
+  });
+  html+=`<div onclick="document.getElementById('grpMoveMenu').remove()" style="text-align:center;padding:12px;color:#888;cursor:pointer;font-size:13px">취소</div>`;
+  menu.innerHTML=html;
+  document.body.appendChild(menu);
+
+  // 바깥 터치로 닫기
+  setTimeout(()=>{
+    const closer=function(e){if(!menu.contains(e.target)){menu.remove();document.removeEventListener('touchstart',closer);}};
+    document.addEventListener('touchstart',closer);
+  },100);
+}
+
+function moveToGrp(cp,targetGrp,fromGrp){
+  txGroupOverrides[cp]=targetGrp;
+  saveGroupOverrides();
+  const menu=document.getElementById('grpMoveMenu');if(menu)menu.remove();
+  btLog('[GRP]','편입: '+cp+' → '+targetGrp+' (from:'+fromGrp+')');
+  renderLedger();
+}
 
 function saveReclassifyMemo(txId,cp,grpName){
   const tx=transactions.find(t=>t._id===txId);
