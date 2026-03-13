@@ -146,11 +146,11 @@ body{font-family:-apple-system,sans-serif;background:#121212;color:#e0e0e0;min-h
 
 <div class="section" id="sec-ledger">
     <div class="filter-row" id="ledgerFilter">
-        <div class="filter-btn active" onclick="setLedgerFilter('out')">출금</div>
+        <div class="filter-btn" onclick="setLedgerFilter('out')">출금</div>
         <div class="filter-btn" onclick="setLedgerFilter('in')">입금</div>
         <div class="filter-btn" onclick="setLedgerFilter('all')">전체</div>
         <div class="filter-btn" onclick="setLedgerFilter('cat')">카테고리</div>
-        <div class="filter-btn" onclick="setLedgerFilter('grp')">그룹</div>
+        <div class="filter-btn active" onclick="setLedgerFilter('grp')">그룹</div>
     </div>
     <div id="ledgerSummary"></div>
     <div id="ledgerContent"></div>
@@ -190,7 +190,7 @@ const tsFmt=ts=>{const d=new Date(ts);return`${(d.getMonth()+1).toString().padSt
 const dateFmt=ts=>{const d=new Date(ts);return`${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`};
 const timeFmt=ts=>{const d=new Date(ts);return`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`};
 
-let accounts={},transactions=[],logs=[],settleManual=[],settleAuto=[],aiRules={},sfaDaily={},currentTab='settle',ledgerMode='out',logFilterTag='all';
+let accounts={},transactions=[],logs=[],settleManual=[],settleAuto=[],aiRules={},sfaDaily={},currentTab='settle',ledgerMode='grp',logFilterTag='all';
 // 그룹 뷰 상태
 let txGroups={},txGroupOverrides={},txSwipeCounts={};
 function loadGroupOverrides(){txGroupOverrides=lsLoad('grp_overrides')||{};txSwipeCounts=lsLoad('grp_swipe_counts')||{};}
@@ -658,7 +658,11 @@ function buildGroups(txList){
     groups[key].txs.push(t);
     groups[key].total+=t.amount||0;
   });
-  return Object.values(groups).sort((a,b)=>b.total-a.total);
+  // 각 그룹 내 최신순 정렬 + 그룹도 최신 거래 기준 정렬
+  const result=Object.values(groups);
+  result.forEach(g=>g.txs.sort((a,b)=>(b.ts||0)-(a.ts||0)));
+  result.sort((a,b)=>(b.txs[0]?.ts||0)-(a.txs[0]?.ts||0));
+  return result;
 }
 
 function renderGroupView(txList){
