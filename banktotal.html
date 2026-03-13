@@ -54,6 +54,25 @@ body{font-family:-apple-system,sans-serif;background:#121212;color:#e0e0e0;min-h
 .cat-name{font-size:14px;color:#ccc}
 .cat-count{font-size:11px;color:#666}
 .cat-amount{font-size:16px;font-weight:bold;color:#ef5350}
+/* ===== 그룹 뷰 ===== */
+.grp-card{background:#1e1e30;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.grp-header{display:flex;justify-content:space-between;align-items:center;padding:12px;cursor:pointer;border-bottom:1px solid #2a2a3e}
+.grp-header:active{background:#2a2a3e}
+.grp-name{font-size:15px;font-weight:700;color:#e0e0e0}
+.grp-meta{text-align:right}
+.grp-amount{font-size:16px;font-weight:bold;color:#ef5350}
+.grp-cnt{font-size:11px;color:#666}
+.grp-body{display:none;padding:0 12px}
+.grp-body.open{display:block}
+.grp-tx{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a1a1a;transition:transform .2s,opacity .2s;touch-action:pan-y}
+.grp-tx:last-child{border-bottom:none}
+.grp-tx-left{display:flex;flex-direction:column;gap:2px}
+.grp-tx-cp{font-size:13px;color:#ccc}
+.grp-tx-time{font-size:10px;color:#555}
+.grp-tx-amt{font-size:14px;font-weight:bold;color:#ef5350;text-align:right}
+.grp-swipe-hint{font-size:10px;color:#7C6FE0;text-align:center;padding:4px;opacity:0;transition:opacity .3s}
+.grp-swipe-hint.show{opacity:1}
+.grp-memo-badge{display:inline-block;font-size:9px;color:#FFD700;background:#FFD70022;padding:1px 6px;border-radius:4px;margin-left:6px}
 .log-item{padding:6px 0;border-bottom:1px solid #1a1a1a;font-family:monospace;font-size:12px}
 .log-ts{color:#555}
 .log-tag{font-weight:bold;margin:0 4px}
@@ -131,6 +150,7 @@ body{font-family:-apple-system,sans-serif;background:#121212;color:#e0e0e0;min-h
         <div class="filter-btn" onclick="setLedgerFilter('in')">입금</div>
         <div class="filter-btn" onclick="setLedgerFilter('all')">전체</div>
         <div class="filter-btn" onclick="setLedgerFilter('cat')">카테고리</div>
+        <div class="filter-btn" onclick="setLedgerFilter('grp')">그룹</div>
     </div>
     <div id="ledgerSummary"></div>
     <div id="ledgerContent"></div>
@@ -171,6 +191,10 @@ const dateFmt=ts=>{const d=new Date(ts);return`${(d.getMonth()+1).toString().pad
 const timeFmt=ts=>{const d=new Date(ts);return`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`};
 
 let accounts={},transactions=[],logs=[],settleManual=[],settleAuto=[],aiRules={},sfaDaily={},currentTab='settle',ledgerMode='out',logFilterTag='all';
+// 그룹 뷰 상태
+let txGroups={},txGroupOverrides={},txSwipeCounts={};
+function loadGroupOverrides(){txGroupOverrides=lsLoad('grp_overrides')||{};txSwipeCounts=lsLoad('grp_swipe_counts')||{};}
+function saveGroupOverrides(){lsCache('grp_overrides',txGroupOverrides);lsCache('grp_swipe_counts',txSwipeCounts);}
 
 // --- localStorage = 주 데이터 / Firebase = 백업 ---
 const BT_DATA_VER='2';
@@ -206,6 +230,7 @@ function checkDataVersion(){
 let _needsFirebaseSync=false;
 function loadCachedData(){
     _needsFirebaseSync=checkDataVersion();
+    loadGroupOverrides();
     const ca=lsLoad('accounts');if(ca){accounts=ca;renderAccounts();}
     const ct=lsLoad('transactions');if(ct){transactions=markTransactions(Object.entries(ct)).sort((a,b)=>(b.ts||0)-(a.ts||0));renderLedger();}
     // Room DB 우선: NativeBridge 있으면 Room에서 settle/sfa 로드
@@ -474,6 +499,10 @@ function renderLedger(){
         renderCategory(transactions.filter(t=>t.type==='출금'&&!t._excluded));
         return;
     }
+    if(ledgerMode==='grp'){
+        renderGroupView(transactions.filter(t=>!t._excluded));
+        return;
+    }
 
     // 요약 (제외 항목 합산 안 함)
     const totalIn=transactions.filter(t=>t.type==='입금'&&!t._excluded).reduce((s,t)=>s+(t.amount||0),0);
@@ -594,6 +623,153 @@ function renderCategory(withdrawals){
         html+=`<div class="cat-item"><div><div class="cat-name">${name}</div><div class="cat-count">${data.count}건</div></div><div class="cat-amount">-${fmt(data.amount)}</div></div>`;
     });
     el.innerHTML=html;
+}
+
+// --- 그룹 뷰 (fuzzy 그룹핑 + 스와이프 재분류) ---
+function fuzzyGroupKey(name){
+  // 사용자 오버라이드 우선
+  if(txGroupOverrides[name])return txGroupOverrides[name];
+  // 접두어 추출: 한글 2자 / 영문 3자 이상 공통
+  const clean=name.replace(/[()（）\s]/g,'');
+  // 토스/카카오페이 등 접두어 제거 후 핵심 이름 추출
+  const prefixes=['토스','카카오페이','네이버페이','페이코','카카오','TOSS','KAKAO'];
+  let core=clean;
+  for(const p of prefixes){if(core.startsWith(p)&&core.length>p.length){core=core.slice(p.length);break;}}
+  // 한글만 추출 (2자 이상이면 그룹키)
+  const kr=core.match(/[가-힣]+/g);
+  if(kr){
+    const longest=kr.sort((a,b)=>b.length-a.length)[0];
+    if(longest.length>=2)return longest;
+  }
+  // 영문+숫자 (3자 이상이면 그룹키)
+  const en=core.match(/[A-Za-z]{3,}/);
+  if(en)return en[0].toUpperCase();
+  return name; // 매칭 실패 시 원본
+}
+
+function buildGroups(txList){
+  loadGroupOverrides();
+  const groups={};
+  txList.forEach(t=>{
+    const cp=t.counterparty||t.bank||'미분류';
+    const key=fuzzyGroupKey(cp);
+    if(!groups[key])groups[key]={name:key,members:{},txs:[],total:0};
+    groups[key].members[cp]=true;
+    groups[key].txs.push(t);
+    groups[key].total+=t.amount||0;
+  });
+  return Object.values(groups).sort((a,b)=>b.total-a.total);
+}
+
+function renderGroupView(txList){
+  const sum=document.getElementById('ledgerSummary');
+  const el=document.getElementById('ledgerContent');
+  if(!txList.length){el.innerHTML='<div class="empty">거래 없음</div>';sum.innerHTML='';return;}
+
+  const total=txList.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
+  const groups=buildGroups(txList);
+  const memoCount=Object.keys(txSwipeCounts).filter(k=>txSwipeCounts[k]>=3).length;
+  sum.innerHTML=`<div class="summary-row">
+    <div class="summary-box"><div class="summary-label">그룹</div><div class="summary-val" style="color:#e0e0e0">${groups.length}개</div></div>
+    <div class="summary-box"><div class="summary-label">총 출금</div><div class="summary-val" style="color:#ef5350">-${fmt(total)}</div></div>
+  </div>${memoCount?`<div style="text-align:center;padding:6px;font-size:11px;color:#FFD700">재분류 요청 ${memoCount}건 대기중</div>`:''}`;
+
+  let html='';
+  groups.forEach((g,gi)=>{
+    const memberList=Object.keys(g.members).join(', ');
+    const outAmt=g.txs.filter(t=>t.type==='출금').reduce((s,t)=>s+(t.amount||0),0);
+    const inAmt=g.txs.filter(t=>t.type==='입금').reduce((s,t)=>s+(t.amount||0),0);
+    html+=`<div class="grp-card">
+      <div class="grp-header" onclick="toggleGrp(${gi})">
+        <div><div class="grp-name">${g.name}</div><div style="font-size:10px;color:#666;margin-top:2px">${memberList}</div></div>
+        <div class="grp-meta">${outAmt?`<div class="grp-amount">-${fmt(outAmt)}</div>`:''}${inAmt?`<div style="font-size:13px;color:#4fc3f7">+${fmt(inAmt)}</div>`:''}
+          <div class="grp-cnt">${g.txs.length}건</div>
+        </div>
+      </div>
+      <div class="grp-body" id="grpBody${gi}">
+        <div class="grp-swipe-hint" id="grpHint${gi}">← 스와이프: 그룹에서 제외 →</div>`;
+    g.txs.forEach(t=>{
+      const cp=t.counterparty||t.bank||'';
+      const isIn=t.type==='입금';
+      const swCnt=txSwipeCounts[t._id]||0;
+      const memoBadge=swCnt>=3?'<span class="grp-memo-badge">재분류 대기</span>':'';
+      html+=`<div class="grp-tx" data-txid="${t._id}" data-grp="${g.name}" data-cp="${cp}"
+        ontouchstart="grpSwStart(event)" ontouchend="grpSwEnd(event)">
+        <div class="grp-tx-left"><span class="grp-tx-cp">${cp}${memoBadge}</span><span class="grp-tx-time">${dateFmt(t.ts)} ${timeFmt(t.ts)}</span></div>
+        <div class="grp-tx-amt" style="color:${isIn?'#4fc3f7':'#ef5350'}">${isIn?'+':'-'}${fmt(t.amount)}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  el.innerHTML=html;
+}
+
+function toggleGrp(idx){
+  const body=document.getElementById('grpBody'+idx);
+  const hint=document.getElementById('grpHint'+idx);
+  if(body)body.classList.toggle('open');
+  if(hint)setTimeout(()=>hint.classList.toggle('show',body.classList.contains('open')),100);
+}
+
+// 그룹 내 스와이프 (재분류)
+let _grpSw=null;
+function grpSwStart(e){
+  const el=e.currentTarget;
+  _grpSw={el,sx:e.touches[0].clientX,sy:e.touches[0].clientY,t0:Date.now(),moved:false};
+}
+function grpSwEnd(e){
+  if(!_grpSw)return;
+  const sw=_grpSw;_grpSw=null;
+  const dx=(e.changedTouches[0]||{clientX:sw.sx}).clientX-sw.sx;
+  sw.el.style.transform='';sw.el.style.opacity='';
+
+  if(Math.abs(dx)>60){
+    // 스와이프 감지
+    const txId=sw.el.dataset.txid;
+    const cp=sw.el.dataset.cp;
+    const grpName=sw.el.dataset.grp;
+    if(!txId)return;
+
+    // 스와이프 카운트 증가
+    txSwipeCounts[txId]=(txSwipeCounts[txId]||0)+1;
+    const cnt=txSwipeCounts[txId];
+
+    if(cnt>=3){
+      // 3회: 자동 메모 기록 → Firebase
+      saveReclassifyMemo(txId,cp,grpName);
+      sw.el.style.background='#FFD70022';
+      setTimeout(()=>{sw.el.style.background='';},1000);
+    } else {
+      // 1~2회: 그룹에서 제외 (원본 이름으로 독립 그룹)
+      txGroupOverrides[cp]=cp+'_독립';
+      saveGroupOverrides();
+      renderLedger();
+    }
+  }
+}
+document.addEventListener('touchmove',function(e){
+  if(!_grpSw)return;
+  const dx=e.touches[0].clientX-_grpSw.sx;
+  const dy=e.touches[0].clientY-_grpSw.sy;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>15){
+    e.preventDefault();
+    _grpSw.el.style.transform=`translateX(${dx}px)`;
+    _grpSw.el.style.opacity=Math.max(0.3,1-Math.abs(dx)/200);
+    _grpSw.moved=true;
+  }
+},{passive:false});
+
+function saveReclassifyMemo(txId,cp,grpName){
+  const tx=transactions.find(t=>t._id===txId);
+  const memo={
+    txId,counterparty:cp,currentGroup:grpName,
+    amount:tx?tx.amount:0,bank:tx?tx.bank:'',
+    ts:Date.now(),status:'pending'
+  };
+  const key='rc_'+Date.now();
+  fetch(FB+'/banktotal/reclassify/'+key+'.json',{method:'PUT',body:JSON.stringify(memo)});
+  saveGroupOverrides();
+  btLog('[GRP]','재분류 요청: '+cp+' (그룹:'+grpName+')');
 }
 
 // --- 로그 렌더링 ---
@@ -1446,10 +1622,13 @@ async function _askAiInner(q){
 - 입금 동작어: 받았,들어왔,들어옴,넣었,입금 → txType="입금"
 - 동작어가 없으면 기본값 txType="출금"
 
-[대화 맥락]
-- 이전 대화에서 언급된 금액, 항목, 날짜를 기억하고 연결하세요
+[대화 맥락 — 반드시 이전 대화 전체를 참조]
+- 이전 대화에서 언급된 금액, 항목, 날짜, 질문/답변 내용을 모두 기억하고 연결하세요
 - "넣어줘", "수정해줘" 요청 시, 직전 대화에서 나온 금액을 자동으로 사용하세요
 - 금액을 이미 알려준 뒤 "그걸로 해줘", "넣어줘" 등이 오면 추가 질문 없이 실행하세요
+- 사용자가 이전에 질문한 내용(예: 특정 항목 금액, 잔고 등)을 다시 물으면 이전 답변과 현재 데이터를 함께 참조해서 답변
+- 대화 중간에 빠진 메시지가 있으면 사용자가 삭제한 것으로 판단하고, 남은 대화 흐름에서 맥락을 자율적으로 추론하세요
+- 아래 [정기 항목], [현재 재무] 데이터는 실시간 현황입니다 — 금액/항목 질문 시 반드시 이 데이터를 참조하여 구체적 수치로 답변하세요
 - 모르는 정보가 있을 때만 질문하세요
 
 [용어 이해]
@@ -1465,7 +1644,7 @@ async function _askAiInner(q){
 일반 입력에는 분석 없이 등록만 실행.
 
 [응답 스타일]
-- 최대한 짧게. "등록완료: 매일입금 130만원" 수준.
+- 최대한 짧게. "등록완료: 매일입금 150만원" 수준.
 - 불필요한 설명, 인사, 이모지 금지.
 
 ${ctx}
@@ -1487,9 +1666,9 @@ ${ctx}
     let body;
     try{
         const contents=[{role:'user',parts:[{text:sys}]},{role:'model',parts:[{text:'네, 준비됐습니다.'}]}];
-        // 이전 대화 맥락 추가 (최근 10턴, ACTION 태그 제거)
+        // 이전 대화 맥락 추가 (최근 20턴, ACTION 태그 제거)
         const hist=aiMessages.slice(0,-2);
-        const recent=hist.slice(-20);
+        const recent=hist.slice(-40);
         for(const m of recent){
             const clean=(m.text||'').replace(/\[ACTION\].*?\[\/ACTION\]/g,'').trim();
             if(!clean)continue;
