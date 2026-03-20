@@ -6,7 +6,7 @@
 <title>PosDelay Dashboard</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(180deg,#1A1A30,#121225);color:#E0E0EC;min-height:100vh;padding:10px;font-size:13px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(180deg,#1A1A30,#121225);color:#E0E0EC;min-height:100vh;padding:10px;padding-bottom:64px;font-size:13px;}
 .card{background:linear-gradient(180deg,#242444,#1A1A35);border:1px solid #2E2E52;border-radius:12px;padding:12px;margin-bottom:8px;}
 .row{display:flex;align-items:center;gap:6px;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
@@ -69,7 +69,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <!-- ═══ 1. 모니터링 ═══ -->
-<div class="card">
+<div class="card" id="monitorCard">
   <div class="row" style="justify-content:space-between;margin-bottom:6px">
     <div class="row" style="gap:8px">
       <span style="color:#A0A0BC;font-size:12px">처리중</span>
@@ -151,7 +151,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <!-- ═══ 2. 게이지 ═══ -->
-<div class="card">
+<div class="card" id="gaugeCard">
   <div style="margin-bottom:8px">
     <div class="row" style="justify-content:space-between;margin-bottom:6px">
       <div class="row" style="gap:6px">
@@ -183,7 +183,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <!-- ═══ 3. 광고 설정 ═══ -->
-<div class="card">
+<div class="card" id="adSettingCard">
   <div class="row" style="justify-content:space-between;margin-bottom:6px">
     <div class="ch" onclick="togSec('adB')" style="flex:1">
       <span style="font-size:13px;font-weight:600;color:#A0A0BC">광고 설정</span>
@@ -221,8 +221,26 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
+<!-- ═══ 3.5 배달료(게이트) 설정 ═══ -->
+<div class="card" id="gatePanel" style="display:none">
+  <div class="ch" onclick="togCB('gate_body')">
+    <div class="row">
+      <span style="font-size:13px;font-weight:600;color:#A0A0BC">배달료</span>
+      <div class="tog" id="tog_gate" onclick="event.stopPropagation();togGate()"></div>
+    </div>
+    <span style="font-size:11px;color:#707088">&#9662;</span>
+  </div>
+  <div class="cb open" id="gate_body">
+    <div class="sr"><span class="sl" style="color:#E67E22">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
+    <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
+    <div class="sr"><span class="sl">배달료 인상</span><div class="sv"><button class="btn bs bn" onclick="adjGate('fee',-500)">-</button><span id="gate_fee" style="color:#FFF;font-size:14px;font-weight:bold;min-width:56px;text-align:center">4,000원</span><button class="btn bs bn" onclick="adjGate('fee',500)">+</button></div></div>
+    <div class="sr"><span class="sl">기본 배달료</span><div class="sv"><button class="btn bs bn" onclick="adjGate('base',-500)">-</button><span id="gate_base" style="color:#9090A8;font-size:13px;font-weight:bold;min-width:56px;text-align:center">500원</span><button class="btn bs bn" onclick="adjGate('base',500)">+</button></div></div>
+    <div id="gate_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:#E67E22"></div>
+  </div>
+</div>
+
 <!-- ═══ 4. 지연 설정 ═══ -->
-<div class="card">
+<div class="card" id="delayCard">
   <div class="ch" onclick="togSec('dlB')">
     <span style="font-size:13px;font-weight:600;color:#A0A0BC">지연 설정</span>
     <span id="dlA" style="color:#A0A0BC">&#9660;</span>
@@ -241,7 +259,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <!-- ═══ 5. 차트 ═══ -->
-<div class="card">
+<div class="card" id="chartCard">
   <div class="ch" onclick="togSec('chB')">
     <span style="font-size:13px;font-weight:600;color:#A0A0BC">건수 변동 (2시간)</span>
     <span id="chA" style="color:#A0A0BC">&#9660;</span>
@@ -250,7 +268,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <!-- ═══ 6. 로그 ═══ -->
-<div class="card">
+<div class="card" id="logCard">
   <div class="ch" onclick="togSec('lgB')">
     <span style="font-size:13px;font-weight:600;color:#A0A0BC">로그</span>
     <span id="lgA" style="color:#A0A0BC">&#9660;</span>
@@ -1120,6 +1138,101 @@ document.addEventListener('visibilitychange',()=>{
     setTimeout(()=>pollAll(true),500);
   }
 });
+
+// ═══ 게이트(배달료) ═══
+let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false};
+
+function adjGate(key, delta) {
+  if (key==='threshold') { gateSettings.threshold = Math.max(1, Math.min(30, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
+  if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
+  if (key==='fee') { gateSettings.fee = Math.max(500, Math.min(10000, gateSettings.fee+delta)); document.getElementById('gate_fee').textContent = gateSettings.fee.toLocaleString()+'원'; }
+  if (key==='base') { gateSettings.base = Math.max(0, Math.min(5000, gateSettings.base+delta)); document.getElementById('gate_base').textContent = gateSettings.base.toLocaleString()+'원'; }
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+}
+
+function togGate() {
+  gateSettings.enabled = !gateSettings.enabled;
+  const el = document.getElementById('tog_gate');
+  el.classList.toggle('on', gateSettings.enabled);
+  document.getElementById('mStat_gate').textContent = gateSettings.enabled ? '● ON' : '○ OFF';
+  document.getElementById('mStat_gate').style.color = gateSettings.enabled ? '#2ECC71' : '#707088';
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+}
+
+function togCB(id) { const e = document.getElementById(id); if(e) e.classList.toggle('open'); }
+
+// ═══ 모드 전환 (ID 기반, 인덱스 미사용) ═══
+const MODE_CARDS = {
+  cook: ['monitorCard','cookCard','gaugeCard','delayCard','chartCard','logCard','permCard'],
+  ad:   ['monitorCard','gaugeCard','adSettingCard','delayCard','chartCard','logCard','permCard'],
+  gate: ['monitorCard','gatePanel']
+};
+let currentMode = 'cook';
+
+function switchMode(mode) {
+  currentMode = mode;
+  // 전체 카드 숨김
+  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+  // 해당 모드 카드만 표시
+  const ids = MODE_CARDS[mode] || MODE_CARDS.cook;
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = ''; });
+  // permCard: 앱에서만 표시
+  if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
+
+  // 탭 활성화
+  ['cook','ad','gate'].forEach(m => {
+    const tab = document.getElementById('mTab_'+m);
+    if(!tab) return;
+    const isActive = m===mode;
+    tab.style.background = isActive ? '#1A1A30' : '';
+    tab.style.borderTop = isActive ? '2px solid #7C6FE0' : 'none';
+    tab.querySelector('span:first-child').style.color = isActive ? '#E0E0EC' : '#707088';
+  });
+
+  // 차트 모드 진입 시 리드로우
+  if (mode !== 'gate') setTimeout(drawChart, 100);
+}
+
+// 초기 모드: cook (기본)
+// gatePanel은 display:none 상태라 cook 모드에서 안 보임 — 정상
+
+// NativeBridge에서 게이트 설정 수신
+function onGateSettingsUpdate(json) {
+  try {
+    const s = JSON.parse(json);
+    gateSettings = Object.assign(gateSettings, s);
+    document.getElementById('gate_threshold').textContent = s.threshold+'건';
+    document.getElementById('gate_valid').textContent = s.valid+'분';
+    document.getElementById('gate_fee').textContent = (s.fee||4000).toLocaleString()+'원';
+    document.getElementById('gate_base').textContent = (s.base||500).toLocaleString()+'원';
+    document.getElementById('tog_gate').classList.toggle('on', !!s.enabled);
+    document.getElementById('mStat_gate').textContent = s.enabled ? '● ON' : '○ OFF';
+    document.getElementById('mStat_gate').style.color = s.enabled ? '#2ECC71' : '#707088';
+    if (s.defending) {
+      document.getElementById('gate_status').style.display = '';
+      document.getElementById('gate_status').textContent = '배달료 인상 중 · ' + (s.fee||4000).toLocaleString() + '원';
+    } else {
+      document.getElementById('gate_status').style.display = 'none';
+    }
+  } catch(e) {}
+}
 </script>
+
+<!-- 하단 모드 탭 바 -->
+<div id="modeTabBar" style="position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;background:#0F0F1F;border-top:1px solid #2E2E52;z-index:100;">
+  <div class="mode-tab active" onclick="switchMode('cook')" id="mTab_cook" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:#1A1A30;border-top:2px solid #7C6FE0;">
+    <span style="font-size:12px;font-weight:600;color:#E0E0EC">조리모드</span>
+    <span id="mStat_cook" style="font-size:10px;color:#2ECC71">● 대기</span>
+  </div>
+  <div class="mode-tab" onclick="switchMode('ad')" id="mTab_ad" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:12px;font-weight:600;color:#707088">광고모드</span>
+    <span id="mStat_ad" style="font-size:10px;color:#707088">● OFF</span>
+  </div>
+  <div class="mode-tab" onclick="switchMode('gate')" id="mTab_gate" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:12px;font-weight:600;color:#707088">배달료</span>
+    <span id="mStat_gate" style="font-size:10px;color:#707088">○ OFF</span>
+  </div>
+</div>
+
 </body>
 </html>
