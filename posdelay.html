@@ -233,8 +233,24 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="cb open" id="gate_body">
     <div class="sr"><span class="sl" style="color:#E67E22">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
     <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
-    <div class="sr"><span class="sl">배달료 인상</span><div class="sv"><button class="btn bs bn" onclick="adjGate('fee',-500)">-</button><span id="gate_fee" style="color:#FFF;font-size:14px;font-weight:bold;min-width:56px;text-align:center">4,000원</span><button class="btn bs bn" onclick="adjGate('fee',500)">+</button></div></div>
-    <div class="sr"><span class="sl">기본 배달료</span><div class="sv"><button class="btn bs bn" onclick="adjGate('base',-500)">-</button><span id="gate_base" style="color:#9090A8;font-size:13px;font-weight:bold;min-width:56px;text-align:center">500원</span><button class="btn bs bn" onclick="adjGate('base',500)">+</button></div></div>
+    <div style="padding:6px 0"><span class="sl">배달료 인상</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px" id="fee_presets">
+        <button class="btn bs bn" onclick="setGateFee(1000)">1,000</button>
+        <button class="btn bs bn" onclick="setGateFee(2000)">2,000</button>
+        <button class="btn bs bn" onclick="setGateFee(3000)">3,000</button>
+        <button class="btn bs bn" onclick="setGateFee(4000)">4,000</button>
+        <button class="btn bs bn" onclick="setGateFee(5000)">5,000</button>
+      </div>
+    </div>
+    <div style="padding:6px 0"><span class="sl">기본(복원) 배달료</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px" id="base_presets">
+        <button class="btn bs bn" onclick="setGateBase(0)">0</button>
+        <button class="btn bs bn" onclick="setGateBase(500)">500</button>
+        <button class="btn bs bn" onclick="setGateBase(1000)">1,000</button>
+        <button class="btn bs bn" onclick="setGateBase(1500)">1,500</button>
+        <button class="btn bs bn" onclick="setGateBase(2000)">2,000</button>
+      </div>
+    </div>
     <div id="gate_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:#E67E22"></div>
   </div>
 </div>
@@ -1147,6 +1163,17 @@ function adjGate(key, delta) {
   if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
   if (key==='fee') { gateSettings.fee = Math.max(500, Math.min(10000, gateSettings.fee+delta)); document.getElementById('gate_fee').textContent = gateSettings.fee.toLocaleString()+'원'; }
   if (key==='base') { gateSettings.base = Math.max(0, Math.min(5000, gateSettings.base+delta)); document.getElementById('gate_base').textContent = gateSettings.base.toLocaleString()+'원'; }
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+}
+
+function setGateFee(v) {
+  gateSettings.fee = v;
+  document.querySelectorAll('#fee_presets .btn').forEach(b => { b.style.background = b.textContent.replace(/,/g,'')===''+v ? '#E67E22' : '#2A2A45'; b.style.color = b.textContent.replace(/,/g,'')===''+v ? '#FFF' : '#E0E0EC'; });
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+}
+function setGateBase(v) {
+  gateSettings.base = v;
+  document.querySelectorAll('#base_presets .btn').forEach(b => { b.style.background = b.textContent.replace(/,/g,'')===''+v ? '#E67E22' : '#2A2A45'; b.style.color = b.textContent.replace(/,/g,'')===''+v ? '#FFF' : '#E0E0EC'; });
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 
