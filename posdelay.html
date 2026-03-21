@@ -221,6 +221,24 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
+<!-- ═══ 배달료 전용 모니터링 ═══ -->
+<div class="card" id="feeMonitorCard" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
+      <span id="printerLabel" style="font-size:11px;color:#2ECC71">프린터 연결됨</span>
+    </div>
+    <span id="captureTime" style="font-size:10px;color:#707088">--</span>
+  </div>
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+    <span style="font-size:11px;color:#9090A8">유효 배달주문</span>
+    <div><span id="feeValidNum" style="font-size:32px;font-weight:700;color:#FFF">0</span><span style="font-size:13px;color:#9090A8"> 건 / 임계 </span><span id="feeThresholdNum" style="font-size:13px;font-weight:700;color:#707088">8</span></div>
+  </div>
+  <div style="height:8px;background:#2E2E52;border-radius:4px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:4px;transition:width .4s"></div></div>
+  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #2E2E52"><span style="font-size:10px;color:#707088">채널별</span></div>
+  <div id="feeOrderList"><div style="font-size:11px;color:#707088;text-align:center;padding:8px 0">수집 대기중</div></div>
+</div>
+
 <!-- ═══ 3.5 배달료(게이트) 설정 ═══ -->
 <div class="card" id="gatePanel" style="display:none">
   <div class="ch" onclick="togCB('gate_body')">
