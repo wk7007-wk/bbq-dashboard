@@ -1264,7 +1264,23 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ═══ 게이트(배달료) ═══
-let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false};
+let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false, threshold_stop:15};
+
+// 페이지 로드 시 Kotlin에서 저장된 설정 복원
+try {
+  if (typeof NativeBridge !== 'undefined' && NativeBridge.getGateSettings) {
+    var saved = JSON.parse(NativeBridge.getGateSettings());
+    Object.assign(gateSettings, saved);
+    // UI 즉시 반영
+    document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건';
+    document.getElementById('gate_valid').textContent = gateSettings.valid+'분';
+    document.getElementById('stop_threshold').textContent = (gateSettings.threshold_stop||15)+'건';
+    document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
+    // fee 프리셋 하이라이트
+    document.querySelectorAll('#fee_presets .btn').forEach(function(b){var v=parseInt(b.textContent.replace(/,/g,''));b.style.background=v===gateSettings.fee?'#E67E22':'#2A2A45';b.style.color=v===gateSettings.fee?'#FFF':'#E0E0EC';});
+    document.querySelectorAll('#base_presets .btn').forEach(function(b){var v=parseInt(b.textContent.replace(/,/g,''));b.style.background=v===gateSettings.base?'#E67E22':'#2A2A45';b.style.color=v===gateSettings.base?'#FFF':'#E0E0EC';});
+  }
+} catch(e) {}
 
 function adjGate(key, delta) {
   if (key==='threshold') { gateSettings.threshold = Math.max(1, Math.min(30, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
@@ -1366,6 +1382,12 @@ function onGateSettingsUpdate(json) {
 function onGateStatusUpdate(jsonStr) {
   try {
     var s = JSON.parse(jsonStr);
+    // gateSettings 동기화 (새로고침 후 복원)
+    if(s.thresholdFee) { gateSettings.threshold = s.thresholdFee; var el=document.getElementById('gate_threshold'); if(el) el.textContent=s.thresholdFee+'건'; }
+    if(s.thresholdStop) { gateSettings.threshold_stop = s.thresholdStop; var el2=document.getElementById('stop_threshold'); if(el2) el2.textContent=s.thresholdStop+'건'; var el3=document.getElementById('feeThresholdNum'); if(el3) el3.textContent=s.thresholdFee||gateSettings.threshold; }
+    if(s.currentFee) gateSettings.fee = s.currentFee;
+    if(s.baseFee !== undefined) gateSettings.base = s.baseFee;
+    if(s.gateEnabled !== undefined) gateSettings.enabled = s.gateEnabled;
     // 건수 표시
     var fc = document.getElementById('gate_fee_count');
     var sc = document.getElementById('gate_stop_count');
