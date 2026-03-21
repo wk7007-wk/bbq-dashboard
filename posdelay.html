@@ -1284,6 +1284,10 @@ try {
     document.querySelectorAll('#fee_presets .btn').forEach(function(b){var v=parseInt(b.textContent.replace(/,/g,''));b.style.background=v===gateSettings.fee?'#E67E22':'#2A2A45';b.style.color=v===gateSettings.fee?'#FFF':'#E0E0EC';});
     document.querySelectorAll('#base_presets .btn').forEach(function(b){var v=parseInt(b.textContent.replace(/,/g,''));b.style.background=v===gateSettings.base?'#E67E22':'#2A2A45';b.style.color=v===gateSettings.base?'#FFF':'#E0E0EC';});
   }
+  // 프린터 주문 리스트 즉시 복원
+  if (typeof NativeBridge !== 'undefined' && NativeBridge.getCaptureStatus) {
+    onCaptureStatusUpdate(NativeBridge.getCaptureStatus());
+  }
 } catch(e) {}
 
 function adjGate(key, delta) {
