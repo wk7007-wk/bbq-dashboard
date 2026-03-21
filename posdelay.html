@@ -339,13 +339,19 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="ch" onclick="togCB('stop_body')">
     <div class="row">
       <span style="font-size:13px;font-weight:600;color:#E74C3C">영업정지</span>
-      <span style="font-size:11px;color:#707088;margin-left:8px">KDS 전체건수 기준</span>
     </div>
     <span style="font-size:11px;color:#707088">▾</span>
   </div>
   <div class="cb open" id="stop_body">
+    <div class="sr" style="margin-bottom:6px">
+      <span class="sl">건수 소스</span>
+      <div class="sv" style="gap:4px">
+        <button class="btn bs" id="stop_src_printer" onclick="setStopSource('PRINTER')" style="background:#2A2A45;color:#E0E0EC;font-size:10px">프린터</button>
+        <button class="btn bs" id="stop_src_kds" onclick="setStopSource('KDS')" style="background:#2AC1BC;color:#FFF;font-size:10px">KDS</button>
+      </div>
+    </div>
     <div style="margin:6px 0">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>KDS 전체건수</span><span id="stop_kds_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span id="stop_src_label">KDS 전체건수</span><span id="stop_kds_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
       <div style="height:8px;background:#2E2E52;margin-top:2px"><div id="stop_kds_bar" style="height:100%;width:0%;background:#E74C3C;transition:width .3s"></div></div>
     </div>
     <div style="margin:8px 0">
@@ -1409,6 +1415,16 @@ function setFeeSource(src) {
   document.getElementById('src_kds').style.background = src==='KDS' ? '#2AC1BC' : '#2A2A45';
   document.getElementById('src_kds').style.color = src==='KDS' ? '#FFF' : '#E0E0EC';
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: src}));
+}
+
+function setStopSource(src) {
+  gateSettings._stopSource = src;
+  document.getElementById('stop_src_printer').style.background = src==='PRINTER' ? '#2AC1BC' : '#2A2A45';
+  document.getElementById('stop_src_printer').style.color = src==='PRINTER' ? '#FFF' : '#E0E0EC';
+  document.getElementById('stop_src_kds').style.background = src==='KDS' ? '#2AC1BC' : '#2A2A45';
+  document.getElementById('stop_src_kds').style.color = src==='KDS' ? '#FFF' : '#E0E0EC';
+  document.getElementById('stop_src_label').textContent = src==='PRINTER' ? '프린터 유효건수' : 'KDS 전체건수';
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({stopSource: src}));
 }
 
 function togCB(id) {
