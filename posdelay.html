@@ -1550,9 +1550,9 @@ function onGateStatusUpdate(jsonStr) {
       if(t) t.classList.toggle('on', pauseState[ch]);
     });
 
-    // 토글 상태
+    // 토글 상태 — 방어 발동 중이면 ON, 아니면 대기/OFF
     var tog = document.getElementById('tog_gate');
-    if(tog) tog.classList.toggle('on', !!s.gateEnabled);
+    if(tog) tog.classList.toggle('on', s.isFeeDefending || s.isStopDefending);
 
     // ═══ 방어 상태 카드 (defenseStatusCard) ═══
     // 활성 탭 표시
