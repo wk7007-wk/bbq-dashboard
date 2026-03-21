@@ -1243,7 +1243,7 @@ function switchMode(mode) {
   document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
   // 해당 모드 카드만 표시
   const ids = MODE_CARDS[mode] || MODE_CARDS.cook;
-  ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = ''; });
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'block'; });
   // permCard: 앱에서만 표시
   if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
 
