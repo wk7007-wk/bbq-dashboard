@@ -1634,7 +1634,7 @@ function onCaptureStatusUpdate(jsonStr) {
 
     // 유효건수 + 리스트 카드 표시
     var fv = document.getElementById('feeValidNum');
-    if(fv) fv.textContent = (s.orders||[]).length;
+    if(fv) fv.textContent = (s.orders||[]).filter(function(o){return !o.expired;}).length;
     // 주문 리스트 카드 건수 업데이트
     var flc = document.getElementById('feeListCount');
     if(flc) flc.textContent = (s.orders||[]).length + '건';
@@ -1658,9 +1658,12 @@ function onCaptureStatusUpdate(jsonStr) {
         var html = '';
         s.orders.forEach(function(o) {
           var chColor = o.channel==='배민'?'#2AC1BC':o.channel==='쿠팡'?'#FFD700':'#E74C3C';
-          html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #2A2A45;font-size:11px">';
-          html += '<div><span style="color:'+chColor+';font-weight:600;margin-right:4px">'+o.channel+'</span><span style="color:#9090A8">'+o.address+'</span></div>';
-          html += '<span style="color:'+(o.elapsed>=25?'#E74C3C':o.elapsed>=15?'#E67E22':'#9090A8')+'">'+o.elapsed+'분</span>';
+          var opacity = o.expired ? '0.4' : '1';
+          var timeColor = o.expired ? '#555' : (o.elapsed>=25?'#E74C3C':o.elapsed>=15?'#E67E22':'#9090A8');
+          var addrColor = o.expired ? '#555' : '#9090A8';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #2A2A45;font-size:11px;opacity:'+opacity+'">';
+          html += '<div><span style="color:'+chColor+';font-weight:600;margin-right:4px">'+o.channel+'</span><span style="color:'+addrColor+'">'+o.address+'</span></div>';
+          html += '<span style="color:'+timeColor+'">'+o.elapsed+'분</span>';
           html += '</div>';
         });
         ol.innerHTML = html;
