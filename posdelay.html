@@ -1449,6 +1449,11 @@ function switchMode(mode) {
     }
     var tg = document.getElementById('tog_gate');
     if(tg) tg.classList.toggle('on', gateSettings.enabled);
+    // 양쪽 탭 상태 즉시 갱신 (Kotlin push 기다리지 않음)
+    var msp = document.getElementById('mStat_printer');
+    var msk = document.getElementById('mStat_kds');
+    if(msp) { msp.textContent = gateSettings._activeTab==='PRINTER' ? '● ON' : '○ OFF'; msp.style.color = gateSettings._activeTab==='PRINTER' ? '#2ECC71' : '#707088'; }
+    if(msk) { msk.textContent = gateSettings._activeTab==='KDS' ? '● ON' : '○ OFF'; msk.style.color = gateSettings._activeTab==='KDS' ? '#2ECC71' : '#707088'; }
   }
 
   ['cook','ad','printer','kds'].forEach(m => {
