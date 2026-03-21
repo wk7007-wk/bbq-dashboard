@@ -272,6 +272,13 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="gatePanelArrow" style="font-size:11px;color:#707088;transition:transform .25s">&#9654;</span>
   </div>
   <div class="cb open" id="gate_body">
+    <div class="sr">
+      <span class="sl">건수 소스</span>
+      <div class="sv" style="gap:4px">
+        <button class="btn bs" id="src_printer" onclick="setFeeSource('PRINTER')" style="background:#2AC1BC;color:#FFF">프린터</button>
+        <button class="btn bs" id="src_kds" onclick="setFeeSource('KDS')" style="background:#2A2A45;color:#E0E0EC">KDS</button>
+      </div>
+    </div>
     <div style="display:flex;gap:8px;margin-bottom:6px">
       <div style="flex:1">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>B 배달료 (유효)</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
@@ -1334,9 +1341,11 @@ try {
     document.getElementById('feeThresholdNum').textContent = gateSettings.threshold;
     if(saved.activeTab) {
       gateSettings._activeTab = saved.activeTab;
-      // 최근 활성 탭 복원
-      var restoreMode = saved.activeTab === 'PRINTER' ? 'printer' : saved.activeTab === 'KDS' ? 'kds' : null;
-      if(restoreMode) setTimeout(function(){ switchMode(restoreMode); }, 300);
+      // 소스 선택 버튼 복원 + 배달료 탭 전환
+      setTimeout(function(){
+        setFeeSource(saved.activeTab);
+        switchMode('fee');
+      }, 300);
     }
     document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
     // fee 프리셋 하이라이트
@@ -1378,21 +1387,28 @@ function setGateBase(v) {
 
 function togGate() {
   // 방어 시스템 활성화/비활성화 (임계값 도달 시 자동 발동 허용/차단)
-  var myTab = currentMode === 'printer' ? 'PRINTER' : currentMode === 'kds' ? 'KDS' : '';
+  var myTab = gateSettings._activeTab || '';
   if (!myTab) return;
 
-  // 현재 탭이 활성이면 → 비활성화
-  if (gateSettings.enabled && gateSettings._activeTab === myTab) {
+  // 현재 활성이면 → 비활성화
+  if (gateSettings.enabled) {
     gateSettings.enabled = false;
-    gateSettings._activeTab = '';
   } else {
-    // 활성화 (다른 탭 자동 OFF)
+    // 활성화
     gateSettings.enabled = true;
-    gateSettings._activeTab = myTab;
   }
 
   // Kotlin에 전달 — UI 갱신은 onGateStatusUpdate에서 일괄 처리
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: gateSettings._activeTab}));
+}
+
+function setFeeSource(src) {
+  gateSettings._activeTab = src;
+  document.getElementById('src_printer').style.background = src==='PRINTER' ? '#2AC1BC' : '#2A2A45';
+  document.getElementById('src_printer').style.color = src==='PRINTER' ? '#FFF' : '#E0E0EC';
+  document.getElementById('src_kds').style.background = src==='KDS' ? '#2AC1BC' : '#2A2A45';
+  document.getElementById('src_kds').style.color = src==='KDS' ? '#FFF' : '#E0E0EC';
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: src}));
 }
 
 function togCB(id) {
@@ -1431,8 +1447,8 @@ function togFeeListExpand() {
 const MODE_CARDS = {
   cook: ['monitorCard','cookCard','gaugeCard','delayCard','chartCard','logCard','permCard'],
   ad:   ['monitorCard','gaugeCard','adSettingCard','delayCard','chartCard','logCard','permCard'],
-  printer: ['feeMonitorCard','feeOrderListCard','gatePanel','stopPanel','defenseStatusCard'],
-  kds: ['monitorCard','gatePanel','stopPanel','defenseStatusCard']
+  fee: ['feeMonitorCard','feeOrderListCard','gatePanel','defenseStatusCard'],
+  stop: ['monitorCard','stopPanel','defenseStatusCard']
 };
 let currentMode = 'cook';
 
@@ -1447,10 +1463,10 @@ function switchMode(mode) {
   if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
 
   // 탭 활성화
-  // 프린터/KDS 탭: 클릭 = 모니터링 보기만 (설정 변경 없음)
+  // 배달료/영업정지 탭: 클릭 = 모니터링 보기만 (설정 변경 없음)
   // 방어 ON/OFF는 탭 안의 tog_gate 토글로만 제어
 
-  ['cook','ad','printer','kds'].forEach(m => {
+  ['cook','ad','fee','stop'].forEach(m => {
     const tab = document.getElementById('mTab_'+m);
     if(!tab) return;
     const isActive = m===mode;
@@ -1541,8 +1557,7 @@ function onGateStatusUpdate(jsonStr) {
 
     // 토글 상태 — 활성(대기 이상)이면 ON
     var tog = document.getElementById('tog_gate');
-    var myTab = currentMode === 'printer' ? 'PRINTER' : currentMode === 'kds' ? 'KDS' : '';
-    if(tog) tog.classList.toggle('on', s.gateEnabled && s.activeTab === myTab);
+    if(tog) tog.classList.toggle('on', s.gateEnabled && !!s.activeTab);
 
     // ═══ 방어 상태 카드 (defenseStatusCard) ═══
     // 활성 탭 표시
@@ -1585,25 +1600,19 @@ function onGateStatusUpdate(jsonStr) {
     }
 
     // ═══ 하단 탭 상태 ═══
-    // 프린터 탭
-    var msp = document.getElementById('mStat_printer');
+    // 배달료 탭
+    var msp = document.getElementById('mStat_fee');
     if(msp) {
-      if(s.activeTab==='PRINTER') {
-        if(s.isStopDefending) { msp.textContent='● 정지중'; msp.style.color='#E74C3C'; }
-        else if(s.isFeeDefending) { msp.textContent='● 유도중'; msp.style.color='#E67E22'; }
-        else if(s.gateEnabled) { msp.textContent='● ON'; msp.style.color='#2ECC71'; }
-        else { msp.textContent='○ OFF'; msp.style.color='#707088'; }
-      } else { msp.textContent='○ OFF'; msp.style.color='#707088'; }
+      if(s.isFeeDefending) { msp.textContent='● 유도중'; msp.style.color='#E67E22'; }
+      else if(s.gateEnabled) { msp.textContent='● ON'; msp.style.color='#2ECC71'; }
+      else { msp.textContent='○ OFF'; msp.style.color='#707088'; }
     }
-    // KDS 탭
-    var msk = document.getElementById('mStat_kds');
+    // 영업정지 탭
+    var msk = document.getElementById('mStat_stop');
     if(msk) {
-      if(s.activeTab==='KDS') {
-        if(s.isStopDefending) { msk.textContent='● 정지중'; msk.style.color='#E74C3C'; }
-        else if(s.isFeeDefending) { msk.textContent='● 유도중'; msk.style.color='#E67E22'; }
-        else if(s.gateEnabled) { msk.textContent='● ON'; msk.style.color='#2ECC71'; }
-        else { msk.textContent='○ OFF'; msk.style.color='#707088'; }
-      } else { msk.textContent='○ OFF'; msk.style.color='#707088'; }
+      if(s.isStopDefending) { msk.textContent='● 정지중'; msk.style.color='#E74C3C'; }
+      else if(s.gateEnabled) { msk.textContent='● ON'; msk.style.color='#2ECC71'; }
+      else { msk.textContent='○ OFF'; msk.style.color='#707088'; }
     }
   } catch(e) {}
 }
@@ -1753,13 +1762,13 @@ function togAdOffOnPause() {
     <span style="font-size:12px;font-weight:600;color:#707088">광고모드</span>
     <span id="mStat_ad" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
-  <div class="mode-tab" onclick="switchMode('printer')" id="mTab_printer" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
-    <span style="font-size:11px;font-weight:600;color:#707088">프린터</span>
-    <span id="mStat_printer" style="font-size:10px;color:#707088">○ OFF</span>
+  <div class="mode-tab" onclick="switchMode('fee')" id="mTab_fee" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:11px;font-weight:600;color:#707088">배달료</span>
+    <span id="mStat_fee" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
-  <div class="mode-tab" onclick="switchMode('kds')" id="mTab_kds" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
-    <span style="font-size:11px;font-weight:600;color:#707088">KDS</span>
-    <span id="mStat_kds" style="font-size:10px;color:#707088">○ OFF</span>
+  <div class="mode-tab" onclick="switchMode('stop')" id="mTab_stop" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:11px;font-weight:600;color:#707088">영업정지</span>
+    <span id="mStat_stop" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
 </div>
 
