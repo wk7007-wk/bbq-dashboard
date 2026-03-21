@@ -1672,7 +1672,8 @@ function onCaptureStatusUpdate(jsonStr) {
 
 // ═══ 수동 방어 ═══
 function manualDefense(action, fee) {
-  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, String(fee||0));
+  var finalFee = action.includes('fee_up') ? String(parseInt(fee)||gateSettings.fee||4000) : String(fee||0);
+  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, finalFee);
 }
 function resetAllCircuits() {
   if (typeof NativeBridge !== 'undefined') NativeBridge.resetAllCircuits();
@@ -1693,7 +1694,13 @@ function togBmPause(type) {
   if(bmPause.agency) types.push('AGENCY_DELIVERY');
   if(bmPause.own) types.push('OWN_DELIVERY');
   if(bmPause.visit) types.push('VISIT');
-  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('baemin_pause_selective', types.join(','));
+  if(typeof NativeBridge!=='undefined') {
+    if(types.length === 0) {
+      NativeBridge.manualDefense('baemin_resume', '0');
+    } else {
+      NativeBridge.manualDefense('baemin_pause_selective', types.join(','));
+    }
+  }
   // 광고 OFF
   if(bmPause[type] && adOffOnPause && typeof NativeBridge!=='undefined') NativeBridge.setSetting('baemin_auto_enabled','false');
 }
