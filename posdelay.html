@@ -584,6 +584,13 @@ function updMonitor(){
   document.getElementById('mLast').textContent='마지막: '+(aS.last_ad_action??'--');
   updCooldown();
   updCkQueue();updGauges(c);updDelayPred();chkAlert(c);
+  // 광고 탭 상태 반영
+  var msAd=document.getElementById('mStat_ad');
+  if(msAd){
+    var adOn=S.ad_enabled;
+    if(adOn){msAd.textContent='● ON';msAd.style.color='#2ECC71';}
+    else{msAd.textContent='○ OFF';msAd.style.color='#707088';}
+  }
 }
 
 // === 쿨타임 게이지 (상시 모니터링) ===
