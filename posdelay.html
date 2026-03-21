@@ -1289,7 +1289,12 @@ try {
     document.getElementById('gate_valid').textContent = gateSettings.valid+'분';
     document.getElementById('stop_threshold').textContent = (gateSettings.threshold_stop||15)+'건';
     document.getElementById('feeThresholdNum').textContent = gateSettings.threshold;
-    if(saved.activeTab) gateSettings._activeTab = saved.activeTab;
+    if(saved.activeTab) {
+      gateSettings._activeTab = saved.activeTab;
+      // 최근 활성 탭 복원
+      var restoreMode = saved.activeTab === 'PRINTER' ? 'printer' : saved.activeTab === 'KDS' ? 'kds' : null;
+      if(restoreMode) setTimeout(function(){ switchMode(restoreMode); }, 300);
+    }
     document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
     // fee 프리셋 하이라이트
     document.querySelectorAll('#fee_presets .btn').forEach(function(b){var v=parseInt(b.textContent.replace(/,/g,''));b.style.background=v===gateSettings.fee?'#E67E22':'#2A2A45';b.style.color=v===gateSettings.fee?'#FFF':'#E0E0EC';});
