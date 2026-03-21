@@ -261,7 +261,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div class="sr"><span class="sl" style="color:#E67E22">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
     <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
-    <div style="padding:6px 0"><span class="sl">배달료 인상</span>
+    <div style="padding:6px 0"><span class="sl">배달료 인상 (자동 설정 + 수동 즉시 적용)</span>
       <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px" id="fee_presets">
         <button class="btn bs bn" onclick="setGateFee(0)">0</button>
         <button class="btn bs bn" onclick="setGateFee(1000)">1,000</button>
@@ -273,6 +273,10 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bn" onclick="setGateFee(2000)">2,000</button>
         <button class="btn bs bn" onclick="setGateFee(2500)">2,500</button>
         <button class="btn bs bn" onclick="setGateFee(3000)">3,000</button>
+      </div>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">수동 인상</button>
+        <button class="btn bs bg" onclick="manualDefense('fee_restore', 0)" id="btn_fee_restore">수동 복원</button>
       </div>
     </div>
     <div style="padding:6px 0"><span class="sl">기본(복원) 배달료</span>
@@ -294,7 +298,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 영업정지 패널 ═══ -->
+<!-- ═══ 영업정지 설정 ═══ -->
 <div class="card" id="stopPanel" style="display:none">
   <div class="ch" onclick="togCB('stop_body')">
     <div class="row">
@@ -304,16 +308,59 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span style="font-size:11px;color:#707088">▾</span>
   </div>
   <div class="cb open" id="stop_body">
-    <!-- KDS 게이지 -->
     <div style="margin:6px 0">
       <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>KDS 전체건수</span><span id="stop_kds_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
       <div style="height:8px;background:#2E2E52;margin-top:2px"><div id="stop_kds_bar" style="height:100%;width:0%;background:#E74C3C;transition:width .3s"></div></div>
     </div>
-    <!-- 임계값 -->
-    <div class="sr"><span class="sl" style="color:#E74C3C">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold" style="color:#E74C3C;font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
-    <!-- 정지 상태 -->
+    <div class="sr"><span class="sl" style="color:#E74C3C">영업정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold" style="color:#E74C3C;font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+    <div style="padding:6px 0"><span class="sl">채널별 정지</span>
+      <div style="margin-top:6px">
+        <div class="sr"><span class="sl" style="color:#2AC1BC">배민</span><div class="sv"><div class="tog" id="tog_pause_baemin" onclick="togPause('baemin')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#FFD700">쿠팡</span><div class="sv"><div class="tog" id="tog_pause_coupang" onclick="togPause('coupang')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#E74C3C">요기요</span><div class="sv"><div class="tog" id="tog_pause_yogiyo" onclick="togPause('yogiyo')"></div></div></div>
+      </div>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <button class="btn bs bred" onclick="manualDefense('pause',0)" id="btn_pause" style="flex:1">전체 정지</button>
+        <button class="btn bs bg" onclick="manualDefense('resume',0)" id="btn_resume" style="flex:1">전체 재개</button>
+      </div>
+    </div>
+    <div style="padding:4px 0">
+      <div class="sr"><span class="sl">정지 시 광고 자동 OFF</span><div class="sv"><div class="tog on" id="tog_ad_off_on_pause" onclick="togAdOffOnPause()"></div></div></div>
+    </div>
     <div id="stop_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:#E74C3C"></div>
   </div>
+</div>
+
+<!-- ═══ 방어 상태 (서킷브레이커 + 에스컬레이션) ═══ -->
+<div class="card" id="defenseStatusCard" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+    <span style="font-size:13px;font-weight:600;color:#A0A0BC">방어 상태</span>
+    <span id="def_activeTab" style="font-size:11px;color:#707088"></span>
+  </div>
+  <!-- 현재 방어 배너 -->
+  <div id="def_banner" style="display:none;padding:8px;border-radius:6px;margin-bottom:6px;font-size:12px;font-weight:600;text-align:center"></div>
+  <!-- 에스컬레이션 카운터 -->
+  <div id="def_escalation" style="display:none;padding:4px 8px;border-radius:4px;background:#E67E2233;border:1px solid #E67E22;font-size:11px;color:#E67E22;margin-bottom:6px;text-align:center"></div>
+  <!-- 서킷브레이커 상태 -->
+  <div style="font-size:10px;color:#707088;margin-bottom:4px">서킷브레이커</div>
+  <div style="display:flex;gap:6px;margin-bottom:6px">
+    <div style="flex:1;background:#1A1A30;border-radius:4px;padding:6px;text-align:center">
+      <div style="font-size:10px;color:#9090A8">배민</div>
+      <div id="cb_baemin" style="font-size:12px;font-weight:600;color:#2ECC71">OK</div>
+    </div>
+    <div style="flex:1;background:#1A1A30;border-radius:4px;padding:6px;text-align:center">
+      <div style="font-size:10px;color:#9090A8">쿠팡</div>
+      <div id="cb_coupang" style="font-size:12px;font-weight:600;color:#2ECC71">OK</div>
+    </div>
+    <div style="flex:1;background:#1A1A30;border-radius:4px;padding:6px;text-align:center">
+      <div style="font-size:10px;color:#9090A8">요기요</div>
+      <div id="cb_yogiyo" style="font-size:12px;font-weight:600;color:#2ECC71">OK</div>
+    </div>
+  </div>
+  <!-- 액션 락 상태 -->
+  <div id="def_lock" style="display:none;font-size:10px;color:#E67E22;text-align:center;padding:2px 0"></div>
+  <!-- 서킷 리셋 -->
+  <button class="btn bs bn" onclick="resetAllCircuits()" style="width:100%;margin-top:4px;font-size:10px;color:#9898B0">서킷 전체 리셋</button>
 </div>
 
 <!-- ═══ 4. 지연 설정 ═══ -->
@@ -1250,8 +1297,6 @@ function togGate() {
   gateSettings.enabled = !gateSettings.enabled;
   const el = document.getElementById('tog_gate');
   el.classList.toggle('on', gateSettings.enabled);
-  document.getElementById('mStat_gate').textContent = gateSettings.enabled ? '● ON' : '○ OFF';
-  document.getElementById('mStat_gate').style.color = gateSettings.enabled ? '#2ECC71' : '#707088';
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 
@@ -1261,8 +1306,8 @@ function togCB(id) { const e = document.getElementById(id); if(e) e.classList.to
 const MODE_CARDS = {
   cook: ['monitorCard','cookCard','gaugeCard','delayCard','chartCard','logCard','permCard'],
   ad:   ['monitorCard','gaugeCard','adSettingCard','delayCard','chartCard','logCard','permCard'],
-  gate: ['feeMonitorCard','gatePanel'],
-  stop: ['monitorCard','stopPanel']
+  printer: ['feeMonitorCard','gatePanel','stopPanel','defenseStatusCard'],
+  kds: ['monitorCard','gatePanel','stopPanel','defenseStatusCard']
 };
 let currentMode = 'cook';
 
@@ -1277,7 +1322,13 @@ function switchMode(mode) {
   if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
 
   // 탭 활성화
-  ['cook','ad','gate','stop'].forEach(m => {
+  // 탭 전환 시 DefenseEngine에 activeTab 전달
+  if (mode === 'printer' || mode === 'kds') {
+    const tab = mode === 'printer' ? 'PRINTER' : 'KDS';
+    if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: tab}));
+  }
+
+  ['cook','ad','printer','kds'].forEach(m => {
     const tab = document.getElementById('mTab_'+m);
     if(!tab) return;
     const isActive = m===mode;
@@ -1303,8 +1354,6 @@ function onGateSettingsUpdate(json) {
     document.getElementById('gate_fee').textContent = (s.fee||4000).toLocaleString()+'원';
     document.getElementById('gate_base').textContent = (s.base||500).toLocaleString()+'원';
     document.getElementById('tog_gate').classList.toggle('on', !!s.enabled);
-    document.getElementById('mStat_gate').textContent = s.enabled ? '● ON' : '○ OFF';
-    document.getElementById('mStat_gate').style.color = s.enabled ? '#2ECC71' : '#707088';
     if (s.defending) {
       document.getElementById('gate_status').style.display = '';
       document.getElementById('gate_status').textContent = '배달료 인상 중 · ' + (s.fee||4000).toLocaleString() + '원';
@@ -1341,25 +1390,124 @@ function onGateStatusUpdate(jsonStr) {
     var skc = document.getElementById('stop_kds_count');
     var skb = document.getElementById('stop_kds_bar');
     var ss = document.getElementById('stop_status');
-    var ms2 = document.getElementById('mStat_stop');
     if(skc) skc.textContent = (s.totalCount||0)+'건';
     if(skb) { var r3=Math.min((s.totalCount||0)/(s.thresholdStop||15)*100, 150); skb.style.width=r3+'%'; skb.style.background=s.isStopDefending?'#E74C3C':r3>70?'#E67E22':'#4FC3F7'; }
     if(ss) { if(s.isStopDefending) { ss.style.display=''; ss.textContent='영업정지 중'; } else { ss.style.display='none'; } }
-    if(ms2) { ms2.textContent=s.isStopDefending?'● 정지중':s.gateEnabled?'● 대기':'○ OFF'; ms2.style.color=s.isStopDefending?'#E74C3C':s.gateEnabled?'#2ECC71':'#707088'; }
+
+    // 수동 버튼 상태
+    var bp = document.getElementById('btn_pause');
+    var br = document.getElementById('btn_resume');
+    if(bp) { bp.disabled = s.isStopDefending || s.actionLocked; bp.style.opacity = bp.disabled ? '0.4' : '1'; }
+    if(br) { br.disabled = !s.isStopDefending || s.actionLocked; br.style.opacity = br.disabled ? '0.4' : '1'; }
+
+    // 채널별 정지 토글 동기화
+    if(s.isStopDefending) {
+      pauseState.baemin=true; pauseState.coupang=true; pauseState.yogiyo=true;
+    }
+    ['baemin','coupang','yogiyo'].forEach(function(ch){
+      var t=document.getElementById('tog_pause_'+ch);
+      if(t) t.classList.toggle('on', pauseState[ch]);
+    });
 
     // 토글 상태
     var tog = document.getElementById('tog_gate');
     if(tog) tog.classList.toggle('on', !!s.gateEnabled);
 
-    // 하단 탭 상태
-    var ms = document.getElementById('mStat_gate');
-    if(ms) {
-      if(s.isStopDefending) { ms.textContent='● 정지중'; ms.style.color='#E74C3C'; }
-      else if(s.isFeeDefending) { ms.textContent='● 유도중'; ms.style.color='#E67E22'; }
-      else if(s.gateEnabled) { ms.textContent='● ON'; ms.style.color='#2ECC71'; }
-      else { ms.textContent='○ OFF'; ms.style.color='#707088'; }
+    // ═══ 방어 상태 카드 (defenseStatusCard) ═══
+    // 활성 탭 표시
+    var at = document.getElementById('def_activeTab');
+    if(at) at.textContent = s.activeTab==='PRINTER'?'프린터 기반':s.activeTab==='KDS'?'KDS 기반':'비활성';
+
+    // 방어 배너
+    var bn = document.getElementById('def_banner');
+    if(bn) {
+      if(s.isStopDefending) { bn.style.display=''; bn.textContent='🔴 영업정지 중'; bn.style.background='#E74C3C33'; bn.style.border='1px solid #E74C3C'; bn.style.color='#E74C3C'; }
+      else if(s.isFeeDefending) { bn.style.display=''; bn.textContent='🟠 배달료 '+(s.currentFee||0).toLocaleString()+'원 인상 중'; bn.style.background='#E67E2233'; bn.style.border='1px solid #E67E22'; bn.style.color='#E67E22'; }
+      else if(s.gateEnabled) { bn.style.display=''; bn.textContent='🟢 방어 대기'; bn.style.background='#2ECC7133'; bn.style.border='1px solid #2ECC71'; bn.style.color='#2ECC71'; }
+      else { bn.style.display='none'; }
+    }
+
+    // 에스컬레이션 카운터
+    var esc = document.getElementById('def_escalation');
+    if(esc) {
+      if(s.escalationRemainSec > 0) { esc.style.display=''; esc.textContent='에스컬레이션까지 '+Math.ceil(s.escalationRemainSec/60)+'분'; }
+      else { esc.style.display='none'; }
+    }
+
+    // 서킷브레이커 상태
+    if(s.circuits) {
+      ['baemin','coupang','yogiyo'].forEach(function(ch) {
+        var el = document.getElementById('cb_'+ch);
+        if(!el || !s.circuits[ch]) return;
+        var c = s.circuits[ch];
+        if(c.open) { el.textContent='차단 ('+c.fails+'회)'; el.style.color='#E74C3C'; }
+        else if(c.fails > 0) { el.textContent='주의 ('+c.fails+'/3)'; el.style.color='#E67E22'; }
+        else { el.textContent='OK'; el.style.color='#2ECC71'; }
+      });
+    }
+
+    // 액션 락 상태
+    var dl = document.getElementById('def_lock');
+    if(dl) {
+      if(s.actionLocked) { dl.style.display=''; dl.textContent='⏳ 실행 중: '+(s.currentAction||''); }
+      else { dl.style.display='none'; }
+    }
+
+    // ═══ 하단 탭 상태 ═══
+    // 프린터 탭
+    var msp = document.getElementById('mStat_printer');
+    if(msp) {
+      if(s.activeTab==='PRINTER') {
+        if(s.isStopDefending) { msp.textContent='● 정지중'; msp.style.color='#E74C3C'; }
+        else if(s.isFeeDefending) { msp.textContent='● 유도중'; msp.style.color='#E67E22'; }
+        else if(s.gateEnabled) { msp.textContent='● ON'; msp.style.color='#2ECC71'; }
+        else { msp.textContent='○ OFF'; msp.style.color='#707088'; }
+      } else { msp.textContent='○ OFF'; msp.style.color='#707088'; }
+    }
+    // KDS 탭
+    var msk = document.getElementById('mStat_kds');
+    if(msk) {
+      if(s.activeTab==='KDS') {
+        if(s.isStopDefending) { msk.textContent='● 정지중'; msk.style.color='#E74C3C'; }
+        else if(s.isFeeDefending) { msk.textContent='● 유도중'; msk.style.color='#E67E22'; }
+        else if(s.gateEnabled) { msk.textContent='● ON'; msk.style.color='#2ECC71'; }
+        else { msk.textContent='○ OFF'; msk.style.color='#707088'; }
+      } else { msk.textContent='○ OFF'; msk.style.color='#707088'; }
     }
   } catch(e) {}
+}
+
+// ═══ 수동 방어 ═══
+function manualDefense(action, fee) {
+  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, fee||0);
+}
+function resetAllCircuits() {
+  if (typeof NativeBridge !== 'undefined') NativeBridge.resetAllCircuits();
+}
+
+// 채널별 영업정지 토글
+let pauseState = {baemin:false, coupang:false, yogiyo:false};
+let adOffOnPause = true;
+
+function togPause(ch) {
+  pauseState[ch] = !pauseState[ch];
+  var el = document.getElementById('tog_pause_'+ch);
+  if(el) el.classList.toggle('on', pauseState[ch]);
+  var action = pauseState[ch] ? ch+'_pause' : ch+'_resume';
+  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, 0);
+  // 정지 시 광고 자동 OFF
+  if (pauseState[ch] && adOffOnPause) {
+    if (typeof NativeBridge !== 'undefined') {
+      if (ch==='baemin') NativeBridge.setSetting('baemin_auto_enabled','false');
+      if (ch==='coupang') NativeBridge.setSetting('coupang_auto_enabled','false');
+    }
+  }
+}
+
+function togAdOffOnPause() {
+  adOffOnPause = !adOffOnPause;
+  var el = document.getElementById('tog_ad_off_on_pause');
+  if(el) el.classList.toggle('on', adOffOnPause);
 }
 </script>
 
@@ -1373,13 +1521,13 @@ function onGateStatusUpdate(jsonStr) {
     <span style="font-size:12px;font-weight:600;color:#707088">광고모드</span>
     <span id="mStat_ad" style="font-size:10px;color:#707088">● OFF</span>
   </div>
-  <div class="mode-tab" onclick="switchMode('gate')" id="mTab_gate" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
-    <span style="font-size:11px;font-weight:600;color:#707088">배달료</span>
-    <span id="mStat_gate" style="font-size:10px;color:#707088">○ OFF</span>
+  <div class="mode-tab" onclick="switchMode('printer')" id="mTab_printer" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:11px;font-weight:600;color:#707088">프린터</span>
+    <span id="mStat_printer" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
-  <div class="mode-tab" onclick="switchMode('stop')" id="mTab_stop" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
-    <span style="font-size:11px;font-weight:600;color:#707088">영업정지</span>
-    <span id="mStat_stop" style="font-size:10px;color:#707088">○ OFF</span>
+  <div class="mode-tab" onclick="switchMode('kds')" id="mTab_kds" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:11px;font-weight:600;color:#707088">KDS</span>
+    <span id="mStat_kds" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
 </div>
 
