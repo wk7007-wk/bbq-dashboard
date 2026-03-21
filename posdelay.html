@@ -1654,7 +1654,7 @@ function onCaptureStatusUpdate(jsonStr) {
     var pl = document.getElementById('printerLabel');
     var ct = document.getElementById('captureTime');
     if(pd) { pd.className = 'dot ' + (s.printerConnected ? 'dg' : 'dr'); }
-    if(pl) { pl.textContent = s.printerConnected ? '프린터 연결됨' : '프린터 끊김'; pl.style.color = s.printerConnected ? '#2ECC71' : '#E74C3C'; }
+    if(pl) { pl.textContent = (s.printerConnected ? '프린터 연결됨' : '프린터 끊김') + (s.status ? ' · '+s.status : ''); pl.style.color = s.printerConnected ? '#2ECC71' : '#E74C3C'; }
     if(ct) ct.textContent = s.lastCaptureAt || '--';
 
     // 유효건수 + 리스트 카드 표시
