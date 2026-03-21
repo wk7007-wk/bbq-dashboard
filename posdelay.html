@@ -1477,6 +1477,60 @@ function onGateStatusUpdate(jsonStr) {
   } catch(e) {}
 }
 
+// ═══ 캡처(프린터) 주문 리스트 ═══
+function onCaptureStatusUpdate(jsonStr) {
+  try {
+    var s = JSON.parse(jsonStr);
+    // 프린터 연결 상태
+    var pd = document.getElementById('printerDot');
+    var pl = document.getElementById('printerLabel');
+    var ct = document.getElementById('captureTime');
+    if(pd) { pd.className = 'dot ' + (s.printerConnected ? 'dg' : 'dr'); }
+    if(pl) { pl.textContent = s.printerConnected ? '프린터 연결됨' : '프린터 끊김'; pl.style.color = s.printerConnected ? '#2ECC71' : '#E74C3C'; }
+    if(ct) ct.textContent = s.lastCaptureAt || '--';
+
+    // 유효건수
+    var fv = document.getElementById('feeValidNum');
+    if(fv) fv.textContent = (s.orders||[]).length;
+
+    // 게이지 바
+    var fg = document.getElementById('feeGaugeBar');
+    var th = parseInt(document.getElementById('feeThresholdNum')?.textContent) || 8;
+    if(fg) { var r = Math.min((s.orders||[]).length / th * 100, 150); fg.style.width = r+'%'; fg.style.background = r>=100?'#E74C3C':r>70?'#E67E22':'#4FC3F7'; }
+
+    // 주문 리스트
+    var ol = document.getElementById('feeOrderList');
+    if(ol) {
+      if(!s.orders || s.orders.length === 0) {
+        ol.innerHTML = '<div style="font-size:11px;color:#707088;text-align:center;padding:8px 0">수집 대기중</div>';
+      } else {
+        var html = '';
+        s.orders.forEach(function(o) {
+          var chColor = o.channel==='배민'?'#2AC1BC':o.channel==='쿠팡'?'#FFD700':'#E74C3C';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #2A2A45;font-size:11px">';
+          html += '<div><span style="color:'+chColor+';font-weight:600;margin-right:4px">'+o.channel+'</span><span style="color:#9090A8">'+o.address+'</span></div>';
+          html += '<span style="color:'+(o.elapsed>=25?'#E74C3C':o.elapsed>=15?'#E67E22':'#9090A8')+'">'+o.elapsed+'분</span>';
+          html += '</div>';
+        });
+        ol.innerHTML = html;
+      }
+    }
+
+    // 채널별 분석
+    var cr = document.getElementById('feeChannelRow');
+    if(cr && s.orders && s.orders.length > 0) {
+      var ch = {};
+      s.orders.forEach(function(o) { ch[o.channel] = (ch[o.channel]||0)+1; });
+      var badges = '<span style="font-size:10px;color:#707088">채널별</span>';
+      Object.keys(ch).forEach(function(k) {
+        var c = k==='배민'?'#2AC1BC':k==='쿠팡'?'#FFD700':'#E74C3C';
+        badges += ' <span style="background:'+c+'22;color:'+c+';padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">'+k+' '+ch[k]+'</span>';
+      });
+      cr.innerHTML = badges;
+    }
+  } catch(e) {}
+}
+
 // ═══ 수동 방어 ═══
 function manualDefense(action, fee) {
   if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, fee||0);
