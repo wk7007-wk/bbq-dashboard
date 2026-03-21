@@ -51,6 +51,13 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 .cd-ring svg{transform:rotate(-90deg);}
 .cd-ring .cd-txt{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#9898B0;}
 .cd-wrap.active .cd-txt{color:#FFF;}
+/* 주문 리스트 스크롤 */
+#feeOrderListWrap{overflow-y:auto;transition:max-height .3s ease;}
+#feeOrderListWrap::-webkit-scrollbar{width:3px;}
+#feeOrderListWrap::-webkit-scrollbar-thumb{background:#2E2E52;border-radius:4px;}
+/* 배달료 설정 헤더 화살표 회전 */
+#gate_body_arrow{transition:transform .25s;}
+.cb.open ~ * #gate_body_arrow{transform:rotate(180deg);}
 </style>
 </head>
 <body>
@@ -235,8 +242,24 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div><span id="feeValidNum" style="font-size:32px;font-weight:700;color:#FFF">0</span><span style="font-size:13px;color:#9090A8"> 건 / 임계 </span><span id="feeThresholdNum" style="font-size:13px;font-weight:700;color:#707088">8</span></div>
   </div>
   <div style="height:8px;background:#2E2E52;border-radius:4px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:4px;transition:width .4s"></div></div>
-  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #2E2E52"><span style="font-size:10px;color:#707088">채널별</span></div>
-  <div id="feeOrderList"><div style="font-size:11px;color:#707088;text-align:center;padding:8px 0">수집 대기중</div></div>
+  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:2px"><span style="font-size:10px;color:#707088">채널별</span></div>
+</div>
+
+<!-- ═══ 배달주문 리스트 ═══ -->
+<div class="card" id="feeOrderListCard" style="display:none;padding:0;overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #2E2E52;cursor:pointer" onclick="togFeeList()">
+    <span style="font-size:12px;font-weight:600;color:#9090A8">주문 리스트</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
+      <span id="feeListArrow" style="font-size:11px;color:#707088">&#9660;</span>
+    </div>
+  </div>
+  <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
+    <div id="feeOrderList" style="padding:4px 0"><div style="font-size:11px;color:#707088;text-align:center;padding:8px 0">수집 대기중</div></div>
+  </div>
+  <div style="display:flex;justify-content:center;padding:6px;border-top:1px solid #2E2E52">
+    <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:#2A2A45;border:1px solid #2E2E52;border-radius:6px;color:#9090A8;font-size:11px;font-weight:600;padding:6px 20px;cursor:pointer;min-height:36px">펼치기</button>
+  </div>
 </div>
 
 <!-- ═══ 3.5 배달료(게이트) 설정 ═══ -->
@@ -246,9 +269,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <span style="font-size:13px;font-weight:600;color:#A0A0BC">배달료</span>
       <div class="tog" id="tog_gate" onclick="event.stopPropagation();togGate()"></div>
     </div>
-    <span style="font-size:11px;color:#707088">&#9662;</span>
+    <span id="gatePanelArrow" style="font-size:11px;color:#707088;transition:transform .25s">&#9654;</span>
   </div>
-  <div class="cb open" id="gate_body">
+  <div class="cb" id="gate_body">
     <div style="display:flex;gap:8px;margin-bottom:6px">
       <div style="flex:1">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>B 배달료 (유효)</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
@@ -716,8 +739,8 @@ function updGauges(c){
 function sendCmd(action,amount){
   const cmd={action:action,amount:amount||0,time:Date.now(),source:'web'};
   fetch(FB+'/posdelay/command.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cmd)})
-    .then(()=>toast(action.replace(/_/g,' ')+' 전송'))
-    .catch(()=>toast('전송 실패'));
+    .then(()=>toast(action.replace(/_/g,' ')+' 전송','ok'))
+    .catch(()=>toast('전송 실패','warn'));
 }
 function doCheck(what){
   if(isApp){
@@ -854,7 +877,7 @@ function togKdsOpen(){
   if(e)e.className='tog'+(paused?'':' on');
   if(isApp){try{NativeBridge.setSetting('kds_paused',String(paused));}catch(ex){}}
   updSyncStatus();
-  toast(paused?'영업 종료 (모니터링 중지)':'영업 시작');
+  toast(paused?'영업 종료 (모니터링 중지)':'영업 시작', paused?'warn':'ok');
 }
 
 // === 스케줄 시간 ===
@@ -972,7 +995,17 @@ function togSec(id){const e=document.getElementById(id),o=e.classList.toggle('op
 // 수동 접기 복원
 try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');Object.keys(c).forEach(id=>{const e=document.getElementById(id);if(e){e.classList.remove('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML='&#9654;';}});}catch(e){}
 function fmtHM(dt){return dt.getHours()+'시'+String(dt.getMinutes()).padStart(2,'0')+'분';}
-function toast(m){const d=document.createElement('div');d.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#2ECC71;color:#FFF;padding:8px 16px;border-radius:8px;font-size:13px;z-index:9999;';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000);}
+let _toastTimer=null;
+function toast(m,type){
+  const bn=document.getElementById('alertB');
+  if(!bn)return;
+  // 타입: ok(초록)/warn(빨강)/info(기본)
+  const t=type||'ok';
+  bn.className='alert '+t;
+  bn.textContent=m;
+  if(_toastTimer)clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{bn.className='alert';_toastTimer=null;},3000);
+}
 
 // === 풀투리프레시 ===
 let _pY=0,_pulling=false;
@@ -1340,13 +1373,43 @@ function togGate() {
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 
-function togCB(id) { const e = document.getElementById(id); if(e) e.classList.toggle('open'); }
+function togCB(id) {
+  const e = document.getElementById(id);
+  if(!e) return;
+  const isOpen = e.classList.toggle('open');
+  // gatePanel 화살표 회전
+  if(id === 'gate_body') {
+    const arr = document.getElementById('gatePanelArrow');
+    if(arr) { arr.innerHTML = isOpen ? '&#9662;' : '&#9654;'; }
+  }
+}
+
+// ─── 주문 리스트 펼침/접힘 ───
+let _feeListOpen = true;
+let _feeListExpanded = false;
+function togFeeList() {
+  _feeListOpen = !_feeListOpen;
+  const wrap = document.getElementById('feeOrderListWrap');
+  const arrow = document.getElementById('feeListArrow');
+  const expandBtn = document.getElementById('feeExpandBtn');
+  if(wrap) wrap.style.maxHeight = _feeListOpen ? (_feeListExpanded ? '800px' : '220px') : '0px';
+  if(arrow) arrow.innerHTML = _feeListOpen ? '&#9660;' : '&#9654;';
+  if(expandBtn) expandBtn.style.display = _feeListOpen ? '' : 'none';
+}
+function togFeeListExpand() {
+  _feeListExpanded = !_feeListExpanded;
+  const wrap = document.getElementById('feeOrderListWrap');
+  const btn = document.getElementById('feeExpandBtn');
+  if(!_feeListOpen) return;
+  if(wrap) wrap.style.maxHeight = _feeListExpanded ? '800px' : '220px';
+  if(btn) { btn.textContent = _feeListExpanded ? '접기' : '펼치기'; btn.style.color = _feeListExpanded ? '#4FC3F7' : '#9090A8'; btn.style.borderColor = _feeListExpanded ? '#4FC3F7' : '#2E2E52'; }
+}
 
 // ═══ 모드 전환 (ID 기반, 인덱스 미사용) ═══
 const MODE_CARDS = {
   cook: ['monitorCard','cookCard','gaugeCard','delayCard','chartCard','logCard','permCard'],
   ad:   ['monitorCard','gaugeCard','adSettingCard','delayCard','chartCard','logCard','permCard'],
-  printer: ['feeMonitorCard','gatePanel','stopPanel','defenseStatusCard'],
+  printer: ['feeMonitorCard','feeOrderListCard','gatePanel','stopPanel','defenseStatusCard'],
   kds: ['monitorCard','gatePanel','stopPanel','defenseStatusCard']
 };
 let currentMode = 'cook';
@@ -1550,9 +1613,17 @@ function onCaptureStatusUpdate(jsonStr) {
     if(pl) { pl.textContent = s.printerConnected ? '프린터 연결됨' : '프린터 끊김'; pl.style.color = s.printerConnected ? '#2ECC71' : '#E74C3C'; }
     if(ct) ct.textContent = s.lastCaptureAt || '--';
 
-    // 유효건수
+    // 유효건수 + 리스트 카드 표시
     var fv = document.getElementById('feeValidNum');
     if(fv) fv.textContent = (s.orders||[]).length;
+    // 주문 리스트 카드 건수 업데이트
+    var flc = document.getElementById('feeListCount');
+    if(flc) flc.textContent = (s.orders||[]).length + '건';
+    // 리스트 카드: printer 모드일 때만 표시
+    var flCard = document.getElementById('feeOrderListCard');
+    if(flCard && document.getElementById('feeMonitorCard').style.display !== 'none') {
+      flCard.style.display = 'block';
+    }
 
     // 게이지 바
     var fg = document.getElementById('feeGaugeBar');
