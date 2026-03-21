@@ -1586,7 +1586,7 @@ function onCaptureStatusUpdate(jsonStr) {
 
 // ═══ 수동 방어 ═══
 function manualDefense(action, fee) {
-  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, fee||0);
+  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, String(fee||0));
 }
 function resetAllCircuits() {
   if (typeof NativeBridge !== 'undefined') NativeBridge.resetAllCircuits();
@@ -1617,7 +1617,7 @@ function togPause(ch) {
   var el = document.getElementById('tog_pause_'+ch);
   if(el) el.classList.toggle('on', pauseState[ch]);
   var action = pauseState[ch] ? ch+'_pause' : ch+'_resume';
-  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense(action, 0);
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense(action, '0');
   if(pauseState[ch] && adOffOnPause && typeof NativeBridge!=='undefined') {
     if(ch==='coupang') NativeBridge.setSetting('coupang_auto_enabled','false');
   }
@@ -1628,7 +1628,7 @@ function pauseAll() {
   pauseState.coupang=true; pauseState.yogiyo=true;
   ['agency','own','visit'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.add('on');});
   ['coupang','yogiyo'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.add('on');});
-  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('pause', 0);
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('pause', '0');
   if(adOffOnPause && typeof NativeBridge!=='undefined') { NativeBridge.setSetting('baemin_auto_enabled','false'); NativeBridge.setSetting('coupang_auto_enabled','false'); }
 }
 
@@ -1637,7 +1637,7 @@ function resumeAll() {
   pauseState.coupang=false; pauseState.yogiyo=false;
   ['agency','own','visit'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.remove('on');});
   ['coupang','yogiyo'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.remove('on');});
-  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('resume', 0);
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('resume', '0');
 }
 
 function togAdOffOnPause() {
