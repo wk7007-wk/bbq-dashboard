@@ -259,8 +259,14 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div style="height:6px;background:#2E2E52;margin-top:2px"><div id="gate_stop_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
       </div>
     </div>
-    <div class="sr"><span class="sl" style="color:#E67E22">배달료 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
-    <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
+    <div style="margin:8px 0">
+      <div class="sr"><span class="sl" style="color:#E67E22">배달료 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#707088;padding:2px 0"><span>min 3건</span><span>max 50건</span></div>
+    </div>
+    <div style="margin:8px 0">
+      <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#707088;padding:2px 0"><span>min 10분</span><span>max 60분</span></div>
+    </div>
     <div style="padding:6px 0"><span class="sl">배달료 인상 (자동 설정 + 수동 즉시 적용)</span>
       <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px" id="fee_presets">
         <button class="btn bs bn" onclick="setGateFee(0)">0</button>
@@ -312,7 +318,10 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>KDS 전체건수</span><span id="stop_kds_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
       <div style="height:8px;background:#2E2E52;margin-top:2px"><div id="stop_kds_bar" style="height:100%;width:0%;background:#E74C3C;transition:width .3s"></div></div>
     </div>
-    <div class="sr"><span class="sl" style="color:#E74C3C">영업정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold" style="color:#E74C3C;font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+    <div style="margin:8px 0">
+      <div class="sr"><span class="sl" style="color:#E74C3C">영업정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold" style="color:#E74C3C;font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#707088;padding:2px 0"><span>min 4건</span><span>max 100건</span></div>
+    </div>
     <div style="padding:6px 0"><span class="sl">채널별 정지</span>
       <div style="margin-top:6px">
         <div style="font-size:10px;color:#707088;padding:2px 0">배민</div>
@@ -1291,7 +1300,7 @@ try {
 } catch(e) {}
 
 function adjGate(key, delta) {
-  if (key==='threshold') { gateSettings.threshold = Math.max(1, Math.min(30, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
+  if (key==='threshold') { gateSettings.threshold = Math.max(3, Math.min(50, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
   if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
   if (key==='fee') { gateSettings.fee = Math.max(500, Math.min(10000, gateSettings.fee+delta)); document.getElementById('gate_fee').textContent = gateSettings.fee.toLocaleString()+'원'; }
   if (key==='base') { gateSettings.base = Math.max(0, Math.min(5000, gateSettings.base+delta)); document.getElementById('gate_base').textContent = gateSettings.base.toLocaleString()+'원'; }
@@ -1300,7 +1309,7 @@ function adjGate(key, delta) {
 
 function adjStop(key, delta) {
   if (key==='threshold') {
-    gateSettings.threshold_stop = Math.max(1, Math.min(30, (gateSettings.threshold_stop||15)+delta));
+    gateSettings.threshold_stop = Math.max(4, Math.min(100, (gateSettings.threshold_stop||15)+delta));
     document.getElementById('stop_threshold').textContent = gateSettings.threshold_stop+'건';
     if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({threshold_stop: gateSettings.threshold_stop}));
   }
