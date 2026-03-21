@@ -1355,10 +1355,23 @@ function switchMode(mode) {
   if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
 
   // 탭 활성화
-  // 탭 전환 시 DefenseEngine에 activeTab 전달
+  // 프린터/KDS 탭: 클릭 = 방어 활성화 (상호배타)
   if (mode === 'printer' || mode === 'kds') {
     const tab = mode === 'printer' ? 'PRINTER' : 'KDS';
-    if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: tab}));
+    const otherTab = mode === 'printer' ? 'KDS' : 'PRINTER';
+    // 이미 활성 탭이면 비활성화 (토글 OFF)
+    if (gateSettings._activeTab === tab && gateSettings.enabled) {
+      gateSettings.enabled = false;
+      gateSettings._activeTab = '';
+      if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: false, activeTab: ''}));
+    } else {
+      // 다른 탭에서 전환 또는 신규 활성화
+      gateSettings.enabled = true;
+      gateSettings._activeTab = tab;
+      if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: true, activeTab: tab}));
+    }
+    var tg = document.getElementById('tog_gate');
+    if(tg) tg.classList.toggle('on', gateSettings.enabled);
   }
 
   ['cook','ad','printer','kds'].forEach(m => {
@@ -1405,6 +1418,7 @@ function onGateStatusUpdate(jsonStr) {
     if(s.currentFee) gateSettings.fee = s.currentFee;
     if(s.baseFee !== undefined) gateSettings.base = s.baseFee;
     if(s.gateEnabled !== undefined) gateSettings.enabled = s.gateEnabled;
+    if(s.activeTab) gateSettings._activeTab = s.activeTab;
     // 건수 표시
     var fc = document.getElementById('gate_fee_count');
     var sc = document.getElementById('gate_stop_count');
