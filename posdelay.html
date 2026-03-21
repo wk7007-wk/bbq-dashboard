@@ -1374,19 +1374,31 @@ function setGateBase(v) {
 }
 
 function togGate() {
-  gateSettings.enabled = !gateSettings.enabled;
-  // ON 시: 현재 보고 있는 탭(printer/kds)을 activeTab으로 설정
-  if (gateSettings.enabled) {
-    var tab = currentMode === 'printer' ? 'PRINTER' : currentMode === 'kds' ? 'KDS' : gateSettings._activeTab || '';
-    gateSettings._activeTab = tab;
+  // 현재 보고 있는 탭 기준으로만 동작
+  var myTab = currentMode === 'printer' ? 'PRINTER' : currentMode === 'kds' ? 'KDS' : '';
+  if (!myTab) return;  // 조리/광고 모드에서는 동작 안 함
+
+  var isMyTabActive = gateSettings.enabled && gateSettings._activeTab === myTab;
+
+  if (isMyTabActive) {
+    // 내 탭이 켜져있으면 → 끄기 (다른 탭 영향 없음)
+    gateSettings.enabled = false;
+    gateSettings._activeTab = '';
+  } else {
+    // 내 탭 켜기 (다른 탭 자동 OFF — 상호배타)
+    gateSettings.enabled = true;
+    gateSettings._activeTab = myTab;
   }
+
   const el = document.getElementById('tog_gate');
-  el.classList.toggle('on', gateSettings.enabled);
-  // 탭 상태 즉시 반영
+  el.classList.toggle('on', gateSettings.enabled && gateSettings._activeTab === myTab);
+
+  // 양쪽 탭 상태 즉시 반영
   var msp = document.getElementById('mStat_printer');
   var msk = document.getElementById('mStat_kds');
   if(msp) { msp.textContent = gateSettings.enabled && gateSettings._activeTab==='PRINTER' ? '● ON' : '○ OFF'; msp.style.color = gateSettings.enabled && gateSettings._activeTab==='PRINTER' ? '#2ECC71' : '#707088'; }
   if(msk) { msk.textContent = gateSettings.enabled && gateSettings._activeTab==='KDS' ? '● ON' : '○ OFF'; msk.style.color = gateSettings.enabled && gateSettings._activeTab==='KDS' ? '#2ECC71' : '#707088'; }
+
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: gateSettings._activeTab}));
 }
 
@@ -1444,6 +1456,12 @@ function switchMode(mode) {
   // 탭 활성화
   // 프린터/KDS 탭: 클릭 = 모니터링 보기만 (설정 변경 없음)
   // 방어 ON/OFF는 탭 안의 tog_gate 토글로만 제어
+  // 탭 전환 시 토글 상태를 해당 탭에 맞게 표시
+  if (mode === 'printer' || mode === 'kds') {
+    var myTab = mode === 'printer' ? 'PRINTER' : 'KDS';
+    var tg = document.getElementById('tog_gate');
+    if(tg) tg.classList.toggle('on', gateSettings.enabled && gateSettings._activeTab === myTab);
+  }
 
   ['cook','ad','printer','kds'].forEach(m => {
     const tab = document.getElementById('mTab_'+m);
