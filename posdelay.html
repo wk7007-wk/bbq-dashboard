@@ -231,6 +231,16 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span style="font-size:11px;color:#707088">&#9662;</span>
   </div>
   <div class="cb open" id="gate_body">
+    <div style="display:flex;gap:8px;margin-bottom:6px">
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>B 배달료 (유효)</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+        <div style="height:6px;background:#2E2E52;margin-top:2px"><div id="gate_fee_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>A 영업정지 (KDS)</span><span id="gate_stop_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+        <div style="height:6px;background:#2E2E52;margin-top:2px"><div id="gate_stop_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
+      </div>
+    </div>
     <div class="sr"><span class="sl" style="color:#E67E22">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
     <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
     <div style="padding:6px 0"><span class="sl">배달료 인상</span>
@@ -1240,6 +1250,44 @@ function onGateSettingsUpdate(json) {
       document.getElementById('gate_status').textContent = '배달료 인상 중 · ' + (s.fee||4000).toLocaleString() + '원';
     } else {
       document.getElementById('gate_status').style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+function onGateStatusUpdate(jsonStr) {
+  try {
+    var s = JSON.parse(jsonStr);
+    // 건수 표시
+    var fc = document.getElementById('gate_fee_count');
+    var sc = document.getElementById('gate_stop_count');
+    if(fc) fc.textContent = (s.validCount||0)+'건';
+    if(sc) sc.textContent = (s.totalCount||0)+'건';
+
+    // 게이지 바
+    var fb = document.getElementById('gate_fee_bar');
+    var sb = document.getElementById('gate_stop_bar');
+    if(fb) { var r=Math.min((s.validCount||0)/(s.thresholdFee||8)*100, 150); fb.style.width=r+'%'; fb.style.background=s.isFeeDefending?'#E74C3C':r>70?'#E67E22':'#4FC3F7'; }
+    if(sb) { var r2=Math.min((s.totalCount||0)/(s.thresholdStop||15)*100, 150); sb.style.width=r2+'%'; sb.style.background=s.isStopDefending?'#E74C3C':r2>70?'#E67E22':'#4FC3F7'; }
+
+    // 방어 상태
+    var gs = document.getElementById('gate_status');
+    if(gs) {
+      if(s.isStopDefending) { gs.style.display=''; gs.textContent='A 영업정지 중'; gs.style.color='#E74C3C'; }
+      else if(s.isFeeDefending) { gs.style.display=''; gs.textContent='B 유도중 · 배달료 '+(s.currentFee||0).toLocaleString()+'원'; gs.style.color='#E67E22'; }
+      else { gs.style.display='none'; }
+    }
+
+    // 토글 상태
+    var tog = document.getElementById('tog_gate');
+    if(tog) tog.classList.toggle('on', !!s.gateEnabled);
+
+    // 하단 탭 상태
+    var ms = document.getElementById('mStat_gate');
+    if(ms) {
+      if(s.isStopDefending) { ms.textContent='● 정지중'; ms.style.color='#E74C3C'; }
+      else if(s.isFeeDefending) { ms.textContent='● 유도중'; ms.style.color='#E67E22'; }
+      else if(s.gateEnabled) { ms.textContent='● ON'; ms.style.color='#2ECC71'; }
+      else { ms.textContent='○ OFF'; ms.style.color='#707088'; }
     }
   } catch(e) {}
 }
