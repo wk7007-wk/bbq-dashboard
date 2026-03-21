@@ -339,6 +339,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="ch" onclick="togCB('stop_body')">
     <div class="row">
       <span style="font-size:13px;font-weight:600;color:#E74C3C">영업정지</span>
+      <div class="tog" id="tog_stop" onclick="event.stopPropagation();togStop()"></div>
     </div>
     <span style="font-size:11px;color:#707088">▾</span>
   </div>
@@ -361,12 +362,12 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div style="padding:6px 0"><span class="sl">채널별 정지</span>
       <div style="margin-top:6px">
         <div style="font-size:10px;color:#707088;padding:2px 0">배민</div>
-        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">배민배달</span><div class="sv"><div class="tog" id="tog_pause_own"></div></div></div>
-        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">가게배달</span><div class="sv"><div class="tog" id="tog_pause_agency"></div></div></div>
-        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">픽업</span><div class="sv"><div class="tog" id="tog_pause_visit"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">배민배달</span><div class="sv"><div class="tog on" id="tog_pause_own" onclick="togChannel('own')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">가게배달</span><div class="sv"><div class="tog on" id="tog_pause_agency" onclick="togChannel('agency')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">픽업</span><div class="sv"><div class="tog on" id="tog_pause_visit" onclick="togChannel('visit')"></div></div></div>
         <div style="font-size:10px;color:#707088;padding:2px 0;margin-top:4px">타 채널</div>
-        <div class="sr"><span class="sl" style="color:#FFD700">쿠팡</span><div class="sv"><div class="tog" id="tog_pause_coupang"></div></div></div>
-        <div class="sr"><span class="sl" style="color:#E74C3C">요기요</span><div class="sv"><div class="tog" id="tog_pause_yogiyo"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#FFD700">쿠팡</span><div class="sv"><div class="tog on" id="tog_pause_coupang" onclick="togChannel('coupang')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#E74C3C">요기요</span><div class="sv"><div class="tog on" id="tog_pause_yogiyo" onclick="togChannel('yogiyo')"></div></div></div>
       </div>
       <div style="font-size:9px;color:#555;margin-top:4px">임계값 도달 시 자동 발동 · 건수 감소 시 자동 해제</div>
     </div>
@@ -1392,20 +1393,21 @@ function setGateBase(v) {
 }
 
 function togGate() {
-  // 방어 시스템 활성화/비활성화 (임계값 도달 시 자동 발동 허용/차단)
-  var myTab = gateSettings._activeTab || '';
-  if (!myTab) return;
-
-  // 현재 활성이면 → 비활성화
-  if (gateSettings.enabled) {
-    gateSettings.enabled = false;
-  } else {
-    // 활성화
-    gateSettings.enabled = true;
-  }
-
-  // Kotlin에 전달 — UI 갱신은 onGateStatusUpdate에서 일괄 처리
+  // 배달료 방어 ON/OFF
+  gateSettings.enabled = !gateSettings.enabled;
+  if (gateSettings.enabled && !gateSettings._activeTab) gateSettings._activeTab = 'PRINTER';
+  var el = document.getElementById('tog_gate');
+  if(el) el.classList.toggle('on', gateSettings.enabled);
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: gateSettings._activeTab}));
+}
+
+function togStop() {
+  // 영업정지 방어 ON/OFF
+  gateSettings._stopEnabled = !gateSettings._stopEnabled;
+  if (gateSettings._stopEnabled && !gateSettings._stopSource) gateSettings._stopSource = 'KDS';
+  var el = document.getElementById('tog_stop');
+  if(el) el.classList.toggle('on', gateSettings._stopEnabled);
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({stopEnabled: gateSettings._stopEnabled, stopSource: gateSettings._stopSource}));
 }
 
 function setFeeSource(src) {
@@ -1425,6 +1427,16 @@ function setStopSource(src) {
   document.getElementById('stop_src_kds').style.color = src==='KDS' ? '#FFF' : '#E0E0EC';
   document.getElementById('stop_src_label').textContent = src==='PRINTER' ? '프린터 유효건수' : 'KDS 전체건수';
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({stopSource: src}));
+}
+
+// 채널별 정지 사전 선택 (임계값 도달 시 이 채널만 정지, 즉시 API 호출 없음)
+let stopChannels = {own:true, agency:true, visit:true, coupang:true, yogiyo:true};
+function togChannel(ch) {
+  stopChannels[ch] = !stopChannels[ch];
+  var el = document.getElementById('tog_pause_'+ch);
+  if(el) el.classList.toggle('on', stopChannels[ch]);
+  // Kotlin에 선택 상태 전달
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({stopChannels: stopChannels}));
 }
 
 function togCB(id) {
