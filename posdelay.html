@@ -315,13 +315,17 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sr"><span class="sl" style="color:#E74C3C">영업정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold" style="color:#E74C3C;font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
     <div style="padding:6px 0"><span class="sl">채널별 정지</span>
       <div style="margin-top:6px">
-        <div class="sr"><span class="sl" style="color:#2AC1BC">배민</span><div class="sv"><div class="tog" id="tog_pause_baemin" onclick="togPause('baemin')"></div></div></div>
+        <div style="font-size:10px;color:#707088;padding:2px 0">배민</div>
+        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">배민배달</span><div class="sv"><div class="tog" id="tog_pause_agency" onclick="togBmPause('agency')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">가게배달</span><div class="sv"><div class="tog" id="tog_pause_own" onclick="togBmPause('own')"></div></div></div>
+        <div class="sr"><span class="sl" style="color:#2AC1BC;padding-left:8px">픽업</span><div class="sv"><div class="tog" id="tog_pause_visit" onclick="togBmPause('visit')"></div></div></div>
+        <div style="font-size:10px;color:#707088;padding:2px 0;margin-top:4px">타 채널</div>
         <div class="sr"><span class="sl" style="color:#FFD700">쿠팡</span><div class="sv"><div class="tog" id="tog_pause_coupang" onclick="togPause('coupang')"></div></div></div>
         <div class="sr"><span class="sl" style="color:#E74C3C">요기요</span><div class="sv"><div class="tog" id="tog_pause_yogiyo" onclick="togPause('yogiyo')"></div></div></div>
       </div>
       <div style="display:flex;gap:4px;margin-top:6px">
-        <button class="btn bs bred" onclick="manualDefense('pause',0)" id="btn_pause" style="flex:1">전체 정지</button>
-        <button class="btn bs bg" onclick="manualDefense('resume',0)" id="btn_resume" style="flex:1">전체 재개</button>
+        <button class="btn bs bred" onclick="pauseAll()" id="btn_pause" style="flex:1">전체 정지</button>
+        <button class="btn bs bg" onclick="resumeAll()" id="btn_resume" style="flex:1">전체 재개</button>
       </div>
     </div>
     <div style="padding:4px 0">
@@ -1562,22 +1566,51 @@ function resetAllCircuits() {
 }
 
 // 채널별 영업정지 토글
-let pauseState = {baemin:false, coupang:false, yogiyo:false};
+let bmPause = {agency:false, own:false, visit:false};  // 배민 배달유형별
+let pauseState = {coupang:false, yogiyo:false};
 let adOffOnPause = true;
+
+// 배민 배달유형별 토글 → PUT 시 선택된 유형만 전송
+function togBmPause(type) {
+  bmPause[type] = !bmPause[type];
+  var el = document.getElementById('tog_pause_'+type);
+  if(el) el.classList.toggle('on', bmPause[type]);
+  // 선택된 유형 목록 → Kotlin에 전달
+  var types = [];
+  if(bmPause.agency) types.push('AGENCY_DELIVERY');
+  if(bmPause.own) types.push('OWN_DELIVERY');
+  if(bmPause.visit) types.push('VISIT');
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('baemin_pause_selective', types.join(','));
+  // 광고 OFF
+  if(bmPause[type] && adOffOnPause && typeof NativeBridge!=='undefined') NativeBridge.setSetting('baemin_auto_enabled','false');
+}
 
 function togPause(ch) {
   pauseState[ch] = !pauseState[ch];
   var el = document.getElementById('tog_pause_'+ch);
   if(el) el.classList.toggle('on', pauseState[ch]);
   var action = pauseState[ch] ? ch+'_pause' : ch+'_resume';
-  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, 0);
-  // 정지 시 광고 자동 OFF
-  if (pauseState[ch] && adOffOnPause) {
-    if (typeof NativeBridge !== 'undefined') {
-      if (ch==='baemin') NativeBridge.setSetting('baemin_auto_enabled','false');
-      if (ch==='coupang') NativeBridge.setSetting('coupang_auto_enabled','false');
-    }
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense(action, 0);
+  if(pauseState[ch] && adOffOnPause && typeof NativeBridge!=='undefined') {
+    if(ch==='coupang') NativeBridge.setSetting('coupang_auto_enabled','false');
   }
+}
+
+function pauseAll() {
+  bmPause.agency=true; bmPause.own=true; bmPause.visit=true;
+  pauseState.coupang=true; pauseState.yogiyo=true;
+  ['agency','own','visit'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.add('on');});
+  ['coupang','yogiyo'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.add('on');});
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('pause', 0);
+  if(adOffOnPause && typeof NativeBridge!=='undefined') { NativeBridge.setSetting('baemin_auto_enabled','false'); NativeBridge.setSetting('coupang_auto_enabled','false'); }
+}
+
+function resumeAll() {
+  bmPause.agency=false; bmPause.own=false; bmPause.visit=false;
+  pauseState.coupang=false; pauseState.yogiyo=false;
+  ['agency','own','visit'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.remove('on');});
+  ['coupang','yogiyo'].forEach(function(t){var e=document.getElementById('tog_pause_'+t);if(e)e.classList.remove('on');});
+  if(typeof NativeBridge!=='undefined') NativeBridge.manualDefense('resume', 0);
 }
 
 function togAdOffOnPause() {
