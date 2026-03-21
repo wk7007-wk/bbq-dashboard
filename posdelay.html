@@ -261,7 +261,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl" style="color:#E67E22">배달료 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:#E67E22;font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:#707088;padding:2px 0"><span>min 3건</span><span>max 50건</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#707088;padding:2px 0"><span>min 1건</span><span>max 50건</span></div>
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:#E67E22;font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
@@ -1300,7 +1300,7 @@ try {
 } catch(e) {}
 
 function adjGate(key, delta) {
-  if (key==='threshold') { gateSettings.threshold = Math.max(3, Math.min(50, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
+  if (key==='threshold') { gateSettings.threshold = Math.max(1, Math.min(50, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
   if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
   if (key==='fee') { gateSettings.fee = Math.max(500, Math.min(10000, gateSettings.fee+delta)); document.getElementById('gate_fee').textContent = gateSettings.fee.toLocaleString()+'원'; }
   if (key==='base') { gateSettings.base = Math.max(0, Math.min(5000, gateSettings.base+delta)); document.getElementById('gate_base').textContent = gateSettings.base.toLocaleString()+'원'; }
