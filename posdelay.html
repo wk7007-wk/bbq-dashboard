@@ -265,6 +265,28 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
+<!-- ═══ 영업정지 패널 ═══ -->
+<div class="card" id="stopPanel" style="display:none">
+  <div class="ch" onclick="togCB('stop_body')">
+    <div class="row">
+      <span style="font-size:13px;font-weight:600;color:#E74C3C">영업정지</span>
+      <span style="font-size:11px;color:#707088;margin-left:8px">KDS 전체건수 기준</span>
+    </div>
+    <span style="font-size:11px;color:#707088">▾</span>
+  </div>
+  <div class="cb open" id="stop_body">
+    <!-- KDS 게이지 -->
+    <div style="margin:6px 0">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#9090A8"><span>KDS 전체건수</span><span id="stop_kds_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+      <div style="height:8px;background:#2E2E52;margin-top:2px"><div id="stop_kds_bar" style="height:100%;width:0%;background:#E74C3C;transition:width .3s"></div></div>
+    </div>
+    <!-- 임계값 -->
+    <div class="sr"><span class="sl" style="color:#E74C3C">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold" style="color:#E74C3C;font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+    <!-- 정지 상태 -->
+    <div id="stop_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:#E74C3C"></div>
+  </div>
+</div>
+
 <!-- ═══ 4. 지연 설정 ═══ -->
 <div class="card" id="delayCard">
   <div class="ch" onclick="togSec('dlB')">
@@ -1176,6 +1198,14 @@ function adjGate(key, delta) {
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 
+function adjStop(key, delta) {
+  if (key==='threshold') {
+    gateSettings.threshold_stop = Math.max(1, Math.min(30, (gateSettings.threshold_stop||15)+delta));
+    document.getElementById('stop_threshold').textContent = gateSettings.threshold_stop+'건';
+    if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({threshold_stop: gateSettings.threshold_stop}));
+  }
+}
+
 function setGateFee(v) {
   gateSettings.fee = v;
   document.querySelectorAll('#fee_presets .btn').forEach(b => { b.style.background = b.textContent.replace(/,/g,'')===''+v ? '#E67E22' : '#2A2A45'; b.style.color = b.textContent.replace(/,/g,'')===''+v ? '#FFF' : '#E0E0EC'; });
@@ -1202,7 +1232,8 @@ function togCB(id) { const e = document.getElementById(id); if(e) e.classList.to
 const MODE_CARDS = {
   cook: ['monitorCard','cookCard','gaugeCard','delayCard','chartCard','logCard','permCard'],
   ad:   ['monitorCard','gaugeCard','adSettingCard','delayCard','chartCard','logCard','permCard'],
-  gate: ['monitorCard','gatePanel']
+  gate: ['monitorCard','gatePanel'],
+  stop: ['monitorCard','stopPanel']
 };
 let currentMode = 'cook';
 
@@ -1217,7 +1248,7 @@ function switchMode(mode) {
   if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
 
   // 탭 활성화
-  ['cook','ad','gate'].forEach(m => {
+  ['cook','ad','gate','stop'].forEach(m => {
     const tab = document.getElementById('mTab_'+m);
     if(!tab) return;
     const isActive = m===mode;
@@ -1269,13 +1300,23 @@ function onGateStatusUpdate(jsonStr) {
     if(fb) { var r=Math.min((s.validCount||0)/(s.thresholdFee||8)*100, 150); fb.style.width=r+'%'; fb.style.background=s.isFeeDefending?'#E74C3C':r>70?'#E67E22':'#4FC3F7'; }
     if(sb) { var r2=Math.min((s.totalCount||0)/(s.thresholdStop||15)*100, 150); sb.style.width=r2+'%'; sb.style.background=s.isStopDefending?'#E74C3C':r2>70?'#E67E22':'#4FC3F7'; }
 
-    // 방어 상태
+    // 방어 상태 (배달료 패널)
     var gs = document.getElementById('gate_status');
     if(gs) {
       if(s.isStopDefending) { gs.style.display=''; gs.textContent='A 영업정지 중'; gs.style.color='#E74C3C'; }
       else if(s.isFeeDefending) { gs.style.display=''; gs.textContent='B 유도중 · 배달료 '+(s.currentFee||0).toLocaleString()+'원'; gs.style.color='#E67E22'; }
       else { gs.style.display='none'; }
     }
+
+    // 영업정지 패널
+    var skc = document.getElementById('stop_kds_count');
+    var skb = document.getElementById('stop_kds_bar');
+    var ss = document.getElementById('stop_status');
+    var ms2 = document.getElementById('mStat_stop');
+    if(skc) skc.textContent = (s.totalCount||0)+'건';
+    if(skb) { var r3=Math.min((s.totalCount||0)/(s.thresholdStop||15)*100, 150); skb.style.width=r3+'%'; skb.style.background=s.isStopDefending?'#E74C3C':r3>70?'#E67E22':'#4FC3F7'; }
+    if(ss) { if(s.isStopDefending) { ss.style.display=''; ss.textContent='영업정지 중'; } else { ss.style.display='none'; } }
+    if(ms2) { ms2.textContent=s.isStopDefending?'● 정지중':s.gateEnabled?'● 대기':'○ OFF'; ms2.style.color=s.isStopDefending?'#E74C3C':s.gateEnabled?'#2ECC71':'#707088'; }
 
     // 토글 상태
     var tog = document.getElementById('tog_gate');
@@ -1304,8 +1345,12 @@ function onGateStatusUpdate(jsonStr) {
     <span id="mStat_ad" style="font-size:10px;color:#707088">● OFF</span>
   </div>
   <div class="mode-tab" onclick="switchMode('gate')" id="mTab_gate" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
-    <span style="font-size:12px;font-weight:600;color:#707088">배달료</span>
+    <span style="font-size:11px;font-weight:600;color:#707088">배달료</span>
     <span id="mStat_gate" style="font-size:10px;color:#707088">○ OFF</span>
+  </div>
+  <div class="mode-tab" onclick="switchMode('stop')" id="mTab_stop" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
+    <span style="font-size:11px;font-weight:600;color:#707088">영업정지</span>
+    <span id="mStat_stop" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
 </div>
 
