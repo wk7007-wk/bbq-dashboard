@@ -588,8 +588,8 @@ function updMonitor(){
   var msAd=document.getElementById('mStat_ad');
   if(msAd){
     var adOn=S.ad_enabled;
-    if(adOn){msAd.textContent='● ON';msAd.style.color='#2ECC71';}
-    else{msAd.textContent='○ OFF';msAd.style.color='#707088';}
+    if(adOn){msAd.textContent='● ON';msAd.style.color='#2ECC71';}  // ON=초록
+    else{msAd.textContent='○ OFF';msAd.style.color='#707088';}   // OFF=회색
   }
 }
 
@@ -1738,11 +1738,11 @@ function togAdOffOnPause() {
 <div id="modeTabBar" style="position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;background:#0F0F1F;border-top:1px solid #2E2E52;z-index:100;">
   <div class="mode-tab active" onclick="switchMode('cook')" id="mTab_cook" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:#1A1A30;border-top:2px solid #7C6FE0;">
     <span style="font-size:12px;font-weight:600;color:#E0E0EC">조리모드</span>
-    <span id="mStat_cook" style="font-size:10px;color:#2ECC71">● 대기</span>
+    <span id="mStat_cook" style="font-size:10px;color:#2ECC71">● ON</span>
   </div>
   <div class="mode-tab" onclick="switchMode('ad')" id="mTab_ad" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
     <span style="font-size:12px;font-weight:600;color:#707088">광고모드</span>
-    <span id="mStat_ad" style="font-size:10px;color:#707088">● OFF</span>
+    <span id="mStat_ad" style="font-size:10px;color:#707088">○ OFF</span>
   </div>
   <div class="mode-tab" onclick="switchMode('printer')" id="mTab_printer" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;">
     <span style="font-size:11px;font-weight:600;color:#707088">프린터</span>
