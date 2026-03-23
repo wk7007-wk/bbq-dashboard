@@ -70,7 +70,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <button onclick="location.reload()" style="background:#2A2A45;border:1px solid #2E2E52;border-radius:4px;color:#A0A0BC;font-size:12px;padding:8px 12px;cursor:pointer">&#8635;</button>
     </div>
   </div>
-  <div id="pullInd" style="text-align:center;color:#9898B0;font-size:11px;height:0;overflow:hidden;transition:height .2s">&#8595; 새로고침</div>
+  <div id="pullInd" style="display:none"></div>
   <div class="alert" id="alertB"></div>
   <div class="alert" id="anomalyB"></div>
 </div>
@@ -1040,20 +1040,7 @@ function toast(m,type){
   _toastTimer=setTimeout(()=>{bn.className='alert';_toastTimer=null;},3000);
 }
 
-// === 풀투리프레시 (SSE 연결 중이면 비활성) ===
-let _pY=0,_pulling=false;
-const _pInd=document.getElementById('pullInd');
-document.addEventListener('touchstart',e=>{if(!_sseOk&&window.scrollY===0)_pY=e.touches[0].clientY;else _pY=0;},{passive:true});
-document.addEventListener('touchmove',e=>{
-  if(_pY===0)return;
-  const d=e.touches[0].clientY-_pY;
-  if(d>0&&d<150&&window.scrollY===0){_pulling=true;_pInd.style.height=Math.min(d/2,30)+'px';_pInd.textContent=d>80?'↑ 놓으면 새로고침':'↓ 연결 끊김 — 당겨서 재연결';}
-  else{_pulling=false;_pInd.style.height='0';}
-},{passive:true});
-document.addEventListener('touchend',()=>{
-  if(_pulling&&parseInt(_pInd.style.height)>=25){_pInd.textContent='재연결 중...';_pInd.style.height='24px';setTimeout(()=>location.reload(),300);}
-  else{_pInd.style.height='0';}_pulling=false;_pY=0;
-});
+// === 풀투리프레시 제거 — 버튼(↻)으로만 새로고침 ===
 
 // === 조리모드 (주문번호 기반) ===
 let ckOn=false,ckQ=[]; // ckQ: {num, t, onKds, ma, fa, da}
