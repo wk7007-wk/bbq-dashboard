@@ -1040,18 +1040,18 @@ function toast(m,type){
   _toastTimer=setTimeout(()=>{bn.className='alert';_toastTimer=null;},3000);
 }
 
-// === 풀투리프레시 ===
+// === 풀투리프레시 (SSE 연결 중이면 비활성) ===
 let _pY=0,_pulling=false;
 const _pInd=document.getElementById('pullInd');
-document.addEventListener('touchstart',e=>{if(window.scrollY===0)_pY=e.touches[0].clientY;else _pY=0;},{passive:true});
+document.addEventListener('touchstart',e=>{if(!_sseOk&&window.scrollY===0)_pY=e.touches[0].clientY;else _pY=0;},{passive:true});
 document.addEventListener('touchmove',e=>{
   if(_pY===0)return;
   const d=e.touches[0].clientY-_pY;
-  if(d>0&&d<150&&window.scrollY===0){_pulling=true;_pInd.style.height=Math.min(d/2,30)+'px';_pInd.textContent=d>80?'↑ 놓으면 새로고침':'↓ 새로고침';}
+  if(d>0&&d<150&&window.scrollY===0){_pulling=true;_pInd.style.height=Math.min(d/2,30)+'px';_pInd.textContent=d>80?'↑ 놓으면 새로고침':'↓ 연결 끊김 — 당겨서 재연결';}
   else{_pulling=false;_pInd.style.height='0';}
 },{passive:true});
 document.addEventListener('touchend',()=>{
-  if(_pulling&&parseInt(_pInd.style.height)>=25){_pInd.textContent='새로고침 중...';_pInd.style.height='24px';setTimeout(()=>location.reload(),300);}
+  if(_pulling&&parseInt(_pInd.style.height)>=25){_pInd.textContent='재연결 중...';_pInd.style.height='24px';setTimeout(()=>location.reload(),300);}
   else{_pInd.style.height='0';}_pulling=false;_pY=0;
 });
 
