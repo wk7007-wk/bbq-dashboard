@@ -44,6 +44,8 @@ document.getElementById("gate").style.display="none";
 var ct=document.getElementById("content");
 ct.style.display="block";
 ct.innerHTML=utf8;
+var scripts=ct.querySelectorAll("script");
+for(var s=0;s<scripts.length;s++){var ns=document.createElement("script");ns.textContent=scripts[s].textContent;scripts[s].parentNode.replaceChild(ns,scripts[s]);}
 }catch(e){
 document.getElementById("err").style.display="block";
 document.getElementById("pw").value="";
