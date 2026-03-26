@@ -38,3 +38,20 @@ var bytes=atob(b64);
 var arr=new Uint8Array(bytes.length);
 for(var i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i);
 var utf8=new TextDecoder().decode(arr);
+if(utf8.indexOf('<div id="app">')<0)throw"x";
+document.getElementById("gate").style.display="none";
+var ct=document.getElementById("content");
+ct.style.display="block";
+ct.innerHTML=utf8;
+var scripts=ct.querySelectorAll("script");
+for(var s=0;s<scripts.length;s++){var ns=document.createElement("script");ns.textContent=scripts[s].textContent;scripts[s].parentNode.replaceChild(ns,scripts[s]);}
+}catch(e){
+document.getElementById("err").style.display="block";
+document.getElementById("pw").value="";
+document.getElementById("pw").focus();
+}
+}
+document.getElementById("pw").addEventListener("keyup",function(e){if(e.key==="Enter")unlock()});
+</script>
+</body>
+</html>
