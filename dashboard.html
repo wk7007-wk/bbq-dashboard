@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>현황판</title>
+<style>
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-card: #16213e;
+  --bg-card-hover: #1a2744;
+  --border-card: #0f3460;
+  --text-primary: #e0e0e0;
+  --text-secondary: #8892a0;
+  --text-muted: #5a6270;
+  --accent-blue: #4fc3f7;
+  --accent-green: #66bb6a;
+  --accent-orange: #ffa726;
+  --accent-red: #ef5350;
+  --accent-purple: #ab47bc;
+  --accent-cyan: #26c6da;
+  --accent-yellow: #ffee58;
+  --accent-pink: #ec407a;
+  --radius: 12px;
+  --gap: 12px;
+  --font: -apple-system, 'Noto Sans KR', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: var(--gap);
+  padding-top: calc(48px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(var(--gap) + env(safe-area-inset-bottom, 0px));
+}
+
+/* 상단 바 */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(44px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 16px;
+  padding-right: 16px;
+  z-index: 100;
+}
+
+.top-bar .title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+.top-bar .status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.top-bar .status .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* 카드 그리드 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  padding: 14px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s;
+}
+
+.card:active {
+  background: var(--bg-card-hover);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card-icon {
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.card-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.card-list {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.card-list .item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-list .item + .item {
+  margin-top: 2px;
+}
+
+/* 카드별 아이콘 배경 */
+.icon-pc { background: rgba(79,195,247,0.15); color: var(--accent-blue); }
+.icon-weather { background: rgba(255,167,38,0.15); color: var(--accent-orange); }
+.icon-schedule { background: rgba(102,187,106,0.15); color: var(--accent-green); }
+.icon-order { background: rgba(236,64,122,0.15); color: var(--accent-pink); }
+.icon-ai { background: rgba(171,71,188,0.15); color: var(--accent-purple); }
+.icon-diag { background: rgba(38,198,218,0.15); color: var(--accent-cyan); }
+.icon-alert { background: rgba(239,83,80,0.15); color: var(--accent-red); }
+.icon-excel { background: rgba(255,238,88,0.15); color: var(--accent-yellow); }
+
+/* 상태 뱃지 */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+.badge-ok { background: rgba(102,187,106,0.2); color: var(--accent-green); }
+.badge-warn { background: rgba(255,167,38,0.2); color: var(--accent-orange); }
+.badge-err { background: rgba(239,83,80,0.2); color: var(--accent-red); }
+.badge-info { background: rgba(79,195,247,0.2); color: var(--accent-blue); }
+
+/* 풀 와이드 카드 */
+.card-wide {
+  grid-column: 1 / -1;
+}
+
+/* 로딩 스켈레톤 */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  height: 20px;
+  width: 60%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 갱신 표시 */
+.refreshing .top-bar .dot {
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to { opacity: 0.3; }
+}
+
+/* 스크롤바 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-card); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="title">현황판</span>
+  <span class="status"><span class="dot"></span><span id="lastUpdate">--:--</span></span>
+</div>
+
+<div class="grid">
+
+  <!-- 1. PC 상태 -->
+  <div class="card" id="card-pc">
+    <div class="card-header">
+      <div class="card-icon icon-pc">&#9211;</div>
+      <div class="card-title">PC 상태</div>
+    </div>
+    <div class="card-body">
+      <div class="card-list" id="pc-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 날씨 -->
+  <div class="card" id="card-weather">
+    <div class="card-header">
+      <div class="card-icon icon-weather">&#9788;</div>
+      <div class="card-title">날씨</div>
+    </div>
+    <div class="card-body">
+      <div id="weather-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 근무표 -->
+  <div class="card" id="card-schedule">
+    <div class="card-header">
+      <div class="card-icon icon-schedule">&#9779;</div>
+      <div class="card-title">근무표</div>
+    </div>
+    <div class="card-body">
+      <div class="card-list" id="schedule-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 주문 현황 -->
+  <div class="card" id="card-order">
+    <div class="card-header">
+      <div class="card-icon icon-order">&#9733;</div>
+      <div class="card-title">주문 현황</div>
+    </div>
+    <div class="card-body">
+      <div id="order-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. AI 활동 -->
+  <div class="card" id="card-ai">
+    <div class="card-header">
+      <div class="card-icon icon-ai">&#9881;</div>
+      <div class="card-title">AI 활동</div>
+    </div>
+    <div class="card-body">
+      <div id="ai-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 진단 보고서 -->
+  <div class="card" id="card-diag">
+    <div class="card-header">
+      <div class="card-icon icon-diag">&#9874;</div>
+      <div class="card-title">진단 보고서</div>
+    </div>
+    <div class="card-body">
+      <div class="card-list" id="diag-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 알림/경고 (풀 와이드) -->
+  <div class="card card-wide" id="card-alert">
+    <div class="card-header">
+      <div class="card-icon icon-alert">&#9888;</div>
+      <div class="card-title">알림 / 경고</div>
+    </div>
+    <div class="card-body">
+      <div class="card-list" id="alert-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 스포츠 -->
+  <div class="card" id="card-sports">
+    <div class="card-header">
+      <div class="card-icon" style="background:#2e7d32">&#9917;</div>
+      <div class="card-title">스포츠</div>
+    </div>
+    <div class="card-body">
+      <div class="card-list" id="sports-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. 엑셀 정산 (풀 와이드) -->
+  <div class="card card-wide" id="card-excel">
+    <div class="card-header">
+      <div class="card-icon icon-excel">&#9638;</div>
+      <div class="card-title">엑셀 정산</div>
+    </div>
+    <div class="card-body">
+      <div class="card-list" id="excel-body">
+        <div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const FB = 'https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+// 시간 포맷
+function timeStr(ts) {
+  if (!ts) return '--';
+  var d = new Date(typeof ts === 'number' ? ts : Date.parse(ts));
+  return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function agoStr(ts) {
+  if (!ts) return '';
+  var sec = Math.floor((Date.now() - (typeof ts === 'number' ? ts : Date.parse(ts))) / 1000);
+  if (sec < 60) return sec + '초 전';
+  if (sec < 3600) return Math.floor(sec / 60) + '분 전';
+  if (sec < 86400) return Math.floor(sec / 3600) + '시간 전';
+  return Math.floor(sec / 86400) + '일 전';
+}
+
+function badge(text, type) {
+  return '<span class="badge badge-' + type + '">' + text + '</span>';
+}
+
+// Firebase fetch 헬퍼
+function fb(path) {
+  return fetch(FB + path + '.json')
+    .then(function(r) { return r.json(); })
+    .catch(function() { return null; });
+}
+
+// --- 카드 업데이트 함수들 ---
+
+// 1. PC 상태
+function updatePC() {
+  fb('/packhelper/heartbeat').then(function(data) {
+    var el = document.getElementById('pc-body');
+    if (!data) { el.innerHTML = badge('데이터 없음', 'warn'); return; }
+    var html = '';
+    var entries = Object.entries(data);
+    entries.forEach(function(kv) {
+      var name = kv[0];
+      var info = kv[1];
+      var ts = info.timestamp || info.time || info.last;
+      var ago = ts ? (Date.now() - ts) / 1000 : 99999;
+      var status = ago < 120 ? badge('ON', 'ok') : ago < 600 ? badge(agoStr(ts), 'warn') : badge('OFF', 'err');
+      html += '<div class="item"><span>' + name + '</span>' + status + '</div>';
+    });
+    el.innerHTML = html || badge('항목 없음', 'info');
+  });
+}
+
+// 2. 날씨
+function updateWeather() {
+  fb('/packhelper/weather').then(function(data) {
+    var el = document.getElementById('weather-body');
+    if (!data) {
+      el.innerHTML = '<div class="card-value">--</div><div class="card-sub">데이터 없음</div>';
+      return;
+    }
+    var temp = data.temp || data.temperature || '--';
+    var desc = data.desc || data.sky || '';
+    var humid = data.humidity || '';
+    el.innerHTML = '<div class="card-value">' + temp + '&#176;</div>' +
+      '<div class="card-sub">' + desc + (humid ? ' / 습도 ' + humid + '%' : '') + '</div>';
+  });
+}
+
+// 3. 근무표
+function updateSchedule() {
+  fb('/packhelper/schedule/today').then(function(data) {
+    var el = document.getElementById('schedule-body');
+    if (!data) { el.innerHTML = badge('데이터 없음', 'warn'); return; }
+    var html = '';
+    if (Array.isArray(data)) {
+      data.forEach(function(p) {
+        var name = typeof p === 'string' ? p : (p.name || '');
+        var time = typeof p === 'string' ? '' : (p.time || '');
+        html += '<div class="item"><span>' + name + '</span><span style="color:var(--text-muted)">' + time + '</span></div>';
+      });
+    } else if (typeof data === 'object') {
+      Object.entries(data).forEach(function(kv) {
+        html += '<div class="item"><span>' + kv[0] + '</span><span style="color:var(--text-muted)">' + kv[1] + '</span></div>';
+      });
+    }
+    el.innerHTML = html || badge('오늘 근무 없음', 'info');
+  });
+}
+
+// 4. 주문 현황
+function updateOrder() {
+  fb('/packhelper/order_summary/today').then(function(data) {
+    var el = document.getElementById('order-body');
+    if (!data) {
+      el.innerHTML = '<div class="card-value">0</div><div class="card-sub">오늘 주문</div>';
+      return;
+    }
+    var count = data.count || data.total || 0;
+    var amt = data.amount || 0;
+    el.innerHTML = '<div class="card-value">' + count + '<span style="font-size:14px;color:var(--text-muted)"> 건</span></div>' +
+      (amt ? '<div class="card-sub">' + Number(amt).toLocaleString() + '원</div>' : '<div class="card-sub">오늘 주문</div>');
+  });
+}
+
+// 5. AI 활동
+function updateAI() {
+  fb('/packhelper/ai_activity').then(function(data) {
+    var el = document.getElementById('ai-body');
+    if (!data) {
+      el.innerHTML = '<div class="card-value">--</div><div class="card-sub">Groq 활동</div>';
+      return;
+    }
+    var count = data.today_count || data.count || 0;
+    var last = data.last_time || data.last || null;
+    el.innerHTML = '<div class="card-value">' + count + '<span style="font-size:14px;color:var(--text-muted)"> 건</span></div>' +
+      '<div class="card-sub">최근 ' + agoStr(last) + '</div>';
+  });
+}
+
+// 6. 진단 보고서
+function updateDiag() {
+  fb('/packhelper/diagnostics/latest').then(function(data) {
+    var el = document.getElementById('diag-body');
+    if (!data) { el.innerHTML = badge('보고서 없음', 'info'); return; }
+    var title = data.title || data.type || '진단';
+    var result = data.result || data.status || '';
+    var ts = data.time || data.timestamp || null;
+    var resultBadge = result === 'ok' ? badge('정상', 'ok') : result === 'warn' ? badge('주의', 'warn') : badge(result || '?', 'info');
+    el.innerHTML = '<div class="item"><span>' + title + '</span>' + resultBadge + '</div>' +
+      (ts ? '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">' + agoStr(ts) + '</div>' : '');
+  });
+}
+
+// 7. 알림/경고
+function updateAlert() {
+  fb('/packhelper/alerts').then(function(data) {
+    var el = document.getElementById('alert-body');
+    if (!data) { el.innerHTML = badge('알림 없음', 'info'); return; }
+    var items = [];
+    if (Array.isArray(data)) {
+      items = data.slice(-5).reverse();
+    } else if (typeof data === 'object') {
+      items = Object.values(data).slice(-5).reverse();
+    }
+    if (items.length === 0) { el.innerHTML = badge('알림 없음', 'info'); return; }
+    var html = '';
+    items.forEach(function(a) {
+      var msg = typeof a === 'string' ? a : (a.message || a.msg || a.content || '');
+      var ts = typeof a === 'object' ? (a.time || a.timestamp || null) : null;
+      var level = typeof a === 'object' ? (a.level || 'info') : 'info';
+      var levelBadge = level === 'error' ? badge('ERR', 'err') : level === 'warn' ? badge('WARN', 'warn') : '';
+      html += '<div class="item"><span>' + levelBadge + ' ' + msg + '</span><span style="color:var(--text-muted)">' + agoStr(ts) + '</span></div>';
+    });
+    el.innerHTML = html;
+  });
+}
+
+// 8. 엑셀 정산
+function updateExcel() {
+  fb('/packhelper/excel_collect/latest').then(function(data) {
+    var el = document.getElementById('excel-body');
+    if (!data) { el.innerHTML = badge('정산 데이터 없음', 'info'); return; }
+    var html = '';
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      Object.entries(data).forEach(function(kv) {
+        if (kv[0] === 'time' || kv[0] === 'timestamp') return;
+        html += '<div class="item"><span>' + kv[0] + '</span><span>' + kv[1] + '</span></div>';
+      });
+      var ts = data.time || data.timestamp || null;
+      if (ts) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">수집: ' + agoStr(ts) + '</div>';
+    } else {
+      html = '<span style="color:var(--text-secondary)">' + JSON.stringify(data).substring(0, 100) + '</span>';
+    }
+    el.innerHTML = html || badge('내용 없음', 'info');
+  });
+}
+
+function updateSports() {
+  fb('/packhelper/sports_summary').then(function(data) {
+    var el = document.getElementById('sports-body');
+    if (!data) { el.innerHTML = badge('스포츠 데이터 없음', 'info'); return; }
+    var summary = data.summary || '정보 없음';
+    var updated = data.updated || '';
+    var count = data.count || 0;
+    var html = '<div style="font-size:14px;line-height:1.6;white-space:pre-wrap">' + summary + '</div>';
+    if (updated) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">갱신: ' + updated + '</div>';
+    el.innerHTML = html;
+  });
+}
+
+// --- 전체 갱신 ---
+function refreshAll() {
+  document.body.classList.add('refreshing');
+  updatePC();
+  updateWeather();
+  updateSchedule();
+  updateOrder();
+  updateAI();
+  updateDiag();
+  updateAlert();
+  updateExcel();
+  updateSports();
+
+  var now = new Date();
+  document.getElementById('lastUpdate').textContent =
+    now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+  setTimeout(function() { document.body.classList.remove('refreshing'); }, 1000);
+}
+
+// 초기 로드 + 30초 자동 갱신
+refreshAll();
+setInterval(refreshAll, 30000);
+</script>
+</body>
+</html>
