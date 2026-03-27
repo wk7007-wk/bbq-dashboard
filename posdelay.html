@@ -12,27 +12,24 @@
   --radius:12px;--radius-sm:6px;
 }
 .engine-section{margin-top:4px;}
-.task-card{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;transition:all .2s;}
-.task-card.running{border-color:var(--c-mid);}
-.task-card.failed{border-color:var(--c-off);}
-.task-row1{display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.task-item{border-bottom:1px solid var(--border);}
+.task-item:last-child{border-bottom:none;}
+.task-header{display:flex;align-items:center;gap:8px;padding:10px 0;cursor:pointer;min-height:44px;}
 .task-state{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .task-state.idle{background:var(--text-muted);}.task-state.running{background:var(--c-mid);animation:pulse 1.5s infinite;}
 .task-state.success{background:var(--c-on);}.task-state.failed{background:var(--c-off);}
 .task-state.cooldown{background:var(--c-mid);opacity:.5;}
-.task-name{font-size:12px;font-weight:600;color:var(--text-bright);flex:1;}
+.task-name{font-size:12px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.task-summary{font-size:10px;color:var(--text-muted);flex-shrink:0;max-width:80px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .task-toggle{width:36px;height:20px;border-radius:10px;background:var(--c-off);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
 .task-toggle.on{background:var(--c-on);}.task-toggle::after{content:'';width:16px;height:16px;border-radius:50%;background:#FFF;position:absolute;top:2px;left:2px;transition:left .2s;}.task-toggle.on::after{left:18px;}
-.task-expand{color:var(--text-muted);font-size:16px;cursor:pointer;padding:4px 8px;flex-shrink:0;}
-.task-row2{font-size:11px;color:var(--text-secondary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.task-actions{display:flex;gap:6px;justify-content:flex-end;}
-.task-btn{padding:6px 12px;border-radius:4px;border:none;font-size:11px;font-weight:600;cursor:pointer;color:#FFF;min-height:32px;touch-action:manipulation;}
-.task-detail{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.task-arrow{color:var(--text-muted);font-size:12px;flex-shrink:0;transition:transform .2s;width:20px;text-align:center;}
+.task-detail{display:none;padding:0 0 10px 16px;}
 .task-detail.open{display:block;}
-.task-cond{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:var(--text-secondary);}
-.task-cond-toggle{width:28px;height:16px;border-radius:8px;background:var(--c-off);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
-.task-cond-toggle.on{background:var(--c-on);}.task-cond-toggle::after{content:'';width:12px;height:12px;border-radius:50%;background:#FFF;position:absolute;top:2px;left:2px;transition:left .2s;}.task-cond-toggle.on::after{left:14px;}
-.task-cond input{width:48px;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:#FFF;padding:3px;text-align:center;font-size:12px;}
+.task-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;}
+.task-btn{padding:6px 12px;border-radius:4px;border:none;font-size:11px;font-weight:600;cursor:pointer;color:#FFF;min-height:32px;touch-action:manipulation;}
+.task-cond-list{font-size:11px;color:var(--text-secondary);}
+.task-cond-label{color:var(--text-muted);font-size:10px;}
 .subphone-bar{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);padding:6px 0;margin-top:4px;border-top:1px solid var(--border);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -1893,50 +1890,61 @@ function renderEngineTasks(engineJson) {
     var list = document.getElementById('engineTaskList');
     if (!list || !e.tasks) return;
 
-    // RUNNING 건수 뱃지
     var running = e.tasks.filter(function(t){return t.state==='RUNNING';}).length;
     var badge = document.getElementById('engineBadge');
     if (badge) badge.textContent = running > 0 ? running + ' 실행중' : '';
 
-    // 태스크 카드 렌더
     var html = '';
     e.tasks.forEach(function(t) {
-      var stateClass = t.state.toLowerCase();
-      var cardClass = 'task-card' + (stateClass==='running'?' running':'') + (stateClass==='failed'?' failed':'');
-      var dotClass = 'task-state ' + stateClass;
-      var togClass = 'task-toggle' + (t.enabled ? ' on' : '');
-      var detailId = 'td_' + t.id;
+      var sc = t.state.toLowerCase();
+      var dotCls = 'task-state ' + sc;
+      var nameCls = t.enabled ? 'color:var(--text-bright)' : 'color:var(--text-muted)';
+      var togCls = 'task-toggle' + (t.enabled ? ' on' : '');
+      var detId = 'td_' + t.id;
+
+      // 상태 요약
+      var summary = '';
+      if (sc === 'running') summary = '실행 중...';
+      else if (sc === 'cooldown' && t.cooldown > 0) summary = '쿨다운 ' + Math.ceil(t.cooldown/1000) + '초';
+      else if (sc === 'failed' && t.circuit) summary = '서킷 차단';
+      else if (sc === 'success') summary = t.summary || '완료';
+      else summary = t.summary || '';
 
       // 상태별 버튼
-      var btns = '';
-      if (stateClass === 'running') btns = '<button class="task-btn bred" onclick="engineCmd(\'force_stop\',\'' + t.id + '\')">중단</button>';
-      else if (stateClass === 'failed') btns = '<button class="task-btn bor" onclick="engineCmd(\'retry\',\'' + t.id + '\')">재시도</button><button class="task-btn bn" onclick="engineCmd(\'reset_circuit\',\'' + t.id + '\')">리셋</button>';
-      else if (stateClass === 'idle' && t.enabled) btns = '<button class="task-btn bor" onclick="engineCmd(\'force_run\',\'' + t.id + '\')">실행</button>';
-      else if (stateClass === 'success') btns = '<button class="task-btn bn" onclick="engineCmd(\'force_run\',\'' + t.id + '\')">재실행</button>';
+      var btn = '';
+      if (sc === 'running') btn = '<button class="task-btn bred" onclick="engineCmd(\'force_stop\',\'' + t.id + '\')">중단</button>';
+      else if (sc === 'failed') btn = '<button class="task-btn bor" onclick="engineCmd(\'retry\',\'' + t.id + '\')">재시도</button> <button class="task-btn bn" onclick="engineCmd(\'reset_circuit\',\'' + t.id + '\')">리셋</button>';
+      else if (t.enabled) btn = '<button class="task-btn bor" onclick="engineCmd(\'force_run\',\'' + t.id + '\')">실행</button>';
 
-      var cooldownTxt = t.cooldown > 0 ? ' · 쿨다운 ' + Math.ceil(t.cooldown/1000) + '초' : '';
-
-      html += '<div class="' + cardClass + '" id="tc_' + t.id + '">'
-        + '<div class="task-row1">'
-        + '<span class="' + dotClass + '"></span>'
-        + '<span class="task-name">' + t.name + '</span>'
-        + '<div class="' + togClass + '" onclick="engineToggle(\'' + t.id + '\')"></div>'
-        + '<span class="task-expand" onclick="toggleTaskDetail(\'' + detailId + '\')">&#9654;</span>'
+      html += '<div class="task-item">'
+        + '<div class="task-header" onclick="toggleTaskDetail(\'' + detId + '\',this)">'
+        + '<span class="' + dotCls + '"></span>'
+        + '<span class="task-name" style="' + nameCls + '">' + t.name + '</span>'
+        + (summary ? '<span class="task-summary">' + summary + '</span>' : '')
+        + '<div class="' + togCls + '" onclick="event.stopPropagation();engineToggle(\'' + t.id + '\')"></div>'
+        + '<span class="task-arrow">&#9654;</span>'
         + '</div>'
-        + '<div class="task-row2">' + (t.summary || '대기') + cooldownTxt + '</div>'
-        + '<div class="task-actions">' + btns + '</div>'
-        + '<div class="task-detail" id="' + detailId + '">'
-        + '<div style="font-size:11px;color:var(--text-muted);padding:4px 0">조건 설정은 앱 설정에서 변경</div>'
+        + '<div class="task-detail" id="' + detId + '">'
+        + '<div class="task-cond-list">'
+        + '<div class="task-cond"><span class="task-cond-label">조건 설정은 앱에서 변경</span></div>'
+        + '</div>'
+        + (btn ? '<div class="task-actions">' + btn + '</div>' : '')
         + '</div>'
         + '</div>';
     });
     list.innerHTML = html;
-  } catch(ex) { console.error('엔진 UI 에러:', ex); }
+  } catch(ex) { console.error('엔진 UI:', ex); }
 }
 
-function toggleTaskDetail(id) {
+function toggleTaskDetail(id, headerEl) {
   var el = document.getElementById(id);
-  if (el) el.classList.toggle('open');
+  if (el) {
+    el.classList.toggle('open');
+    if (headerEl) {
+      var arrow = headerEl.querySelector('.task-arrow');
+      if (arrow) arrow.textContent = el.classList.contains('open') ? '\u25BC' : '\u25B6';
+    }
+  }
 }
 
 function engineCmd(cmd, taskId) {
