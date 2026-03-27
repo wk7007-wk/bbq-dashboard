@@ -33,7 +33,7 @@
 .subphone-bar{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);padding:6px 0;margin-top:4px;border-top:1px solid var(--border);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(180deg,#1A1A30,#121225);color:#E0E0EC;min-height:100vh;padding:10px;padding-bottom:64px;font-size:13px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(180deg,#1A1A30,#121225);color:#E0E0EC;min-height:100vh;padding:10px;padding-bottom:16px;font-size:13px;}
 .card{background:linear-gradient(180deg,#242444,#1A1A35);border:1px solid #2E2E52;border-radius:12px;padding:12px;margin-bottom:8px;}
 .row{display:flex;align-items:center;gap:6px;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
@@ -161,36 +161,38 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 2. 게이지 ═══ -->
-<div class="card" id="gaugeCard">
-  <div style="margin-bottom:8px">
-    <div class="row" style="justify-content:space-between;margin-bottom:6px">
-      <div class="row" style="gap:6px">
-        <span style="color:var(--c-coupang);font-size:12px;font-weight:600">쿠팡</span>
-        <span id="cSt" style="font-size:11px"></span>
-      </div>
-      <div class="row" style="gap:6px">
-        <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
-        <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
-      </div>
+<!-- ═══ 1-2. 배달료 모니터링 ═══ -->
+<div class="card" id="feeMonitorCard">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
+      <span id="printerLabel" style="font-size:11px;color:var(--c-on)">프린터 연결됨</span>
     </div>
-    <div class="gauge" id="cG"></div>
+    <span id="captureTime" style="font-size:10px;color:var(--text-muted)">--</span>
   </div>
-  <div style="border-top:1px solid var(--bg-input);padding-top:8px">
-    <div class="row" style="justify-content:space-between;margin-bottom:6px">
-      <div class="row" style="gap:6px">
-        <span style="color:var(--c-baemin);font-size:12px;font-weight:600">배민</span>
-        <span id="bSt" style="font-size:11px"></span>
-      </div>
-      <div class="row" style="gap:6px">
-        <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
-        <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
-        <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
-      </div>
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+    <span style="font-size:11px;color:var(--text-secondary)">유효 배달주문</span>
+    <div><span id="feeValidNum" style="font-size:32px;font-weight:700;color:var(--text-bright)">0</span><span style="font-size:13px;color:var(--text-secondary)"> 건 / 임계 </span><span id="feeThresholdNum" style="font-size:13px;font-weight:700;color:var(--text-muted)">8</span></div>
+  </div>
+  <div style="height:8px;background:var(--border);border-radius:4px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:4px;transition:width .4s"></div></div>
+  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:2px"><span style="font-size:10px;color:var(--text-muted)">채널별</span></div>
+</div>
+
+<!-- ═══ 2. 주문 리스트 ═══ -->
+<div class="card" id="feeOrderListCard" style="padding:0;overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="togFeeList()">
+    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">주문 리스트</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
+      <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
     </div>
-    <div class="gauge" id="bG"></div>
   </div>
-  <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
+  <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
+    <div id="feeOrderList" style="padding:4px 0"><div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0">수집 대기중</div></div>
+  </div>
+  <div style="display:flex;justify-content:center;padding:6px;border-top:1px solid var(--border)">
+    <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:11px;font-weight:600;padding:6px 20px;cursor:pointer;min-height:36px">펼치기</button>
+  </div>
 </div>
 
 <!-- ═══ 3. 자동화 엔진 ═══ -->
@@ -208,104 +210,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 4. 조리모드 ═══ -->
-<div class="card" id="cookCard">
-  <div class="ch" onclick="togSec('ckB')">
-    <div class="row" style="gap:6px">
-      <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">조리모드</span>
-      <div class="tog" id="tog_cook_mode" onclick="event.stopPropagation();togCookMode()"></div>
-      <span id="ckStatus" style="font-size:11px;font-weight:600;color:var(--c-on)"></span>
-    </div>
-    <span id="ckA" style="color:var(--text-secondary)">&#9660;</span>
-  </div>
-  <div class="cb open" id="ckB">
-    <div class="sr"><span class="sl" style="color:var(--c-on)">전체</span><div class="sv"><button class="btn bs bn" onclick="adjCk('target',-10)">-</button><span id="ck_target_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">25:00</span><button class="btn bs bn" onclick="adjCk('target',10)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-mid)">조리</span><div class="sv"><button class="btn bs bn" onclick="adjCk('mid',-10)">-</button><span id="ck_mid_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">17:00</span><button class="btn bs bn" onclick="adjCk('mid',10)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-off)">포장</span><div class="sv"><button class="btn bs bn" onclick="adjCk('finish',-10)">-</button><span id="ck_finish_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">4:00</span><button class="btn bs bn" onclick="adjCk('finish',10)">+</button></div></div>
-    <input type="hidden" id="ck_target" value="1500"><input type="hidden" id="ck_mid" value="1020"><input type="hidden" id="ck_finish" value="240">
-    <div id="cookQ" style="margin-top:6px;font-size:12px;color:var(--text-secondary)">대기중</div>
-  </div>
-  <!-- 실시간 리스트 (설정 접힘과 무관하게 항상 표시) -->
-  <div id="cookListArea" style="display:none;margin-top:6px;border-top:1px solid var(--bg-input);padding-top:6px">
-    <div id="cookList"></div>
-  </div>
-</div>
-
-<!-- ═══ 5. 광고 설정 (기본 접힘) ═══ -->
-<div class="card" id="adSettingCard">
-  <div class="row" style="justify-content:space-between;margin-bottom:6px">
-    <div class="ch" onclick="togSec('adB')" style="flex:1">
-      <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">광고 설정</span>
-      <span id="adA" style="color:var(--text-secondary)">&#9654;</span>
-    </div>
-    <div class="row" style="gap:3px">
-      <button class="btn bs bg" onclick="saveAll()" style="font-size:12px;padding:8px 12px">저장</button>
-      <button class="btn bs bn" onclick="restoreAll()" style="font-size:12px;padding:8px 12px">복원</button>
-    </div>
-  </div>
-  <div class="cb" id="adB">
-    <div class="sec" style="color:var(--c-baemin)">배민 금액</div>
-    <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-50)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',50)">+</button></div></div>
-    <div class="sec">토글</div>
-    <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
-    <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
-    <div class="sr"><span class="sl">건수 자동</span><div class="tog" id="tog_order_auto_off_enabled" onclick="togS('order_auto_off_enabled')"></div></div>
-    <div class="sr"><span class="sl">쿠팡 자동</span><div class="tog" id="tog_coupang_auto_enabled" onclick="togS('coupang_auto_enabled')"></div></div>
-    <div class="sr"><span class="sl">배민 자동</span><div class="tog" id="tog_baemin_auto_enabled" onclick="togS('baemin_auto_enabled')"></div></div>
-    <div class="sec">스케줄</div>
-    <div class="sr">
-      <div class="row" style="gap:4px">
-        <div class="tog" id="tog_schedule_enabled2" onclick="togS('schedule_enabled')"></div>
-        <span class="dot dr" id="schDot2"></span>
-      </div>
-      <div class="row" style="gap:4px">
-        <span id="schOnDisp" style="font-size:14px;font-weight:bold;color:var(--text-bright);cursor:pointer" onclick="pickTime('on')">--:--</span>
-        <span style="color:var(--text-secondary);font-size:12px">~</span>
-        <span id="schOffDisp" style="font-size:14px;font-weight:bold;color:var(--text-bright);cursor:pointer" onclick="pickTime('off')">--:--</span>
-      </div>
-    </div>
-    <input type="time" id="schTimePicker" style="position:absolute;opacity:0;pointer-events:none">
-  </div>
-</div>
-
-<!-- ═══ 배달료 전용 모니터링 ═══ -->
-<div class="card" id="feeMonitorCard" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-    <div style="display:flex;align-items:center;gap:6px">
-      <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
-      <span id="printerLabel" style="font-size:11px;color:var(--c-on)">프린터 연결됨</span>
-    </div>
-    <span id="captureTime" style="font-size:10px;color:var(--text-muted)">--</span>
-  </div>
-  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
-    <span style="font-size:11px;color:var(--text-secondary)">유효 배달주문</span>
-    <div><span id="feeValidNum" style="font-size:32px;font-weight:700;color:var(--text-bright)">0</span><span style="font-size:13px;color:var(--text-secondary)"> 건 / 임계 </span><span id="feeThresholdNum" style="font-size:13px;font-weight:700;color:var(--text-muted)">8</span></div>
-  </div>
-  <div style="height:8px;background:var(--border);border-radius:4px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:4px;transition:width .4s"></div></div>
-  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:2px"><span style="font-size:10px;color:var(--text-muted)">채널별</span></div>
-</div>
-
-<!-- ═══ 배달주문 리스트 ═══ -->
-<div class="card" id="feeOrderListCard" style="display:none;padding:0;overflow:hidden">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="togFeeList()">
-    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">주문 리스트</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
-      <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
-    </div>
-  </div>
-  <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
-    <div id="feeOrderList" style="padding:4px 0"><div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0">수집 대기중</div></div>
-  </div>
-  <div style="display:flex;justify-content:center;padding:6px;border-top:1px solid var(--border)">
-    <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:11px;font-weight:600;padding:6px 20px;cursor:pointer;min-height:36px">펼치기</button>
-  </div>
-</div>
-
-<!-- ═══ 배달료(게이트) 설정 ═══ -->
-<div class="card" id="gatePanel" style="display:none">
+<!-- ═══ 4. 배달료(게이트) 설정 ═══ -->
+<div class="card" id="gatePanel">
   <div class="ch" onclick="togCB('gate_body')">
     <div class="row">
       <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">배달료</span>
@@ -385,14 +291,14 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 영업정지 설정 ═══ -->
-<div class="card" id="stopPanel" style="display:none">
+<!-- ═══ 5. 영업정지 설정 ═══ -->
+<div class="card" id="stopPanel">
   <div class="ch" onclick="togCB('stop_body')">
     <div class="row">
       <span style="font-size:13px;font-weight:600;color:var(--c-off)">영업정지</span>
       <div class="tog" id="tog_stop" onclick="event.stopPropagation();togStop()"></div>
     </div>
-    <span style="font-size:11px;color:var(--text-muted)">▾</span>
+    <span style="font-size:11px;color:var(--text-muted)">&#9662;</span>
   </div>
   <div class="cb open" id="stop_body">
     <div class="sr" style="margin-bottom:6px">
@@ -430,7 +336,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <!-- ═══ 방어 상태 (서킷브레이커 + 에스컬레이션) ═══ -->
-<div class="card" id="defenseStatusCard" style="display:none">
+<div class="card" id="defenseStatusCard">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
     <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">방어 상태</span>
     <span id="def_activeTab" style="font-size:11px;color:var(--text-muted)"></span>
@@ -461,7 +367,101 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <button class="btn bs bn" onclick="resetAllCircuits()" style="width:100%;margin-top:4px;font-size:10px;color:var(--text-secondary)">서킷 전체 리셋</button>
 </div>
 
-<!-- ═══ 6. 지연 설정 (기본 접힘) ═══ -->
+<!-- ═══ 6. 광고 설정 (기본 접힘) ═══ -->
+<div class="card" id="adSettingCard">
+  <div class="row" style="justify-content:space-between;margin-bottom:6px">
+    <div class="ch" onclick="togSec('adB')" style="flex:1">
+      <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">광고 설정</span>
+      <span id="adA" style="color:var(--text-secondary)">&#9654;</span>
+    </div>
+    <div class="row" style="gap:3px">
+      <button class="btn bs bg" onclick="saveAll()" style="font-size:12px;padding:8px 12px">저장</button>
+      <button class="btn bs bn" onclick="restoreAll()" style="font-size:12px;padding:8px 12px">복원</button>
+    </div>
+  </div>
+  <div class="cb" id="adB">
+    <div class="sec" style="color:var(--c-baemin)">배민 금액</div>
+    <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-50)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',50)">+</button></div></div>
+    <div class="sec">토글</div>
+    <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
+    <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
+    <div class="sr"><span class="sl">건수 자동</span><div class="tog" id="tog_order_auto_off_enabled" onclick="togS('order_auto_off_enabled')"></div></div>
+    <div class="sr"><span class="sl">쿠팡 자동</span><div class="tog" id="tog_coupang_auto_enabled" onclick="togS('coupang_auto_enabled')"></div></div>
+    <div class="sr"><span class="sl">배민 자동</span><div class="tog" id="tog_baemin_auto_enabled" onclick="togS('baemin_auto_enabled')"></div></div>
+    <div class="sec">스케줄</div>
+    <div class="sr">
+      <div class="row" style="gap:4px">
+        <div class="tog" id="tog_schedule_enabled2" onclick="togS('schedule_enabled')"></div>
+        <span class="dot dr" id="schDot2"></span>
+      </div>
+      <div class="row" style="gap:4px">
+        <span id="schOnDisp" style="font-size:14px;font-weight:bold;color:var(--text-bright);cursor:pointer" onclick="pickTime('on')">--:--</span>
+        <span style="color:var(--text-secondary);font-size:12px">~</span>
+        <span id="schOffDisp" style="font-size:14px;font-weight:bold;color:var(--text-bright);cursor:pointer" onclick="pickTime('off')">--:--</span>
+      </div>
+    </div>
+    <input type="time" id="schTimePicker" style="position:absolute;opacity:0;pointer-events:none">
+  </div>
+</div>
+
+<!-- ═══ 7. 조리모드 (기본 접힘) ═══ -->
+<div class="card" id="cookCard">
+  <div class="ch" onclick="togSec('ckB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">조리모드</span>
+      <div class="tog" id="tog_cook_mode" onclick="event.stopPropagation();togCookMode()"></div>
+      <span id="ckStatus" style="font-size:11px;font-weight:600;color:var(--c-on)"></span>
+    </div>
+    <span id="ckA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="ckB">
+    <div class="sr"><span class="sl" style="color:var(--c-on)">전체</span><div class="sv"><button class="btn bs bn" onclick="adjCk('target',-10)">-</button><span id="ck_target_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">25:00</span><button class="btn bs bn" onclick="adjCk('target',10)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-mid)">조리</span><div class="sv"><button class="btn bs bn" onclick="adjCk('mid',-10)">-</button><span id="ck_mid_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">17:00</span><button class="btn bs bn" onclick="adjCk('mid',10)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-off)">포장</span><div class="sv"><button class="btn bs bn" onclick="adjCk('finish',-10)">-</button><span id="ck_finish_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">4:00</span><button class="btn bs bn" onclick="adjCk('finish',10)">+</button></div></div>
+    <input type="hidden" id="ck_target" value="1500"><input type="hidden" id="ck_mid" value="1020"><input type="hidden" id="ck_finish" value="240">
+    <div id="cookQ" style="margin-top:6px;font-size:12px;color:var(--text-secondary)">대기중</div>
+  </div>
+  <!-- 실시간 리스트 (설정 접힘과 무관하게 항상 표시) -->
+  <div id="cookListArea" style="display:none;margin-top:6px;border-top:1px solid var(--bg-input);padding-top:6px">
+    <div id="cookList"></div>
+  </div>
+</div>
+
+<!-- ═══ 게이지 (숨김 — 엔진으로 대체) ═══ -->
+<div class="card" id="gaugeCard" style="display:none">
+  <div style="margin-bottom:8px">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <div class="row" style="gap:6px">
+        <span style="color:var(--c-coupang);font-size:12px;font-weight:600">쿠팡</span>
+        <span id="cSt" style="font-size:11px"></span>
+      </div>
+      <div class="row" style="gap:6px">
+        <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
+        <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
+      </div>
+    </div>
+    <div class="gauge" id="cG"></div>
+  </div>
+  <div style="border-top:1px solid var(--bg-input);padding-top:8px">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <div class="row" style="gap:6px">
+        <span style="color:var(--c-baemin);font-size:12px;font-weight:600">배민</span>
+        <span id="bSt" style="font-size:11px"></span>
+      </div>
+      <div class="row" style="gap:6px">
+        <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
+        <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
+        <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
+      </div>
+    </div>
+    <div class="gauge" id="bG"></div>
+  </div>
+  <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
+</div>
+
+<!-- ═══ 8. 지연 설정 (기본 접힘) ═══ -->
 <div class="card" id="delayCard">
   <div class="ch" onclick="togSec('dlB')">
     <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">지연 설정</span>
@@ -480,7 +480,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 7. 진단 (차트 + 로그, 기본 접힘) ═══ -->
+<!-- ═══ 9. 진단 (차트 + 로그, 기본 접힘) ═══ -->
 <div class="card" id="diagCard">
   <div class="ch" onclick="togSec('diagB')">
     <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">진단 (차트 · 로그)</span>
@@ -504,7 +504,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 8. 권한 ═══ -->
+<!-- ═══ 10. 권한 ═══ -->
 <div class="card" id="permCard" style="display:none">
   <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">권한 / 앱 설정</div>
   <div class="sr"><div class="row"><span class="dot dd" id="pdD"></span><span class="sl" style="margin-left:4px">지연 접근성</span></div><button class="btn bs bb" onclick="nb('openAccessibilitySettings')">설정</button></div>
@@ -1519,29 +1519,16 @@ let currentMode = localStorage.getItem('_posdelay_mode') || 'cook';
 function switchMode(mode) {
   currentMode = mode;
   try { localStorage.setItem('_posdelay_mode', mode); } catch(e) {}
-  // 전체 카드 숨김
-  document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-  // 해당 모드 카드만 표시
-  const ids = MODE_CARDS[mode] || MODE_CARDS.cook;
-  ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'block'; });
-  // permCard: 앱에서만 표시
-  if (mode !== 'gate' && !isApp) { const pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
-
-  // 탭 활성화
-  // 배달료/영업정지 탭: 클릭 = 모니터링 보기만 (설정 변경 없음)
-  // 방어 ON/OFF는 탭 안의 tog_gate 토글로만 제어
-
-  ['cook','ad','fee','stop'].forEach(m => {
-    const tab = document.getElementById('mTab_'+m);
-    if(!tab) return;
-    const isActive = m===mode;
-    tab.style.background = isActive ? '#1A1A30' : '';
-    tab.style.borderTop = isActive ? '2px solid #7C6FE0' : 'none';
-    tab.querySelector('span:first-child').style.color = isActive ? '#E0E0EC' : '#707088';
+  // 탭 제거 — 모든 카드 항상 표시
+  document.querySelectorAll('.card,[id$=Card],[id$=Panel]').forEach(function(el) {
+    if (el.id !== 'permCard' && el.id !== 'gaugeCard') el.style.display = '';
   });
-
-  // 차트 모드 진입 시 리드로우
-  if (mode !== 'gate') setTimeout(drawChart, 100);
+  // gaugeCard는 숨김 (엔진 리스트로 대체)
+  var gc = document.getElementById('gaugeCard');
+  if (gc) gc.style.display = 'none';
+  // permCard: 앱에서만 표시
+  if (!isApp) { var pc = document.getElementById('permCard'); if(pc) pc.style.display = 'none'; }
+  setTimeout(drawChart, 100);
 }
 
 // 초기 모드: cook (기본)
@@ -1971,7 +1958,7 @@ function updateSubphoneStatus(json) {
 </script>
 
 <!-- 하단 모드 탭 바 -->
-<div id="modeTabBar" style="position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;background:#0F0F1F;border-top:1px solid var(--border);z-index:100;">
+<div id="modeTabBar" style="position:fixed;bottom:0;left:0;right:0;height:56px;display:none;background:#0F0F1F;border-top:1px solid var(--border);z-index:100;">
   <div class="mode-tab active" onclick="switchMode('cook')" id="mTab_cook" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--bg-deep);border-top:2px solid #7C6FE0;">
     <span style="font-size:12px;font-weight:600;color:var(--text-bright)">조리모드</span>
     <span id="mStat_cook" style="font-size:10px;color:var(--text-muted)">○ OFF</span>
@@ -1991,8 +1978,8 @@ function updateSubphoneStatus(json) {
 </div>
 
 <script>
-// 저장된 탭 모드 복원
-if (currentMode !== 'cook') switchMode(currentMode);
+// 탭 제거 — 모든 카드 표시 초기화
+switchMode('all');
 </script>
 </body>
 </html>
