@@ -379,123 +379,122 @@ function fb(path) {
 
 // 1. PC 상태
 function updatePC() {
-  fb('/packhelper/heartbeat').then(function(data) {
+  fb('/monitor/main_pc/status').then(function(data) {
     var el = document.getElementById('pc-body');
     if (!data) { el.innerHTML = badge('데이터 없음', 'warn'); return; }
-    var html = '';
-    var entries = Object.entries(data);
-    entries.forEach(function(kv) {
-      var name = kv[0];
-      var info = kv[1];
-      var ts = info.timestamp || info.time || info.last;
-      var ago = ts ? (Date.now() - ts) / 1000 : 99999;
-      var status = ago < 120 ? badge('ON', 'ok') : ago < 600 ? badge(agoStr(ts), 'warn') : badge('OFF', 'err');
-      html += '<div class="item"><span>' + name + '</span>' + status + '</div>';
+    var ts = data.ts || '';
+    var up = data.uptime_min || 0;
+    var svcs = data.services || {};
+    var html = '<div class="item"><span>uptime</span><span>' + up + '분</span></div>';
+    Object.entries(svcs).forEach(function(kv) {
+      var name = kv[0]; var info = kv[1];
+      if (typeof info !== 'object') return;
+      var alive = info.alive;
+      html += '<div class="item"><span>' + name + '</span>' + (alive ? badge('ON', 'ok') : badge('OFF', 'err')) + '</div>';
     });
-    el.innerHTML = html || badge('항목 없음', 'info');
+    if (ts) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">' + agoStr(ts) + '</div>';
+    el.innerHTML = html;
   });
 }
 
-// 2. 날씨
+// 2. 날씨 (기상청 API — 추후 연동, 현재 placeholder)
 function updateWeather() {
-  fb('/packhelper/weather').then(function(data) {
-    var el = document.getElementById('weather-body');
-    if (!data) {
-      el.innerHTML = '<div class="card-value">--</div><div class="card-sub">데이터 없음</div>';
-      return;
-    }
-    var temp = data.temp || data.temperature || '--';
-    var desc = data.desc || data.sky || '';
-    var humid = data.humidity || '';
-    el.innerHTML = '<div class="card-value">' + temp + '&#176;</div>' +
-      '<div class="card-sub">' + desc + (humid ? ' / 습도 ' + humid + '%' : '') + '</div>';
-  });
+  var el = document.getElementById('weather-body');
+  var now = new Date();
+  el.innerHTML = '<div class="card-value">' + now.toLocaleDateString('ko-KR', {month:'long', day:'numeric', weekday:'short'}) + '</div>' +
+    '<div class="card-sub">' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false}) + ' (날씨 API 연동 예정)</div>';
 }
 
 // 3. 근무표
 function updateSchedule() {
-  fb('/packhelper/schedule/today').then(function(data) {
+  var today = new Date().toISOString().slice(0,10);
+  fb('/packhelper/storebot_attendance/' + today).then(function(data) {
     var el = document.getElementById('schedule-body');
-    if (!data) { el.innerHTML = badge('데이터 없음', 'warn'); return; }
+    if (!data) { el.innerHTML = badge('오늘 출근 기록 없음', 'info'); return; }
     var html = '';
-    if (Array.isArray(data)) {
-      data.forEach(function(p) {
-        var name = typeof p === 'string' ? p : (p.name || '');
-        var time = typeof p === 'string' ? '' : (p.time || '');
-        html += '<div class="item"><span>' + name + '</span><span style="color:var(--text-muted)">' + time + '</span></div>';
-      });
-    } else if (typeof data === 'object') {
-      Object.entries(data).forEach(function(kv) {
-        html += '<div class="item"><span>' + kv[0] + '</span><span style="color:var(--text-muted)">' + kv[1] + '</span></div>';
-      });
-    }
-    el.innerHTML = html || badge('오늘 근무 없음', 'info');
+    Object.entries(data).forEach(function(kv) {
+      var emp = kv[0]; var info = kv[1];
+      if (typeof info === 'object') {
+        var start = info.start || info.check_in || '';
+        var end = info.end || info.check_out || '';
+        var status = end ? badge('퇴근', 'info') : badge('근무중', 'ok');
+        html += '<div class="item"><span>' + emp + ' ' + start + '</span>' + status + '</div>';
+      } else {
+        html += '<div class="item"><span>' + emp + '</span><span>' + info + '</span></div>';
+      }
+    });
+    el.innerHTML = html || badge('기록 없음', 'info');
   });
 }
 
 // 4. 주문 현황
 function updateOrder() {
-  fb('/packhelper/order_summary/today').then(function(data) {
+  var today = new Date().toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'}).replace(/\./g,'').replace(/\s/g,'').slice(0,4);
+  fetch(FB + '/packhelper/capture.json?shallow=true').then(function(r){return r.json()}).then(function(data) {
     var el = document.getElementById('order-body');
-    if (!data) {
-      el.innerHTML = '<div class="card-value">0</div><div class="card-sub">오늘 주문</div>';
-      return;
-    }
-    var count = data.count || data.total || 0;
-    var amt = data.amount || 0;
+    if (!data) { el.innerHTML = '<div class="card-value">0</div><div class="card-sub">오늘 주문</div>'; return; }
+    var keys = Object.keys(data);
+    var todayKeys = keys.filter(function(k) { return k.startsWith(today + '_'); });
+    var count = todayKeys.length;
     el.innerHTML = '<div class="card-value">' + count + '<span style="font-size:14px;color:var(--text-muted)"> 건</span></div>' +
-      (amt ? '<div class="card-sub">' + Number(amt).toLocaleString() + '원</div>' : '<div class="card-sub">오늘 주문</div>');
+      '<div class="card-sub">오늘 주문</div>';
   });
 }
 
 // 5. AI 활동
 function updateAI() {
-  fb('/packhelper/ai_activity').then(function(data) {
+  fb('/packhelper/ai_monitor/apps').then(function(data) {
     var el = document.getElementById('ai-body');
-    if (!data) {
-      el.innerHTML = '<div class="card-value">--</div><div class="card-sub">Groq 활동</div>';
-      return;
-    }
-    var count = data.today_count || data.count || 0;
-    var last = data.last_time || data.last || null;
-    el.innerHTML = '<div class="card-value">' + count + '<span style="font-size:14px;color:var(--text-muted)"> 건</span></div>' +
-      '<div class="card-sub">최근 ' + agoStr(last) + '</div>';
+    if (!data) { el.innerHTML = '<div class="card-value">--</div><div class="card-sub">Groq 활동</div>'; return; }
+    var html = '';
+    Object.entries(data).forEach(function(kv) {
+      var app = kv[0]; var metrics = kv[1];
+      if (typeof metrics !== 'object') return;
+      var items = [];
+      Object.entries(metrics).forEach(function(mv) {
+        var m = mv[1];
+        if (typeof m === 'object' && m.count > 0) {
+          items.push(mv[0] + ': ' + m.count);
+        }
+      });
+      if (items.length > 0) {
+        html += '<div class="item"><span style="color:var(--accent-cyan)">' + app + '</span><span>' + items.join(', ') + '</span></div>';
+      }
+    });
+    el.innerHTML = html || badge('활동 없음', 'info');
   });
 }
 
 // 6. 진단 보고서
 function updateDiag() {
-  fb('/packhelper/diagnostics/latest').then(function(data) {
+  fb('/monitor/main_pc/ai_diagnosis').then(function(data) {
     var el = document.getElementById('diag-body');
     if (!data) { el.innerHTML = badge('보고서 없음', 'info'); return; }
-    var title = data.title || data.type || '진단';
-    var result = data.result || data.status || '';
-    var ts = data.time || data.timestamp || null;
-    var resultBadge = result === 'ok' ? badge('정상', 'ok') : result === 'warn' ? badge('주의', 'warn') : badge(result || '?', 'info');
-    el.innerHTML = '<div class="item"><span>' + title + '</span>' + resultBadge + '</div>' +
+    var status = data.status || '?';
+    var reason = data.reason || '';
+    var ts = data.ts || '';
+    var statusBadge = status === '정상' ? badge('정상', 'ok') : status === '경고' ? badge('경고', 'warn') : status === '위험' ? badge('위험', 'err') : badge(status, 'info');
+    el.innerHTML = '<div class="item"><span>Groq 자가진단</span>' + statusBadge + '</div>' +
+      (reason ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">' + reason + '</div>' : '') +
       (ts ? '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">' + agoStr(ts) + '</div>' : '');
   });
 }
 
 // 7. 알림/경고
 function updateAlert() {
-  fb('/packhelper/alerts').then(function(data) {
+  fb('/monitor/main_pc/alert').then(function(data) {
     var el = document.getElementById('alert-body');
-    if (!data) { el.innerHTML = badge('알림 없음', 'info'); return; }
-    var items = [];
-    if (Array.isArray(data)) {
-      items = data.slice(-5).reverse();
-    } else if (typeof data === 'object') {
-      items = Object.values(data).slice(-5).reverse();
-    }
-    if (items.length === 0) { el.innerHTML = badge('알림 없음', 'info'); return; }
+    if (!data) { el.innerHTML = badge('알림 없음', 'ok'); return; }
+    var items = Object.entries(data).sort().reverse().slice(0, 5);
+    if (items.length === 0) { el.innerHTML = badge('알림 없음', 'ok'); return; }
     var html = '';
-    items.forEach(function(a) {
-      var msg = typeof a === 'string' ? a : (a.message || a.msg || a.content || '');
-      var ts = typeof a === 'object' ? (a.time || a.timestamp || null) : null;
-      var level = typeof a === 'object' ? (a.level || 'info') : 'info';
-      var levelBadge = level === 'error' ? badge('ERR', 'err') : level === 'warn' ? badge('WARN', 'warn') : '';
-      html += '<div class="item"><span>' + levelBadge + ' ' + msg + '</span><span style="color:var(--text-muted)">' + agoStr(ts) + '</span></div>';
+    items.forEach(function(kv) {
+      var a = kv[1];
+      var type = a.type || '';
+      var reason = a.reason || a.msg || '';
+      var ts = a.ts || '';
+      var typeBadge = type.indexOf('위험') >= 0 ? badge('위험', 'err') : type.indexOf('경고') >= 0 ? badge('경고', 'warn') : badge(type, 'info');
+      html += '<div class="item"><span>' + typeBadge + ' ' + reason.substring(0,50) + '</span><span style="color:var(--text-muted)">' + agoStr(ts) + '</span></div>';
     });
     el.innerHTML = html;
   });
@@ -503,20 +502,17 @@ function updateAlert() {
 
 // 8. 엑셀 정산
 function updateExcel() {
-  fb('/packhelper/excel_collect/latest').then(function(data) {
+  fb('/packhelper/excel_settle_data').then(function(data) {
     var el = document.getElementById('excel-body');
     if (!data) { el.innerHTML = badge('정산 데이터 없음', 'info'); return; }
     var html = '';
-    if (typeof data === 'object' && !Array.isArray(data)) {
-      Object.entries(data).forEach(function(kv) {
-        if (kv[0] === 'time' || kv[0] === 'timestamp') return;
-        html += '<div class="item"><span>' + kv[0] + '</span><span>' + kv[1] + '</span></div>';
-      });
-      var ts = data.time || data.timestamp || null;
-      if (ts) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">수집: ' + agoStr(ts) + '</div>';
-    } else {
-      html = '<span style="color:var(--text-secondary)">' + JSON.stringify(data).substring(0, 100) + '</span>';
-    }
+    var items = data.items || [];
+    items.forEach(function(item) {
+      var amt = Number(item.amount || 0).toLocaleString();
+      html += '<div class="item"><span>' + (item.name || '') + '</span><span>' + amt + '원</span></div>';
+    });
+    var updated = data.updated || '';
+    if (updated) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">수집: ' + updated + '</div>';
     el.innerHTML = html || badge('내용 없음', 'info');
   });
 }
