@@ -1347,7 +1347,6 @@ try {
       // 소스 선택 버튼 복원 + 배달료 탭 전환
       setTimeout(function(){
         setFeeSource(saved.activeTab);
-        switchMode('fee');
       }, 300);
     }
     document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
@@ -1474,10 +1473,11 @@ const MODE_CARDS = {
   fee: ['feeMonitorCard','feeOrderListCard','gatePanel','defenseStatusCard'],
   stop: ['monitorCard','stopPanel','defenseStatusCard']
 };
-let currentMode = 'cook';
+let currentMode = localStorage.getItem('_posdelay_mode') || 'cook';
 
 function switchMode(mode) {
   currentMode = mode;
+  try { localStorage.setItem('_posdelay_mode', mode); } catch(e) {}
   // 전체 카드 숨김
   document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
   // 해당 모드 카드만 표시
@@ -1863,5 +1863,9 @@ function togAdOffOnPause() {
   </div>
 </div>
 
+<script>
+// 저장된 탭 모드 복원
+if (currentMode !== 'cook') switchMode(currentMode);
+</script>
 </body>
 </html>
