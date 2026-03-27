@@ -19,15 +19,15 @@
 .task-state.idle{background:var(--text-muted);}.task-state.running{background:var(--c-mid);animation:pulse 1.5s infinite;}
 .task-state.success{background:var(--c-on);}.task-state.failed{background:var(--c-off);}
 .task-state.cooldown{background:var(--c-mid);opacity:.5;}
-.task-name{font-size:12px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.task-summary{font-size:10px;color:var(--text-muted);flex-shrink:0;max-width:80px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.task-name{font-size:13px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.task-summary{font-size:11px;color:var(--text-muted);flex-shrink:0;max-width:80px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .task-toggle{width:36px;height:20px;border-radius:10px;background:var(--c-off);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
 .task-toggle.on{background:var(--c-on);}.task-toggle::after{content:'';width:16px;height:16px;border-radius:50%;background:#FFF;position:absolute;top:2px;left:2px;transition:left .2s;}.task-toggle.on::after{left:18px;}
 .task-arrow{color:var(--text-muted);font-size:12px;flex-shrink:0;transition:transform .2s;width:20px;text-align:center;}
 .task-detail{display:none;padding:0 0 10px 16px;}
 .task-detail.open{display:block;}
 .task-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;}
-.task-btn{padding:6px 12px;border-radius:4px;border:none;font-size:11px;font-weight:600;cursor:pointer;color:#FFF;min-height:32px;touch-action:manipulation;}
+.task-btn{padding:6px 12px;border-radius:4px;border:none;font-size:11px;font-weight:600;cursor:pointer;color:var(--text-bright);min-height:36px;touch-action:manipulation;}
 .task-cond-list{font-size:11px;color:var(--text-secondary);}
 .task-cond-label{color:var(--text-muted);font-size:10px;}
 .subphone-bar{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);padding:6px 0;margin-top:4px;border-top:1px solid var(--border);}
