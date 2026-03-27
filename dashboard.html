@@ -74,13 +74,26 @@ body {
   vertical-align: middle;
 }
 
-/* 카드 그리드 */
-.grid {
+/* 2열 레이아웃: 좌측 생활정보 + 우측 운영모니터링 */
+.layout {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: var(--gap);
   max-width: 600px;
   margin: 0 auto;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.bottom-wide {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
 }
 
 .card {
@@ -166,6 +179,8 @@ body {
 .icon-diag { background: rgba(38,198,218,0.15); color: var(--accent-cyan); }
 .icon-alert { background: rgba(239,83,80,0.15); color: var(--accent-red); }
 .icon-excel { background: rgba(255,238,88,0.15); color: var(--accent-yellow); }
+.icon-news { background: rgba(79,195,247,0.15); color: var(--accent-blue); }
+.icon-sns { background: rgba(236,64,122,0.15); color: var(--accent-pink); }
 
 /* 상태 뱃지 */
 .badge {
@@ -181,9 +196,26 @@ body {
 .badge-err { background: rgba(239,83,80,0.2); color: var(--accent-red); }
 .badge-info { background: rgba(79,195,247,0.2); color: var(--accent-blue); }
 
-/* 풀 와이드 카드 */
-.card-wide {
-  grid-column: 1 / -1;
+/* 뉴스 링크 스타일 */
+.news-link {
+  display: block;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(15,52,96,0.5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.news-link:last-child {
+  border-bottom: none;
+}
+
+.news-link:active {
+  color: var(--accent-blue);
 }
 
 /* 로딩 스켈레톤 */
@@ -224,129 +256,184 @@ body {
   <span class="status"><span class="dot"></span><span id="lastUpdate">--:--</span></span>
 </div>
 
-<div class="grid">
+<div class="layout">
 
-  <!-- 1. PC 상태 -->
-  <div class="card" id="card-pc">
-    <div class="card-header">
-      <div class="card-icon icon-pc">&#9211;</div>
-      <div class="card-title">PC 상태</div>
-    </div>
-    <div class="card-body">
-      <div class="card-list" id="pc-body">
-        <div class="skeleton"></div>
+  <!-- 좌측: 생활정보 -->
+  <div class="column">
+
+    <!-- 날씨 -->
+    <div class="card" id="card-weather">
+      <div class="card-header">
+        <div class="card-icon icon-weather">&#9788;</div>
+        <div class="card-title">날씨</div>
+      </div>
+      <div class="card-body">
+        <div id="weather-body">
+          <div class="skeleton"></div>
+        </div>
       </div>
     </div>
+
+    <!-- 경제/AI 뉴스 -->
+    <div class="card" id="card-news">
+      <div class="card-header">
+        <div class="card-icon icon-news">&#9993;</div>
+        <div class="card-title">경제/AI 뉴스</div>
+      </div>
+      <div class="card-body">
+        <div id="news-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SNS 이슈 -->
+    <div class="card" id="card-sns">
+      <div class="card-header">
+        <div class="card-icon icon-sns">&#9729;</div>
+        <div class="card-title">SNS 이슈</div>
+      </div>
+      <div class="card-body">
+        <div id="sns-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 스포츠 -->
+    <div class="card" id="card-sports">
+      <div class="card-header">
+        <div class="card-icon" style="background:#2e7d32">&#9917;</div>
+        <div class="card-title">스포츠</div>
+      </div>
+      <div class="card-body">
+        <div class="card-list" id="sports-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- 2. 날씨 -->
-  <div class="card" id="card-weather">
-    <div class="card-header">
-      <div class="card-icon icon-weather">&#9788;</div>
-      <div class="card-title">날씨</div>
-    </div>
-    <div class="card-body">
-      <div id="weather-body">
-        <div class="skeleton"></div>
+  <!-- 우측: 운영 모니터링 -->
+  <div class="column">
+
+    <!-- PC 상태 -->
+    <div class="card" id="card-pc">
+      <div class="card-header">
+        <div class="card-icon icon-pc">&#9211;</div>
+        <div class="card-title">PC 상태</div>
+      </div>
+      <div class="card-body">
+        <div class="card-list" id="pc-body">
+          <div class="skeleton"></div>
+        </div>
       </div>
     </div>
+
+    <!-- AI 활동 -->
+    <div class="card" id="card-ai">
+      <div class="card-header">
+        <div class="card-icon icon-ai">&#9881;</div>
+        <div class="card-title">AI 활동</div>
+      </div>
+      <div class="card-body">
+        <div id="ai-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 주문 현황 -->
+    <div class="card" id="card-order">
+      <div class="card-header">
+        <div class="card-icon icon-order">&#9733;</div>
+        <div class="card-title">주문 현황</div>
+      </div>
+      <div class="card-body">
+        <div id="order-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 진단 보고서 -->
+    <div class="card" id="card-diag">
+      <div class="card-header">
+        <div class="card-icon icon-diag">&#9874;</div>
+        <div class="card-title">진단 보고서</div>
+      </div>
+      <div class="card-body">
+        <div class="card-list" id="diag-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 알림/경고 -->
+    <div class="card" id="card-alert">
+      <div class="card-header">
+        <div class="card-icon icon-alert">&#9888;</div>
+        <div class="card-title">알림 / 경고</div>
+      </div>
+      <div class="card-body">
+        <div class="card-list" id="alert-body">
+          <div class="skeleton"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- 3. 근무표 -->
-  <div class="card" id="card-schedule">
-    <div class="card-header">
-      <div class="card-icon icon-schedule">&#9779;</div>
-      <div class="card-title">근무표</div>
-    </div>
-    <div class="card-body">
-      <div class="card-list" id="schedule-body">
-        <div class="skeleton"></div>
-      </div>
-    </div>
-  </div>
+  <!-- 하단 풀 와이드 -->
+  <div class="bottom-wide">
 
-  <!-- 4. 주문 현황 -->
-  <div class="card" id="card-order">
-    <div class="card-header">
-      <div class="card-icon icon-order">&#9733;</div>
-      <div class="card-title">주문 현황</div>
-    </div>
-    <div class="card-body">
-      <div id="order-body">
-        <div class="skeleton"></div>
+    <!-- 근무표 -->
+    <div class="card" id="card-schedule">
+      <div class="card-header">
+        <div class="card-icon icon-schedule">&#9779;</div>
+        <div class="card-title">근무표</div>
+      </div>
+      <div class="card-body">
+        <div class="card-list" id="schedule-body">
+          <div class="skeleton"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 5. AI 활동 -->
-  <div class="card" id="card-ai">
-    <div class="card-header">
-      <div class="card-icon icon-ai">&#9881;</div>
-      <div class="card-title">AI 활동</div>
-    </div>
-    <div class="card-body">
-      <div id="ai-body">
-        <div class="skeleton"></div>
+    <!-- 엑셀 정산 -->
+    <div class="card" id="card-excel">
+      <div class="card-header">
+        <div class="card-icon icon-excel">&#9638;</div>
+        <div class="card-title">엑셀 정산</div>
+      </div>
+      <div class="card-body">
+        <div class="card-list" id="excel-body">
+          <div class="skeleton"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 6. 진단 보고서 -->
-  <div class="card" id="card-diag">
-    <div class="card-header">
-      <div class="card-icon icon-diag">&#9874;</div>
-      <div class="card-title">진단 보고서</div>
-    </div>
-    <div class="card-body">
-      <div class="card-list" id="diag-body">
-        <div class="skeleton"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 7. 알림/경고 (풀 와이드) -->
-  <div class="card card-wide" id="card-alert">
-    <div class="card-header">
-      <div class="card-icon icon-alert">&#9888;</div>
-      <div class="card-title">알림 / 경고</div>
-    </div>
-    <div class="card-body">
-      <div class="card-list" id="alert-body">
-        <div class="skeleton"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 8. 스포츠 -->
-  <div class="card" id="card-sports">
-    <div class="card-header">
-      <div class="card-icon" style="background:#2e7d32">&#9917;</div>
-      <div class="card-title">스포츠</div>
-    </div>
-    <div class="card-body">
-      <div class="card-list" id="sports-body">
-        <div class="skeleton"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 9. 엑셀 정산 (풀 와이드) -->
-  <div class="card card-wide" id="card-excel">
-    <div class="card-header">
-      <div class="card-icon icon-excel">&#9638;</div>
-      <div class="card-title">엑셀 정산</div>
-    </div>
-    <div class="card-body">
-      <div class="card-list" id="excel-body">
-        <div class="skeleton"></div>
-      </div>
-    </div>
   </div>
 
 </div>
 
 <script>
-const FB = 'https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
+var FB = 'https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
+var PROXY = 'https://api.allorigins.win/get?url=';
+var NEWS_RSS = 'https://news.google.com/rss/search?q=%ED%95%98%EC%9D%B4%EB%8B%89%EC%8A%A4+OR+%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90+OR+AI&hl=ko&gl=KR&ceid=KR:ko';
+var TRENDS_RSS = 'https://trends.google.co.kr/trending/rss?geo=KR';
+
+// 뉴스 갱신 간격 (5분) -- 30초 주기와 별도 관리
+var NEWS_INTERVAL_MS = 5 * 60 * 1000;
+var lastNewsFetch = 0;
+
+// HTML 이스케이프 (XSS 방지)
+function esc(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
 
 // 시간 포맷
 function timeStr(ts) {
@@ -365,7 +452,7 @@ function agoStr(ts) {
 }
 
 function badge(text, type) {
-  return '<span class="badge badge-' + type + '">' + text + '</span>';
+  return '<span class="badge badge-' + type + '">' + esc(text) + '</span>';
 }
 
 // Firebase fetch 헬퍼
@@ -375,9 +462,35 @@ function fb(path) {
     .catch(function() { return null; });
 }
 
+// RSS XML 파싱 공통 함수
+function fetchRSS(rssUrl, maxItems) {
+  var url = PROXY + encodeURIComponent(rssUrl);
+  return fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data || !data.contents) return [];
+      var parser = new DOMParser();
+      var xml = parser.parseFromString(data.contents, 'text/xml');
+      var items = xml.querySelectorAll('item');
+      var result = [];
+      for (var i = 0; i < Math.min(items.length, maxItems); i++) {
+        var titleEl = items[i].querySelector('title');
+        var linkEl = items[i].querySelector('link');
+        if (titleEl) {
+          result.push({
+            title: titleEl.textContent || '',
+            link: linkEl ? linkEl.textContent || '' : ''
+          });
+        }
+      }
+      return result;
+    })
+    .catch(function() { return []; });
+}
+
 // --- 카드 업데이트 함수들 ---
 
-// 1. PC 상태
+// PC 상태
 function updatePC() {
   fb('/monitor/main_pc/status').then(function(data) {
     var el = document.getElementById('pc-body');
@@ -390,22 +503,22 @@ function updatePC() {
       var name = kv[0]; var info = kv[1];
       if (typeof info !== 'object') return;
       var alive = info.alive;
-      html += '<div class="item"><span>' + name + '</span>' + (alive ? badge('ON', 'ok') : badge('OFF', 'err')) + '</div>';
+      html += '<div class="item"><span>' + esc(name) + '</span>' + (alive ? badge('ON', 'ok') : badge('OFF', 'err')) + '</div>';
     });
     if (ts) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">' + agoStr(ts) + '</div>';
     el.innerHTML = html;
   });
 }
 
-// 2. 날씨 (기상청 API — 추후 연동, 현재 placeholder)
+// 날씨 (기상청 API -- 추후 연동, 현재 placeholder)
 function updateWeather() {
   var el = document.getElementById('weather-body');
   var now = new Date();
-  el.innerHTML = '<div class="card-value">' + now.toLocaleDateString('ko-KR', {month:'long', day:'numeric', weekday:'short'}) + '</div>' +
-    '<div class="card-sub">' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false}) + ' (날씨 API 연동 예정)</div>';
+  el.innerHTML = '<div class="card-value">' + esc(now.toLocaleDateString('ko-KR', {month:'long', day:'numeric', weekday:'short'})) + '</div>' +
+    '<div class="card-sub">' + esc(now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false})) + '</div>';
 }
 
-// 3. 근무표
+// 근무표
 function updateSchedule() {
   var today = new Date().toISOString().slice(0,10);
   fb('/packhelper/storebot_attendance/' + today).then(function(data) {
@@ -418,16 +531,16 @@ function updateSchedule() {
         var start = info.start || info.check_in || '';
         var end = info.end || info.check_out || '';
         var status = end ? badge('퇴근', 'info') : badge('근무중', 'ok');
-        html += '<div class="item"><span>' + emp + ' ' + start + '</span>' + status + '</div>';
+        html += '<div class="item"><span>' + esc(emp) + ' ' + esc(start) + '</span>' + status + '</div>';
       } else {
-        html += '<div class="item"><span>' + emp + '</span><span>' + info + '</span></div>';
+        html += '<div class="item"><span>' + esc(emp) + '</span><span>' + esc(String(info)) + '</span></div>';
       }
     });
     el.innerHTML = html || badge('기록 없음', 'info');
   });
 }
 
-// 4. 주문 현황
+// 주문 현황
 function updateOrder() {
   var today = new Date().toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit'}).replace(/\./g,'').replace(/\s/g,'').slice(0,4);
   fetch(FB + '/packhelper/capture.json?shallow=true').then(function(r){return r.json()}).then(function(data) {
@@ -441,7 +554,7 @@ function updateOrder() {
   });
 }
 
-// 5. AI 활동
+// AI 활동
 function updateAI() {
   fb('/packhelper/ai_monitor/apps').then(function(data) {
     var el = document.getElementById('ai-body');
@@ -454,18 +567,18 @@ function updateAI() {
       Object.entries(metrics).forEach(function(mv) {
         var m = mv[1];
         if (typeof m === 'object' && m.count > 0) {
-          items.push(mv[0] + ': ' + m.count);
+          items.push(esc(mv[0]) + ': ' + m.count);
         }
       });
       if (items.length > 0) {
-        html += '<div class="item"><span style="color:var(--accent-cyan)">' + app + '</span><span>' + items.join(', ') + '</span></div>';
+        html += '<div class="item"><span style="color:var(--accent-cyan)">' + esc(app) + '</span><span>' + items.join(', ') + '</span></div>';
       }
     });
     el.innerHTML = html || badge('활동 없음', 'info');
   });
 }
 
-// 6. 진단 보고서
+// 진단 보고서
 function updateDiag() {
   fb('/monitor/main_pc/ai_diagnosis').then(function(data) {
     var el = document.getElementById('diag-body');
@@ -475,12 +588,12 @@ function updateDiag() {
     var ts = data.ts || '';
     var statusBadge = status === '정상' ? badge('정상', 'ok') : status === '경고' ? badge('경고', 'warn') : status === '위험' ? badge('위험', 'err') : badge(status, 'info');
     el.innerHTML = '<div class="item"><span>Groq 자가진단</span>' + statusBadge + '</div>' +
-      (reason ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">' + reason + '</div>' : '') +
+      (reason ? '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px">' + esc(reason) + '</div>' : '') +
       (ts ? '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">' + agoStr(ts) + '</div>' : '');
   });
 }
 
-// 7. 알림/경고
+// 알림/경고
 function updateAlert() {
   fb('/monitor/main_pc/alert').then(function(data) {
     var el = document.getElementById('alert-body');
@@ -493,14 +606,14 @@ function updateAlert() {
       var type = a.type || '';
       var reason = a.reason || a.msg || '';
       var ts = a.ts || '';
-      var typeBadge = type.indexOf('위험') >= 0 ? badge('위험', 'err') : type.indexOf('경고') >= 0 ? badge('경고', 'warn') : badge(type, 'info');
-      html += '<div class="item"><span>' + typeBadge + ' ' + reason.substring(0,50) + '</span><span style="color:var(--text-muted)">' + agoStr(ts) + '</span></div>';
+      var typeBadge = type.indexOf('위험') >= 0 ? badge('위험', 'err') : type.indexOf('경고') >= 0 ? badge('경고', 'warn') : badge(type || '알림', 'info');
+      html += '<div class="item"><span>' + typeBadge + ' ' + esc(reason.substring(0,50)) + '</span><span style="color:var(--text-muted)">' + agoStr(ts) + '</span></div>';
     });
     el.innerHTML = html;
   });
 }
 
-// 8. 엑셀 정산
+// 엑셀 정산
 function updateExcel() {
   fb('/packhelper/excel_settle_data').then(function(data) {
     var el = document.getElementById('excel-body');
@@ -509,25 +622,76 @@ function updateExcel() {
     var items = data.items || [];
     items.forEach(function(item) {
       var amt = Number(item.amount || 0).toLocaleString();
-      html += '<div class="item"><span>' + (item.name || '') + '</span><span>' + amt + '원</span></div>';
+      html += '<div class="item"><span>' + esc(item.name || '') + '</span><span>' + amt + '원</span></div>';
     });
     var updated = data.updated || '';
-    if (updated) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">수집: ' + updated + '</div>';
+    if (updated) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">수집: ' + esc(updated) + '</div>';
     el.innerHTML = html || badge('내용 없음', 'info');
   });
 }
 
+// 스포츠
 function updateSports() {
   fb('/packhelper/sports_summary').then(function(data) {
     var el = document.getElementById('sports-body');
     if (!data) { el.innerHTML = badge('스포츠 데이터 없음', 'info'); return; }
     var summary = data.summary || '정보 없음';
     var updated = data.updated || '';
-    var count = data.count || 0;
-    var html = '<div style="font-size:14px;line-height:1.6;white-space:pre-wrap">' + summary + '</div>';
-    if (updated) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">갱신: ' + updated + '</div>';
+    var html = '<div style="font-size:14px;line-height:1.6;white-space:pre-wrap">' + esc(summary) + '</div>';
+    if (updated) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">갱신: ' + esc(updated) + '</div>';
     el.innerHTML = html;
   });
+}
+
+// 경제/AI 뉴스 (Google News RSS)
+function updateNews() {
+  var el = document.getElementById('news-body');
+  fetchRSS(NEWS_RSS, 5).then(function(items) {
+    if (items.length === 0) {
+      el.innerHTML = badge('뉴스 로딩 실패', 'warn');
+      return;
+    }
+    var html = '';
+    items.forEach(function(item) {
+      // Google News 제목에서 소스 제거 (- 뒤 부분)
+      var title = item.title.replace(/ - [^-]+$/, '');
+      if (title.length > 40) title = title.substring(0, 40) + '...';
+      html += '<a class="news-link" href="' + esc(item.link) + '" target="_blank" rel="noopener">' + esc(title) + '</a>';
+    });
+    var now = new Date();
+    html += '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false}) + ' 갱신</div>';
+    el.innerHTML = html;
+  });
+}
+
+// SNS 이슈 (Google Trends RSS)
+function updateSNS() {
+  var el = document.getElementById('sns-body');
+  fetchRSS(TRENDS_RSS, 5).then(function(items) {
+    if (items.length === 0) {
+      el.innerHTML = badge('트렌드 로딩 실패', 'warn');
+      return;
+    }
+    var html = '';
+    items.forEach(function(item) {
+      var title = item.title;
+      if (title.length > 35) title = title.substring(0, 35) + '...';
+      html += '<a class="news-link" href="' + esc(item.link) + '" target="_blank" rel="noopener">' + esc(title) + '</a>';
+    });
+    var now = new Date();
+    html += '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false}) + ' 갱신</div>';
+    el.innerHTML = html;
+  });
+}
+
+// 뉴스/SNS 갱신 (5분 간격 제어)
+function updateNewsIfNeeded() {
+  var now = Date.now();
+  if (now - lastNewsFetch >= NEWS_INTERVAL_MS) {
+    lastNewsFetch = now;
+    updateNews();
+    updateSNS();
+  }
 }
 
 // --- 전체 갱신 ---
@@ -542,6 +706,7 @@ function refreshAll() {
   updateAlert();
   updateExcel();
   updateSports();
+  updateNewsIfNeeded();
 
   var now = new Date();
   document.getElementById('lastUpdate').textContent =
