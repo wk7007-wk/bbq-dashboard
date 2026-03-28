@@ -988,6 +988,7 @@ function updSetUI(){
 function renderGroupSummary(){
   var gs=document.getElementById('groupSummary');
   if(!gs)return;
+  var c2=getActiveCount()||0;
   var items=[];
   // 배민 광고
   var bAdOn=S.baemin_auto_enabled;
@@ -998,28 +999,43 @@ function renderGroupSummary(){
   var cOn=aS.coupang_current_on;
   items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',card:'coupangAdCard'});
   // 배민 지연
+  var bdt=g(S,'baemin_delay_threshold',5);
   var btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
-  var c2=getActiveCount();
-  var bDel=c2!=null?Math.max(0,Math.round(c2*avgInterval+bfc-btt)):0;
-  items.push({name:'배민지연',color:'var(--c-baemin)',on:true,detail:bDel>0?'+'+bDel+'분':'0분',card:'baeminDelayCard'});
+  var bDel=c2>0?Math.max(0,Math.round(c2*avgInterval+bfc-btt)):0;
+  var bdOn=S.baemin_delay_enabled!==false;
+  items.push({name:'배민지연',color:'var(--c-baemin)',on:bdOn,detail:bDel>0?'+'+bDel+'분':'정상',card:'baeminDelayCard',count:c2,threshold:bdt,exceeded:bDel>0});
   // 쿠팡 지연
+  var cdt=g(S,'coupang_delay_threshold',5);
   var ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
-  var cDel=c2!=null?Math.max(0,Math.round(c2*avgInterval+cfc-ctt)):0;
+  var cDel=c2>0?Math.max(0,Math.round(c2*avgInterval+cfc-ctt)):0;
+  var cdOn=S.coupang_delay_enabled!==false;
   var cdAuto=S.coupang_delay_auto;
-  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:true,detail:(cDel>0?'+'+cDel+'분':'0분')+(cdAuto?' 자동':''),card:'coupangDelayCard'});
+  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:cdOn,detail:(cDel>0?'+'+cDel+'분':'정상')+(cdAuto?' ⚡':''),card:'coupangDelayCard',count:c2,threshold:cdt,exceeded:cDel>0});
   // 배달료
-  items.push({name:'배달료',color:'#4FC3F7',on:gateSettings.enabled,detail:(gateSettings.fee||0).toLocaleString()+'원',card:'gatePanel'});
+  var feeThreshold=gateSettings.threshold||8;
+  items.push({name:'배달료',color:'#4FC3F7',on:gateSettings.enabled,detail:(gateSettings.fee||0).toLocaleString()+'원',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
   // 영업정지
-  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:'',card:'stopPanel'});
+  var stopThreshold=gateSettings.threshold_stop||15;
+  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:'',card:'stopPanel',count:c2,threshold:stopThreshold});
   var h='';
   items.forEach(function(it){
     var dotCls=it.on?'dg':'dd';
-    var detailColor=it.on?'var(--text-bright)':'var(--text-muted)';
-    h+='<div style="display:flex;align-items:center;gap:6px;padding:2px 0;cursor:pointer" onclick="document.getElementById(\''+it.card+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
+    var hasGauge=it.threshold!=null&&it.on;
+    var ratio=hasGauge?Math.min(it.count/it.threshold*100,150):0;
+    var barColor=ratio>=100?'#E74C3C':ratio>70?'#E67E22':it.exceeded?'#E74C3C':'#4FC3F7';
+    var detailColor=it.exceeded?'#E74C3C':it.on?'var(--text-bright)':'var(--text-muted)';
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer" onclick="document.getElementById(\''+it.card+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
     h+='<span class="dot '+dotCls+'"></span>';
-    h+='<span style="font-size:11px;color:'+it.color+';font-weight:600;min-width:56px">'+it.name+'</span>';
-    h+='<span style="font-size:11px;color:'+(it.on?'var(--c-on)':'var(--text-muted)')+'">'+( it.on?'ON':'OFF')+'</span>';
-    h+='<span style="font-size:10px;color:'+detailColor+';flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.detail+'</span>';
+    h+='<span style="font-size:11px;color:'+it.color+';font-weight:600;min-width:52px">'+it.name+'</span>';
+    if(hasGauge){
+      h+='<div style="flex:1;height:6px;background:var(--border);border-radius:3px;position:relative">';
+      h+='<div style="height:100%;width:'+Math.min(ratio,100)+'%;background:'+barColor+';border-radius:3px;transition:width .3s"></div>';
+      h+='</div>';
+      h+='<span style="font-size:10px;color:'+barColor+';min-width:32px;text-align:right;font-weight:600">'+it.count+'/'+it.threshold+'</span>';
+    }else{
+      h+='<div style="flex:1"></div>';
+    }
+    h+='<span style="font-size:10px;color:'+detailColor+';min-width:50px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.detail+'</span>';
     h+='</div>';
   });
   gs.innerHTML=h;
