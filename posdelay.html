@@ -255,6 +255,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="ch" onclick="togSec('bdlB')">
     <div class="row" style="gap:6px">
       <span style="font-size:13px;font-weight:600;color:var(--c-baemin)">배민 지연</span>
+      <div class="tog" id="tog_baemin_delay_enabled" onclick="event.stopPropagation();togS('baemin_delay_enabled')"></div>
       <span id="bdlSummary" class="acc-summary"></span>
     </div>
     <span id="bdlA" style="color:var(--text-secondary)">&#9654;</span>
@@ -274,6 +275,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="ch" onclick="togSec('cdlB')">
     <div class="row" style="gap:6px">
       <span style="font-size:13px;font-weight:600;color:var(--c-coupang)">쿠팡 지연</span>
+      <div class="tog" id="tog_coupang_delay_enabled" onclick="event.stopPropagation();togS('coupang_delay_enabled')"></div>
       <span id="cdlSummary" class="acc-summary"></span>
     </div>
     <span id="cdlA" style="color:var(--text-secondary)">&#9654;</span>
@@ -965,7 +967,7 @@ function updSetUI(){
   var cdmd=document.getElementById('set_coupang_delay_minutes_disp');
   if(cdmd&&S.coupang_delay_minutes!=null)cdmd.textContent=S.coupang_delay_minutes+'분';
   updSchDisp();
-  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','coupang_delay_auto'].forEach(f=>{
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','coupang_delay_auto','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
     const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
   });
   const se2=document.getElementById('tog_schedule_enabled2');if(se2)se2.className='tog'+(S.schedule_enabled?' on':'');
