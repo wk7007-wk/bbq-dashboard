@@ -275,7 +275,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="ch" onclick="togSec('cdlB')">
     <div class="row" style="gap:6px">
       <span style="font-size:13px;font-weight:600;color:var(--c-coupang)">쿠팡 지연</span>
-      <div class="tog" id="tog_coupang_delay_enabled" onclick="event.stopPropagation();togS('coupang_delay_enabled')"></div>
+      <div class="tog" id="tog_coupang_delay_enabled" onclick="event.stopPropagation();togS('coupang_delay_enabled');S.coupang_delay_auto=S.coupang_delay_enabled;_lastSaveKeys.push('coupang_delay_auto');_autoSave()"></div>
       <span id="cdlSummary" class="acc-summary"></span>
     </div>
     <span id="cdlA" style="color:var(--text-secondary)">&#9654;</span>
@@ -285,14 +285,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',-1)">-</button><input type="number" id="set_coupang_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
     <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',-1)">-</button><input type="number" id="set_coupang_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">지연 시간</span><div class="sv"><button class="btn bs bn" onclick="adjCoupangDelayMin(-5)">5분</button><button class="btn bs bn" onclick="adjCoupangDelayMin(10)">10분</button><span id="set_coupang_delay_minutes_disp" style="color:var(--c-coupang);font-size:13px;font-weight:bold;min-width:40px;text-align:center">10분</span></div></div>
-    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">최대 10분 (쿠팡 앱 제한)</div>
-    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
-      <div class="sr">
-        <span class="sl" style="color:var(--c-coupang);font-weight:600">자동처리 (서브폰)</span>
-        <div class="tog" id="tog_coupang_delay_auto" onclick="togS('coupang_delay_auto')"></div>
-      </div>
-      <div style="font-size:9px;color:var(--text-muted);padding:2px 0">서브폰에서 쿠팡이츠 앱 → 준비지연 자동 실행</div>
-    </div>
+    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">최대 10분 (쿠팡 앱 제한) · 서브폰 자동처리</div>
   </div>
 </div>
 
@@ -967,7 +960,7 @@ function updSetUI(){
   var cdmd=document.getElementById('set_coupang_delay_minutes_disp');
   if(cdmd&&S.coupang_delay_minutes!=null)cdmd.textContent=S.coupang_delay_minutes+'분';
   updSchDisp();
-  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','coupang_delay_auto','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
     const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
   });
   const se2=document.getElementById('tog_schedule_enabled2');if(se2)se2.className='tog'+(S.schedule_enabled?' on':'');
