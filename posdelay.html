@@ -928,7 +928,7 @@ function calcCookSpeed(){
 
 // === 지연 예측 ===
 function updDelayPred(){
-  const c=kS.count;
+  const c=getActiveCount();
   const dp=document.getElementById('delayPred');
   if(c==null||c<1){dp.style.display='none';return;}
   dp.style.display='block';
@@ -990,14 +990,18 @@ function renderGroupSummary(){
   if(!gs)return;
   var c2=getActiveCount()||0;
   var items=[];
-  // 배민 광고
+  // Zone에서 OFF/최소가 시작되는 건수 찾기
+  function findZoneThreshold(zones,offVal){for(var i=0;i<zones.length;i++){if(zones[i]>=offVal)return i;}return zones.length;}
+  // 배민 광고 (3=최소, 2=중간에서 변동 시작)
   var bAdOn=S.baemin_auto_enabled;
   var bBid=aS.baemin_current_bid;
-  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:bBid>0?bBid+'원':'-',card:'adSettingCard'});
-  // 쿠팡 광고
+  var bz=getZones('baemin');var bAdTh=findZoneThreshold(bz,3);
+  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:bBid>0?bBid+'원':'-',card:'adSettingCard',count:c2,threshold:bAdTh,exceeded:c2>=bAdTh&&bAdTh<=10});
+  // 쿠팡 광고 (2=OFF)
   var cAdOn=S.coupang_auto_enabled;
   var cOn=aS.coupang_current_on;
-  items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',card:'coupangAdCard'});
+  var cz=getZones('coupang');var cAdTh=findZoneThreshold(cz,2);
+  items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',card:'coupangAdCard',count:c2,threshold:cAdTh,exceeded:c2>=cAdTh&&cAdTh<=10});
   // 배민 지연
   var bdt=g(S,'baemin_delay_threshold',5);
   var btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
@@ -1020,18 +1024,20 @@ function renderGroupSummary(){
   var h='';
   items.forEach(function(it){
     var dotCls=it.on?'dg':'dd';
-    var hasGauge=it.threshold!=null&&it.on;
-    var ratio=hasGauge?Math.min(it.count/it.threshold*100,150):0;
-    var barColor=ratio>=100?'#E74C3C':ratio>70?'#E67E22':it.exceeded?'#E74C3C':'#4FC3F7';
+    var hasGauge=it.threshold!=null;
+    var ratio=hasGauge?Math.min((it.count||0)/it.threshold*100,150):0;
+    var barColor=!it.on?'#555':ratio>=100?'#E74C3C':ratio>70?'#E67E22':it.exceeded?'#E74C3C':'#4FC3F7';
     var detailColor=it.exceeded?'#E74C3C':it.on?'var(--text-bright)':'var(--text-muted)';
-    h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer" onclick="document.getElementById(\''+it.card+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
+    var nameColor=it.on?it.color:'#555';
+    var countColor=it.on?barColor:'#555';
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;opacity:'+(it.on?'1':'0.5')+'" onclick="document.getElementById(\''+it.card+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
     h+='<span class="dot '+dotCls+'"></span>';
-    h+='<span style="font-size:11px;color:'+it.color+';font-weight:600;min-width:52px">'+it.name+'</span>';
+    h+='<span style="font-size:11px;color:'+nameColor+';font-weight:600;min-width:52px">'+it.name+'</span>';
     if(hasGauge){
       h+='<div style="flex:1;height:6px;background:var(--border);border-radius:3px;position:relative">';
       h+='<div style="height:100%;width:'+Math.min(ratio,100)+'%;background:'+barColor+';border-radius:3px;transition:width .3s"></div>';
       h+='</div>';
-      h+='<span style="font-size:10px;color:'+barColor+';min-width:32px;text-align:right;font-weight:600">'+it.count+'/'+it.threshold+'</span>';
+      h+='<span style="font-size:10px;color:'+countColor+';min-width:32px;text-align:right;font-weight:600">'+(it.count||0)+'/'+it.threshold+'</span>';
     }else{
       h+='<div style="flex:1"></div>';
     }
