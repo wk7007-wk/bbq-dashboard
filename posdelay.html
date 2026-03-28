@@ -116,20 +116,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <span id="mStatus" style="font-size:14px;font-weight:600;color:var(--c-on)">정상</span>
   </div>
-  <div class="row" style="justify-content:space-between;padding:4px 0;border-top:1px solid var(--bg-input);border-bottom:1px solid var(--bg-input)">
-    <div class="row" style="gap:4px">
-      <span style="color:var(--c-baemin);font-size:12px;font-weight:600">배민</span>
-      <span class="dot dd" id="mBd"></span>
-      <span id="mBv" style="font-size:12px;font-weight:600;color:var(--c-baemin)">-</span>
-      <div class="cd-wrap" id="cdBaemin"><span class="cd-label">배</span><div class="cd-ring"><svg viewBox="0 0 44 44" width="44" height="44"><circle cx="22" cy="22" r="17" fill="none" stroke="var(--bg-input)" stroke-width="4"/><circle id="cdBaeminArc" cx="22" cy="22" r="17" fill="none" stroke="var(--c-baemin)" stroke-width="4" stroke-linecap="round" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg><div class="cd-txt" id="cdBaeminTxt">--</div></div></div>
-    </div>
-    <div class="row" style="gap:4px">
-      <div class="cd-wrap" id="cdCoupang"><div class="cd-ring"><svg viewBox="0 0 44 44" width="44" height="44"><circle cx="22" cy="22" r="17" fill="none" stroke="var(--bg-input)" stroke-width="4"/><circle id="cdCoupangArc" cx="22" cy="22" r="17" fill="none" stroke="var(--c-coupang)" stroke-width="4" stroke-linecap="round" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg><div class="cd-txt" id="cdCoupangTxt">--</div></div><span class="cd-label">쿠</span></div>
-      <span style="color:var(--c-coupang);font-size:12px;font-weight:600">쿠팡</span>
-      <span class="dot dd" id="mCd"></span>
-      <span id="mCv" style="font-size:12px;font-weight:600;color:var(--c-coupang)">-</span>
-    </div>
-  </div>
+  <!-- 배민/쿠팡 상태행: 숨김 (각 카드로 이동) -->
+  <span id="mBd" style="display:none"></span><span id="mBv" style="display:none"></span>
+  <span id="mCd" style="display:none"></span><span id="mCv" style="display:none"></span>
   <div style="padding:4px 0;border-bottom:1px solid var(--bg-input)">
     <div class="sync-row">
       <div class="sync-item"><span class="dot dd" id="sKd"></span><span id="sKt" style="color:var(--text-secondary)">KDS --</span></div>
@@ -154,101 +143,19 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <span id="dpCoupang" style="font-size:11px;font-weight:600">-</span>
     </div>
   </div>
+  <span id="mLast" style="display:none">마지막: --</span>
   <div class="row" style="justify-content:space-between;padding-top:4px">
-    <span id="mLast" style="font-size:10px;color:var(--text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">마지막: --</span>
-    <div class="row" style="gap:3px">
-      <button class="btn bs bb" onclick="doCheck('baemin')">배민</button>
-      <button class="btn bs bcp" onclick="doCheck('coupang')">쿠팡</button>
-      <button class="btn bs bn" onclick="doCheck('refresh')">정정</button>
-      <button class="btn bs bg" onclick="doForceRefresh()" style="font-size:12px">&#8635;</button>
-    </div>
+    <button class="btn bs bg" onclick="doForceRefresh()" style="font-size:12px">&#8635;</button>
   </div>
-  <!-- B1에 통합된 게이지 -->
-  <div style="border-top:1px solid var(--bg-input);margin-top:6px;padding-top:6px">
-    <div style="margin-bottom:4px">
-      <div class="row" style="justify-content:space-between;margin-bottom:4px">
-        <div class="row" style="gap:6px">
-          <span style="color:var(--c-coupang);font-size:12px;font-weight:600">쿠팡</span>
-          <span id="cSt" style="font-size:11px"></span>
-        </div>
-        <div class="row" style="gap:6px">
-          <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
-          <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
-        </div>
-      </div>
-      <div class="gauge" id="cG"></div>
-    </div>
-    <div style="padding-top:4px">
-      <div class="row" style="justify-content:space-between;margin-bottom:4px">
-        <div class="row" style="gap:6px">
-          <span style="color:var(--c-baemin);font-size:12px;font-weight:600">배민</span>
-          <span id="bSt" style="font-size:11px"></span>
-        </div>
-        <div class="row" style="gap:6px">
-          <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
-          <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
-          <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
-        </div>
-      </div>
-      <div class="gauge" id="bG"></div>
-    </div>
-    <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
+  <!-- 그룹 상태 요약 -->
+  <div id="groupSummary" style="padding:6px 0;border-top:1px solid var(--bg-input)">
   </div>
 </div>
 
 <!-- gaugeCard: B1에 통합되어 숨김 처리 -->
 <div class="card" id="gaugeCard" style="display:none"></div>
 
-<!-- ═══ B1-2. 배달료 전용 모니터링 ═══ -->
-<div class="card" id="feeMonitorCard">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-    <div style="display:flex;align-items:center;gap:6px">
-      <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
-      <span id="printerLabel" style="font-size:11px;color:var(--c-on)">프린터 연결됨</span>
-    </div>
-    <span id="captureTime" style="font-size:10px;color:var(--text-muted)">--</span>
-  </div>
-  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
-    <span style="font-size:11px;color:var(--text-secondary)">유효 배달주문</span>
-    <div><span id="feeValidNum" style="font-size:32px;font-weight:700;color:var(--text-bright)">0</span><span style="font-size:13px;color:var(--text-secondary)"> 건 / 임계 </span><span id="feeThresholdNum" style="font-size:13px;font-weight:700;color:var(--text-muted)">8</span></div>
-  </div>
-  <div style="height:8px;background:var(--border);border-radius:4px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:4px;transition:width .4s"></div></div>
-  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:2px"><span style="font-size:10px;color:var(--text-muted)">채널별</span></div>
-</div>
-
-<!-- ═══ B1-3. 배달주문 리스트 ═══ -->
-<div class="card" id="feeOrderListCard" style="padding:0;overflow:hidden">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="togFeeList()">
-    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">주문 리스트</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
-      <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
-    </div>
-  </div>
-  <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
-    <div id="feeOrderList" style="padding:4px 0"><div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0">수집 대기중</div></div>
-  </div>
-  <div style="display:flex;justify-content:center;padding:6px;border-top:1px solid var(--border)">
-    <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:11px;font-weight:600;padding:6px 20px;cursor:pointer;min-height:36px">펼치기</button>
-  </div>
-</div>
-
-<!-- ═══ 3. 자동화 엔진 ═══ -->
-<div class="card engine-section" id="engineCard">
-  <div class="ch" onclick="togCB('engineB')">
-    <div class="row"><span style="font-size:13px;font-weight:600">자동화 엔진</span><span id="engineBadge" style="font-size:10px;color:var(--c-mid);margin-left:6px"></span></div>
-    <span id="engineArrow" style="color:var(--text-muted);font-size:14px">&#9660;</span>
-  </div>
-  <div class="cb open" id="engineB">
-    <div id="engineTaskList" style="margin-top:8px"></div>
-    <div class="subphone-bar" id="subphoneBar">
-      <span class="dot dd" id="subDot"></span>
-      <span id="subStatus">서브폰 상태 대기...</span>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ 4. 조리모드 ═══ -->
+<!-- ═══ 2. 조리모드 ═══ -->
 <div class="card" id="cookCard">
   <div class="ch" onclick="togSec('ckB')">
     <div class="row" style="gap:6px">
@@ -271,20 +178,28 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 5. 광고 설정 (기본 접힘) ═══ -->
+<!-- ═══ 3a. 배민 광고 ═══ -->
 <div class="card" id="adSettingCard">
-  <div class="row" style="justify-content:space-between;margin-bottom:6px">
-    <div class="ch" onclick="togSec('adB')" style="flex:1">
-      <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">광고 설정</span>
+  <div class="ch" onclick="togSec('adB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--c-baemin)">배민 광고</span>
+      <div class="tog" id="tog_baemin_auto_enabled" onclick="event.stopPropagation();togS('baemin_auto_enabled')"></div>
       <span id="adSummary" class="acc-summary"></span>
-      <span id="adA" style="color:var(--text-secondary)">&#9654;</span>
     </div>
-    <div class="row" style="gap:3px">
-      <button class="btn bs bg" onclick="saveAll()" style="font-size:12px;padding:8px 12px">저장</button>
-      <button class="btn bs bn" onclick="restoreAll()" style="font-size:12px;padding:8px 12px">복원</button>
-    </div>
+    <span id="adA" style="color:var(--text-secondary)">&#9654;</span>
   </div>
   <div class="cb" id="adB">
+    <!-- 배민 수동 버튼 + 상태 -->
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <span id="bSt" style="font-size:11px"></span>
+      <div class="row" style="gap:6px">
+        <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
+        <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
+        <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
+      </div>
+    </div>
+    <div class="gauge" id="bG"></div>
+    <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
     <div class="sec" style="color:var(--c-baemin)">배민 금액</div>
     <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
@@ -293,8 +208,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
     <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
     <div class="sr"><span class="sl">건수 자동</span><div class="tog" id="tog_order_auto_off_enabled" onclick="togS('order_auto_off_enabled')"></div></div>
-    <div class="sr"><span class="sl">쿠팡 자동</span><div class="tog" id="tog_coupang_auto_enabled" onclick="togS('coupang_auto_enabled')"></div></div>
-    <div class="sr"><span class="sl">배민 자동</span><div class="tog" id="tog_baemin_auto_enabled" onclick="togS('baemin_auto_enabled')"></div></div>
     <div class="sec">스케줄</div>
     <div class="sr">
       <div class="row" style="gap:4px">
@@ -308,10 +221,77 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       </div>
     </div>
     <input type="time" id="schTimePicker" style="position:absolute;opacity:0;pointer-events:none">
+    <div class="row" style="gap:3px;margin-top:6px;justify-content:flex-end">
+      <button class="btn bs bg" onclick="saveAll()" style="font-size:12px;padding:8px 12px">저장</button>
+      <button class="btn bs bn" onclick="restoreAll()" style="font-size:12px;padding:8px 12px">복원</button>
+    </div>
   </div>
 </div>
 
-<!-- ═══ 배달료(게이트) 설정 ═══ -->
+<!-- ═══ 3b. 쿠팡 광고 ═══ -->
+<div class="card" id="coupangAdCard">
+  <div class="ch" onclick="togSec('cadB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--c-coupang)">쿠팡 광고</span>
+      <div class="tog" id="tog_coupang_auto_enabled" onclick="event.stopPropagation();togS('coupang_auto_enabled')"></div>
+      <span id="cadSummary" class="acc-summary"></span>
+    </div>
+    <span id="cadA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="cadB">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <span id="cSt" style="font-size:11px"></span>
+      <div class="row" style="gap:6px">
+        <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
+        <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
+      </div>
+    </div>
+    <div class="gauge" id="cG"></div>
+  </div>
+</div>
+
+<!-- ═══ 3c. 배민 지연 ═══ -->
+<div class="card" id="baeminDelayCard">
+  <div class="ch" onclick="togSec('bdlB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--c-baemin)">배민 지연</span>
+      <span id="bdlSummary" class="acc-summary"></span>
+    </div>
+    <span id="bdlA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="bdlB">
+    <div style="font-size:10px;color:var(--text-secondary);padding:4px 0">지연 = max(0, 건수 x 완료간격 + 고정조리 - 목표)</div>
+    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_target_time',-1)">-</button><input type="number" id="set_baemin_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('baemin_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',-1)">-</button><input type="number" id="set_baemin_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',-1)">-</button><input type="number" id="set_baemin_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div style="font-size:9px;color:var(--text-muted);padding:4px 0">알림만 (앱 조작 미구현)</div>
+  </div>
+</div>
+
+<!-- ═══ 3d. 쿠팡 지연 ═══ -->
+<div class="card" id="coupangDelayCard">
+  <div class="ch" onclick="togSec('cdlB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--c-coupang)">쿠팡 지연</span>
+      <span id="cdlSummary" class="acc-summary"></span>
+    </div>
+    <span id="cdlA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="cdlB">
+    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_target_time',-1)">-</button><input type="number" id="set_coupang_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('coupang_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',-1)">-</button><input type="number" id="set_coupang_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',-1)">-</button><input type="number" id="set_coupang_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
+      <div class="sr">
+        <span class="sl" style="color:var(--c-coupang);font-weight:600">자동처리 (서브폰)</span>
+        <div class="tog" id="tog_coupang_delay_auto" onclick="togS('coupang_delay_auto')"></div>
+      </div>
+      <div style="font-size:9px;color:var(--text-muted);padding:2px 0">서브폰에서 쿠팡이츠 앱 → 준비지연 자동 실행</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 3e. 배달료(게이트) 설정 ═══ -->
 <div class="card" id="gatePanel">
   <div class="ch" onclick="togCB('gate_body')">
     <div class="row">
@@ -436,23 +416,52 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ C2. 지연 설정 (기본 접힘) ═══ -->
-<div class="card" id="delayCard">
-  <div class="ch" onclick="togSec('dlB')">
-    <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">지연 설정</span>
-    <span id="delaySummary" class="acc-summary"></span>
-    <span id="dlA" style="color:var(--text-secondary)">&#9654;</span>
+<!-- ═══ B1-2. 배달료 전용 모니터링 ═══ -->
+<div class="card" id="feeMonitorCard">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
+      <span id="printerLabel" style="font-size:11px;color:var(--c-on)">프린터 연결됨</span>
+    </div>
+    <span id="captureTime" style="font-size:10px;color:var(--text-muted)">--</span>
   </div>
-  <div class="cb" id="dlB">
-    <div style="font-size:10px;color:var(--text-secondary);padding:4px 0">지연 = max(0, 건수 x 완료간격 + 고정조리 - 목표)</div>
-    <div class="sec" style="color:var(--c-baemin)">배민</div>
-    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_target_time',-1)">-</button><input type="number" id="set_baemin_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('baemin_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',-1)">-</button><input type="number" id="set_baemin_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',-1)">-</button><input type="number" id="set_baemin_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
-    <div class="sec" style="color:var(--c-coupang)">쿠팡</div>
-    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_target_time',-1)">-</button><input type="number" id="set_coupang_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('coupang_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',-1)">-</button><input type="number" id="set_coupang_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',-1)">-</button><input type="number" id="set_coupang_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+    <span style="font-size:11px;color:var(--text-secondary)">유효 배달주문</span>
+    <div><span id="feeValidNum" style="font-size:32px;font-weight:700;color:var(--text-bright)">0</span><span style="font-size:13px;color:var(--text-secondary)"> 건 / 임계 </span><span id="feeThresholdNum" style="font-size:13px;font-weight:700;color:var(--text-muted)">8</span></div>
+  </div>
+  <div style="height:8px;background:var(--border);border-radius:4px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:4px;transition:width .4s"></div></div>
+  <div id="feeChannelRow" style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:2px"><span style="font-size:10px;color:var(--text-muted)">채널별</span></div>
+</div>
+
+<!-- ═══ B1-3. 배달주문 리스트 ═══ -->
+<div class="card" id="feeOrderListCard" style="padding:0;overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="togFeeList()">
+    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">주문 리스트</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
+      <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
+    </div>
+  </div>
+  <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
+    <div id="feeOrderList" style="padding:4px 0"><div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0">수집 대기중</div></div>
+  </div>
+  <div style="display:flex;justify-content:center;padding:6px;border-top:1px solid var(--border)">
+    <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:11px;font-weight:600;padding:6px 20px;cursor:pointer;min-height:36px">펼치기</button>
+  </div>
+</div>
+
+<!-- ═══ 자동화 엔진 ═══ -->
+<div class="card engine-section" id="engineCard">
+  <div class="ch" onclick="togCB('engineB')">
+    <div class="row"><span style="font-size:13px;font-weight:600">자동화 엔진</span><span id="engineBadge" style="font-size:10px;color:var(--c-mid);margin-left:6px"></span></div>
+    <span id="engineArrow" style="color:var(--text-muted);font-size:14px">&#9660;</span>
+  </div>
+  <div class="cb open" id="engineB">
+    <div id="engineTaskList" style="margin-top:8px"></div>
+    <div class="subphone-bar" id="subphoneBar">
+      <span class="dot dd" id="subDot"></span>
+      <span id="subStatus">서브폰 상태 대기...</span>
+    </div>
   </div>
 </div>
 
@@ -535,7 +544,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <button class="nbtn bn" onclick="nb('openAppSettings')">앱 정보 (제한해제)</button>
 </div>
 
-<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v3.6 (0327.fullscroll)</div>
+<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v4.0 (0328.group)</div>
 
 <script>
 const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
@@ -653,14 +662,14 @@ function updMonitor(){
     else{st.textContent='유지';st.style.color='#A0A0BC';}
   }
   const b=aS.baemin_current_bid;
-  document.getElementById('mBv').textContent=b!=null&&b>0?b+'원':'-';
-  document.getElementById('mBd').className='dot '+(b>0?(b>=g(S,'baemin_amount',200)?'dg':b>=g(S,'baemin_mid_amount',100)?'do':'dr'):'dd');
+  var _mBv=document.getElementById('mBv');if(_mBv)_mBv.textContent=b!=null&&b>0?b+'원':'-';
+  var _mBd=document.getElementById('mBd');if(_mBd)_mBd.className='dot '+(b>0?(b>=g(S,'baemin_amount',200)?'dg':b>=g(S,'baemin_mid_amount',100)?'do':'dr'):'dd');
   const co2=aS.coupang_current_on;
-  document.getElementById('mCv').textContent=co2===true?'ON':co2===false?'OFF':'-';
-  document.getElementById('mCd').className='dot '+(co2===true?'dg':co2===false?'dr':'dd');
-  document.getElementById('mLast').textContent='마지막: '+(aS.last_ad_action??'--');
+  var _mCv=document.getElementById('mCv');if(_mCv)_mCv.textContent=co2===true?'ON':co2===false?'OFF':'-';
+  var _mCd=document.getElementById('mCd');if(_mCd)_mCd.className='dot '+(co2===true?'dg':co2===false?'dr':'dd');
+  var _mLast=document.getElementById('mLast');if(_mLast)_mLast.textContent='마지막: '+(aS.last_ad_action??'--');
   updCooldown();
-  updCkQueue();updGauges(c);updDelayPred();chkAlert(c);
+  updCkQueue();updGauges(c);updDelayPred();chkAlert(c);renderGroupSummary();
   // 조리 탭 상태 반영
   var msCook=document.getElementById('mStat_cook');
   if(msCook){
@@ -691,6 +700,7 @@ function updCooldown(){
 }
 function _updRing(wrId,arcId,txtId,endMs,now){
   const wr=document.getElementById(wrId);
+  if(!wr)return; // DOM 제거된 경우 안전 탈출
   const remain=endMs-now;
   const circ=106.8; // 2*PI*17
   if(!endMs||remain<=0){
@@ -928,11 +938,19 @@ function updDelayPred(){
   const cEl=document.getElementById('dpCoupang');
   if(cDelay>0){cEl.textContent=cDelay+'분';cEl.style.color='#E74C3C';}
   else{cEl.textContent='0분';cEl.style.color='#2ECC71';}
-  // 지연설정 접힌 헤더 요약
-  var dlSum=document.getElementById('delaySummary');
-  if(dlSum){
-    var bt=g(S,'baemin_target_time',20),ct2=g(S,'coupang_target_time',20);
-    dlSum.textContent='배민'+bt+'분 쿠팡'+ct2+'분';
+  // 지연설정 접힌 헤더 요약 (분리된 카드)
+  var bdlSum=document.getElementById('bdlSummary');
+  if(bdlSum){
+    var bt2=g(S,'baemin_target_time',20);
+    bdlSum.textContent='목표'+bt2+'분'+(bDelay>0?' +'+bDelay+'분':'');
+    bdlSum.style.color=bDelay>0?'var(--c-off)':'var(--text-secondary)';
+  }
+  var cdlSum=document.getElementById('cdlSummary');
+  if(cdlSum){
+    var ct3=g(S,'coupang_target_time',20);
+    var cdAuto=S.coupang_delay_auto;
+    cdlSum.textContent='목표'+ct3+'분'+(cDelay>0?' +'+cDelay+'분':'')+(cdAuto?' 자동':'');
+    cdlSum.style.color=cDelay>0?'var(--c-off)':'var(--text-secondary)';
   }
 }
 
@@ -941,22 +959,68 @@ function updSetUI(){
   const fields=['baemin_amount','baemin_mid_amount','baemin_reduced_amount','baemin_target_time','baemin_fixed_cook_time','baemin_delay_threshold','coupang_target_time','coupang_fixed_cook_time','coupang_delay_threshold'];
   fields.forEach(f=>{const e=document.getElementById('set_'+f);if(e&&S[f]!=null)e.value=S[f];});
   updSchDisp();
-  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled'].forEach(f=>{
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','coupang_delay_auto'].forEach(f=>{
     const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
   });
   const se2=document.getElementById('tog_schedule_enabled2');if(se2)se2.className='tog'+(S.schedule_enabled?' on':'');
   const sd2=document.getElementById('schDot2');if(sd2)sd2.className='dot '+(S.schedule_enabled?'dg':'dr');
   const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
   updGauges(getActiveCount());
-  // 광고 설정 접힌 헤더 요약
+  // 배민 광고 접힌 헤더 요약
   var adSum=document.getElementById('adSummary');
   if(adSum){
-    var parts=[];
-    var adMaster=S.ad_enabled;parts.push('광고'+(adMaster?'ON':'OFF'));
-    var bAuto=S.baemin_auto_enabled;if(bAuto)parts.push('배자동');
-    var cAuto=S.coupang_auto_enabled;if(cAuto)parts.push('쿠자동');
-    adSum.textContent=parts.join(' ');
+    var bBid2=aS.baemin_current_bid;
+    var adMaster=S.ad_enabled;
+    adSum.textContent=(adMaster?'마스터ON':'마스터OFF')+(bBid2>0?' '+bBid2+'원':'');
     adSum.style.color=adMaster?'var(--c-on)':'var(--text-muted)';
+  }
+}
+
+// === 그룹 상태 요약 (monitorCard) ===
+function renderGroupSummary(){
+  var gs=document.getElementById('groupSummary');
+  if(!gs)return;
+  var items=[];
+  // 배민 광고
+  var bAdOn=S.baemin_auto_enabled;
+  var bBid=aS.baemin_current_bid;
+  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:bBid>0?bBid+'원':'-',card:'adSettingCard'});
+  // 쿠팡 광고
+  var cAdOn=S.coupang_auto_enabled;
+  var cOn=aS.coupang_current_on;
+  items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',card:'coupangAdCard'});
+  // 배민 지연
+  var btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
+  var c2=getActiveCount();
+  var bDel=c2!=null?Math.max(0,Math.round(c2*avgInterval+bfc-btt)):0;
+  items.push({name:'배민지연',color:'var(--c-baemin)',on:true,detail:bDel>0?'+'+bDel+'분':'0분',card:'baeminDelayCard'});
+  // 쿠팡 지연
+  var ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
+  var cDel=c2!=null?Math.max(0,Math.round(c2*avgInterval+cfc-ctt)):0;
+  var cdAuto=S.coupang_delay_auto;
+  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:true,detail:(cDel>0?'+'+cDel+'분':'0분')+(cdAuto?' 자동':''),card:'coupangDelayCard'});
+  // 배달료
+  items.push({name:'배달료',color:'#4FC3F7',on:gateSettings.enabled,detail:(gateSettings.fee||0).toLocaleString()+'원',card:'gatePanel'});
+  // 영업정지
+  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:'',card:'stopPanel'});
+  var h='';
+  items.forEach(function(it){
+    var dotCls=it.on?'dg':'dd';
+    var detailColor=it.on?'var(--text-bright)':'var(--text-muted)';
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:2px 0;cursor:pointer" onclick="document.getElementById(\''+it.card+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">';
+    h+='<span class="dot '+dotCls+'"></span>';
+    h+='<span style="font-size:11px;color:'+it.color+';font-weight:600;min-width:56px">'+it.name+'</span>';
+    h+='<span style="font-size:11px;color:'+(it.on?'var(--c-on)':'var(--text-muted)')+'">'+( it.on?'ON':'OFF')+'</span>';
+    h+='<span style="font-size:10px;color:'+detailColor+';flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.detail+'</span>';
+    h+='</div>';
+  });
+  gs.innerHTML=h;
+  // 쿠팡 광고 카드 요약
+  var cadSum=document.getElementById('cadSummary');
+  if(cadSum){
+    var cOn2=aS.coupang_current_on;
+    cadSum.textContent=cOn2===true?'ON':cOn2===false?'OFF':'-';
+    cadSum.style.color=cOn2===true?'var(--c-on)':cOn2===false?'var(--c-off)':'var(--text-muted)';
   }
 }
 
@@ -1104,7 +1168,7 @@ try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');Object.keys(c).
 try{var cbc=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');Object.keys(cbc).forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('open');var am={gate_body:'gatePanelArrow',stop_body:'stopPanelArrow',defenseB:'defenseArrow',engineB:'engineArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}});}catch(e){}
 // 기본 접힘: 최초 방문 시 (사용자가 한번도 열지 않은 섹션)
 (function(){
-  var defaults_togSec=['adB','dlB','diagB'];
+  var defaults_togSec=['adB','bdlB','cdlB','cadB','diagB'];
   var defaults_togCB=['gate_body','stop_body','defenseB'];
   try{var c=JSON.parse(localStorage.getItem('_collapsed')||'{}');
   defaults_togSec.forEach(function(id){
@@ -1561,8 +1625,8 @@ function togFeeListExpand() {
 
 // ═══ 모드 전환 (풀스크롤 — 탭 폐기) ═══
 const MODE_CARDS = {
-  cook: ['monitorCard','gaugeCard','engineCard','cookCard','delayCard','diagCard','permCard'],
-  ad:   ['monitorCard','gaugeCard','engineCard','adSettingCard','delayCard','diagCard','permCard'],
+  cook: ['monitorCard','gaugeCard','engineCard','cookCard','baeminDelayCard','coupangDelayCard','diagCard','permCard'],
+  ad:   ['monitorCard','gaugeCard','engineCard','adSettingCard','coupangAdCard','baeminDelayCard','coupangDelayCard','diagCard','permCard'],
   fee: ['feeMonitorCard','feeOrderListCard','gatePanel','engineCard','defenseStatusCard'],
   stop: ['monitorCard','stopPanel','engineCard','defenseStatusCard']
 };
