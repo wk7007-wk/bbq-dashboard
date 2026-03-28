@@ -2057,7 +2057,7 @@ function renderEngineTasks(engineJson) {
         + '<span class="' + dotCls + '"></span>'
         + '<span class="task-name" style="' + nameCls + '">' + t.name + '</span>'
         + (summary ? '<span class="task-summary">' + summary + '</span>' : '')
-        + '<div class="' + togCls + '" onclick="event.stopPropagation();engineToggle(\'' + t.id + '\')"></div>'
+        + '<span style="font-size:10px;color:'+(t.enabled?'var(--c-on)':'var(--text-muted)')+'">'+(t.enabled?'ON':'OFF')+'</span>'
         + '<span class="task-arrow">&#9654;</span>'
         + '</div>'
         + '<div class="task-detail" id="' + detId + '">'
