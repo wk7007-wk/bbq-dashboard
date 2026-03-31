@@ -1842,7 +1842,7 @@ function onGateStatusUpdate(jsonStr) {
             var opacity = o.expired ? '0.4' : '1';
             var timeColor = o.expired ? '#555' : (o.elapsed>=25?'#E74C3C':o.elapsed>=15?'#E67E22':'#9090A8');
             var addrColor = o.expired ? '#555' : '#9090A8';
-            html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #2A2A45;font-size:11px;opacity:'+opacity+';cursor:pointer" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #2A2A45;font-size:11px;opacity:'+opacity+'">';
             html += '<div><span style="color:'+chColor+';font-weight:600;margin-right:4px">'+o.channel+'</span><span style="color:'+addrColor+'">'+o.address+'</span></div>';
             html += '<span style="color:'+timeColor+'">'+o.elapsed+'분</span>';
             html += '</div>';
