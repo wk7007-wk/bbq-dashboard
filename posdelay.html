@@ -271,6 +271,13 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       </div>
     </div>
     <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">모든주문 정액할인 · 같은 유형 등록 시 기존 자동 종료</div>
+    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
+      <div class="row" style="justify-content:space-between">
+        <span style="font-size:11px;color:var(--text-secondary)">배민클럽 가게배달 배달팁</span>
+        <button class="btn bs bg" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배달팁 전액 할인 · 금액 설정 불필요</div>
+    </div>
   </div>
 </div>
 
@@ -913,7 +920,7 @@ function exDiscount(amount){
     sendCmd('BAEMIN_DISCOUNT_SET',amount);
   }
   var el=document.getElementById('discSt');
-  if(el)el.innerHTML='<span style="color:var(--c-warn)">'+amount+'원 등록 중...</span>';
+  if(el)el.innerHTML='<span style="color:var(--c-warn)">'+(amount===-1?'배민클럽 배달팁':amount+'원')+' 등록 중...</span>';
 }
 
 // === 조리 속도 ===
@@ -1052,7 +1059,7 @@ function renderGroupSummary(){
   items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:'',card:'stopPanel',count:c2,threshold:stopThreshold});
   // 즉시할인
   var discCur=g(S,'baemin_discount_current',0);
-  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur>0,detail:discCur>0?discCur.toLocaleString()+'원':'-',card:'discountCard'});
+  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0,detail:discCur===-1?'클럽배달팁':discCur>0?discCur.toLocaleString()+'원':'-',card:'discountCard'});
   var h='';
   items.forEach(function(it){
     var dotCls=it.on?'dg':'dd';
