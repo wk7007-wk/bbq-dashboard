@@ -263,14 +263,22 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="cb" id="discB">
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="discSt" style="font-size:11px"></span>
-      <div class="row" style="gap:4px">
-        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(1000)">1천</button>
-        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(1500)">1.5천</button>
-        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(2000)">2천</button>
-        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(3000)">3천</button>
+      <div class="row" style="gap:3px;flex-wrap:wrap">
+        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1000)">1천</button>
+        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1500)">1.5천</button>
+        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2000)">2천</button>
+        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2500)">2.5천</button>
+        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
       </div>
     </div>
     <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">모든주문 정액할인 · 같은 유형 등록 시 기존 자동 종료</div>
+    <div class="sec" style="font-size:11px;color:var(--text-secondary)">주문유형</div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;padding:2px 0">
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_SINGLE" onchange="updDiscDt()" checked><span>알뜰</span></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_COMMON" onchange="updDiscDt()" checked><span>한집</span></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_AGENCY_DELIVERY" onchange="updDiscDt()" checked><span>가게배달</span></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_VISIT" onchange="updDiscDt()" checked><span>픽업</span></label>
+    </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:space-between">
         <span style="font-size:11px;color:var(--text-secondary)">배민클럽 가게배달 배달팁</span>
@@ -922,6 +930,18 @@ function exDiscount(amount){
   var el=document.getElementById('discSt');
   if(el)el.innerHTML='<span style="color:var(--c-warn)">'+(amount===-1?'배민클럽 배달팁':amount+'원')+' 등록 중...</span>';
 }
+function updDiscDt(){
+  var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
+  var sel=types.filter(function(t){var cb=document.getElementById('dt_'+t);return cb&&cb.checked;});
+  var csv=sel.join(',');
+  S.baemin_discount_dt=csv;
+  _lastSaveKeys=['baemin_discount_dt'];_autoSave();
+}
+function loadDiscDt(){
+  var csv=(S.baemin_discount_dt||'SINGLE,COMMON,AGENCY_DELIVERY,VISIT');
+  var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
+  types.forEach(function(t){var cb=document.getElementById('dt_'+t);if(cb)cb.checked=csv.indexOf(t)>=0;});
+}
 
 // === 조리 속도 ===
 function calcAvgInterval(){
@@ -1008,6 +1028,7 @@ function updSetUI(){
   const sd2=document.getElementById('schDot2');if(sd2)sd2.className='dot '+(S.schedule_enabled?'dg':'dr');
   const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
   updGauges(getActiveCount());
+  loadDiscDt();
   // 배민 광고 접힌 헤더 요약
   var adSum=document.getElementById('adSummary');
   if(adSum){
