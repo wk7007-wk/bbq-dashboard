@@ -251,6 +251,29 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
+<!-- ═══ 3b2. 배민 즉시할인 ═══ -->
+<div class="card" id="discountCard">
+  <div class="ch" onclick="togSec('discB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:13px;font-weight:600;color:var(--c-baemin)">즉시할인</span>
+      <span id="discSummary" class="acc-summary"></span>
+    </div>
+    <span id="discA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="discB">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <span id="discSt" style="font-size:11px"></span>
+      <div class="row" style="gap:4px">
+        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(1000)">1천</button>
+        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(1500)">1.5천</button>
+        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(2000)">2천</button>
+        <button class="btn bs bg" style="min-width:42px;font-size:12px" onclick="exDiscount(3000)">3천</button>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">모든주문 정액할인 · 같은 유형 등록 시 기존 자동 종료</div>
+  </div>
+</div>
+
 <!-- ═══ 3c. 배민 지연 ═══ -->
 <div class="card" id="baeminDelayCard">
   <div class="ch" onclick="togSec('bdlB')">
@@ -882,6 +905,16 @@ function exAd(platform,action){
     }
   }
 }
+function exDiscount(amount){
+  if(isApp){
+    nb('trackUsage','exec_discount_'+amount);
+    nb('executeAd','BAEMIN_DISCOUNT_SET',amount);
+  }else{
+    sendCmd('BAEMIN_DISCOUNT_SET',amount);
+  }
+  var el=document.getElementById('discSt');
+  if(el)el.innerHTML='<span style="color:var(--c-warn)">'+amount+'원 등록 중...</span>';
+}
 
 // === 조리 속도 ===
 function calcAvgInterval(){
@@ -1017,6 +1050,9 @@ function renderGroupSummary(){
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
   items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:'',card:'stopPanel',count:c2,threshold:stopThreshold});
+  // 즉시할인
+  var discCur=g(S,'baemin_discount_current',0);
+  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur>0,detail:discCur>0?discCur.toLocaleString()+'원':'-',card:'discountCard'});
   var h='';
   items.forEach(function(it){
     var dotCls=it.on?'dg':'dd';
