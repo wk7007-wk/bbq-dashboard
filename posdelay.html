@@ -926,7 +926,10 @@ function exAd(platform,action){
     }
   }
 }
+var _discBusy=false;
 function exDiscount(amount){
+  if(_discBusy){return;}
+  _discBusy=true;setTimeout(function(){_discBusy=false;},5000);
   if(isApp){
     nb('trackUsage','exec_discount_'+amount);
     nb('executeAd','BAEMIN_DISCOUNT_SET',amount);
