@@ -287,10 +287,12 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배달팁 전액 할인 · 금액 설정 불필요</div>
     </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
-      <div class="row" style="justify-content:flex-end">
-        <button class="btn bs bred" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-99)">전체 종료</button>
+      <div class="row" style="justify-content:flex-end;gap:4px">
+        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-98)">금액 종료</button>
+        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
+        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
       </div>
-      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">모든주문 + 가게배달팁 즉시할인 종료 (배민클럽 배민배달은 유지)</div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민클럽 배민배달은 유지됨</div>
     </div>
   </div>
 </div>
@@ -937,7 +939,8 @@ function exDiscount(amount){
     sendCmd('BAEMIN_DISCOUNT_SET',amount);
   }
   var el=document.getElementById('discSt');
-  if(el)el.innerHTML='<span style="color:var(--c-warn)">'+(amount===-99?'종료 중...':amount===-1?'배민클럽 배달팁 등록 중...':amount+'원 등록 중...')+'</span>';
+  var msg=amount===-99?'전체 종료 중...':amount===-98?'금액할인 종료 중...':amount===-97?'배달팁 종료 중...':amount===-1?'배민클럽 배달팁 등록 중...':amount+'원 등록 중...';
+  if(el)el.innerHTML='<span style="color:var(--c-warn)">'+msg+'</span>';
 }
 function updDiscDt(){
   var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
