@@ -335,7 +335,7 @@ strong.danger { color: var(--accent-red); }
   <div class="tab-content active" id="tab-overview">
     <div class="banner">
       <h1>박준에게 빌려준 것을 돌려받는다</h1>
-      <p>피해자 3명 공동 대응 | 증거 93건 확보 | 2026.04 기준</p>
+      <p>피해자 3명 공동 대응 | 서류 확인 증거 29건 | 2026.04 기준</p>
     </div>
 
     <!-- 피의자 -->
@@ -378,11 +378,11 @@ strong.danger { color: var(--accent-red); }
     <div class="card">
       <div class="victim-header">
         <span class="victim-name">권연옥 <span style="font-size:0.78rem; color:var(--text-muted);">(=김연옥)</span></span>
-        <span class="victim-amount red">확인분 20,294,760원</span>
+        <span class="victim-amount red">확정 4,879,680원</span>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:0.82rem; color:var(--text-secondary);">차용증+KT대납+보증금+권리금+위약금</span>
-        <span class="win-rate high">승소율 80~85%</span>
+        <span style="font-size:0.82rem; color:var(--text-secondary);">차용증 400만(B-7) + KT대납 879,680원(B-9, B-11)</span>
+        <span class="win-rate mid">승소율 65~80%</span>
       </div>
     </div>
 
@@ -394,13 +394,12 @@ strong.danger { color: var(--accent-red); }
       <div class="rel-row">
         <span class="rel-node rel-victim">장재화 (금전대여)</span>
         <span class="rel-node rel-victim">이원규 (NMAX+금전)</span>
-        <span class="rel-node rel-victim">권연옥 (보증금+KT+차용)</span>
+        <span class="rel-node rel-victim">권연옥 (차용+KT대납)</span>
       </div>
-      <div class="rel-line" style="margin-top:14px;">-- 관계자 --</div>
+      <div class="rel-line" style="margin-top:14px;">-- 가게 관계자 (서류 확인) --</div>
       <div class="rel-row">
-        <span class="rel-node rel-other">조영선 (임대인)</span>
-        <span class="rel-node rel-other">김병석 (전임차인)</span>
-        <span class="rel-node rel-other">박준모 (부친)</span>
+        <span class="rel-node rel-other">조영선 (임대인, 보증금영수증)</span>
+        <span class="rel-node rel-other">김병석 (전임차인, 권리금계약)</span>
       </div>
     </div>
 
@@ -416,7 +415,6 @@ strong.danger { color: var(--accent-red); }
         <div class="tl-item"><div class="tl-date">2023.07.04</div><div class="tl-text">박준 &rarr; 장재화 카카오페이 20만원</div></div>
         <div class="tl-item"><div class="tl-date">2023.09</div><div class="tl-text">장재화 "미수금 130만, 경찰접수" &rarr; 박준 "죄송"</div></div>
         <div class="tl-item"><div class="tl-date">2024.06.27</div><div class="tl-text">박준 "다음달 60 보내면 안될까요" (<strong class="hl">채무승인</strong>)</div></div>
-        <div class="tl-item"><div class="tl-date">2026.01~03</div><div class="tl-text">이원규-박준모 통화 51건</div></div>
         <div class="tl-item"><div class="tl-date">2026.04</div><div class="tl-text">증거 수집 및 분석 완료</div></div>
       </div>
     </div>
@@ -424,7 +422,7 @@ strong.danger { color: var(--accent-red); }
 
   <!-- 탭2: 증거목록 -->
   <div class="tab-content" id="tab-evidence">
-    <div class="section-title">증거목록 <span class="count">총 93건</span></div>
+    <div class="section-title">증거목록 <span class="count">서류 확인 29건</span></div>
 
     <!-- A. 통화녹음 이원규-박준 -->
     <div class="accordion open">
@@ -484,7 +482,7 @@ strong.danger { color: var(--accent-red); }
     <!-- C. 장재화 증거 -->
     <div class="accordion">
       <div class="acc-header" onclick="toggleAcc(this)">
-        <h3>C. 장재화 증거 <span class="count">(7건)</span></h3>
+        <h3>C. 장재화 증거 <span class="count">(6건)</span></h3>
         <span class="acc-arrow">&#9660;</span>
       </div>
       <div class="acc-body">
@@ -504,45 +502,12 @@ strong.danger { color: var(--accent-red); }
       </div>
     </div>
 
-    <!-- D. 통화녹음 이원규-박준모 -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc(this)">
-        <h3>D. 통화녹음 -- 이원규 &harr; 박준모 <span class="count">(51건)</span></h3>
-        <span class="acc-arrow">&#9660;</span>
-      </div>
-      <div class="acc-body">
-        <div class="acc-inner">
-          <div style="text-align:center; padding: 20px;">
-            <span class="badge-pending">미분석 -- Whisper 분석 예정</span>
-            <p style="margin-top:12px; font-size:0.85rem; color:var(--text-secondary);">2026.01~03, 총 51건 녹음 파일 확보</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- E. 항소이유서 -->
-    <div class="accordion">
-      <div class="acc-header" onclick="toggleAcc(this)">
-        <h3>E. 항소이유서 <span class="count">(4건)</span></h3>
-        <span class="acc-arrow">&#9660;</span>
-      </div>
-      <div class="acc-body">
-        <div class="acc-inner">
-          <table class="ev-table">
-            <thead><tr><th>#</th><th>증거명</th><th>비고</th></tr></thead>
-            <tbody>
-              <tr><td>E-1~4</td><td>박재홍 변호사 관련 항소이유서</td><td>HWP 문서</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
     <!-- 증거 요약 -->
     <div class="card" style="margin-top:16px; text-align:center;">
       <div style="font-size:0.85rem; color:var(--text-secondary);">
-        통화녹음 <strong>61건</strong> | 서류 <strong>11건</strong> | 카톡/송금 <strong>5건</strong> | 계좌내역 <strong>2건</strong> | 신분증 <strong>1건</strong> | 항소이유서 <strong>4건</strong> | 기타 <strong>9건</strong>
+        통화녹음 <strong>10건</strong> | 서류 <strong>11건</strong> | 카톡/송금 <strong>5건</strong> | 계좌내역 <strong>2건</strong> | 신분증 <strong>1건</strong>
       </div>
+      <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">서류 확인 기준, 총 29건</div>
     </div>
   </div>
 
@@ -556,7 +521,6 @@ strong.danger { color: var(--accent-red); }
         <span class="law-badge law-civil">민법 &sect;598 소비대차</span>
         <span class="law-badge law-civil">민법 &sect;162 소멸시효 10년</span>
         <span class="law-badge law-civil">민법 &sect;168&#9314; 승인</span>
-        <span class="law-badge law-civil">민법 &sect;703 조합</span>
         <span class="law-badge law-civil">민법 &sect;741 부당이득</span>
         <span class="law-badge law-civil">민법 &sect;750 불법행위</span>
       </div>
@@ -566,13 +530,12 @@ strong.danger { color: var(--accent-red); }
       <div class="card-label">형사</div>
       <div style="margin-top:8px;">
         <span class="law-badge law-criminal">형법 &sect;347 사기</span>
-        <span class="law-badge law-criminal">형법 &sect;355&#9312; 횡령</span>
         <span class="law-badge law-criminal">전기통신사업법 &sect;32의4 명의도용</span>
       </div>
     </div>
 
     <!-- 핵심 판례 -->
-    <div class="section-title">핵심 판례 <span class="count">10건</span></div>
+    <div class="section-title">핵심 판례 <span class="count">9건</span></div>
 
     <div class="case-card">
       <div class="case-num">1. 대법원 2012도14516 (2016.04.28)</div>
@@ -617,19 +580,13 @@ strong.danger { color: var(--accent-red); }
     </div>
 
     <div class="case-card">
-      <div class="case-num">8. 대법원 2010도5014 (2010.06.10)</div>
-      <div class="case-title">조합재산 합유, 1인 임의처분 = 횡령</div>
-      <div class="case-desc">조합재산은 합유이므로 1인이 임의로 처분하면 횡령</div>
-    </div>
-
-    <div class="case-card">
-      <div class="case-num">9. 대법원 2015다232316 (2018.10.18)</div>
+      <div class="case-num">8. 대법원 2015다232316 (2018.10.18)</div>
       <div class="case-title">소멸시효 중단을 위한 후소 (전원합의체)</div>
       <div class="case-desc">소멸시효 중단 목적의 후소 허용</div>
     </div>
 
     <div class="case-card">
-      <div class="case-num">10. 대법원 2023다290829 (2024.02.29)</div>
+      <div class="case-num">9. 대법원 2023다290829 (2024.02.29)</div>
       <div class="case-title">대여금반환 최신 판례</div>
       <div class="case-desc">대여금반환 청구에 관한 최신 대법원 판결</div>
     </div>
@@ -645,8 +602,7 @@ strong.danger { color: var(--accent-red); }
           <tr><td>장재화</td><td>대여금</td><td>10년</td><td>2031</td><td class="status-safe">안전</td></tr>
           <tr><td>이원규</td><td>대여금/가액</td><td>10년</td><td>2031</td><td class="status-safe">안전</td></tr>
           <tr><td>권연옥</td><td>대여금(차용증)</td><td>10년</td><td>~2032</td><td class="status-safe">안전</td></tr>
-          <tr><td>권연옥</td><td>부당이득(KT)</td><td>10년</td><td>2032</td><td class="status-safe">안전</td></tr>
-          <tr><td>권연옥</td><td><strong class="danger">불법행위(사기)</strong></td><td><strong class="danger">3년</strong></td><td><strong class="danger">2025.8</strong></td><td class="status-danger">위험</td></tr>
+          <tr><td>권연옥</td><td>부당이득(KT대납)</td><td>10년</td><td>2032</td><td class="status-safe">안전</td></tr>
         </tbody>
       </table>
     </div>
@@ -662,7 +618,7 @@ strong.danger { color: var(--accent-red); }
       <div class="acc-body">
         <div class="acc-inner">
           <div class="weakness-q">예상 항변: "연인 사이에 빌려준 건 선물 아닌가?"</div>
-          <div class="weakness-a">대출금은 빌린 돈이며, 차용증이 존재하고, "가게 운영"이라는 구체적 사용처가 명시됨. 대법원 2012도14516 판례에 따라 연인 관계라도 허위사실 등 사정이 있으면 사기 인정.</div>
+          <div class="weakness-a">자필 차용증(B-7)에 "400만원 일시상환 약속"이 명시되어 있으므로 증여가 아닌 대여. KT 요금 대납도 박준 번호(010-2633-2870) 확정 영수증(B-11)이 있음. 대법원 2012도14516: 연인 관계라도 허위사실 등 사정이 있으면 사기 인정.</div>
         </div>
       </div>
     </div>
@@ -740,12 +696,11 @@ strong.danger { color: var(--accent-red); }
     <div class="card">
       <div class="victim-header">
         <span class="victim-name">권연옥</span>
-        <span class="victim-amount red">최소 2,000만원</span>
+        <span class="victim-amount red">확정 4,879,680원</span>
       </div>
       <p style="font-size:0.88rem; color:var(--text-secondary); margin-top:6px;">
-        <strong>대여금 + 부당이득 + 조합재산</strong> 복합 소송<br>
-        차용증 400만 + KT대납 전액 + 보증금 500만 + 권리금 지분 + 위약금<br>
-        <span style="color:var(--accent-red); font-weight:600;">불법행위(사기) 시효 2025.8 -- 6월 전 접수 필수!</span>
+        <strong>대여금 + 부당이득</strong><br>
+        차용증 400만(B-7) + KT대납 879,680원(B-9, B-11)
       </p>
     </div>
 
@@ -791,36 +746,24 @@ strong.danger { color: var(--accent-red); }
 
     <div class="card" style="margin-bottom:20px; text-align:center;">
       <span style="font-size:2rem; font-weight:900; color:var(--accent-blue);">5</span>
-      <span style="font-size:1rem; color:var(--text-muted);"> / 13 완료</span>
+      <span style="font-size:1rem; color:var(--text-muted);"> / 12 완료</span>
     </div>
 
     <ul class="checklist">
-      <li><span class="check-icon check-done">&#10003;</span><span>증거 수집 완료 (93건)</span></li>
+      <li><span class="check-icon check-done">&#10003;</span><span>증거 수집 완료 (서류 확인 29건)</span></li>
       <li><span class="check-icon check-done">&#10003;</span><span>음성분석 완료 (10건)</span></li>
       <li><span class="check-icon check-done">&#10003;</span><span>법적 분석 완료</span></li>
       <li><span class="check-icon check-done">&#10003;</span><span>MCP 판례 검색 완료</span></li>
       <li><span class="check-icon check-done">&#10003;</span><span>증거 대시보드 구축</span></li>
-      <li><span class="check-icon check-todo">&#9744;</span><span>내용증명 발송</span></li>
-      <li><span class="check-icon check-todo">&#9744;</span><span>권연옥 대출계약서 수집</span></li>
       <li><span class="check-icon check-todo">&#9744;</span><span>장재화 이전 소송 판결문 확보</span></li>
       <li><span class="check-icon check-todo">&#9744;</span><span>박준 현재 주소 확인</span></li>
-      <li><span class="check-icon check-todo">&#9744;</span><span>05_통화녹음 51건 분석 (Whisper)</span></li>
+      <li><span class="check-icon check-todo">&#9744;</span><span>내용증명 발송</span></li>
       <li><span class="check-icon check-todo">&#9744;</span><span>장재화 민사 소장 접수</span></li>
-      <li style="border-color:var(--accent-red);"><span class="check-icon check-todo" style="color:var(--accent-red);">&#9744;</span><span style="color:var(--accent-red); font-weight:600;">형사 공동 고소장 제출</span></li>
-      <li style="border-color:var(--accent-red);"><span class="check-icon check-todo" style="color:var(--accent-red);">&#9744;</span><span style="color:var(--accent-red); font-weight:600;">권연옥 민사 소장 접수 (6월 전 필수!)</span></li>
+      <li><span class="check-icon check-todo">&#9744;</span><span>형사 공동 고소장 제출</span></li>
+      <li><span class="check-icon check-todo">&#9744;</span><span>권연옥 민사 소장 접수</span></li>
       <li><span class="check-icon check-todo">&#9744;</span><span>이원규 민사 소장 접수</span></li>
     </ul>
 
-    <div class="card" style="margin-top:16px; border-color:var(--accent-red);">
-      <div style="text-align:center;">
-        <span style="color:var(--accent-red); font-weight:700; font-size:0.95rem;">
-          &#9888; 긴급: 권연옥 불법행위(사기) 시효 2025.8 만료
-        </span>
-        <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:4px;">
-          민사 소장을 2025년 6월 이전에 반드시 접수해야 합니다
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
