@@ -21,11 +21,11 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .icon-btn,.icon-btn-text{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg-input);color:var(--text-secondary);cursor:pointer;touch-action:manipulation;}
 .icon-btn{font-size:18px;padding:0;}
 .icon-btn-text{font-size:12px;font-weight:600;padding:0 12px;}
-.section-title{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;padding:10px 2px 6px;}
+.section-title{display:none;}
 .section-title:first-of-type{padding-top:12px;}
 .section-title-block{display:flex;flex-direction:column;gap:3px;}
 .section-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
-.section-heading{font-size:16px;font-weight:800;letter-spacing:-.02em;}
+.section-heading{font-size:14px;font-weight:800;letter-spacing:-.02em;}
 .section-note{display:none;}
 .section-chip{display:none;}
 .stack-tight{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
@@ -57,7 +57,7 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .monitor-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .monitor-title{font-size:18px;font-weight:800;letter-spacing:-.03em;}
 .hero-status{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:700;}
-.role-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.role-row{display:none;}
 .role-pill{display:inline-flex;align-items:center;min-height:26px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:10px;font-weight:600;color:var(--text-secondary);}
 .role-pill.primary{background:rgba(42,193,188,.14);border-color:rgba(42,193,188,.28);color:#B5F2EF;}
 .monitor-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:160px;}
@@ -86,7 +86,7 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .order-shell{border-bottom:1px solid var(--border);margin-bottom:4px;}
 .order-header{display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer;min-height:44px;}
 .order-empty{text-align:center;padding:10px 0;font-size:11px;color:var(--text-muted);}
-.order-note{font-size:10px;color:var(--text-muted);padding:0 0 6px;}
+.order-note{display:none;}
 .order-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-input);font-size:11px;}
 .order-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
 .order-channel-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
@@ -193,7 +193,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="conn" style="margin:0"><span class="dot dd" id="cD"></span> <span id="cT" class="text-secondary">...</span><span id="appVer" style="font-size:9px;color:#888;margin-left:6px"></span></div>
     <div class="icon-row">
       <button type="button" class="icon-btn" onclick="doCapture()" aria-label="캡처">&#128247;</button>
-      <button type="button" class="icon-btn-text" onclick="location.reload()">새로고침</button>
+      <button type="button" class="icon-btn-text" onclick="location.reload()">갱신</button>
     </div>
   </div>
   <div id="pullInd" style="display:none"></div>
@@ -215,8 +215,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div>
         <div class="kicker">POS Delay Operations</div>
         <div class="monitor-title-row">
-          <span class="monitor-title">매장 실시간 제어 보드</span>
-          <span id="mStatus" class="hero-status">정상</span>
+          <span class="monitor-title">상황</span>
+          <span id="mStatus" class="hero-status">-</span>
         </div>
         <div class="role-row">
           <span class="role-pill primary">개인폰 제어 · 서브폰 실행</span>
@@ -234,36 +234,36 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="mCd" style="display:none"></span><span id="mCv" style="display:none"></span>
     <div class="hero-grid">
       <div class="hero-panel primary">
-        <span class="hero-label">현재 처리중</span>
+        <span class="hero-label">처리</span>
         <div class="hero-number-row"><span id="mCount" class="hero-number">--</span><span class="hero-unit">건</span></div>
-        <div class="hero-meta strong">광고·방어 판단 기준</div>
+        <div class="hero-meta strong">KDS</div>
       </div>
       <div class="hero-panel">
-        <span class="hero-label">프린터 수집</span>
+        <span class="hero-label">프린터</span>
         <div class="hero-number-row"><span id="printerCount" class="hero-number-sm">0</span><span class="hero-unit">건</span></div>
-        <div class="hero-meta"><span id="printerDot2" class="dot dd"></span><span id="heroPrinterState">프린터 대기</span></div>
-        <div id="heroCaptureTime" class="hero-meta">마지막 수집 --</div>
+        <div class="hero-meta"><span id="printerDot2" class="dot dd"></span><span id="heroPrinterState">OFF</span></div>
+        <div id="heroCaptureTime" class="hero-meta">수집 --</div>
       </div>
       <div class="hero-panel">
-        <span class="hero-label">배달료 방어</span>
+        <span class="hero-label">배달료</span>
         <div class="hero-number-row"><span id="heroFeeCurrent" class="hero-number-sm">0원</span></div>
-        <div id="heroFeeMode" class="hero-meta accent">감시 대기</div>
-        <div class="hero-meta">임계 <span id="heroFeeThreshold">8건</span> · 유효 <span id="heroFeeValid">30분</span></div>
+        <div id="heroFeeMode" class="hero-meta accent">OFF</div>
+        <div class="hero-meta">설정 <span id="heroFeeThreshold">8건</span> · <span id="heroFeeValid">30분</span></div>
       </div>
     </div>
     <div id="delayPred" class="prediction-grid">
       <div class="prediction-card">
-        <span class="prediction-title">조리속도</span>
+        <span class="prediction-title">조리</span>
         <span id="dpSpeed" class="prediction-value">-</span>
         <span class="prediction-note">최근 완료 기록 기준</span>
       </div>
       <div class="prediction-card">
-        <span class="prediction-title">배민 예상지연</span>
+        <span class="prediction-title">배민</span>
         <span id="dpBaemin" class="prediction-value">-</span>
         <span class="prediction-note">목표시간 대비 예상 차이</span>
       </div>
       <div class="prediction-card">
-        <span class="prediction-title">쿠팡 예상지연</span>
+        <span class="prediction-title">쿠팡</span>
         <span id="dpCoupang" class="prediction-value">-</span>
         <span class="prediction-note">실시간 조리속도 반영</span>
       </div>
@@ -273,7 +273,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div id="mRefresh" class="board-last">수집 --</div>
         <div id="mLast" class="board-last">마지막: --</div>
       </div>
-      <button class="board-refresh" onclick="doForceRefresh()">지금 새로 수집</button>
+      <button class="board-refresh" onclick="doForceRefresh()">수집</button>
     </div>
     <div id="groupSummary" class="summary-grid border-top"></div>
   </div>
@@ -386,7 +386,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <div class="cb" id="schB">
     <div class="sr">
-      <span class="sl">활성 시간</span>
+      <span class="sl">시간</span>
       <div class="row" style="gap:4px">
         <span id="schOnDisp2" class="time-pill" onclick="pickTime('on')">--:--</span>
         <span style="color:var(--text-secondary);font-size:12px">~</span>
@@ -416,7 +416,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
       </div>
     </div>
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">정액 할인 · 중복 등록 시 기존 자동 종료</div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">정액</div>
     <div class="sec" style="font-size:11px;color:var(--text-secondary)">주문유형</div>
     <div class="row" style="gap:6px;flex-wrap:wrap;padding:2px 0">
       <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_SINGLE" onchange="updDiscDt()" checked><span>알뜰</span></label>
@@ -426,10 +426,10 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:space-between">
-        <span style="font-size:11px;color:var(--text-secondary)">배민클럽 가게배달 배달팁</span>
+        <span style="font-size:11px;color:var(--text-secondary)">가게배달 팁</span>
         <button class="btn bs bg" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
       </div>
-      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배달팁 전액 할인</div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">전액</div>
     </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:flex-end;gap:4px">
@@ -437,7 +437,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
         <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
       </div>
-      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민클럽 배민배달 유지</div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민배달</div>
     </div>
   </div>
 </div>
@@ -465,25 +465,25 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px">
           <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
-          <span id="printerLabel" style="font-size:11px;color:var(--c-on)">프린터 연결됨</span>
+          <span id="printerLabel" style="font-size:11px;color:var(--c-on)">ON</span>
         </div>
         <span id="captureTime" style="font-size:10px;color:var(--text-muted)">--</span>
       </div>
       <div class="compare-grid">
         <div class="compare-box">
-          <span class="compare-label">실제 유효주문</span>
+          <span class="compare-label">실제</span>
           <div class="hero-number-row"><span id="feeValidNum" class="compare-value">0</span><span class="hero-unit">건</span></div>
-          <span class="compare-sub"><span id="feeLiveSource">프린터 기준</span><br><span id="feeLiveClock">마지막 수집 --</span></span>
+          <span class="compare-sub"><span id="feeLiveSource">프린터</span><br><span id="feeLiveClock">수집 --</span></span>
         </div>
         <div class="compare-box">
-          <span class="compare-label">설정 기준</span>
+          <span class="compare-label">설정</span>
           <div class="hero-number-row"><span id="feeThresholdNum" class="compare-value">8</span><span class="hero-unit">건</span></div>
-          <span class="compare-sub"><span id="feeLiveValid">유효시간 30분</span><br><span id="feeLiveHint">임계까지 8건 남음</span></span>
+          <span class="compare-sub"><span id="feeLiveValid">30분</span><br><span id="feeLiveHint">8건 남음</span></span>
         </div>
         <div class="compare-box" id="fee_current_status">
-          <span class="compare-label">현재 배달료</span>
+          <span class="compare-label">현재값</span>
           <span id="fee_current_value" class="compare-value">0원</span>
-          <span class="compare-sub"><span id="feeLiveState">감시 대기</span><br>인상 <span id="fee_set_up" style="color:var(--c-mid)">2,000</span>원 · 복원 <span id="fee_set_base" style="color:var(--c-on)">0</span>원</span>
+          <span class="compare-sub"><span id="feeLiveState">OFF</span><br>인상 <span id="fee_set_up" style="color:var(--c-mid)">2,000</span>원 · 복원 <span id="fee_set_base" style="color:var(--c-on)">0</span>원</span>
         </div>
       </div>
       <div style="height:6px;background:var(--border);border-radius:3px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:3px;transition:width .4s"></div></div>
@@ -491,7 +491,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div class="order-shell">
       <div class="order-header" onclick="togFeeList()">
-        <span style="font-size:11px;font-weight:600;color:var(--text-secondary)">실제 상황 대조</span>
+        <span style="font-size:11px;font-weight:600;color:var(--text-secondary)">주문</span>
         <div style="display:flex;align-items:center;gap:8px">
           <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
           <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
@@ -499,14 +499,14 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       </div>
       <div class="order-note">주소 참고용 · 건수/경과 대조</div>
       <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
-        <div id="feeOrderList" style="padding:2px 0"><div class="order-empty">수집 대기중</div></div>
+        <div id="feeOrderList" style="padding:2px 0"><div class="order-empty">대기</div></div>
       </div>
       <div style="display:flex;justify-content:center;padding:4px 0">
-        <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:10px;font-weight:600;padding:4px 16px;cursor:pointer;min-height:32px">펼치기</button>
+        <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:10px;font-weight:600;padding:4px 16px;cursor:pointer;min-height:32px">더보기</button>
       </div>
     </div>
     <div class="sr">
-      <span class="sl">건수 소스</span>
+      <span class="sl">소스</span>
       <div class="sv" style="gap:4px">
         <button class="btn bs" id="src_printer" onclick="setFeeSource('PRINTER')" style="background:var(--c-baemin);color:#FFF">프린터</button>
         <button class="btn bs" id="src_kds" onclick="setFeeSource('KDS')" style="background:var(--bg-input);color:var(--text-bright)">KDS</button>
@@ -514,23 +514,23 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div style="display:flex;gap:8px;margin-bottom:6px">
       <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span>B 배달료 (유효)</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span>배달료</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
         <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_fee_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
       </div>
       <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span id="gate_stop_label">A 영업정지 (KDS)</span><span id="gate_stop_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span id="gate_stop_label">영업정지</span><span id="gate_stop_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
         <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_stop_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
       </div>
     </div>
     <div style="margin:8px 0">
-      <div class="sr"><span class="sl" style="color:var(--c-mid)">배달료 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
+      <div class="sr"><span class="sl" style="color:var(--c-mid)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 1건</span><span>max 50건</span></div>
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:var(--c-mid);font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 10분</span><span>max 60분</span></div>
     </div>
-    <div style="padding:6px 0"><span class="sl">배달료 인상 (자동 설정 + 수동 즉시 적용)</span>
+    <div style="padding:6px 0"><span class="sl">인상값</span>
       <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px" id="fee_presets">
         <button class="btn bs bn" onclick="setGateFee(0)">0</button>
         <button class="btn bs bn" onclick="setGateFee(1000)">1,000</button>
@@ -544,11 +544,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bn" onclick="setGateFee(3000)">3,000</button>
       </div>
       <div style="display:flex;gap:4px;margin-top:6px">
-        <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">수동 인상</button>
-        <button class="btn bs bg" onclick="manualDefense('fee_restore', 0)" id="btn_fee_restore">수동 복원</button>
+        <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">인상</button>
+        <button class="btn bs bg" onclick="manualDefense('fee_restore', 0)" id="btn_fee_restore">복원</button>
       </div>
     </div>
-    <div style="padding:6px 0"><span class="sl">기본(복원) 배달료</span>
+    <div style="padding:6px 0"><span class="sl">복원값</span>
       <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px" id="base_presets">
         <button class="btn bs bn" onclick="setGateBase(0)">0</button>
         <button class="btn bs bn" onclick="setGateBase(500)">500</button>
@@ -583,31 +583,31 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs" id="stop_src_kds" onclick="setStopSource('KDS')" style="background:var(--c-baemin);color:#FFF;font-size:10px">KDS</button>
       </div>
     </div>
-    <div class="compare-grid">
-      <div class="compare-box">
-        <span class="compare-label">실제 건수</span>
-        <span id="stop_kds_count" class="compare-value">0건</span>
-        <span class="compare-sub"><span id="stop_src_label">KDS 전체건수</span><br><span id="stopLiveCountHint">실시간 집계</span></span>
+      <div class="compare-grid">
+        <div class="compare-box">
+          <span class="compare-label">실제</span>
+          <span id="stop_kds_count" class="compare-value">0건</span>
+          <span class="compare-sub"><span id="stop_src_label">KDS</span><br><span id="stopLiveCountHint">집계</span></span>
+        </div>
+        <div class="compare-box">
+          <span class="compare-label">설정</span>
+          <span id="stop_threshold" class="compare-value">15건</span>
+          <span id="stopLiveThreshold" class="compare-sub">임계 15건</span>
+        </div>
+        <div class="compare-box">
+          <span class="compare-label">상태</span>
+          <span id="stopLiveState" class="compare-value">OFF</span>
+          <span id="stopLiveHint" class="compare-sub">-</span>
+        </div>
       </div>
-      <div class="compare-box">
-        <span class="compare-label">정지 임계값</span>
-        <span id="stop_threshold" class="compare-value">15건</span>
-        <span id="stopLiveThreshold" class="compare-sub">임계 도달 시 자동 정지</span>
-      </div>
-      <div class="compare-box">
-        <span class="compare-label">현재 상태</span>
-        <span id="stopLiveState" class="compare-value">대기</span>
-        <span id="stopLiveHint" class="compare-sub">감시 중</span>
-      </div>
-    </div>
     <div style="margin:6px 0">
       <div style="height:8px;background:var(--border);margin-top:2px"><div id="stop_kds_bar" style="height:100%;width:0%;background:var(--c-off);transition:width .3s"></div></div>
     </div>
     <div style="margin:8px 0">
-      <div class="sr"><span class="sl" style="color:var(--c-off)">영업정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span style="color:var(--c-off);font-size:14px;font-weight:bold;min-width:44px;text-align:center" id="stop_threshold_disp">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+      <div class="sr"><span class="sl" style="color:var(--c-off)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span style="color:var(--c-off);font-size:14px;font-weight:bold;min-width:44px;text-align:center" id="stop_threshold_disp">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 4건</span><span>max 100건</span></div>
     </div>
-    <div style="padding:6px 0"><span class="sl">채널별 정지</span>
+    <div style="padding:6px 0"><span class="sl">채널</span>
       <div style="margin-top:6px">
         <div style="font-size:10px;color:var(--text-muted);padding:2px 0">배민</div>
         <div class="sr"><span class="sl" style="color:var(--c-baemin);padding-left:8px">배민배달</span><div class="sv"><div class="tog on" id="tog_pause_own" onclick="togChannel('own')"></div></div></div>
@@ -617,7 +617,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div class="sr"><span class="sl" style="color:var(--c-coupang)">쿠팡</span><div class="sv"><div class="tog on" id="tog_pause_coupang" onclick="togChannel('coupang')"></div></div></div>
         <div class="sr"><span class="sl" style="color:var(--c-off)">요기요</span><div class="sv"><div class="tog on" id="tog_pause_yogiyo" onclick="togChannel('yogiyo')"></div></div></div>
       </div>
-      <div style="font-size:9px;color:#555;margin-top:4px">도달 시 자동 발동 · 감소 시 해제</div>
     </div>
     <div style="padding:4px 0">
       <div class="sr"><span class="sl">정지 시 광고 자동 OFF</span><div class="sv"><div class="tog on" id="tog_ad_off_on_pause" onclick="togAdOffOnPause()"></div></div></div>
@@ -838,10 +837,10 @@ function updMonitor(){
     const ci=Math.min(c,10);
     const cz=getZones('coupang'),bz=getZones('baemin');
     const cState=cz[ci],bState=bz[ci];
-    if(cState===2||bState===3){st.textContent='끄기/최소';st.style.color='#E74C3C';}
+    if(cState===2||bState===3){st.textContent='OFF/최소';st.style.color='#E74C3C';}
     else if(bState===2){st.textContent='중간';st.style.color='#E67E22';}
-    else if(cState===1||bState===1){st.textContent='정상';st.style.color='#2ECC71';}
-    else{st.textContent='유지';st.style.color='#A0A0BC';}
+    else if(cState===1||bState===1){st.textContent='ON';st.style.color='#2ECC71';}
+    else{st.textContent='-';st.style.color='#A0A0BC';}
   }
   const b=aS.baemin_current_bid;
   var _mBv=document.getElementById('mBv');if(_mBv)_mBv.textContent=b!=null&&b>0?b+'원':'-';
@@ -961,7 +960,7 @@ function updGauges(c){
   document.getElementById('cG').innerHTML=h;
   if(c!=null){
     const cs=cz[c];
-    document.getElementById('cSt').innerHTML=cs===2?'<span style="color:#E74C3C">OFF</span>':cs===1?'<span style="color:#2ECC71">ON</span>':'<span style="color:#A0A0BC">유지</span>';
+    document.getElementById('cSt').innerHTML=cs===2?'<span style="color:#E74C3C">OFF</span>':cs===1?'<span style="color:#2ECC71">ON</span>':'<span style="color:#A0A0BC">-</span>';
   }
   h='';
   for(let i=0;i<=10;i++){
@@ -971,7 +970,7 @@ function updGauges(c){
   const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
   if(c!=null){
     const bs2=bz[c];
-    document.getElementById('bSt').innerHTML=bs2===3?`<span style="color:#E74C3C">최소 ${bra}원</span>`:bs2===2?`<span style="color:#E67E22">중간 ${bma}원</span>`:bs2===1?`<span style="color:#2ECC71">최대 ${ba}원</span>`:'<span style="color:#A0A0BC">유지</span>';
+    document.getElementById('bSt').innerHTML=bs2===3?`<span style="color:#E74C3C">최소 ${bra}원</span>`:bs2===2?`<span style="color:#E67E22">중간 ${bma}원</span>`:bs2===1?`<span style="color:#2ECC71">최대 ${ba}원</span>`:'<span style="color:#A0A0BC">-</span>';
   }
   // 게이지 아래 조리구간 범례
   const lgEl=document.getElementById('gaugeLegend');
@@ -988,8 +987,8 @@ function updGauges(c){
 function sendCmd(action,amount){
   const cmd={action:action,amount:amount||0,time:Date.now(),source:'web'};
   fetch(FB+'/posdelay/command.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cmd)})
-    .then(()=>toast(action.replace(/_/g,' ')+' 전송','ok'))
-    .catch(()=>toast('전송 실패','warn'));
+    .then(()=>toast('완료','ok'))
+    .catch(()=>toast('오류','warn'));
 }
 function doCheck(what){
   if(isApp){
@@ -1006,7 +1005,7 @@ function doForceRefresh(){
   if(isApp){nb('forceRefresh');}
   else{
     // 웹에서는 SSE 재연결 + 전체 데이터 새로 가져오기
-    _sseOk=false;pollAll(true);toast('새로고침...');
+    _sseOk=false;pollAll(true);toast('갱신중');
   }
 }
 
@@ -1043,7 +1042,7 @@ function exDiscount(amount){
     sendCmd('BAEMIN_DISCOUNT_SET',amount);
   }
   var el=document.getElementById('discSt');
-  var msg=amount===-99?'전체 종료 중...':amount===-98?'금액할인 종료 중...':amount===-97?'배달팁 종료 중...':amount===-1?'배민클럽 배달팁 등록 중...':amount+'원 등록 중...';
+  var msg=amount<0?'변경중':amount+'원 변경중';
   if(el)el.innerHTML='<span style="color:var(--c-warn)">'+msg+'</span>';
 }
 function updDiscDt(){
@@ -1164,7 +1163,7 @@ function updSetUI(){
   if(adSum){
     var bBid2=aS.baemin_current_bid;
     var adMaster=S.ad_enabled;
-    adSum.textContent=(adMaster?'마스터ON':'마스터OFF')+(bBid2>0?' '+bBid2+'원':'');
+    adSum.textContent=(adMaster?'ON':'OFF')+(bBid2>0?' '+bBid2+'원':'');
     adSum.style.color=adMaster?'var(--c-on)':'var(--text-muted)';
   }
 }
@@ -1188,7 +1187,7 @@ function renderGroupSummary(){
   var bBid=aS.baemin_current_bid;
   var bz=getZones('baemin');var bAdTh=findZoneThreshold(bz,3);
   var bMax=g(S,'baemin_amount',500),bMid=g(S,'baemin_mid_amount',300),bMin=g(S,'baemin_reduced_amount',50);
-  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:bBid>0?bBid+'원':'-',setting:bMax+'/'+bMid+'/'+bMin,card:'adSettingCard',count:c2,threshold:bAdTh,exceeded:c2>=bAdTh&&bAdTh<=10});
+  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:bBid>0?bBid+'원':'OFF',setting:bMax+'/'+bMid+'/'+bMin,card:'adSettingCard',count:c2,threshold:bAdTh,exceeded:c2>=bAdTh&&bAdTh<=10});
   // 쿠팡 광고 (2=OFF)
   var cAdOn=S.coupang_auto_enabled;
   var cOn=aS.coupang_current_on;
@@ -1199,25 +1198,25 @@ function renderGroupSummary(){
   var btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
   var bDel=c2>0?Math.max(0,Math.round(c2*avgInterval+bfc-btt)):0;
   var bdOn=S.baemin_delay_enabled!==false;
-  items.push({name:'배민지연',color:'var(--c-baemin)',on:bdOn,detail:bDel>0?'+'+bDel+'분':'정상',setting:'목표'+btt+'분',card:'baeminDelayCard',count:c2,threshold:bdt,exceeded:bDel>0});
+  items.push({name:'배민지연',color:'var(--c-baemin)',on:bdOn,detail:bDel+'분',setting:'목표'+btt+'분',card:'baeminDelayCard',count:c2,threshold:bdt,exceeded:bDel>0});
   // 쿠팡 지연
   var cdt=g(S,'coupang_delay_threshold',5);
   var ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
   var cDel=c2>0?Math.max(0,Math.round(c2*avgInterval+cfc-ctt)):0;
   var cdOn=S.coupang_delay_enabled!==false;
   var cdAuto=S.coupang_delay_auto;
-  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:cdOn,detail:(cDel>0?'+'+cDel+'분':'정상')+(cdAuto?' ⚡':''),setting:'목표'+ctt+'분',card:'coupangDelayCard',count:c2,threshold:cdt,exceeded:cDel>0});
+  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:cdOn,detail:cDel+'분',setting:'목표'+ctt+'분'+(cdAuto?' · 자동':''),card:'coupangDelayCard',count:c2,threshold:cdt,exceeded:cDel>0});
   // 배달료
   var feeThreshold=gateSettings.threshold||8;
   var baseFee=gateSettings.base||0;
-  items.push({name:'배달료',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+'건 · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
+  items.push({name:'배달료',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
   var stopCount=gateSettings._stopSource==='PRINTER'?(gateSettings._validCount||0):c2;
-  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'감시중':'대기',setting:(gateSettings._stopSource==='PRINTER'?'프린터':'KDS')+' · 임계'+stopThreshold+'건',card:'stopPanel',count:stopCount,threshold:stopThreshold});
+  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'ON':'OFF',setting:(gateSettings._stopSource==='PRINTER'?'프린터':'KDS')+' · 임계'+stopThreshold+'건',card:'stopPanel',count:stopCount,threshold:stopThreshold});
   // 즉시할인
   var discCur=g(S,'baemin_discount_current',0);
-  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0,detail:discCur===-1?'클럽배달팁':discCur>0?discCur.toLocaleString()+'원':'-',card:'discountCard'});
+  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0,detail:discCur===-1?'배달팁':discCur>0?discCur.toLocaleString()+'원':'OFF',card:'discountCard'});
   var h='';
   items.forEach(function(it){
     var hasGauge=it.threshold!=null;
@@ -1225,8 +1224,8 @@ function renderGroupSummary(){
     var fillColor=!it.on?'#555':ratio>=100||it.exceeded?'#E74C3C':ratio>70?'#E67E22':it.color;
     var detailColor=it.exceeded?'#E74C3C':it.on?'var(--text-bright)':'var(--text-muted)';
     var countText=hasGauge?(it.count||0)+'/'+it.threshold:(it.on?'ON':'OFF');
-    var metaLeft=hasGauge?'실제 '+(it.count||0)+'건':(it.on?'실행중':'대기');
-    var metaRight=it.setting||'설정 확인';
+    var metaLeft=hasGauge?(it.count||0)+'건':(it.on?'ON':'OFF');
+    var metaRight=it.setting||'-';
     h+='<button type="button" class="summary-card'+(it.on?'':' off')+'" onclick="scrollToCard(\''+it.card+'\')">';
     h+='<span class="summary-head"><span class="dot '+(it.on?'dg':'dd')+'"></span><span class="summary-name" style="color:'+(it.on?it.color:'#707088')+'">'+it.name+'</span><span class="summary-count" style="color:'+(it.on?fillColor:'#555')+'">'+countText+'</span></span>';
     h+='<span class="summary-meter"><span style="width:'+(hasGauge?Math.min(ratio,100):(it.on?100:0))+'%;background:'+fillColor+'"></span></span>';
@@ -1268,7 +1267,7 @@ function togKdsOpen(){
   if(e)e.className='tog'+(paused?'':' on');
   if(isApp){try{NativeBridge.setSetting('kds_paused',String(paused));}catch(ex){}}
   updSyncStatus();
-  toast(paused?'영업 종료 (모니터링 중지)':'영업 시작', paused?'warn':'ok');
+  toast(paused?'OFF':'ON', paused?'warn':'ok');
 }
 
 // === 스케줄 시간 ===
@@ -1290,7 +1289,7 @@ function updSchDisp(){
   var sf2=document.getElementById('schOffDisp2');if(sf2)sf2.textContent=off||'--:--';
   var ss=document.getElementById('schSummary');
   if(ss){
-    ss.textContent=(on||'--:--')+' ~ '+(off||'--:--')+(S.schedule_enabled?' · 활성':' · 정지');
+    ss.textContent=(on||'--:--')+' ~ '+(off||'--:--')+(S.schedule_enabled?' · ON':' · OFF');
     ss.style.color=S.schedule_enabled?'var(--text-bright)':'var(--text-muted)';
   }
 }
@@ -1298,12 +1297,12 @@ function updSchDisp(){
 // === 저장/복원 ===
 function saveAll(){
   saveCk();
-  toast('저장 완료');
+  toast('완료');
 }
 function restoreAll(){
   // NativeBridge에서 로컬 설정 다시 불러오기
-  if(!isApp){toast('앱에서만 가능');return;}
-  try{const d=JSON.parse(NativeBridge.getSettings());Object.assign(S,d);sseLoaded=true;updSetUI();updMonitor();toast('복원 완료');}catch(e){toast('복원 실패');}
+  if(!isApp){toast('앱 전용');return;}
+  try{const d=JSON.parse(NativeBridge.getSettings());Object.assign(S,d);sseLoaded=true;updSetUI();updMonitor();toast('완료');}catch(e){toast('오류');}
 }
 
 // === 알림 ===
@@ -1341,8 +1340,8 @@ function chkAlert(c){
     if(alertMode==='delayed'){
       alertMode='normal';
       const el=Math.floor((now-aTS)/60000);
-      bn.className='alert ok';bn.textContent=`정상 복귀 (${el}분만에)`;
-      sendNotif('정상 복귀',`정상 복귀 (${el}분만에)`);
+      bn.className='alert ok';bn.textContent=`복귀 ${el}분`;
+      sendNotif('복귀',`복귀 ${el}분`);
       setTimeout(()=>{bn.className='alert';},10000);
     }
     aTS=0;
@@ -1893,7 +1892,7 @@ function togFeeListExpand() {
   const btn = document.getElementById('feeExpandBtn');
   if(!_feeListOpen) return;
   if(wrap) wrap.style.maxHeight = _feeListExpanded ? '800px' : '220px';
-  if(btn) { btn.textContent = _feeListExpanded ? '접기' : '펼치기'; btn.style.color = _feeListExpanded ? '#4FC3F7' : '#9090A8'; btn.style.borderColor = _feeListExpanded ? '#4FC3F7' : '#2E2E52'; }
+  if(btn) { btn.textContent = _feeListExpanded ? '접기' : '더보기'; btn.style.color = _feeListExpanded ? '#4FC3F7' : '#9090A8'; btn.style.borderColor = _feeListExpanded ? '#4FC3F7' : '#2E2E52'; }
 }
 
 function highlightPresetButtons(selector, value) {
@@ -1929,12 +1928,12 @@ function syncGateDashboardState() {
   var stopCount=gateSettings._stopCount||0;
   var activeTab=gateSettings._activeTab||'PRINTER';
   var stopMode=gateSettings._stopSource||'KDS';
-  var feeSource=activeTab==='KDS'?'KDS 기준':'프린터 기준';
-  var stopSource=stopMode==='PRINTER'?'프린터 유효건수':'KDS 전체건수';
+  var feeSource=activeTab==='KDS'?'KDS':'프린터';
+  var stopSource=stopMode==='PRINTER'?'프린터':'KDS';
   var feeRemain=Math.max(0,threshold-validCount);
   var stopRemain=Math.max(0,stopThreshold-stopCount);
   var feeCurrent=(gateSettings._stopDefending?(gateSettings.base||0):(gateSettings._isFeeDefending?(gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:(gateSettings.fee||0)):(gateSettings.base||0)))||0;
-  var feeState=gateSettings._stopDefending?'영업정지 우선':gateSettings._isFeeDefending?'B 유도중':gateSettings.enabled?feeSource+' 감시중':'감시 대기';
+  var feeState=gateSettings._stopDefending?'정지중':gateSettings._isFeeDefending?'변경중':gateSettings.enabled?'ON':'OFF';
   var feePrinter=document.getElementById('src_printer');
   var feeKds=document.getElementById('src_kds');
   if(feePrinter){feePrinter.style.background=activeTab==='PRINTER'?'#2AC1BC':'#2A2A45';feePrinter.style.color=activeTab==='PRINTER'?'#FFF':'#E0E0EC';}
@@ -1948,41 +1947,41 @@ function syncGateDashboardState() {
   var feeThresholdNum=document.getElementById('feeThresholdNum');
   if(feeThresholdNum)feeThresholdNum.textContent=threshold;
   var feeLiveValid=document.getElementById('feeLiveValid');
-  if(feeLiveValid)feeLiveValid.textContent='유효시간 '+valid+'분';
+  if(feeLiveValid)feeLiveValid.textContent=valid+'분';
   var heroFeeThreshold=document.getElementById('heroFeeThreshold');
   if(heroFeeThreshold)heroFeeThreshold.textContent=threshold+'건';
   var heroFeeValid=document.getElementById('heroFeeValid');
   if(heroFeeValid)heroFeeValid.textContent=valid+'분';
   var feeLiveHint=document.getElementById('feeLiveHint');
-  if(feeLiveHint)feeLiveHint.textContent=feeRemain>0?'임계까지 '+feeRemain+'건 남음':'임계 도달 · 자동 인상 구간';
+  if(feeLiveHint)feeLiveHint.textContent=feeRemain>0?feeRemain+'건 남음':'도달';
   var feeLiveState=document.getElementById('feeLiveState');
   if(feeLiveState)feeLiveState.textContent=feeState;
   var heroFeeCurrent=document.getElementById('heroFeeCurrent');
   if(heroFeeCurrent)heroFeeCurrent.textContent=feeCurrent.toLocaleString()+'원';
   var heroFeeMode=document.getElementById('heroFeeMode');
   if(heroFeeMode){
-    heroFeeMode.textContent=gateSettings._stopDefending?'영업정지 발동 중':gateSettings._isFeeDefending?feeSource+' 자동 인상 중':gateSettings.enabled?feeSource+' 기준 감시중':'감시 대기';
+    heroFeeMode.textContent=feeState;
     heroFeeMode.style.color=gateSettings._stopDefending?'#E74C3C':gateSettings._isFeeDefending?'#E67E22':'var(--text-secondary)';
   }
   var stopSrcLabel=document.getElementById('stop_src_label');
   if(stopSrcLabel)stopSrcLabel.textContent=stopSource;
   var stopLiveCountHint=document.getElementById('stopLiveCountHint');
-  if(stopLiveCountHint)stopLiveCountHint.textContent=stopMode==='PRINTER'?'유효주문 기준 집계':'전체 주문 기준 집계';
+  if(stopLiveCountHint)stopLiveCountHint.textContent='집계';
   var gateStopLabel=document.getElementById('gate_stop_label');
-  if(gateStopLabel)gateStopLabel.textContent='A 영업정지 ('+(stopMode==='PRINTER'?'프린터':'KDS')+')';
+  if(gateStopLabel)gateStopLabel.textContent='영업정지';
   var stopThresholdEl=document.getElementById('stop_threshold');
   if(stopThresholdEl)stopThresholdEl.textContent=stopThreshold+'건';
   var stopThresholdDisp=document.getElementById('stop_threshold_disp');
   if(stopThresholdDisp)stopThresholdDisp.textContent=stopThreshold+'건';
   var stopLiveThreshold=document.getElementById('stopLiveThreshold');
-  if(stopLiveThreshold)stopLiveThreshold.textContent='임계 '+stopThreshold+'건 · '+(stopRemain>0?stopRemain+'건 남음':'도달');
+  if(stopLiveThreshold)stopLiveThreshold.textContent=stopThreshold+'건 · '+(stopRemain>0?stopRemain+'건 남음':'도달');
   var stopLiveState=document.getElementById('stopLiveState');
-  if(stopLiveState)stopLiveState.textContent=gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'감시중':'대기';
+  if(stopLiveState)stopLiveState.textContent=gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'ON':'OFF';
   var stopLiveHint=document.getElementById('stopLiveHint');
   if(stopLiveHint){
-    if(gateSettings._stopDefending)stopLiveHint.textContent='채널 자동 정지 발동 중';
-    else if(gateSettings._stopEnabled)stopLiveHint.textContent=stopRemain>0?'임계까지 '+stopRemain+'건 남음':'자동 정지 조건 도달';
-    else stopLiveHint.textContent='감시 꺼짐';
+    if(gateSettings._stopDefending)stopLiveHint.textContent='도달';
+    else if(gateSettings._stopEnabled)stopLiveHint.textContent=stopRemain>0?stopRemain+'건 남음':'도달';
+    else stopLiveHint.textContent='-';
   }
   var gateSummary=document.getElementById('gateSummary');
   if(gateSummary)gateSummary.textContent=feeCurrent.toLocaleString()+'원  임계'+threshold+'건';
@@ -1994,7 +1993,7 @@ function renderFeeOrderList(orders){
   var list=document.getElementById('feeOrderList');
   if(!list)return;
   if(!orders.length){
-    list.innerHTML='<div class="order-empty">수집 대기중</div>';
+    list.innerHTML='<div class="order-empty">대기</div>';
     return;
   }
   var html='';
@@ -2004,11 +2003,11 @@ function renderFeeOrderList(orders){
     var elapsed=order.elapsed||0;
     var color=getOrderChannelColor(channel);
     var remain=Math.max(0,validLimit-elapsed);
-    var status=elapsed>=validLimit?'유효 초과':remain<=10?'유효 임박':'유효 내';
+    var status=elapsed>=validLimit?'초과':remain<=10?'임박':'유효';
     var statusColor=elapsed>=validLimit?'#E74C3C':remain<=10?'#E67E22':getOrderElapsedColor(elapsed);
     html+='<div class="order-row">';
-    html+='<div class="order-main"><div class="order-channel-line"><span class="order-channel" style="color:'+color+';background:'+color+'22">'+channel+'</span><span class="order-status-mini" style="color:'+statusColor+'">'+status+'</span></div><span class="order-address">'+(order.address||'주소 없음')+'</span></div>';
-    html+='<div class="order-elapsed"><span class="elapsed-main" style="color:'+statusColor+'">'+elapsed+'분</span><span class="elapsed-sub">'+(elapsed>=validLimit?'설정 유효시간 초과':('유효 '+remain+'분 남음'))+'</span></div>';
+    html+='<div class="order-main"><div class="order-channel-line"><span class="order-channel" style="color:'+color+';background:'+color+'22">'+channel+'</span><span class="order-status-mini" style="color:'+statusColor+'">'+status+'</span></div><span class="order-address">'+(order.address||'-')+'</span></div>';
+    html+='<div class="order-elapsed"><span class="elapsed-main" style="color:'+statusColor+'">'+elapsed+'분</span><span class="elapsed-sub">'+(elapsed>=validLimit?'초과':(remain+'분 남음'))+'</span></div>';
     html+='</div>';
   });
   list.innerHTML=html;
@@ -2034,7 +2033,7 @@ function renderCaptureSnapshot(patch){
   gateSettings._validCount=orders.length;
   gateSettings._printerConnected=connected;
   gateSettings._captureStatus=lastCaptureSnapshot.status||'';
-  var printerLabel=(connected?'프린터 연결됨':'프린터 끊김')+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
+  var printerLabel=(connected?'ON':'OFF')+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
   var printerDotClass='dot '+(connected?'dg':'dr');
   var labelColor=connected?'#2ECC71':'#E74C3C';
   var feeGaugeRatio=Math.min((orders.length/threshold)*100,150);
@@ -2053,9 +2052,9 @@ function renderCaptureSnapshot(patch){
   if(printerDot2)printerDot2.className=printerDotClass;
   if(printerText){printerText.textContent=printerLabel;printerText.style.color=labelColor;}
   if(captureTime)captureTime.textContent=lastCaptureSnapshot.lastCaptureAt||'--';
-  if(heroPrinterState)heroPrinterState.textContent=(connected?'프린터 연결':'프린터 끊김')+' · '+orders.length+'건'+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
-  if(heroCaptureTime)heroCaptureTime.textContent='마지막 수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
-  if(feeLiveClock)feeLiveClock.textContent='마지막 수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
+  if(heroPrinterState)heroPrinterState.textContent=(connected?'ON':'OFF')+' · '+orders.length+'건'+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
+  if(heroCaptureTime)heroCaptureTime.textContent='수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
+  if(feeLiveClock)feeLiveClock.textContent='수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
   if(feeValue)feeValue.textContent=orders.length;
   if(feeCount)feeCount.textContent=orders.length+'건';
   if(printerCount)printerCount.textContent=orders.length;
@@ -2087,7 +2086,7 @@ function onGateSettingsUpdate(json) {
     if(gateToggle)gateToggle.classList.toggle('on', !!gateSettings.enabled);
     var gateStatus=document.getElementById('gate_status');
     if(gateStatus){
-      if(s.defending||s.isFeeDefending){gateStatus.style.display='';gateStatus.textContent='B 유도중 · 배달료 '+(gateSettings.fee||0).toLocaleString()+'원';gateStatus.style.color='#E67E22';}
+      if(s.defending||s.isFeeDefending){gateStatus.style.display='';gateStatus.textContent='변경중 · '+(gateSettings.fee||0).toLocaleString()+'원';gateStatus.style.color='#E67E22';}
       else{gateStatus.style.display='none';}
     }
     syncGateDashboardState();
@@ -2147,8 +2146,8 @@ function onGateStatusUpdate(jsonStr) {
     // 방어 상태 (배달료 패널)
     var gateStatus = document.getElementById('gate_status');
     if(gateStatus) {
-      if(s.isStopDefending) { gateStatus.style.display=''; gateStatus.textContent='A 영업정지 중'; gateStatus.style.color='#E74C3C'; }
-      else if(s.isFeeDefending) { gateStatus.style.display=''; gateStatus.textContent='B 유도중 · 배달료 '+(s.currentFee||0).toLocaleString()+'원'; gateStatus.style.color='#E67E22'; }
+      if(s.isStopDefending) { gateStatus.style.display=''; gateStatus.textContent='정지중'; gateStatus.style.color='#E74C3C'; }
+      else if(s.isFeeDefending) { gateStatus.style.display=''; gateStatus.textContent='변경중 · '+(s.currentFee||0).toLocaleString()+'원'; gateStatus.style.color='#E67E22'; }
       else { gateStatus.style.display='none'; }
     }
 
@@ -2159,7 +2158,7 @@ function onGateStatusUpdate(jsonStr) {
     var stopActualCount = gateSettings._stopSource==='PRINTER' ? (s.validCount||0) : (s.totalCount||0);
     if(skc) skc.textContent = stopActualCount+'건';
     if(skb) { var r3=Math.min(stopActualCount/(s.thresholdStop||15)*100, 150); skb.style.width=r3+'%'; skb.style.background=s.isStopDefending?'#E74C3C':r3>70?'#E67E22':'#4FC3F7'; }
-    if(ss) { if(s.isStopDefending) { ss.style.display=''; ss.textContent='영업정지 중'; } else { ss.style.display='none'; } }
+    if(ss) { if(s.isStopDefending) { ss.style.display=''; ss.textContent='정지중'; } else { ss.style.display='none'; } }
 
     // 토글 상태 — 활성(대기 이상)이면 ON
     var tog = document.getElementById('tog_gate');
