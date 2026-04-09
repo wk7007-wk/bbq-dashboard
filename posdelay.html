@@ -1169,11 +1169,42 @@ function updSetUI(){
 }
 
 // === 그룹 상태 요약 (monitorCard) ===
+function expandCardForSummary(cardId){
+  var targets={
+    cookCard:{body:'ckB',mode:'togSec'},
+    adSettingCard:{body:'adB',mode:'togSec'},
+    coupangAdCard:{body:'cadB',mode:'togSec'},
+    scheduleCard:{body:'schB',mode:'togSec'},
+    discountCard:{body:'discB',mode:'togSec'},
+    baeminDelayCard:{body:'bdlB',mode:'togSec'},
+    coupangDelayCard:{body:'cdlB',mode:'togSec'},
+    gatePanel:{body:'gate_body',mode:'togCB'},
+    stopPanel:{body:'stop_body',mode:'togCB'},
+    diagCard:{body:'diagB',mode:'togSec'}
+  };
+  var target=targets[cardId];
+  if(!target)return false;
+  var body=document.getElementById(target.body);
+  if(!body||body.classList.contains('open'))return false;
+  if(target.mode==='togCB')togCB(target.body);
+  else togSec(target.body);
+  return true;
+}
 function scrollToCard(id){
   var el=document.getElementById(id);
   if(!el)return;
-  var top=el.getBoundingClientRect().top+window.pageYOffset-72;
-  window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  var expanded=expandCardForSummary(id);
+  function move(){
+    var top=el.getBoundingClientRect().top+window.pageYOffset-72;
+    window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  }
+  if(expanded){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(move);
+    });
+    return;
+  }
+  move();
 }
 function renderGroupSummary(){
   var gs=document.getElementById('groupSummary');
