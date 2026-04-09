@@ -21,13 +21,13 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .icon-btn,.icon-btn-text{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg-input);color:var(--text-secondary);cursor:pointer;touch-action:manipulation;}
 .icon-btn{font-size:18px;padding:0;}
 .icon-btn-text{font-size:12px;font-weight:600;padding:0 12px;}
-.section-title{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:14px 2px 8px;}
+.section-title{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;padding:10px 2px 6px;}
 .section-title:first-of-type{padding-top:12px;}
 .section-title-block{display:flex;flex-direction:column;gap:3px;}
 .section-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
-.section-heading{font-size:18px;font-weight:800;letter-spacing:-.02em;}
-.section-note{font-size:11px;color:var(--text-secondary);}
-.section-chip{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary);}
+.section-heading{font-size:16px;font-weight:800;letter-spacing:-.02em;}
+.section-note{display:none;}
+.section-chip{display:none;}
 .stack-tight{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
 .stat-label{font-size:12px;color:var(--text-secondary);}
 .stat-label-sm{font-size:10px;color:var(--text-muted);}
@@ -51,39 +51,39 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .summary-detail{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .summary-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px;color:var(--text-muted);}
 .summary-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;font-size:10px;color:var(--text-muted);border-top:1px solid var(--bg-input);}
-.monitor-shell{display:flex;flex-direction:column;gap:10px;}
+.monitor-shell{display:flex;flex-direction:column;gap:8px;}
 .monitor-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
-.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-info);font-weight:700;}
-.monitor-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;}
-.monitor-title{font-size:20px;font-weight:800;letter-spacing:-.03em;}
+.kicker{display:none;}
+.monitor-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.monitor-title{font-size:18px;font-weight:800;letter-spacing:-.03em;}
 .hero-status{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:700;}
-.role-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.role-pill{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:11px;font-weight:600;color:var(--text-secondary);}
+.role-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.role-pill{display:inline-flex;align-items:center;min-height:26px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:10px;font-weight:600;color:var(--text-secondary);}
 .role-pill.primary{background:rgba(42,193,188,.14);border-color:rgba(42,193,188,.28);color:#B5F2EF;}
-.monitor-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:180px;}
+.monitor-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:160px;}
 .sync-cluster{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;}
-.sync-badge{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
-.hero-grid{display:grid;grid-template-columns:1.3fr repeat(3,minmax(0,1fr));gap:8px;}
-.hero-panel{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:14px;background:rgba(12,16,30,.66);border:1px solid rgba(255,255,255,.06);min-height:108px;}
+.sync-badge{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
+.hero-grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px;}
+.hero-panel{display:flex;flex-direction:column;gap:6px;padding:9px;border-radius:14px;background:rgba(12,16,30,.66);border:1px solid rgba(255,255,255,.06);min-height:88px;}
 .hero-panel.primary{background:linear-gradient(135deg,rgba(79,195,247,.16),rgba(42,193,188,.10) 55%,rgba(12,16,30,.78));}
 .hero-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
 .hero-number-row{display:flex;align-items:flex-end;gap:6px;line-height:1;}
-.hero-number{font-size:40px;font-weight:800;letter-spacing:-.06em;}
-.hero-number-sm{font-size:28px;font-weight:800;letter-spacing:-.04em;}
+.hero-number{font-size:36px;font-weight:800;letter-spacing:-.06em;}
+.hero-number-sm{font-size:24px;font-weight:800;letter-spacing:-.04em;}
 .hero-unit{font-size:13px;color:var(--text-secondary);padding-bottom:4px;}
-.hero-meta{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);line-height:1.4;}
+.hero-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-secondary);line-height:1.35;}
 .hero-meta.strong{align-items:flex-start;font-weight:600;color:var(--text-bright);}
 .hero-meta.accent{color:var(--c-mid);}
 .prediction-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:8px;}
-.prediction-card{display:flex;flex-direction:column;gap:4px;padding:10px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
+.prediction-card{display:flex;flex-direction:column;gap:3px;padding:8px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
 .prediction-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
-.prediction-value{font-size:22px;font-weight:800;letter-spacing:-.04em;}
-.prediction-note{font-size:10px;color:var(--text-secondary);}
+.prediction-value{font-size:19px;font-weight:800;letter-spacing:-.04em;}
+.prediction-note{display:none;}
 .board-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.board-refresh{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 14px;border-radius:10px;border:1px solid rgba(79,195,247,.24);background:rgba(79,195,247,.10);color:#C6EBFF;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;}
-.board-last{font-size:11px;color:var(--text-secondary);}
-.panel-shell{padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:6px;}
-.order-shell{border-bottom:1px solid var(--border);margin-bottom:6px;}
+.board-refresh{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid rgba(79,195,247,.24);background:rgba(79,195,247,.10);color:#C6EBFF;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;}
+.board-last{font-size:10px;color:var(--text-secondary);}
+.panel-shell{padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.order-shell{border-bottom:1px solid var(--border);margin-bottom:4px;}
 .order-header{display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer;min-height:44px;}
 .order-empty{text-align:center;padding:10px 0;font-size:11px;color:var(--text-muted);}
 .order-note{font-size:10px;color:var(--text-muted);padding:0 0 6px;}
@@ -98,16 +98,16 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .elapsed-sub{font-size:10px;color:var(--text-secondary);}
 .badge-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding-bottom:2px;}
 .badge-chip{padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;}
-.compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 10px;}
-.compare-box{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
+.compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0 8px;}
+.compare-box{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
 .compare-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
-.compare-value{font-size:22px;font-weight:800;letter-spacing:-.04em;}
+.compare-value{font-size:20px;font-weight:800;letter-spacing:-.04em;}
 .compare-sub{font-size:10px;color:var(--text-secondary);line-height:1.35;}
 .acc-header{cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:2px 0;}
 .acc-summary{font-size:11px;color:var(--text-secondary);margin-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:right;padding-right:8px;}
 .acc-arrow{color:var(--text-muted);font-size:14px;transition:transform .2s;flex-shrink:0;}
 .acc-arrow.open{transform:rotate(90deg);}
-.card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(36,36,68,.92),rgba(18,18,37,.94));border:1px solid rgba(69,76,122,.54);border-radius:16px;padding:10px;margin-bottom:8px;box-shadow:0 16px 40px rgba(0,0,0,.22);scroll-margin-top:72px;}
+.card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(36,36,68,.92),rgba(18,18,37,.94));border:1px solid rgba(69,76,122,.54);border-radius:16px;padding:9px;margin-bottom:6px;box-shadow:0 16px 40px rgba(0,0,0,.22);scroll-margin-top:72px;}
 .card::before{content:'';position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.22),rgba(255,255,255,.06));}
 .card-monitor::before{background:linear-gradient(90deg,rgba(79,195,247,.2),rgba(42,193,188,.92),rgba(255,215,0,.4));}
 .card-control::before{background:linear-gradient(90deg,rgba(79,195,247,.14),rgba(79,195,247,.78),rgba(255,255,255,.08));}
@@ -123,9 +123,9 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .gc{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#FFF;border-radius:2px;opacity:.85;cursor:pointer;}
 .gc.act{opacity:1;box-shadow:inset 0 0 0 2px #FFF;}
 .btn{padding:3px 10px;border-radius:5px;border:none;font-size:12px;font-weight:600;cursor:pointer;color:#FFF;touch-action:manipulation;min-height:40px;}
-.bs{padding:10px 14px;font-size:11px;}
+.bs{padding:9px 12px;font-size:11px;}
 .bg{background:#2ECC71;}.bred{background:#E74C3C;}.bor{background:#E67E22;}.bn{background:#2A2A45;color:#E0E0EC;}.bb{background:#2AC1BC;}.bcp{background:#FFD700;color:#1A1A30;}
-.sr{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #2A2A45;}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid #2A2A45;}
 .sr:last-child{border-bottom:none;}
 .sl{font-size:12px;color:#A0A0BC;}
 .sv{display:flex;align-items:center;gap:4px;}
@@ -171,13 +171,18 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 }
 @media (max-width:900px){
   .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-  .prediction-grid{grid-template-columns:1fr;}
+  .prediction-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
 }
 @media (max-width:640px){
-  .section-title{align-items:flex-start;flex-direction:column;}
+  .section-title{align-items:flex-start;flex-direction:column;padding-top:8px;}
   .monitor-side{align-items:flex-start;min-width:0;}
-  .compare-grid{grid-template-columns:1fr;}
-  .hero-grid{grid-template-columns:1fr;}
+  .compare-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .compare-grid .compare-box:last-child{grid-column:span 2;}
+  .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .hero-grid .hero-panel.primary{grid-column:span 2;}
+  .prediction-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .prediction-title{font-size:9px;}
+  .prediction-value{font-size:17px;}
 }
 </style>
 </head>
@@ -214,9 +219,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
           <span id="mStatus" class="hero-status">정상</span>
         </div>
         <div class="role-row">
-          <span class="role-pill primary">실시간 설정 + 모니터링</span>
-          <span class="role-pill">개인폰: 제어 가능</span>
-          <span class="role-pill">서브폰: 실동작 · 설정 읽기</span>
+          <span class="role-pill primary">개인폰 제어 · 서브폰 실행</span>
         </div>
       </div>
       <div class="monitor-side">
@@ -233,7 +236,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div class="hero-panel primary">
         <span class="hero-label">현재 처리중</span>
         <div class="hero-number-row"><span id="mCount" class="hero-number">--</span><span class="hero-unit">건</span></div>
-        <div class="hero-meta strong">광고·방어 판단의 기준이 되는 실시간 주문량</div>
+        <div class="hero-meta strong">광고·방어 판단 기준</div>
       </div>
       <div class="hero-panel">
         <span class="hero-label">프린터 수집</span>
@@ -246,11 +249,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div class="hero-number-row"><span id="heroFeeCurrent" class="hero-number-sm">0원</span></div>
         <div id="heroFeeMode" class="hero-meta accent">감시 대기</div>
         <div class="hero-meta">임계 <span id="heroFeeThreshold">8건</span> · 유효 <span id="heroFeeValid">30분</span></div>
-      </div>
-      <div class="hero-panel">
-        <span class="hero-label">운영 역할</span>
-        <div class="hero-meta strong">개인폰은 설정과 모니터링, 서브폰은 실제 동작과 서버 역할</div>
-        <div id="heroRoleHint" class="hero-meta">설정 충돌을 막기 위해 서브폰에서는 설정을 읽기 기준으로 봅니다.</div>
       </div>
     </div>
     <div id="delayPred" class="prediction-grid">
@@ -300,9 +298,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div class="tog" id="tog_cook_mode" onclick="event.stopPropagation();togCookMode()"></div>
       <span id="ckStatus" style="font-size:11px;font-weight:600;color:var(--c-on)"></span>
     </div>
-    <span id="ckA" style="color:var(--text-secondary)">&#9660;</span>
+    <span id="ckA" style="color:var(--text-secondary)">&#9654;</span>
   </div>
-  <div class="cb open" id="ckB">
+  <div class="cb" id="ckB">
     <div class="sr"><span class="sl" style="color:var(--c-on)">전체</span><div class="sv"><button class="btn bs bn" onclick="adjCk('target',-10)">-</button><span id="ck_target_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">25:00</span><button class="btn bs bn" onclick="adjCk('target',10)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-mid)">조리</span><div class="sv"><button class="btn bs bn" onclick="adjCk('mid',-10)">-</button><span id="ck_mid_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">17:00</span><button class="btn bs bn" onclick="adjCk('mid',10)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-off)">포장</span><div class="sv"><button class="btn bs bn" onclick="adjCk('finish',-10)">-</button><span id="ck_finish_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">4:00</span><button class="btn bs bn" onclick="adjCk('finish',10)">+</button></div></div>
@@ -387,7 +385,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="schA" style="color:var(--text-secondary)">&#9654;</span>
   </div>
   <div class="cb" id="schB">
-    <div class="note">배민·쿠팡 광고 공통 스케줄. 시간대 밖이면 자동화가 정지됩니다.</div>
     <div class="sr">
       <span class="sl">활성 시간</span>
       <div class="row" style="gap:4px">
@@ -419,7 +416,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
       </div>
     </div>
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">모든주문 정액할인 · 같은 유형 등록 시 기존 자동 종료</div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">정액 할인 · 중복 등록 시 기존 자동 종료</div>
     <div class="sec" style="font-size:11px;color:var(--text-secondary)">주문유형</div>
     <div class="row" style="gap:6px;flex-wrap:wrap;padding:2px 0">
       <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_SINGLE" onchange="updDiscDt()" checked><span>알뜰</span></label>
@@ -432,7 +429,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <span style="font-size:11px;color:var(--text-secondary)">배민클럽 가게배달 배달팁</span>
         <button class="btn bs bg" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
       </div>
-      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배달팁 전액 할인 · 금액 설정 불필요</div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배달팁 전액 할인</div>
     </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:flex-end;gap:4px">
@@ -440,7 +437,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
         <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
       </div>
-      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민클럽 배민배달은 유지됨</div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민클럽 배민배달 유지</div>
     </div>
   </div>
 </div>
@@ -500,7 +497,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
           <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
         </div>
       </div>
-      <div class="order-note">주소는 참고용이며, 채널·경과시간·총건수와 설정값을 실제 상황과 대조하는 영역입니다.</div>
+      <div class="order-note">주소 참고용 · 건수/경과 대조</div>
       <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
         <div id="feeOrderList" style="padding:2px 0"><div class="order-empty">수집 대기중</div></div>
       </div>
@@ -620,7 +617,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div class="sr"><span class="sl" style="color:var(--c-coupang)">쿠팡</span><div class="sv"><div class="tog on" id="tog_pause_coupang" onclick="togChannel('coupang')"></div></div></div>
         <div class="sr"><span class="sl" style="color:var(--c-off)">요기요</span><div class="sv"><div class="tog on" id="tog_pause_yogiyo" onclick="togChannel('yogiyo')"></div></div></div>
       </div>
-      <div style="font-size:9px;color:#555;margin-top:4px">임계값 도달 시 자동 발동 · 건수 감소 시 자동 해제</div>
+      <div style="font-size:9px;color:#555;margin-top:4px">도달 시 자동 발동 · 감소 시 해제</div>
     </div>
     <div style="padding:4px 0">
       <div class="sr"><span class="sl">정지 시 광고 자동 OFF</span><div class="sv"><div class="tog on" id="tog_ad_off_on_pause" onclick="togAdOffOnPause()"></div></div></div>
@@ -640,12 +637,12 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="bdlA" style="color:var(--text-secondary)">&#9654;</span>
   </div>
   <div class="cb" id="bdlB">
-    <div style="font-size:10px;color:var(--text-secondary);padding:4px 0">지연 = max(0, 건수 x 완료간격 + 고정조리 - 목표)</div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">알림 전용</div>
     <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_target_time',-1)">-</button><input type="number" id="set_baemin_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('baemin_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
     <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',-1)">-</button><input type="number" id="set_baemin_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
     <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',-1)">-</button><input type="number" id="set_baemin_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">지연 시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_minutes',-5)">-</button><input type="number" id="set_baemin_delay_minutes" min="5" max="30" readonly style="width:40px"><button class="btn bs bn" onclick="adjS('baemin_delay_minutes',5)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div style="font-size:9px;color:var(--text-muted);padding:4px 0">알림만 (앱 조작 미구현)</div>
+    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">앱 조작 없음</div>
   </div>
 </div>
 
@@ -664,7 +661,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',-1)">-</button><input type="number" id="set_coupang_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
     <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',-1)">-</button><input type="number" id="set_coupang_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">지연 시간</span><div class="sv"><button class="btn bs bn" onclick="adjCoupangDelayMin(-5)">5분</button><button class="btn bs bn" onclick="adjCoupangDelayMin(10)">10분</button><span id="set_coupang_delay_minutes_disp" style="color:var(--c-coupang);font-size:13px;font-weight:bold;min-width:40px;text-align:center">10분</span></div></div>
-    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">최대 10분 (쿠팡 앱 제한) · 서브폰 자동처리</div>
+    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">최대 10분 · 서브폰 자동처리</div>
   </div>
 </div>
 
@@ -2239,13 +2236,11 @@ function updateSubphoneStatus(json) {
     latestSubphoneState = typeof json === 'string' ? JSON.parse(json) : json;
     var dot2 = document.getElementById('subDot2');
     var txt2 = document.getElementById('subStatus2');
-    var hint = document.getElementById('heroRoleHint');
     var ago = Math.floor((Date.now() - latestSubphoneState.ts) / 1000);
     var cls = ago < 120 ? 'dot dg' : ago < 300 ? 'dot do' : 'dot dr';
     var msg = '서브폰 ' + (latestSubphoneState.device||'S10+') + ' 배터리' + (latestSubphoneState.battery||'?') + '% KDS ' + (latestSubphoneState.kds_count>=0?latestSubphoneState.kds_count:'?') + '건 ' + ago + '초전';
     if (dot2) dot2.className = cls;
     if (txt2) txt2.textContent = msg;
-    if (hint) hint.textContent = '최근 수신 ' + ago + '초 전 · 배터리 ' + (latestSubphoneState.battery||'?') + '% · KDS ' + (latestSubphoneState.kds_count>=0?latestSubphoneState.kds_count:'?') + '건';
     refreshActivityLog();
   } catch(e) {}
 }
