@@ -805,15 +805,20 @@ function hSet(m){
   sseLoaded=true;updSetUI();updMonitor();
 }
 let _lastAdAction=null;
+// 3단계 알림 정책 화이트리스트: 시도/완료/실패만 toast/Notification, 내부 상태 변화는 제외
+const _AD_NOTIFY_SKIP=['서킷','쿨다운','CHECK','이미','retry','wait','스킵','복구 시도','자동복구','해결중','해결 중','접근성','일시 차단','일시중단'];
 function hASt(m){
   if(!m.data||m.data==='null')return;
   if(m.path==='/')Object.assign(aS,m.data);else aS[m.path.slice(1)]=m.data;
   const cur=aS.last_ad_action;
   if(cur&&cur!==_lastAdAction){
     if(_lastAdAction!==null){
-      toast('광고: '+cur,'ok');
-      if('Notification'in window&&Notification.permission==='granted'){
-        try{new Notification('광고 실행',{body:cur,tag:'ad_action'});}catch(e){}
+      const _skip=_AD_NOTIFY_SKIP.some(function(k){return cur.indexOf(k)>=0;});
+      if(!_skip){
+        toast('광고: '+cur,'ok');
+        if('Notification'in window&&Notification.permission==='granted'){
+          try{new Notification('광고 실행',{body:cur,tag:'ad_action'});}catch(e){}
+        }
       }
     }
     _lastAdAction=cur;
