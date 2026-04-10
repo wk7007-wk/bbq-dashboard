@@ -804,9 +804,20 @@ function hSet(m){
   if(m.path==='/')Object.assign(S,m.data);else S[m.path.slice(1)]=m.data;
   sseLoaded=true;updSetUI();updMonitor();
 }
+let _lastAdAction=null;
 function hASt(m){
   if(!m.data||m.data==='null')return;
   if(m.path==='/')Object.assign(aS,m.data);else aS[m.path.slice(1)]=m.data;
+  const cur=aS.last_ad_action;
+  if(cur&&cur!==_lastAdAction){
+    if(_lastAdAction!==null){
+      toast('광고: '+cur,'ok');
+      if('Notification'in window&&Notification.permission==='granted'){
+        try{new Notification('광고 실행',{body:cur,tag:'ad_action'});}catch(e){}
+      }
+    }
+    _lastAdAction=cur;
+  }
   updMonitor();
 }
 function hStatus(m){
