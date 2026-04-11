@@ -1,0 +1,29 @@
+bbq-dashboard — GitHub Pages 현황판
+=====================================
+
+## 구조
+- index.html          : 메인 랜딩 (앱 진입 카드)
+- dashboard.html      : 통합 대시보드
+- posdelay.html       : PosDelay 현황판 (배달료 방어 게이트 설정 포함)
+- kds.html            : PosKDS 현황판
+- banktotal.html      : BankTotal 현황판
+- evidence.html       : 증거 페이지 (legal)
+- hikorea-guide.html  : HiKorea 가이드
+- saaya.html          : SaaYa 페이지
+- CODEX_HANDOFF.md    : Codex 인수인계 문서
+
+## 배포
+- GitHub Pages 자동 반영 (main 브랜치 push 시)
+- 로컬 빌드 불필요
+
+## 주요 의존
+- Firebase RTDB (읽기 전용, 현황 표시용)
+- SSE 스트림 (실시간 갱신)
+
+## posdelay.html 주요 섹션
+- gateSettings : 배달료 방어 게이트 설정 (threshold/valid/fee/base)
+  - threshold: min 0, max 50 (0건부터 발동 가능)
+  - valid: min 10, max 60 분
+  - fee: min 500, max 10000 원
+  - base: min 0, max 5000 원
+- adjGate(key, delta) : 게이트 값 조정 함수
