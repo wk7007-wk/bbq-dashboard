@@ -565,7 +565,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 정책: 자동수락 ═══ -->
+<!-- ═══ 자동수락 ═══ -->
 <div class="card card-control" id="autoAcceptPanel">
   <div class="ch" onclick="togCB('auto_accept_body')">
     <div class="row">
@@ -575,18 +575,17 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb" id="auto_accept_body">
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">메인 PC 텍스트 인계값 그대로 입력</div>
-    <div class="sr"><span class="sl">0건</span><div class="sv"><input type="number" id="policy_kds_0" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">1건</span><div class="sv"><input type="number" id="policy_kds_1" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">2~3건</span><div class="sv"><input type="number" id="policy_kds_23" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
-    <div class="sr"><span class="sl">4건 이상</span><div class="sv"><input type="number" id="policy_kds_4plus" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">분 단위 자동수락 시작 건수 입력</div>
+    <div class="sr"><span class="sl">20분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">주문</span><input type="number" id="policy_threshold_20" min="0" max="999" style="width:54px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sr"><span class="sl">25분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">주문</span><input type="number" id="policy_threshold_25" min="0" max="999" style="width:54px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sr"><span class="sl">30분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">주문</span><input type="number" id="policy_threshold_30" min="0" max="999" style="width:54px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
     <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
-      <button class="btn bs bg" onclick="savePolicySettings()">정책 저장</button>
+      <button class="btn bs bg" onclick="savePolicySettings()">저장</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ 정책: 영업정지 ═══ -->
+<!-- ═══ 영업정지 ═══ -->
 <div class="card card-stop" id="stopPanel">
   <div class="ch" onclick="togCB('stop_body')">
     <div class="row">
@@ -597,7 +596,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="stopPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb" id="stop_body">
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">디자이너 시안 대신 실제 정책 입력 카드로 사용</div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">메인 PC 임계값 입력</div>
     <div class="sec" style="color:var(--c-baemin)">배민1</div>
     <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_baemin1_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_baemin1_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
@@ -609,7 +608,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div class="sr"><span class="sl">사용</span><div class="sv"><div class="tog" id="tog_policy_enabled" onclick="togStop()"></div></div></div>
     </div>
     <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
-      <button class="btn bs bg" onclick="savePolicySettings()">정책 저장</button>
+      <button class="btn bs bg" onclick="savePolicySettings()">저장</button>
     </div>
 
     <!-- legacy dead UI 호환용 hidden nodes -->
@@ -1813,10 +1812,9 @@ document.addEventListener('visibilitychange',()=>{
 let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false, threshold_stop:15};
 let policySettings = {
   enabled:false,
-  kds_0:20,
-  kds_1:20,
-  kds_23:25,
-  kds_4plus:30,
+  threshold_20:0,
+  threshold_30:4,
+  threshold_25:2,
   baemin1_pause_at:10,
   baemin1_resume_at:2,
   baemin1_pause_duration:'3시간',
@@ -1826,7 +1824,7 @@ let policySettings = {
 
 function syncPolicySummary() {
   var autoSummary=document.getElementById('autoAcceptSummary');
-  if(autoSummary)autoSummary.textContent='0·1·23·4+ = '+policySettings.kds_0+'/'+policySettings.kds_1+'/'+policySettings.kds_23+'/'+policySettings.kds_4plus+'분';
+  if(autoSummary)autoSummary.textContent='20분 '+policySettings.threshold_20+'건 · 25분 '+policySettings.threshold_25+'건 · 30분 '+policySettings.threshold_30+'건';
   var stopSummary=document.getElementById('stopSummary');
   if(stopSummary)stopSummary.textContent=policySettings.enabled
     ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
@@ -1840,10 +1838,9 @@ function syncPolicySummary() {
 
 function applyPolicySettingsToUI() {
   var pairs=[
-    ['policy_kds_0',policySettings.kds_0],
-    ['policy_kds_1',policySettings.kds_1],
-    ['policy_kds_23',policySettings.kds_23],
-    ['policy_kds_4plus',policySettings.kds_4plus],
+    ['policy_threshold_20',policySettings.threshold_20],
+    ['policy_threshold_30',policySettings.threshold_30],
+    ['policy_threshold_25',policySettings.threshold_25],
     ['policy_baemin1_pause',policySettings.baemin1_pause_at],
     ['policy_baemin1_resume',policySettings.baemin1_resume_at],
     ['policy_baemin1_duration',policySettings.baemin1_pause_duration],
@@ -1885,10 +1882,9 @@ function savePolicySettings() {
   }
   var next = {
     enabled: !!policySettings.enabled,
-    kds_0: readPolicyInt('policy_kds_0','0건 분',1,120),
-    kds_1: readPolicyInt('policy_kds_1','1건 분',1,120),
-    kds_23: readPolicyInt('policy_kds_23','2~3건 분',1,120),
-    kds_4plus: readPolicyInt('policy_kds_4plus','4건 이상 분',1,120),
+    threshold_20: readPolicyInt('policy_threshold_20','20분 시작건수',0,999),
+    threshold_30: readPolicyInt('policy_threshold_30','30분 시작건수',0,999),
+    threshold_25: readPolicyInt('policy_threshold_25','25분 시작건수',0,999),
     baemin1_pause_at: readPolicyInt('policy_baemin1_pause','배민1 중지',1,100),
     baemin1_resume_at: readPolicyInt('policy_baemin1_resume','배민1 재개',0,99),
     baemin1_pause_duration: (document.getElementById('policy_baemin1_duration')||{}).value || '',
@@ -1896,6 +1892,10 @@ function savePolicySettings() {
     coupang_resume_at: readPolicyInt('policy_coupang_resume','쿠팡 재개',0,99)
   };
   if(Object.keys(next).some(function(k){return next[k]===null;}))return;
+  if(new Set([next.threshold_20,next.threshold_30,next.threshold_25]).size!==3){
+    toast('자동수락 시작건수는 서로 달라야 합니다','warn');
+    return;
+  }
   if(next.baemin1_pause_at<=next.baemin1_resume_at){
     toast('배민1 중지값이 재개값보다 커야 합니다','warn');
     return;
@@ -1907,14 +1907,14 @@ function savePolicySettings() {
   try {
     var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify(next));
     if(!ok){
-      toast('정책 저장 실패','warn');
+      toast('저장 실패','warn');
       return;
     }
     Object.assign(policySettings, next);
     applyPolicySettingsToUI();
-    toast('정책 저장','ok');
+    toast('저장 완료','ok');
   } catch(e) {
-    toast('정책 저장 실패','warn');
+    toast('저장 실패','warn');
   }
 }
 
