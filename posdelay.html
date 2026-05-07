@@ -565,7 +565,28 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
 </div>
 
-<!-- ═══ 영업정지 설정 ═══ -->
+<!-- ═══ 정책: 자동수락 ═══ -->
+<div class="card card-control" id="autoAcceptPanel">
+  <div class="ch" onclick="togCB('auto_accept_body')">
+    <div class="row">
+      <span style="font-size:12px;font-weight:600;color:var(--c-mid)">자동수락</span>
+    </div>
+    <span id="autoAcceptSummary" class="acc-summary"></span>
+    <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
+  </div>
+  <div class="cb" id="auto_accept_body">
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">메인 PC 텍스트 인계값 그대로 입력</div>
+    <div class="sr"><span class="sl">0건</span><div class="sv"><input type="number" id="policy_kds_0" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">1건</span><div class="sv"><input type="number" id="policy_kds_1" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">2~3건</span><div class="sv"><input type="number" id="policy_kds_23" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">4건 이상</span><div class="sv"><input type="number" id="policy_kds_4plus" min="1" max="120" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
+      <button class="btn bs bg" onclick="savePolicySettings()">정책 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 정책: 영업정지 ═══ -->
 <div class="card card-stop" id="stopPanel">
   <div class="ch" onclick="togCB('stop_body')">
     <div class="row">
@@ -576,52 +597,41 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="stopPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb" id="stop_body">
-    <div class="sr" style="margin-bottom:6px">
-      <span class="sl">건수 소스</span>
-      <div class="sv" style="gap:4px">
-        <button class="btn bs" id="stop_src_printer" onclick="setStopSource('PRINTER')" style="background:var(--bg-input);color:var(--text-bright);font-size:10px">프린터</button>
-        <button class="btn bs" id="stop_src_kds" onclick="setStopSource('KDS')" style="background:var(--c-baemin);color:#FFF;font-size:10px">KDS</button>
-      </div>
-    </div>
-      <div class="compare-grid">
-        <div class="compare-box">
-          <span class="compare-label">실제</span>
-          <span id="stop_kds_count" class="compare-value">0건</span>
-          <span class="compare-sub"><span id="stop_src_label">KDS</span><br><span id="stopLiveCountHint">집계</span></span>
-        </div>
-        <div class="compare-box">
-          <span class="compare-label">설정</span>
-          <span id="stop_threshold" class="compare-value">15건</span>
-          <span id="stopLiveThreshold" class="compare-sub">임계 15건</span>
-        </div>
-        <div class="compare-box">
-          <span class="compare-label">상태</span>
-          <span id="stopLiveState" class="compare-value">OFF</span>
-          <span id="stopLiveHint" class="compare-sub">-</span>
-        </div>
-      </div>
-    <div style="margin:6px 0">
-      <div style="height:8px;background:var(--border);margin-top:2px"><div id="stop_kds_bar" style="height:100%;width:0%;background:var(--c-off);transition:width .3s"></div></div>
-    </div>
-    <div style="margin:8px 0">
-      <div class="sr"><span class="sl" style="color:var(--c-off)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span style="color:var(--c-off);font-size:14px;font-weight:bold;min-width:44px;text-align:center" id="stop_threshold_disp">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 4건</span><span>max 100건</span></div>
-    </div>
-    <div style="padding:6px 0"><span class="sl">채널</span>
-      <div style="margin-top:6px">
-        <div style="font-size:10px;color:var(--text-muted);padding:2px 0">배민</div>
-        <div class="sr"><span class="sl" style="color:var(--c-baemin);padding-left:8px">배민배달</span><div class="sv"><div class="tog on" id="tog_pause_own" onclick="togChannel('own')"></div></div></div>
-        <div class="sr"><span class="sl" style="color:var(--c-baemin);padding-left:8px">가게배달</span><div class="sv"><div class="tog on" id="tog_pause_agency" onclick="togChannel('agency')"></div></div></div>
-        <div class="sr"><span class="sl" style="color:var(--c-baemin);padding-left:8px">픽업</span><div class="sv"><div class="tog on" id="tog_pause_visit" onclick="togChannel('visit')"></div></div></div>
-        <div style="font-size:10px;color:var(--text-muted);padding:2px 0;margin-top:4px">타 채널</div>
-        <div class="sr"><span class="sl" style="color:var(--c-coupang)">쿠팡</span><div class="sv"><div class="tog on" id="tog_pause_coupang" onclick="togChannel('coupang')"></div></div></div>
-        <div class="sr"><span class="sl" style="color:var(--c-off)">요기요</span><div class="sv"><div class="tog on" id="tog_pause_yogiyo" onclick="togChannel('yogiyo')"></div></div></div>
-      </div>
-    </div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">디자이너 시안 대신 실제 정책 입력 카드로 사용</div>
+    <div class="sec" style="color:var(--c-baemin)">배민1</div>
+    <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_baemin1_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_baemin1_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">일시중지</span><div class="sv"><input type="text" id="policy_baemin1_duration" style="width:90px" placeholder="3시간"></div></div>
+    <div class="sec" style="color:var(--c-coupang)">쿠팡이츠</div>
+    <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_coupang_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_coupang_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div style="padding:4px 0">
-      <div class="sr"><span class="sl">정지 시 광고 자동 OFF</span><div class="sv"><div class="tog on" id="tog_ad_off_on_pause" onclick="togAdOffOnPause()"></div></div></div>
+      <div class="sr"><span class="sl">사용</span><div class="sv"><div class="tog" id="tog_policy_enabled" onclick="togStop()"></div></div></div>
     </div>
-    <div id="stop_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:var(--c-off)"></div>
+    <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
+      <button class="btn bs bg" onclick="savePolicySettings()">정책 저장</button>
+    </div>
+
+    <!-- legacy dead UI 호환용 hidden nodes -->
+    <div style="display:none">
+      <button id="stop_src_printer" type="button"></button>
+      <button id="stop_src_kds" type="button"></button>
+      <span id="stop_src_label">KDS</span>
+      <span id="stop_kds_count">0건</span>
+      <span id="stopLiveCountHint">집계</span>
+      <span id="stop_threshold">15건</span>
+      <span id="stop_threshold_disp">15건</span>
+      <span id="stopLiveThreshold">-</span>
+      <span id="stopLiveState">OFF</span>
+      <span id="stopLiveHint">-</span>
+      <div id="stop_kds_bar"></div>
+      <div id="stop_status"></div>
+      <div id="tog_pause_own"></div>
+      <div id="tog_pause_agency"></div>
+      <div id="tog_pause_visit"></div>
+      <div id="tog_pause_coupang"></div>
+      <div id="tog_pause_yogiyo"></div>
+    </div>
   </div>
 </div>
 
@@ -1801,6 +1811,112 @@ document.addEventListener('visibilitychange',()=>{
 
 // ═══ 게이트(배달료) ═══
 let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false, threshold_stop:15};
+let policySettings = {
+  enabled:false,
+  kds_0:20,
+  kds_1:20,
+  kds_23:25,
+  kds_4plus:30,
+  baemin1_pause_at:10,
+  baemin1_resume_at:2,
+  baemin1_pause_duration:'3시간',
+  coupang_pause_at:12,
+  coupang_resume_at:3
+};
+
+function syncPolicySummary() {
+  var autoSummary=document.getElementById('autoAcceptSummary');
+  if(autoSummary)autoSummary.textContent='0·1·23·4+ = '+policySettings.kds_0+'/'+policySettings.kds_1+'/'+policySettings.kds_23+'/'+policySettings.kds_4plus+'분';
+  var stopSummary=document.getElementById('stopSummary');
+  if(stopSummary)stopSummary.textContent=policySettings.enabled
+    ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
+    : 'OFF';
+  var toggles=['tog_stop','tog_policy_enabled'];
+  toggles.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.classList.toggle('on',!!policySettings.enabled);
+  });
+}
+
+function applyPolicySettingsToUI() {
+  var pairs=[
+    ['policy_kds_0',policySettings.kds_0],
+    ['policy_kds_1',policySettings.kds_1],
+    ['policy_kds_23',policySettings.kds_23],
+    ['policy_kds_4plus',policySettings.kds_4plus],
+    ['policy_baemin1_pause',policySettings.baemin1_pause_at],
+    ['policy_baemin1_resume',policySettings.baemin1_resume_at],
+    ['policy_baemin1_duration',policySettings.baemin1_pause_duration],
+    ['policy_coupang_pause',policySettings.coupang_pause_at],
+    ['policy_coupang_resume',policySettings.coupang_resume_at]
+  ];
+  pairs.forEach(function(pair){
+    var el=document.getElementById(pair[0]);
+    if(el)el.value=pair[1];
+  });
+  syncPolicySummary();
+}
+
+function readPolicyInt(id,label,min,max){
+  var el=document.getElementById(id);
+  if(!el)return null;
+  var v=parseInt(el.value,10);
+  if(!Number.isFinite(v)||v<min||v>max){
+    toast(label+' 범위 확인','warn');
+    try{el.focus();}catch(e){}
+    return null;
+  }
+  return v;
+}
+
+function loadPolicySettings() {
+  if(typeof NativeBridge==='undefined' || !NativeBridge.getPolicyConfig)return;
+  try {
+    var saved = JSON.parse(NativeBridge.getPolicyConfig()||'{}');
+    Object.assign(policySettings, saved);
+    applyPolicySettingsToUI();
+  } catch(e) {}
+}
+
+function savePolicySettings() {
+  if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
+    toast('앱 전용','warn');
+    return;
+  }
+  var next = {
+    enabled: !!policySettings.enabled,
+    kds_0: readPolicyInt('policy_kds_0','0건 분',1,120),
+    kds_1: readPolicyInt('policy_kds_1','1건 분',1,120),
+    kds_23: readPolicyInt('policy_kds_23','2~3건 분',1,120),
+    kds_4plus: readPolicyInt('policy_kds_4plus','4건 이상 분',1,120),
+    baemin1_pause_at: readPolicyInt('policy_baemin1_pause','배민1 중지',1,100),
+    baemin1_resume_at: readPolicyInt('policy_baemin1_resume','배민1 재개',0,99),
+    baemin1_pause_duration: (document.getElementById('policy_baemin1_duration')||{}).value || '',
+    coupang_pause_at: readPolicyInt('policy_coupang_pause','쿠팡 중지',1,100),
+    coupang_resume_at: readPolicyInt('policy_coupang_resume','쿠팡 재개',0,99)
+  };
+  if(Object.keys(next).some(function(k){return next[k]===null;}))return;
+  if(next.baemin1_pause_at<=next.baemin1_resume_at){
+    toast('배민1 중지값이 재개값보다 커야 합니다','warn');
+    return;
+  }
+  if(next.coupang_pause_at<=next.coupang_resume_at){
+    toast('쿠팡 중지값이 재개값보다 커야 합니다','warn');
+    return;
+  }
+  try {
+    var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify(next));
+    if(!ok){
+      toast('정책 저장 실패','warn');
+      return;
+    }
+    Object.assign(policySettings, next);
+    applyPolicySettingsToUI();
+    toast('정책 저장','ok');
+  } catch(e) {
+    toast('정책 저장 실패','warn');
+  }
+}
 
 // 페이지 로드 시 Kotlin에서 저장된 설정 복원
 try {
@@ -1832,6 +1948,7 @@ try {
   if (typeof NativeBridge !== 'undefined' && NativeBridge.getCaptureStatus) {
     onCaptureStatusUpdate(NativeBridge.getCaptureStatus());
   }
+  loadPolicySettings();
 } catch(e) {}
 
 function adjGate(key, delta) {
@@ -1878,13 +1995,8 @@ function togGate() {
 }
 
 function togStop() {
-  // 영업정지 방어 ON/OFF
-  gateSettings._stopEnabled = !gateSettings._stopEnabled;
-  if (gateSettings._stopEnabled && !gateSettings._stopSource) gateSettings._stopSource = 'KDS';
-  var el = document.getElementById('tog_stop');
-  if(el) el.classList.toggle('on', gateSettings._stopEnabled);
-  syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({stopEnabled: gateSettings._stopEnabled, stopSource: gateSettings._stopSource}));
+  policySettings.enabled = !policySettings.enabled;
+  syncPolicySummary();
 }
 
 function setFeeSource(src) {
@@ -1914,7 +2026,7 @@ function togCB(id) {
   if(!e) return;
   const isOpen = e.classList.toggle('open');
   // 화살표 업데이트
-  var arrowMap = {gate_body:'gatePanelArrow', stop_body:'stopPanelArrow'};
+  var arrowMap = {gate_body:'gatePanelArrow', auto_accept_body:'autoAcceptPanelArrow', stop_body:'stopPanelArrow'};
   var arrId = arrowMap[id];
   if(arrId) { var arr = document.getElementById(arrId); if(arr) arr.innerHTML = isOpen ? '&#9660;' : '&#9654;'; }
   // 접힘 상태 localStorage 저장
@@ -2033,7 +2145,9 @@ function syncGateDashboardState() {
   var gateSummary=document.getElementById('gateSummary');
   if(gateSummary)gateSummary.textContent=feeCurrent.toLocaleString()+'원  임계'+threshold+'건';
   var stopSummary=document.getElementById('stopSummary');
-  if(stopSummary)stopSummary.textContent=gateSettings._stopDefending?'정지중':(gateSettings._stopEnabled?'ON  임계'+stopThreshold+'건':'OFF');
+  if(stopSummary)stopSummary.textContent=policySettings.enabled
+    ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
+    : 'OFF';
   if(document.getElementById('groupSummary'))renderGroupSummary();
 }
 function renderFeeOrderList(orders){
