@@ -116,6 +116,17 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .card-defense::before{background:linear-gradient(90deg,rgba(79,195,247,.2),rgba(79,195,247,.9),rgba(255,255,255,.08));}
 .card-stop::before{background:linear-gradient(90deg,rgba(231,76,60,.18),rgba(231,76,60,.92),rgba(255,255,255,.08));}
 .card-diag::before{background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.22),rgba(255,255,255,.08));}
+.card-power::before{background:linear-gradient(90deg,rgba(124,111,224,.18),rgba(124,111,224,.88),rgba(79,195,247,.18));}
+@keyframes pcPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+.pc-pulse{animation:pcPulse 2s ease-in-out infinite;}
+.pc-overlay{position:fixed;inset:0;background:rgba(8,10,20,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px;}
+.pc-overlay.show{display:flex;}
+.pc-dialog{width:100%;max-width:340px;background:linear-gradient(180deg,rgba(36,36,68,.98),rgba(18,18,37,.98));border:1px solid rgba(124,111,224,.45);border-radius:16px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.pc-dialog .pc-dialog-title{font-size:14px;font-weight:800;color:var(--text-bright);margin-bottom:6px;letter-spacing:-.02em;}
+.pc-dialog .pc-dialog-msg{font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.45;}
+.pc-dialog .pc-dialog-count{font-size:28px;font-weight:800;color:#E67E22;text-align:center;margin:6px 0 14px;letter-spacing:-.04em;}
+.pc-dialog .pc-dialog-row{display:flex;gap:8px;}
+.pc-dialog .pc-dialog-row > .btn{flex:1;min-height:48px;font-size:14px;font-weight:700;}
 .row{display:flex;align-items:center;gap:6px;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
 .dg{background:#2ECC71;}.do{background:#E67E22;}.dr{background:#E74C3C;}.dd{background:#707088;}
@@ -290,6 +301,22 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <span class="section-chip">Control</span>
 </div>
+<!-- ═══ 2-0. 메인 PC 전원 ═══ -->
+<div class="card card-power" id="pcPowerCard">
+  <div class="row" style="justify-content:space-between; margin-bottom:10px">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px; font-weight:600; color:var(--text-secondary)">메인 PC</span>
+      <span id="pcRelayDot" class="dot dd" title="WoL 릴레이"></span>
+    </div>
+    <span id="pcStatusPill" class="hero-status">-- 확인 중</span>
+  </div>
+  <div class="row" style="gap:8px">
+    <button id="pcOnBtn"  class="btn bg" style="flex:1; min-height:48px; font-size:14px; font-weight:700">켜기</button>
+    <button id="pcOffBtn" class="btn bred" style="flex:1; min-height:48px; font-size:14px; font-weight:700">끄기</button>
+  </div>
+  <div id="pcLastHb" class="note" style="text-align:right; margin-top:6px">박동 --</div>
+</div>
+
 <!-- ═══ 2. 조리모드 ═══ -->
 <div class="card card-control" id="cookCard">
   <div class="ch" onclick="togSec('ckB')">
@@ -2406,6 +2433,267 @@ function updateSubphoneStatus(json) {
     refreshActivityLog();
   } catch(e) {}
 }
+
+// ═══ 메인 PC 전원 (WoL + Shutdown) ═══
+var pcState = {
+  lastHb: 0,
+  cleanShutdown: false,
+  bootId: null,
+  relayTs: 0,
+  wakingUntil: 0,
+  fastUntil: 0,
+  state: 'UNKNOWN',
+  pollTimer: null,
+  hbTimer: null,
+  cdTimer: null
+};
+
+function pcRand6(){var s='';var c='abcdefghijklmnopqrstuvwxyz0123456789';for(var i=0;i<6;i++)s+=c.charAt(Math.floor(Math.random()*c.length));return s;}
+
+function pcRelTime(ms){
+  if(!ms)return '--';
+  var diff=Date.now()-ms;
+  if(diff<0)diff=0;
+  if(diff<10000)return '방금';
+  if(diff<60000)return Math.floor(diff/1000)+'초 전';
+  if(diff<3600000)return Math.floor(diff/60000)+'분 전';
+  if(diff<86400000)return Math.floor(diff/3600000)+'시간 전';
+  return Math.floor(diff/86400000)+'일 전';
+}
+
+function pcUpdateLastHb(){
+  var el=document.getElementById('pcLastHb');
+  if(!el)return;
+  if(pcState.cleanShutdown){el.textContent='정상 종료됨';return;}
+  if(!pcState.lastHb){el.textContent='박동 --';return;}
+  el.textContent='박동 '+pcRelTime(pcState.lastHb);
+}
+
+function pcApplyStatus(state){
+  pcState.state=state;
+  var pill=document.getElementById('pcStatusPill');
+  if(!pill)return;
+  pill.classList.remove('pc-pulse');
+  var bg='', bd='', cl='', tx='';
+  if(state==='ON'){tx='\u{1F7E2} ON';bg='rgba(46,204,113,.15)';bd='rgba(46,204,113,.40)';cl='#2ECC71';}
+  else if(state==='WAKING'){tx='⏳ 깨우는 중';bg='rgba(230,126,34,.14)';bd='rgba(230,126,34,.38)';cl='#E67E22';pill.classList.add('pc-pulse');}
+  else if(state==='STALE'){tx='\u{1F7E1} 느림';bg='rgba(230,126,34,.14)';bd='rgba(230,126,34,.38)';cl='#E67E22';}
+  else if(state==='OFF'){tx='⚪ OFF';bg='rgba(112,112,136,.12)';bd='rgba(112,112,136,.30)';cl='#9090A8';}
+  else {tx='-- 확인 중';bg='rgba(255,255,255,.06)';bd='rgba(255,255,255,.08)';cl='var(--text-muted)';}
+  pill.textContent=tx;
+  pill.style.background=bg;
+  pill.style.borderColor=bd;
+  pill.style.color=cl;
+}
+
+function pcUpdateRelayDot(){
+  var dot=document.getElementById('pcRelayDot');
+  if(!dot)return;
+  if(!pcState.relayTs){dot.className='dot dd';return;}
+  var ago=Date.now()-pcState.relayTs;
+  if(ago<=120000)dot.className='dot dg';
+  else if(ago<=600000)dot.className='dot do';
+  else dot.className='dot dr';
+}
+
+function pcEvalState(){
+  var now=Date.now();
+  if(pcState.wakingUntil && now < pcState.wakingUntil){
+    pcApplyStatus('WAKING');
+    return;
+  }
+  if(pcState.cleanShutdown===true){pcApplyStatus('OFF');return;}
+  if(!pcState.lastHb){pcApplyStatus('UNKNOWN');return;}
+  var d=now-pcState.lastHb;
+  if(d<=90000)pcApplyStatus('ON');
+  else if(d<=300000)pcApplyStatus('STALE');
+  else pcApplyStatus('OFF');
+}
+
+function pcSchedulePoll(){
+  if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+  var now=Date.now();
+  var interval=(pcState.fastUntil && now < pcState.fastUntil) ? 10000 : 60000;
+  pcState.pollTimer=setTimeout(pollPcPower, interval);
+}
+
+function pollPcPower(){
+  Promise.all([
+    fetch(FB+'/packhelper/heartbeat/main_pc.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch(FB+'/packhelper/heartbeat/wol_relay.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;})
+  ]).then(function(arr){
+    var mp=arr[0]||{}, wr=arr[1]||{};
+    var prevHb=pcState.lastHb;
+    var hb=(typeof mp.ts_epoch_ms==='number')?mp.ts_epoch_ms:0;
+    pcState.lastHb=hb;
+    pcState.cleanShutdown=(mp.clean_shutdown===true);
+    pcState.bootId=mp.boot_id||null;
+    pcState.relayTs=(typeof wr.ts_epoch_ms==='number')?wr.ts_epoch_ms:0;
+    // heartbeat 갱신 감지 시 waking 해제
+    if(pcState.wakingUntil && hb && hb > prevHb && (Date.now()-hb) <= 90000){
+      pcState.wakingUntil=0;
+      pcState.fastUntil=0;
+      pcResetButtons();
+    }
+    // 가속 종료 (만료)
+    if(pcState.fastUntil && Date.now() >= pcState.fastUntil){
+      pcState.fastUntil=0;
+    }
+    pcEvalState();
+    pcUpdateRelayDot();
+    pcUpdateLastHb();
+  }).catch(function(){
+    pcEvalState();
+  }).then(function(){
+    pcSchedulePoll();
+  });
+}
+
+function pcResetButtons(){
+  var b=document.getElementById('pcOnBtn');
+  if(b){b.textContent='켜기';b.style.opacity='';b.style.pointerEvents='';}
+}
+
+function pcOnClickWake(){
+  var btn=document.getElementById('pcOnBtn');
+  if(!btn)return;
+  // wol_relay 점이 회색이면 경고만 출력 (다이얼로그 없이)
+  var dot=document.getElementById('pcRelayDot');
+  if(dot && dot.classList.contains('dd')){
+    console.warn('[pcPower] wol_relay 비활성 — 명령은 보내지만 깨우지 못할 수 있음');
+  }
+  var now=Date.now();
+  var cmd={
+    cmd_id:'wol_'+now+'_'+pcRand6(),
+    action:'wake',
+    ts_ms:now,
+    expires_at:now+60000,
+    source:'posdelay_dash',
+    status:'pending'
+  };
+  fetch(FB+'/packhelper/wol_cmd/main_pc.json',{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(cmd)
+  }).catch(function(){});
+  btn.textContent='깨우는 중...';
+  btn.style.opacity='.45';
+  btn.style.pointerEvents='none';
+  pcState.wakingUntil=now+60000;
+  pcState.fastUntil=now+120000;
+  pcApplyStatus('WAKING');
+  // 가속 폴링 즉시 시작
+  if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+  setTimeout(pollPcPower, 1500);
+}
+
+function pcShowOverlay(html){
+  var ov=document.getElementById('pcOverlay');
+  if(!ov)return;
+  ov.innerHTML='<div class="pc-dialog">'+html+'</div>';
+  ov.classList.add('show');
+}
+function pcHideOverlay(){
+  var ov=document.getElementById('pcOverlay');
+  if(!ov)return;
+  ov.classList.remove('show');
+  ov.innerHTML='';
+  if(pcState.cdTimer){clearInterval(pcState.cdTimer);pcState.cdTimer=null;}
+}
+
+function pcOnClickShutdown(){
+  pcShowOverlay(
+    '<div class="pc-dialog-title">메인 PC 종료 확인</div>'+
+    '<div class="pc-dialog-msg">메인 PC를 끄시겠습니까?</div>'+
+    '<div class="pc-dialog-row">'+
+      '<button class="btn bn" id="pcCancel1">취소</button>'+
+      '<button class="btn bred" id="pcConfirm1">확인 → 계속</button>'+
+    '</div>'
+  );
+  var c=document.getElementById('pcCancel1');
+  var k=document.getElementById('pcConfirm1');
+  if(c)c.addEventListener('click',pcHideOverlay);
+  if(k)k.addEventListener('click',pcShowCountdown);
+}
+
+function pcShowCountdown(){
+  pcShowOverlay(
+    '<div class="pc-dialog-title">PC를 종료합니다</div>'+
+    '<div class="pc-dialog-count" id="cdCountText">5초 후 명령 전송...</div>'+
+    '<button class="btn bn" id="pcCdCancel" style="width:100%; min-height:52px; font-size:14px; font-weight:700">취소</button>'
+  );
+  var cancel=document.getElementById('pcCdCancel');
+  if(cancel)cancel.addEventListener('click',pcHideOverlay);
+  var remain=5;
+  if(pcState.cdTimer)clearInterval(pcState.cdTimer);
+  pcState.cdTimer=setInterval(function(){
+    remain--;
+    var el=document.getElementById('cdCountText');
+    if(remain>0){
+      if(el)el.textContent=remain+'초 후 명령 전송...';
+    } else {
+      clearInterval(pcState.cdTimer);
+      pcState.cdTimer=null;
+      pcSendShutdown();
+    }
+  },1000);
+}
+
+function pcSendShutdown(){
+  var now=Date.now();
+  // 최신 boot_id 확보 후 명령 PUT
+  fetch(FB+'/packhelper/heartbeat/main_pc.json',{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .catch(function(){return null;})
+    .then(function(mp){
+      var target=(mp&&mp.boot_id)?mp.boot_id:(pcState.bootId||null);
+      var cmd={
+        cmd_id:'shdn_'+now+'_'+pcRand6(),
+        action:'shutdown',
+        ts_ms:now,
+        expires_at:now+60000,
+        boot_id_target:target,
+        source:'posdelay_dash',
+        status:'pending'
+      };
+      fetch(FB+'/packhelper/shutdown_cmd/main_pc.json',{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(cmd)
+      }).catch(function(){});
+      pcHideOverlay();
+      var btn=document.getElementById('pcOffBtn');
+      if(btn){
+        btn.style.opacity='.45';
+        btn.style.pointerEvents='none';
+        setTimeout(function(){btn.style.opacity='';btn.style.pointerEvents='';},30000);
+      }
+      pcState.fastUntil=Date.now()+120000;
+      if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+      setTimeout(pollPcPower,1500);
+    });
+}
+
+// overlay/이벤트/폴링 부팅
+(function pcBootstrap(){
+  if(!document.getElementById('pcOverlay')){
+    var ov=document.createElement('div');
+    ov.id='pcOverlay';
+    ov.className='pc-overlay';
+    ov.addEventListener('click',function(e){if(e.target===ov)pcHideOverlay();});
+    document.body.appendChild(ov);
+  }
+  var on=document.getElementById('pcOnBtn');
+  var off=document.getElementById('pcOffBtn');
+  if(on)on.addEventListener('click',pcOnClickWake);
+  if(off)off.addEventListener('click',pcOnClickShutdown);
+  // 1분 주기 상대시간 갱신
+  if(pcState.hbTimer)clearInterval(pcState.hbTimer);
+  pcState.hbTimer=setInterval(pcUpdateLastHb,60000);
+  // 초기 폴링
+  pcApplyStatus('UNKNOWN');
+  setTimeout(pollPcPower,1200);
+})();
 </script>
 </body>
 </html>
