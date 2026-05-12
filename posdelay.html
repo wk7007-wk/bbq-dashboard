@@ -2517,6 +2517,16 @@ function pcSchedulePoll(){
   pcState.pollTimer=setTimeout(pollPcPower, interval);
 }
 
+function pcTryNativeWake(target){
+  if(typeof NativeBridge==='undefined' || !NativeBridge.wakeMainPc || !target || !target.mac) return false;
+  try {
+    return !!NativeBridge.wakeMainPc(String(target.mac||''), String(target.ip||''));
+  } catch (e) {
+    console.warn('[pcPower] native wake 실패', e);
+    return false;
+  }
+}
+
 function pollPcPower(){
   Promise.all([
     fetch(FB+'/packhelper/heartbeat/main_pc.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;}),
@@ -2528,7 +2538,7 @@ function pollPcPower(){
     pcState.lastHb=hb;
     pcState.cleanShutdown=(mp.clean_shutdown===true);
     pcState.bootId=mp.boot_id||null;
-    pcState.relayTs=(typeof wr.ts_epoch_ms==='number')?wr.ts_epoch_ms:0;
+    pcState.relayTs=(typeof wr.ts_epoch_ms==='number')?wr.ts_epoch_ms:((typeof wr.ts_ms==='number')?wr.ts_ms:0);
     // heartbeat 갱신 감지 시 waking 해제
     if(pcState.wakingUntil && hb && hb > prevHb && (Date.now()-hb) <= 90000){
       pcState.wakingUntil=0;
@@ -2582,6 +2592,10 @@ function pcOnClickWake(){
   pcState.wakingUntil=now+60000;
   pcState.fastUntil=now+120000;
   pcApplyStatus('WAKING');
+  fetch(FB+'/packhelper/wol_targets/main_pc.json',{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(target){ pcTryNativeWake(target||null); })
+    .catch(function(){});
   // 가속 폴링 즉시 시작
   if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
   setTimeout(pollPcPower, 1500);
