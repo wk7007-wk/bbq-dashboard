@@ -632,9 +632,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sec" style="color:var(--c-coupang)">쿠팡이츠</div>
     <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_coupang_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_coupang_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
-    <div style="padding:4px 0">
-      <div class="sr"><span class="sl">사용</span><div class="sv"><div class="tog" id="tog_policy_enabled" onclick="togStop()"></div><span id="tog_policy_enabled_label" style="font-size:11px;color:var(--text-secondary);margin-left:6px">대기</span></div></div>
-    </div>
     <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
       <button class="btn bs bg" onclick="savePolicySettings()">저장</button>
     </div>
@@ -1862,13 +1859,8 @@ function syncPolicySummary() {
   if(stopSummary)stopSummary.textContent=policySettings.enabled
     ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
     : 'OFF';
-  var toggles=['tog_stop','tog_policy_enabled'];
-  toggles.forEach(function(id){
-    var el=document.getElementById(id);
-    if(el)el.classList.toggle('on',!!policySettings.enabled);
-  });
-  var togLabel=document.getElementById('tog_policy_enabled_label');
-  if(togLabel)togLabel.textContent=policySettings.enabled?'ON':'OFF';
+  var stopTog=document.getElementById('tog_stop');
+  if(stopTog)stopTog.classList.toggle('on',!!policySettings.enabled);
 }
 
 function applyPolicySettingsToUI() {
