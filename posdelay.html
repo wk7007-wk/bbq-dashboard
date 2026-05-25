@@ -597,6 +597,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="ch" onclick="togCB('auto_accept_body')">
     <div class="row">
       <span style="font-size:12px;font-weight:600;color:var(--c-mid)">자동수락</span>
+      <div class="tog" id="tog_auto_accept" onclick="event.stopPropagation();togAutoAccept()"></div>
     </div>
     <span id="autoAcceptSummary" class="acc-summary"></span>
     <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
@@ -627,7 +628,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sec" style="color:var(--c-baemin)">배민1</div>
     <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_baemin1_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_baemin1_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
-    <div class="sr"><span class="sl">일시중지</span><div class="sv"><input type="text" id="policy_baemin1_duration" style="width:90px" placeholder="3시간"></div></div>
+    <div class="sr"><span class="sl">일시중지</span><div class="sv"><span style="font-size:12px;color:var(--c-mid);font-weight:700">30분</span><input type="hidden" id="policy_baemin1_duration" value="30분"></div></div>
     <div class="sec" style="color:var(--c-coupang)">쿠팡이츠</div>
     <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_coupang_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_coupang_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
@@ -1839,19 +1840,24 @@ document.addEventListener('visibilitychange',()=>{
 let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false, threshold_stop:15};
 let policySettings = {
   enabled:false,
+  auto_accept_enabled:true,
   threshold_20:0,
   threshold_30:4,
   threshold_25:2,
   baemin1_pause_at:10,
   baemin1_resume_at:2,
-  baemin1_pause_duration:'3시간',
+  baemin1_pause_duration:'30분',
   coupang_pause_at:12,
   coupang_resume_at:3
 };
 
 function syncPolicySummary() {
   var autoSummary=document.getElementById('autoAcceptSummary');
-  if(autoSummary)autoSummary.textContent='20분 '+policySettings.threshold_20+'건 · 25분 '+policySettings.threshold_25+'건 · 30분 '+policySettings.threshold_30+'건';
+  if(autoSummary)autoSummary.textContent=policySettings.auto_accept_enabled
+    ? '20분 '+policySettings.threshold_20+'건 · 25분 '+policySettings.threshold_25+'건 · 30분 '+policySettings.threshold_30+'건'
+    : 'OFF';
+  var autoTog=document.getElementById('tog_auto_accept');
+  if(autoTog)autoTog.classList.toggle('on',!!policySettings.auto_accept_enabled);
   var stopSummary=document.getElementById('stopSummary');
   if(stopSummary)stopSummary.textContent=policySettings.enabled
     ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
@@ -1904,46 +1910,49 @@ function loadPolicySettings() {
   } catch(e) {}
 }
 
-function savePolicySettings() {
+function savePolicySettings(silent) {
   if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
-    toast('앱 전용','warn');
-    return;
+    if(!silent)toast('앱 전용','warn');
+    return false;
   }
   var next = {
     enabled: !!policySettings.enabled,
+    auto_accept_enabled: !!policySettings.auto_accept_enabled,
     threshold_20: readPolicyInt('policy_threshold_20','20분 시작건수',0,999),
     threshold_30: readPolicyInt('policy_threshold_30','30분 시작건수',0,999),
     threshold_25: readPolicyInt('policy_threshold_25','25분 시작건수',0,999),
     baemin1_pause_at: readPolicyInt('policy_baemin1_pause','배민1 중지',1,100),
     baemin1_resume_at: readPolicyInt('policy_baemin1_resume','배민1 재개',0,99),
-    baemin1_pause_duration: (document.getElementById('policy_baemin1_duration')||{}).value || '',
+    baemin1_pause_duration: '30분',
     coupang_pause_at: readPolicyInt('policy_coupang_pause','쿠팡 중지',1,100),
     coupang_resume_at: readPolicyInt('policy_coupang_resume','쿠팡 재개',0,99)
   };
-  if(Object.keys(next).some(function(k){return next[k]===null;}))return;
+  if(Object.keys(next).some(function(k){return next[k]===null;}))return false;
   if(new Set([next.threshold_20,next.threshold_30,next.threshold_25]).size!==3){
-    toast('자동수락 시작건수는 서로 달라야 합니다','warn');
-    return;
+    if(!silent)toast('자동수락 시작건수는 서로 달라야 합니다','warn');
+    return false;
   }
   if(next.baemin1_pause_at<=next.baemin1_resume_at){
-    toast('배민1 중지값이 재개값보다 커야 합니다','warn');
-    return;
+    if(!silent)toast('배민1 중지값이 재개값보다 커야 합니다','warn');
+    return false;
   }
   if(next.coupang_pause_at<=next.coupang_resume_at){
-    toast('쿠팡 중지값이 재개값보다 커야 합니다','warn');
-    return;
+    if(!silent)toast('쿠팡 중지값이 재개값보다 커야 합니다','warn');
+    return false;
   }
   try {
     var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify(next));
     if(!ok){
-      toast('저장 실패','warn');
-      return;
+      if(!silent)toast('저장 실패','warn');
+      return false;
     }
     Object.assign(policySettings, next);
     applyPolicySettingsToUI();
-    toast('저장 완료','ok');
+    if(!silent)toast('저장 완료','ok');
+    return true;
   } catch(e) {
-    toast('저장 실패','warn');
+    if(!silent)toast('저장 실패','warn');
+    return false;
   }
 }
 
@@ -2024,8 +2033,29 @@ function togGate() {
 }
 
 function togStop() {
+  var prev = policySettings.enabled;
   policySettings.enabled = !policySettings.enabled;
   syncPolicySummary();
+  if(!savePolicySettings(true)){
+    policySettings.enabled = prev;
+    syncPolicySummary();
+    toast('저장 실패','warn');
+    return;
+  }
+  toast(policySettings.enabled?'자동중지 ON':'자동중지 OFF','ok');
+}
+
+function togAutoAccept() {
+  var prev = policySettings.auto_accept_enabled;
+  policySettings.auto_accept_enabled = !policySettings.auto_accept_enabled;
+  syncPolicySummary();
+  if(!savePolicySettings(true)){
+    policySettings.auto_accept_enabled = prev;
+    syncPolicySummary();
+    toast('저장 실패','warn');
+    return;
+  }
+  toast(policySettings.auto_accept_enabled?'자동수락 ON':'자동수락 OFF','ok');
 }
 
 function setFeeSource(src) {
