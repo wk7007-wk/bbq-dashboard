@@ -603,10 +603,18 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb" id="auto_accept_body">
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">30분 내 가게배달 프린터 활성건수 기준</div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">피크=일반, 피크 외=1인근무 · 30분 내 가게배달 프린터 활성건수 기준</div>
+    <div class="sec" style="color:var(--c-mid)">피크시간</div>
+    <div class="sr"><span class="sl">피크1</span><div class="sv"><input type="time" id="policy_peak1_start" style="width:82px"><span style="color:var(--text-secondary);font-size:10px">~</span><input type="time" id="policy_peak1_end" style="width:82px"></div></div>
+    <div class="sr"><span class="sl">피크2</span><div class="sv"><input type="time" id="policy_peak2_start" style="width:82px"><span style="color:var(--text-secondary);font-size:10px">~</span><input type="time" id="policy_peak2_end" style="width:82px"></div></div>
+    <div class="sec" style="color:var(--c-mid)">일반</div>
     <div class="sr"><span class="sl">20분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_threshold_20" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
     <div class="sr"><span class="sl">25분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_threshold_25" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
     <div class="sr"><span class="sl">30분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_threshold_30" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sec" style="color:var(--c-off)">1인근무</div>
+    <div class="sr"><span class="sl">20분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_one_threshold_20" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sr"><span class="sl">25분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_one_threshold_25" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sr"><span class="sl">30분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_one_threshold_30" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
     <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
       <button class="btn bs bg" onclick="savePolicySettings()">저장</button>
     </div>
@@ -624,14 +632,18 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="stopPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb" id="stop_body">
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">메인 PC 임계값 입력</div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">피크=일반, 피크 외=1인근무 · 메인 PC 임계값 입력</div>
     <div class="sec" style="color:var(--c-baemin)">배민1</div>
-    <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_baemin1_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
-    <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_baemin1_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">일반 중지</span><div class="sv"><input type="number" id="policy_baemin1_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">일반 재개</span><div class="sv"><input type="number" id="policy_baemin1_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">1인 중지</span><div class="sv"><input type="number" id="policy_baemin1_one_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">1인 재개</span><div class="sv"><input type="number" id="policy_baemin1_one_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="sr"><span class="sl">일시중지</span><div class="sv"><input type="text" id="policy_baemin1_duration" value="30분" readonly style="width:60px;text-align:center;color:var(--c-mid);font-weight:700"></div></div>
     <div class="sec" style="color:var(--c-coupang)">쿠팡이츠</div>
-    <div class="sr"><span class="sl">영업중지</span><div class="sv"><input type="number" id="policy_coupang_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
-    <div class="sr"><span class="sl">영업재개</span><div class="sv"><input type="number" id="policy_coupang_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">일반 중지</span><div class="sv"><input type="number" id="policy_coupang_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">일반 재개</span><div class="sv"><input type="number" id="policy_coupang_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">1인 중지</span><div class="sv"><input type="number" id="policy_coupang_one_pause" min="1" max="100" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">1인 재개</span><div class="sv"><input type="number" id="policy_coupang_one_resume" min="0" max="99" style="width:60px"><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
     <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
       <button class="btn bs bg" onclick="savePolicySettings()">저장</button>
     </div>
@@ -1838,26 +1850,39 @@ let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false, th
 let policySettings = {
   enabled:false,
   auto_accept_enabled:true,
+  time_mode_enabled:false,
+  peak1_start:'',
+  peak1_end:'',
+  peak2_start:'',
+  peak2_end:'',
   threshold_20:0,
   threshold_30:4,
   threshold_25:2,
+  one_threshold_20:0,
+  one_threshold_30:4,
+  one_threshold_25:2,
   baemin1_pause_at:10,
   baemin1_resume_at:2,
+  baemin1_one_pause_at:10,
+  baemin1_one_resume_at:2,
   baemin1_pause_duration:'30분',
   coupang_pause_at:12,
-  coupang_resume_at:3
+  coupang_resume_at:3,
+  coupang_one_pause_at:12,
+  coupang_one_resume_at:3
 };
 
 function syncPolicySummary() {
+  var peakLabel = policySettings.time_mode_enabled ? '피크설정' : '항상일반';
   var autoSummary=document.getElementById('autoAcceptSummary');
   if(autoSummary)autoSummary.textContent=policySettings.auto_accept_enabled
-    ? '30분활성 · 20분 '+policySettings.threshold_20+'건 · 25분 '+policySettings.threshold_25+'건 · 30분 '+policySettings.threshold_30+'건'
+    ? peakLabel+' · 일반 '+policySettings.threshold_25+'/'+policySettings.threshold_30+' · 1인 '+policySettings.one_threshold_25+'/'+policySettings.one_threshold_30
     : 'OFF';
   var autoTog=document.getElementById('tog_auto_accept');
   if(autoTog)autoTog.classList.toggle('on',!!policySettings.auto_accept_enabled);
   var stopSummary=document.getElementById('stopSummary');
   if(stopSummary)stopSummary.textContent=policySettings.enabled
-    ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
+    ? peakLabel+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
     : 'OFF';
   var stopTog=document.getElementById('tog_stop');
   if(stopTog)stopTog.classList.toggle('on',!!policySettings.enabled);
@@ -1865,14 +1890,25 @@ function syncPolicySummary() {
 
 function applyPolicySettingsToUI() {
   var pairs=[
+    ['policy_peak1_start',policySettings.peak1_start],
+    ['policy_peak1_end',policySettings.peak1_end],
+    ['policy_peak2_start',policySettings.peak2_start],
+    ['policy_peak2_end',policySettings.peak2_end],
     ['policy_threshold_20',policySettings.threshold_20],
     ['policy_threshold_30',policySettings.threshold_30],
     ['policy_threshold_25',policySettings.threshold_25],
+    ['policy_one_threshold_20',policySettings.one_threshold_20],
+    ['policy_one_threshold_30',policySettings.one_threshold_30],
+    ['policy_one_threshold_25',policySettings.one_threshold_25],
     ['policy_baemin1_pause',policySettings.baemin1_pause_at],
     ['policy_baemin1_resume',policySettings.baemin1_resume_at],
+    ['policy_baemin1_one_pause',policySettings.baemin1_one_pause_at],
+    ['policy_baemin1_one_resume',policySettings.baemin1_one_resume_at],
     ['policy_baemin1_duration',policySettings.baemin1_pause_duration],
     ['policy_coupang_pause',policySettings.coupang_pause_at],
-    ['policy_coupang_resume',policySettings.coupang_resume_at]
+    ['policy_coupang_resume',policySettings.coupang_resume_at],
+    ['policy_coupang_one_pause',policySettings.coupang_one_pause_at],
+    ['policy_coupang_one_resume',policySettings.coupang_one_resume_at]
   ];
   pairs.forEach(function(pair){
     var el=document.getElementById(pair[0]);
@@ -1893,11 +1929,39 @@ function readPolicyInt(id,label,min,max){
   return v;
 }
 
+function readPolicyTime(id){
+  var el=document.getElementById(id);
+  return el ? String(el.value||'').trim() : '';
+}
+
+function validatePeakPair(startId,endId,label){
+  var start=readPolicyTime(startId);
+  var end=readPolicyTime(endId);
+  if(!start && !end)return {ok:true,start:'',end:''};
+  if(!start || !end || start===end){
+    toast(label+' 시간 확인','warn');
+    return {ok:false,start:start,end:end};
+  }
+  return {ok:true,start:start,end:end};
+}
+
+function normalizePolicySettings() {
+  if(!policySettings.one_threshold_20 && policySettings.one_threshold_20!==0)policySettings.one_threshold_20=policySettings.threshold_20;
+  if(!policySettings.one_threshold_25 && policySettings.one_threshold_25!==0)policySettings.one_threshold_25=policySettings.threshold_25;
+  if(!policySettings.one_threshold_30 && policySettings.one_threshold_30!==0)policySettings.one_threshold_30=policySettings.threshold_30;
+  if(!policySettings.baemin1_one_pause_at)policySettings.baemin1_one_pause_at=policySettings.baemin1_pause_at;
+  if(policySettings.baemin1_one_resume_at===undefined||policySettings.baemin1_one_resume_at===null)policySettings.baemin1_one_resume_at=policySettings.baemin1_resume_at;
+  if(!policySettings.coupang_one_pause_at)policySettings.coupang_one_pause_at=policySettings.coupang_pause_at;
+  if(policySettings.coupang_one_resume_at===undefined||policySettings.coupang_one_resume_at===null)policySettings.coupang_one_resume_at=policySettings.coupang_resume_at;
+  policySettings.time_mode_enabled=!!(policySettings.peak1_start||policySettings.peak2_start);
+}
+
 function loadPolicySettings() {
   if(typeof NativeBridge==='undefined' || !NativeBridge.getPolicyConfig)return;
   try {
     var saved = JSON.parse(NativeBridge.getPolicyConfig()||'{}');
     Object.assign(policySettings, saved);
+    normalizePolicySettings();
     applyPolicySettingsToUI();
   } catch(e) {}
 }
@@ -1907,29 +1971,57 @@ function savePolicySettings(silent) {
     if(!silent)toast('앱 전용','warn');
     return false;
   }
+  var peak1=validatePeakPair('policy_peak1_start','policy_peak1_end','피크1');
+  if(!peak1.ok)return false;
+  var peak2=validatePeakPair('policy_peak2_start','policy_peak2_end','피크2');
+  if(!peak2.ok)return false;
   var next = {
     enabled: !!policySettings.enabled,
     auto_accept_enabled: !!policySettings.auto_accept_enabled,
+    time_mode_enabled: !!(peak1.start || peak2.start),
+    peak1_start: peak1.start,
+    peak1_end: peak1.end,
+    peak2_start: peak2.start,
+    peak2_end: peak2.end,
     threshold_20: readPolicyInt('policy_threshold_20','가게배달 20분 시작건수',0,999),
     threshold_30: readPolicyInt('policy_threshold_30','가게배달 30분 시작건수',0,999),
     threshold_25: readPolicyInt('policy_threshold_25','가게배달 25분 시작건수',0,999),
+    one_threshold_20: readPolicyInt('policy_one_threshold_20','1인 가게배달 20분 시작건수',0,999),
+    one_threshold_30: readPolicyInt('policy_one_threshold_30','1인 가게배달 30분 시작건수',0,999),
+    one_threshold_25: readPolicyInt('policy_one_threshold_25','1인 가게배달 25분 시작건수',0,999),
     baemin1_pause_at: readPolicyInt('policy_baemin1_pause','배민1 중지',1,100),
     baemin1_resume_at: readPolicyInt('policy_baemin1_resume','배민1 재개',0,99),
+    baemin1_one_pause_at: readPolicyInt('policy_baemin1_one_pause','1인 배민1 중지',1,100),
+    baemin1_one_resume_at: readPolicyInt('policy_baemin1_one_resume','1인 배민1 재개',0,99),
     baemin1_pause_duration: '30분',
     coupang_pause_at: readPolicyInt('policy_coupang_pause','쿠팡 중지',1,100),
-    coupang_resume_at: readPolicyInt('policy_coupang_resume','쿠팡 재개',0,99)
+    coupang_resume_at: readPolicyInt('policy_coupang_resume','쿠팡 재개',0,99),
+    coupang_one_pause_at: readPolicyInt('policy_coupang_one_pause','1인 쿠팡 중지',1,100),
+    coupang_one_resume_at: readPolicyInt('policy_coupang_one_resume','1인 쿠팡 재개',0,99)
   };
   if(Object.keys(next).some(function(k){return next[k]===null;}))return false;
   if(new Set([next.threshold_20,next.threshold_30,next.threshold_25]).size!==3){
     if(!silent)toast('가게배달 시간 시작건수는 서로 달라야 합니다','warn');
     return false;
   }
+  if(new Set([next.one_threshold_20,next.one_threshold_30,next.one_threshold_25]).size!==3){
+    if(!silent)toast('1인 가게배달 시작건수는 서로 달라야 합니다','warn');
+    return false;
+  }
   if(next.baemin1_pause_at<=next.baemin1_resume_at){
     if(!silent)toast('배민1 중지값이 재개값보다 커야 합니다','warn');
     return false;
   }
+  if(next.baemin1_one_pause_at<=next.baemin1_one_resume_at){
+    if(!silent)toast('1인 배민1 중지값이 재개값보다 커야 합니다','warn');
+    return false;
+  }
   if(next.coupang_pause_at<=next.coupang_resume_at){
     if(!silent)toast('쿠팡 중지값이 재개값보다 커야 합니다','warn');
+    return false;
+  }
+  if(next.coupang_one_pause_at<=next.coupang_one_resume_at){
+    if(!silent)toast('1인 쿠팡 중지값이 재개값보다 커야 합니다','warn');
     return false;
   }
   try {
@@ -2197,7 +2289,7 @@ function syncGateDashboardState() {
   if(gateSummary)gateSummary.textContent=feeCurrent.toLocaleString()+'원  임계'+threshold+'건';
   var stopSummary=document.getElementById('stopSummary');
   if(stopSummary)stopSummary.textContent=policySettings.enabled
-    ? '배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at
+    ? (policySettings.time_mode_enabled?'피크설정':'항상일반')+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
     : 'OFF';
   if(document.getElementById('groupSummary'))renderGroupSummary();
 }
