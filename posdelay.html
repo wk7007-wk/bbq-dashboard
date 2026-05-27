@@ -256,7 +256,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div id="heroCaptureTime" class="hero-meta">수집 --</div>
       </div>
       <div class="hero-panel">
-        <span class="hero-label">배달료</span>
+        <span class="hero-label">가게배달</span>
         <div class="hero-number-row"><span id="heroFeeCurrent" class="hero-number-sm">0원</span></div>
         <div id="heroFeeMode" class="hero-meta accent">OFF</div>
         <div class="hero-meta">설정 <span id="heroFeeThreshold">8건</span> · <span id="heroFeeValid">30분</span></div>
@@ -477,11 +477,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <span class="section-chip">Defense</span>
 </div>
-<!-- ═══ 3e. 배달료(게이트) 설정 ═══ -->
+<!-- ═══ 3e. 가게배달(게이트) 설정 ═══ -->
 <div class="card card-defense" id="gatePanel">
   <div class="ch" onclick="togCB('gate_body')">
     <div class="row">
-      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">배달료</span>
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">가게배달</span>
       <div class="tog" id="tog_gate" onclick="event.stopPropagation();togGate()"></div>
     </div>
     <span id="gateSummary" class="acc-summary"></span>
@@ -541,7 +541,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div style="display:flex;gap:8px;margin-bottom:6px">
       <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span>배달료</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span>가게배달</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
         <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_fee_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
       </div>
       <div style="flex:1">
@@ -596,17 +596,17 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 <div class="card card-control" id="autoAcceptPanel">
   <div class="ch" onclick="togCB('auto_accept_body')">
     <div class="row">
-      <span style="font-size:12px;font-weight:600;color:var(--c-mid)">자동수락</span>
+      <span style="font-size:12px;font-weight:600;color:var(--c-mid)">가게배달 시간</span>
       <div class="tog" id="tog_auto_accept" onclick="event.stopPropagation();togAutoAccept()"></div>
     </div>
     <span id="autoAcceptSummary" class="acc-summary"></span>
     <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb" id="auto_accept_body">
-    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">분 단위 자동수락 시작 건수 입력</div>
-    <div class="sr"><span class="sl">20분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">주문</span><input type="number" id="policy_threshold_20" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
-    <div class="sr"><span class="sl">25분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">주문</span><input type="number" id="policy_threshold_25" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
-    <div class="sr"><span class="sl">30분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">주문</span><input type="number" id="policy_threshold_30" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0 6px">30분 내 가게배달 프린터 활성건수 기준</div>
+    <div class="sr"><span class="sl">20분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_threshold_20" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sr"><span class="sl">25분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_threshold_25" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
+    <div class="sr"><span class="sl">30분 시작</span><div class="sv"><span style="color:var(--text-secondary);font-size:10px">활성</span><input type="number" id="policy_threshold_30" min="0" max="999" style="width:60px;text-align:center;margin:0 4px"><span style="color:var(--text-secondary);font-size:10px">건부터</span></div></div>
     <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
       <button class="btn bs bg" onclick="savePolicySettings()">저장</button>
     </div>
@@ -1290,7 +1290,7 @@ function renderGroupSummary(){
   // 배달료
   var feeThreshold=gateSettings.threshold||8;
   var baseFee=gateSettings.base||0;
-  items.push({name:'배달료',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
+  items.push({name:'가게배달',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
   var stopCount=gateSettings._stopSource==='PRINTER'?(gateSettings._validCount||0):c2;
@@ -1851,7 +1851,7 @@ let policySettings = {
 function syncPolicySummary() {
   var autoSummary=document.getElementById('autoAcceptSummary');
   if(autoSummary)autoSummary.textContent=policySettings.auto_accept_enabled
-    ? '20분 '+policySettings.threshold_20+'건 · 25분 '+policySettings.threshold_25+'건 · 30분 '+policySettings.threshold_30+'건'
+    ? '30분활성 · 20분 '+policySettings.threshold_20+'건 · 25분 '+policySettings.threshold_25+'건 · 30분 '+policySettings.threshold_30+'건'
     : 'OFF';
   var autoTog=document.getElementById('tog_auto_accept');
   if(autoTog)autoTog.classList.toggle('on',!!policySettings.auto_accept_enabled);
@@ -1910,9 +1910,9 @@ function savePolicySettings(silent) {
   var next = {
     enabled: !!policySettings.enabled,
     auto_accept_enabled: !!policySettings.auto_accept_enabled,
-    threshold_20: readPolicyInt('policy_threshold_20','20분 시작건수',0,999),
-    threshold_30: readPolicyInt('policy_threshold_30','30분 시작건수',0,999),
-    threshold_25: readPolicyInt('policy_threshold_25','25분 시작건수',0,999),
+    threshold_20: readPolicyInt('policy_threshold_20','가게배달 20분 시작건수',0,999),
+    threshold_30: readPolicyInt('policy_threshold_30','가게배달 30분 시작건수',0,999),
+    threshold_25: readPolicyInt('policy_threshold_25','가게배달 25분 시작건수',0,999),
     baemin1_pause_at: readPolicyInt('policy_baemin1_pause','배민1 중지',1,100),
     baemin1_resume_at: readPolicyInt('policy_baemin1_resume','배민1 재개',0,99),
     baemin1_pause_duration: '30분',
@@ -1921,7 +1921,7 @@ function savePolicySettings(silent) {
   };
   if(Object.keys(next).some(function(k){return next[k]===null;}))return false;
   if(new Set([next.threshold_20,next.threshold_30,next.threshold_25]).size!==3){
-    if(!silent)toast('자동수락 시작건수는 서로 달라야 합니다','warn');
+    if(!silent)toast('가게배달 시간 시작건수는 서로 달라야 합니다','warn');
     return false;
   }
   if(next.baemin1_pause_at<=next.baemin1_resume_at){
@@ -2047,7 +2047,7 @@ function togAutoAccept() {
     toast('저장 실패','warn');
     return;
   }
-  toast(policySettings.auto_accept_enabled?'자동수락 ON':'자동수락 OFF','ok');
+  toast(policySettings.auto_accept_enabled?'가게배달 시간 ON':'가게배달 시간 OFF','ok');
 }
 
 function setFeeSource(src) {
