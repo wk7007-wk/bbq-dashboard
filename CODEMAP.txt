@@ -25,5 +25,5 @@ bbq-dashboard — GitHub Pages 현황판
 - gateSettings : 배달료 조정 설정 (threshold/valid/fee/base)
   - threshold: min 1, max 50 (프린터 30분 활성건수 기준)
   - valid: min 10, max 60 분
-  - fee/base: min 0, max 4000 원, 500원 단위
+  - fee/base: min 0, max 4000 원, 500원 단위. threshold 이상은 fee, threshold 미만과 0건은 base 적용
 - adjGate(key, delta) : 게이트 값 조정 함수

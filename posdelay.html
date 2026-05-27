@@ -548,7 +548,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div class="compare-box" id="fee_current_status">
           <span class="compare-label">현재값</span>
           <span id="fee_current_value" class="compare-value">0원</span>
-          <span class="compare-sub"><span id="feeLiveState">OFF</span><br>인상 <span id="fee_set_up" style="color:var(--c-mid)">2,000</span>원 · 복원 <span id="fee_set_base" style="color:var(--c-on)">0</span>원</span>
+          <span class="compare-sub"><span id="feeLiveState">OFF</span><br>기준이상 <span id="fee_set_up" style="color:var(--c-mid)">2,000</span>원 · 미만/0건 <span id="fee_set_base" style="color:var(--c-on)">0</span>원</span>
         </div>
       </div>
       <div style="height:6px;background:var(--border);border-radius:3px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:3px;transition:width .4s"></div></div>
@@ -586,13 +586,13 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl" style="color:var(--c-mid)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 1건</span><span>max 50건</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>1건 이상부터 기준이상 금액</span><span>0건은 미만/0건 금액</span></div>
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:var(--c-mid);font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 10분</span><span>max 60분</span></div>
     </div>
-    <div style="padding:6px 0"><span class="sl">인상값</span>
+    <div style="padding:6px 0"><span class="sl">기준이상 금액</span>
       <div class="preset-grid" id="fee_presets">
         <button class="btn bs bn" onclick="setGateFee(0)">0</button>
         <button class="btn bs bn" onclick="setGateFee(500)">500</button>
@@ -605,11 +605,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bn" onclick="setGateFee(4000)">4,000</button>
       </div>
       <div style="display:flex;gap:4px;margin-top:6px">
-        <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">인상</button>
-        <button class="btn bs bg" onclick="manualDefense('fee_restore', 0)" id="btn_fee_restore">복원</button>
+        <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">기준값 적용</button>
+        <button class="btn bs bg" onclick="manualDefense('fee_restore', 0)" id="btn_fee_restore">미만값 적용</button>
       </div>
     </div>
-    <div style="padding:6px 0"><span class="sl">복원값</span>
+    <div style="padding:6px 0"><span class="sl">미만/0건 금액</span>
       <div class="preset-grid" id="base_presets">
         <button class="btn bs bn" onclick="setGateBase(0)">0</button>
         <button class="btn bs bn" onclick="setGateBase(500)">500</button>
@@ -1929,7 +1929,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ═══ 게이트(배달료) ═══
-let gateSettings = {threshold:8, valid:30, fee:4000, base:500, enabled:false, threshold_stop:15};
+let gateSettings = {threshold:8, valid:30, fee:4000, base:0, enabled:false, threshold_stop:15};
 let policySettings = {
   enabled:false,
   auto_accept_enabled:true,
