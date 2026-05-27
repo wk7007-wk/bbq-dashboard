@@ -4,7 +4,7 @@ bbq-dashboard — GitHub Pages 현황판
 ## 구조
 - index.html          : 메인 랜딩 (앱 진입 카드)
 - dashboard.html      : 통합 대시보드
-- posdelay.html       : PosDelay 현황판 (상단 카테고리, 가게배달/자동수락/영업정지 설정, 피크시간·1인근무 임계값 포함)
+- posdelay.html       : PosDelay 현황판 (상단 카테고리, 배달료 조정/운영모드/자동수락/영업정지 임계값 포함)
 - POSDELAY_UI_STANDARDS.md : PosDelay 화면 카테고리/자동저장/임계값 카드 추가 기준
 - kds.html            : PosKDS 현황판
 - banktotal.html      : BankTotal 현황판
@@ -22,9 +22,8 @@ bbq-dashboard — GitHub Pages 현황판
 - SSE 스트림 (실시간 갱신)
 
 ## posdelay.html 주요 섹션
-- gateSettings : 배달료 방어 게이트 설정 (threshold/valid/fee/base)
-  - threshold: min 0, max 50 (0건부터 발동 가능)
+- gateSettings : 배달료 조정 설정 (threshold/valid/fee/base)
+  - threshold: min 1, max 50 (프린터 30분 활성건수 기준)
   - valid: min 10, max 60 분
-  - fee: min 500, max 10000 원
-  - base: min 0, max 5000 원
+  - fee/base: min 0, max 4000 원, 500원 단위
 - adjGate(key, delta) : 게이트 값 조정 함수

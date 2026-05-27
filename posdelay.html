@@ -42,8 +42,8 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .text-xs{font-size:10px;}
 .note{font-size:10px;color:var(--text-muted);padding:4px 0;}
 .time-pill{display:inline-flex;align-items:center;justify-content:center;min-width:72px;min-height:44px;padding:0 12px;border-radius:10px;background:var(--bg-deep);border:1px solid var(--border);color:var(--text-bright);font-size:16px;font-weight:700;cursor:pointer;}
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:6px;padding-top:6px;}
-.summary-card{appearance:none;display:flex;flex-direction:column;gap:5px;width:100%;padding:8px;border-radius:10px;border:1px solid var(--border);background:rgba(18,18,37,.56);color:inherit;text-align:left;font:inherit;cursor:pointer;touch-action:manipulation;}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:5px;padding-top:6px;}
+.summary-card{appearance:none;display:flex;flex-direction:column;gap:4px;width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:rgba(18,18,37,.56);color:inherit;text-align:left;font:inherit;cursor:pointer;touch-action:manipulation;}
 .summary-card:active{transform:translateY(1px);border-color:rgba(255,255,255,.18);}
 .summary-card.off{opacity:.56;}
 .summary-head{display:flex;align-items:center;gap:6px;}
@@ -51,7 +51,7 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .summary-count{font-size:10px;font-weight:700;flex-shrink:0;}
 .summary-meter{height:5px;border-radius:999px;background:var(--border);overflow:hidden;}
 .summary-meter>span{display:block;height:100%;border-radius:999px;transition:width .3s;}
-.summary-detail{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.summary-detail{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .summary-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px;color:var(--text-muted);}
 .summary-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;font-size:10px;color:var(--text-muted);border-top:1px solid var(--bg-input);}
 .monitor-shell{display:flex;flex-direction:column;gap:8px;}
@@ -116,7 +116,7 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .card-control::before{background:linear-gradient(90deg,rgba(79,195,247,.14),rgba(79,195,247,.78),rgba(255,255,255,.08));}
 .card-ad::before,.card-delay::before{background:linear-gradient(90deg,rgba(42,193,188,.18),rgba(42,193,188,.92),rgba(255,255,255,.08));}
 .card-coupang::before{background:linear-gradient(90deg,rgba(255,215,0,.16),rgba(255,215,0,.92),rgba(255,255,255,.08));}
-.card-defense::before{background:linear-gradient(90deg,rgba(79,195,247,.2),rgba(79,195,247,.9),rgba(255,255,255,.08));}
+.card-fee::before{background:linear-gradient(90deg,rgba(79,195,247,.2),rgba(79,195,247,.9),rgba(255,255,255,.08));}
 .card-stop::before{background:linear-gradient(90deg,rgba(231,76,60,.18),rgba(231,76,60,.92),rgba(255,255,255,.08));}
 .card-diag::before{background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.22),rgba(255,255,255,.08));}
 .card-power::before{background:linear-gradient(90deg,rgba(124,111,224,.18),rgba(124,111,224,.88),rgba(79,195,247,.18));}
@@ -175,6 +175,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 .policy-num{width:58px!important;text-align:center!important;}
 .policy-time{width:88px!important;text-align:center!important;}
 .readonly-pill{width:62px!important;text-align:center!important;color:var(--c-mid)!important;}
+.preset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:4px;}
+.preset-grid .btn{min-height:38px;padding:6px 4px;}
 .nbtn{width:100%;padding:8px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;color:#FFF;margin-top:6px;touch-action:manipulation;}
 .alert{padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;display:none;}
 .alert.warn{background:#E74C3C33;border:1px solid #E74C3C;color:#E74C3C;display:block;}
@@ -508,16 +510,16 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 <div class="section-title">
   <div class="section-title-block">
     <span class="section-eyebrow">임계값</span>
-    <span class="section-heading">자동 방어 / 예측</span>
-    <span class="section-note">실제 건수와 설정 임계값을 같은 화면에서 비교하고 자동 방어 상태를 확인합니다.</span>
+    <span class="section-heading">배달료 조정 / 운영 임계값</span>
+    <span class="section-note">실제 건수와 설정 임계값을 같은 화면에서 비교하고 자동 조정 상태를 확인합니다.</span>
   </div>
-  <span class="section-chip">Defense</span>
+  <span class="section-chip">조정</span>
 </div>
-<!-- ═══ 3e. 가게배달(게이트) 설정 ═══ -->
-<div class="card card-defense" id="gatePanel">
+<!-- ═══ 3e. 배달료 조정 설정 ═══ -->
+<div class="card card-fee" id="gatePanel">
   <div class="ch" onclick="togCB('gate_body')">
     <div class="row">
-      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">가게배달</span>
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">배달료 조정</span>
       <div class="tog" id="tog_gate" onclick="event.stopPropagation();togGate()"></div>
     </div>
     <span id="gateSummary" class="acc-summary"></span>
@@ -569,11 +571,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       </div>
     </div>
     <div class="sr">
-      <span class="sl">소스</span>
-      <div class="sv" style="gap:4px">
-        <button class="btn bs" id="src_printer" onclick="setFeeSource('PRINTER')" style="background:var(--c-baemin);color:#FFF">프린터</button>
-        <button class="btn bs" id="src_kds" onclick="setFeeSource('KDS')" style="background:var(--bg-input);color:var(--text-bright)">KDS</button>
-      </div>
+      <span class="sl">기준</span>
+      <div class="sv"><span class="auto-save-note">프린터 30분 활성건수</span></div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:6px">
       <div style="flex:1">
@@ -587,24 +586,23 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl" style="color:var(--c-mid)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 0건</span><span>max 50건</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 1건</span><span>max 50건</span></div>
     </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:var(--c-mid);font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 10분</span><span>max 60분</span></div>
     </div>
     <div style="padding:6px 0"><span class="sl">인상값</span>
-      <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px" id="fee_presets">
+      <div class="preset-grid" id="fee_presets">
         <button class="btn bs bn" onclick="setGateFee(0)">0</button>
+        <button class="btn bs bn" onclick="setGateFee(500)">500</button>
         <button class="btn bs bn" onclick="setGateFee(1000)">1,000</button>
         <button class="btn bs bn" onclick="setGateFee(1500)">1,500</button>
-        <button class="btn bs bn" onclick="setGateFee(1600)">1,600</button>
-        <button class="btn bs bn" onclick="setGateFee(1700)">1,700</button>
-        <button class="btn bs bn" onclick="setGateFee(1800)">1,800</button>
-        <button class="btn bs bn" onclick="setGateFee(1900)">1,900</button>
         <button class="btn bs bn" onclick="setGateFee(2000)">2,000</button>
         <button class="btn bs bn" onclick="setGateFee(2500)">2,500</button>
         <button class="btn bs bn" onclick="setGateFee(3000)">3,000</button>
+        <button class="btn bs bn" onclick="setGateFee(3500)">3,500</button>
+        <button class="btn bs bn" onclick="setGateFee(4000)">4,000</button>
       </div>
       <div style="display:flex;gap:4px;margin-top:6px">
         <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">인상</button>
@@ -612,20 +610,42 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       </div>
     </div>
     <div style="padding:6px 0"><span class="sl">복원값</span>
-      <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px" id="base_presets">
+      <div class="preset-grid" id="base_presets">
         <button class="btn bs bn" onclick="setGateBase(0)">0</button>
         <button class="btn bs bn" onclick="setGateBase(500)">500</button>
         <button class="btn bs bn" onclick="setGateBase(1000)">1,000</button>
         <button class="btn bs bn" onclick="setGateBase(1500)">1,500</button>
-        <button class="btn bs bn" onclick="setGateBase(1600)">1,600</button>
-        <button class="btn bs bn" onclick="setGateBase(1700)">1,700</button>
-        <button class="btn bs bn" onclick="setGateBase(1800)">1,800</button>
-        <button class="btn bs bn" onclick="setGateBase(1900)">1,900</button>
         <button class="btn bs bn" onclick="setGateBase(2000)">2,000</button>
+        <button class="btn bs bn" onclick="setGateBase(2500)">2,500</button>
+        <button class="btn bs bn" onclick="setGateBase(3000)">3,000</button>
+        <button class="btn bs bn" onclick="setGateBase(3500)">3,500</button>
+        <button class="btn bs bn" onclick="setGateBase(4000)">4,000</button>
       </div>
     </div>
     <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
     <div id="gate_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:var(--c-mid)"></div>
+  </div>
+</div>
+
+<!-- ═══ 운영모드 / 피크시간 ═══ -->
+<div class="card card-control" id="timeModePanel">
+  <div class="ch" onclick="togCB('time_mode_body')">
+    <div class="row">
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">운영모드</span>
+    </div>
+    <span id="timeModeSummary" class="acc-summary"></span>
+    <span id="timeModePanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
+  </div>
+  <div class="cb settings-panel" id="time_mode_body">
+    <div class="setting-hint">피크시간 안은 일반, 밖은 1인근무 임계값을 자동수락과 영업정지에 같이 적용합니다.</div>
+    <div class="settings-block">
+      <div class="settings-title"><span>피크시간</span><small>일반 임계값 적용</small></div>
+      <div class="policy-row"><span class="policy-label">피크1</span><div class="policy-control"><input type="time" id="policy_peak1_start" class="policy-time"><span>~</span><input type="time" id="policy_peak1_end" class="policy-time"></div></div>
+      <div class="policy-row"><span class="policy-label">피크2</span><div class="policy-control"><input type="time" id="policy_peak2_start" class="policy-time"><span>~</span><input type="time" id="policy_peak2_end" class="policy-time"></div></div>
+    </div>
+    <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
+      <span class="auto-save-note policy-save-state">자동저장</span>
+    </div>
   </div>
 </div>
 
@@ -640,12 +660,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb settings-panel" id="auto_accept_body">
-    <div class="setting-hint">피크시간 안은 일반, 밖은 1인근무 · 30분 내 가게배달 프린터 활성건수 기준</div>
-    <div class="settings-block">
-      <div class="settings-title"><span>피크시간</span><small>일반 임계값 적용</small></div>
-      <div class="policy-row"><span class="policy-label">피크1</span><div class="policy-control"><input type="time" id="policy_peak1_start" class="policy-time"><span>~</span><input type="time" id="policy_peak1_end" class="policy-time"></div></div>
-      <div class="policy-row"><span class="policy-label">피크2</span><div class="policy-control"><input type="time" id="policy_peak2_start" class="policy-time"><span>~</span><input type="time" id="policy_peak2_end" class="policy-time"></div></div>
-    </div>
+    <div class="setting-hint">30분 내 가게배달 프린터 활성건수 기준 · 운영모드 카드의 피크시간을 같이 사용합니다.</div>
     <div class="threshold-grid">
       <div class="threshold-card">
         <div class="threshold-title">일반</div>
@@ -1300,6 +1315,8 @@ function expandCardForSummary(cardId){
     baeminDelayCard:{body:'bdlB',mode:'togSec'},
     coupangDelayCard:{body:'cdlB',mode:'togSec'},
     gatePanel:{body:'gate_body',mode:'togCB'},
+    timeModePanel:{body:'time_mode_body',mode:'togCB'},
+    autoAcceptPanel:{body:'auto_accept_body',mode:'togCB'},
     stopPanel:{body:'stop_body',mode:'togCB'},
     diagCard:{body:'diagB',mode:'togSec'}
   };
@@ -1361,7 +1378,7 @@ function renderGroupSummary(){
   // 배달료
   var feeThreshold=gateSettings.threshold||8;
   var baseFee=gateSettings.base||0;
-  items.push({name:'가게배달',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
+  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
   var stopCount=gateSettings._stopSource==='PRINTER'?(gateSettings._validCount||0):c2;
@@ -1369,6 +1386,13 @@ function renderGroupSummary(){
   // 즉시할인
   var discCur=g(S,'baemin_discount_current',0);
   items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0,detail:discCur===-1?'배달팁':discCur>0?discCur.toLocaleString()+'원':'OFF',card:'discountCard'});
+  items.sort(function(a,b){
+    var ao=a.on?1:0, bo=b.on?1:0;
+    if(ao!==bo)return bo-ao;
+    var ae=a.exceeded?1:0, be=b.exceeded?1:0;
+    if(ae!==be)return be-ae;
+    return 0;
+  });
   var h='';
   items.forEach(function(it){
     var hasGauge=it.threshold!=null;
@@ -1583,12 +1607,12 @@ function sLt(tab,el){
 function togSec(id){const e=document.getElementById(id),o=e.classList.toggle('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML=o?'&#9660;':'&#9654;';if(id==='diagB'&&o)setTimeout(drawChart,100);try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');if(o)delete c[id];else c[id]=1;localStorage.setItem('_collapsed',JSON.stringify(c));}catch(e){}}
 // 수동 접기 복원 (togSec 계열: adB, dlB, diagB)
 try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');Object.keys(c).forEach(id=>{const e=document.getElementById(id);if(e){e.classList.remove('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML='&#9654;';}});}catch(e){}
-// togCB 계열 접힘 복원 (gate_body, stop_body)
-try{var cbc=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');Object.keys(cbc).forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('open');var am={gate_body:'gatePanelArrow',stop_body:'stopPanelArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}});}catch(e){}
+// togCB 계열 접힘 복원
+try{var cbc=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');Object.keys(cbc).forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('open');var am={gate_body:'gatePanelArrow',time_mode_body:'timeModePanelArrow',auto_accept_body:'autoAcceptPanelArrow',stop_body:'stopPanelArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}});}catch(e){}
 // 기본 접힘: 최초 방문 시 (사용자가 한번도 열지 않은 섹션)
 (function(){
   var defaults_togSec=['adB','bdlB','cdlB','cadB','diagB','schB'];
-  var defaults_togCB=['gate_body','stop_body'];
+  var defaults_togCB=['gate_body','time_mode_body','auto_accept_body','stop_body'];
   try{var c=JSON.parse(localStorage.getItem('_collapsed')||'{}');
   defaults_togSec.forEach(function(id){
     var e=document.getElementById(id);if(!e)return;
@@ -1599,7 +1623,7 @@ try{var cbc=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');Object.keys(
   try{var cb=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');
   defaults_togCB.forEach(function(id){
     var e=document.getElementById(id);if(!e)return;
-    if(cb[id]===undefined){e.classList.remove('open');var am={gate_body:'gatePanelArrow',stop_body:'stopPanelArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}}
+    if(cb[id]===undefined){e.classList.remove('open');var am={gate_body:'gatePanelArrow',time_mode_body:'timeModePanelArrow',auto_accept_body:'autoAcceptPanelArrow',stop_body:'stopPanelArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}}
   });}catch(ex){}
 })();
 function fmtHM(dt){return dt.getHours()+'시'+String(dt.getMinutes()).padStart(2,'0')+'분';}
@@ -1933,6 +1957,13 @@ let policySettings = {
 
 function syncPolicySummary() {
   var peakLabel = policySettings.time_mode_enabled ? '피크설정' : '항상일반';
+  var timeSummary=document.getElementById('timeModeSummary');
+  if(timeSummary){
+    var ranges=[];
+    if(policySettings.peak1_start&&policySettings.peak1_end)ranges.push(policySettings.peak1_start+'~'+policySettings.peak1_end);
+    if(policySettings.peak2_start&&policySettings.peak2_end)ranges.push(policySettings.peak2_start+'~'+policySettings.peak2_end);
+    timeSummary.textContent=ranges.length?ranges.join(' · '):'항상일반';
+  }
   var autoSummary=document.getElementById('autoAcceptSummary');
   if(autoSummary)autoSummary.textContent=policySettings.auto_accept_enabled
     ? peakLabel+' · 일반 '+policySettings.threshold_25+'/'+policySettings.threshold_30+' · 1인 '+policySettings.one_threshold_25+'/'+policySettings.one_threshold_30
@@ -2133,12 +2164,28 @@ function savePolicySettings(silent) {
   }
 }
 
+const FEE_MIN=0, FEE_MAX=4000, FEE_STEP=500;
+function clampFeeValue(value){
+  var n=parseInt(value,10);
+  if(!Number.isFinite(n))n=0;
+  n=Math.max(FEE_MIN,Math.min(FEE_MAX,n));
+  return Math.round(n/FEE_STEP)*FEE_STEP;
+}
+function clampFeeThreshold(value){
+  var n=parseInt(value,10);
+  if(!Number.isFinite(n))n=8;
+  return Math.max(1,Math.min(50,n));
+}
+
 // 페이지 로드 시 Kotlin에서 저장된 설정 복원
 try {
   if (typeof NativeBridge !== 'undefined' && NativeBridge.getGateSettings) {
     var saved = JSON.parse(NativeBridge.getGateSettings());
     Object.assign(gateSettings, saved);
-    if(saved.activeTab)gateSettings._activeTab=saved.activeTab;
+    gateSettings.threshold = clampFeeThreshold(gateSettings.threshold);
+    gateSettings.fee = clampFeeValue(gateSettings.fee);
+    gateSettings.base = clampFeeValue(gateSettings.base);
+    gateSettings._activeTab='PRINTER';
     if(saved.stopSource)gateSettings._stopSource=saved.stopSource;
     if(saved.stopEnabled!==undefined)gateSettings._stopEnabled=!!saved.stopEnabled;
     // UI 즉시 반영
@@ -2148,13 +2195,7 @@ try {
     var stopDispInit=document.getElementById('stop_threshold_disp');
     if(stopDispInit)stopDispInit.textContent=(gateSettings.threshold_stop||15)+'건';
     document.getElementById('feeThresholdNum').textContent = gateSettings.threshold;
-    if(saved.activeTab) {
-      gateSettings._activeTab = saved.activeTab;
-      // 소스 선택 버튼 복원 + 배달료 탭 전환
-      setTimeout(function(){
-        setFeeSource(saved.activeTab);
-      }, 300);
-    }
+    setTimeout(function(){setFeeSource('PRINTER');}, 300);
     document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
     syncGatePriceDisplay();
     syncGateDashboardState();
@@ -2167,10 +2208,10 @@ try {
 } catch(e) {}
 
 function adjGate(key, delta) {
-  if (key==='threshold') { gateSettings.threshold = Math.max(0, Math.min(50, gateSettings.threshold+delta)); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
+  if (key==='threshold') { gateSettings.threshold = clampFeeThreshold((gateSettings.threshold||8)+delta); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
   if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
-  if (key==='fee') { gateSettings.fee = Math.max(500, Math.min(10000, gateSettings.fee+delta)); syncGatePriceDisplay(); }
-  if (key==='base') { gateSettings.base = Math.max(0, Math.min(5000, gateSettings.base+delta)); syncGatePriceDisplay(); }
+  if (key==='fee') { gateSettings.fee = clampFeeValue((gateSettings.fee||0)+delta); syncGatePriceDisplay(); }
+  if (key==='base') { gateSettings.base = clampFeeValue((gateSettings.base||0)+delta); syncGatePriceDisplay(); }
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
@@ -2187,26 +2228,26 @@ function adjStop(key, delta) {
 }
 
 function setGateFee(v) {
-  gateSettings.fee = v;
+  gateSettings.fee = clampFeeValue(v);
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 function setGateBase(v) {
-  gateSettings.base = v;
+  gateSettings.base = clampFeeValue(v);
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 
 function togGate() {
-  // 배달료 방어 ON/OFF
+  // 배달료 조정 ON/OFF
   gateSettings.enabled = !gateSettings.enabled;
-  if (gateSettings.enabled && !gateSettings._activeTab) gateSettings._activeTab = 'PRINTER';
+  gateSettings._activeTab = 'PRINTER';
   var el = document.getElementById('tog_gate');
   if(el) el.classList.toggle('on', gateSettings.enabled);
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: gateSettings._activeTab}));
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: 'PRINTER'}));
 }
 
 function togStop() {
@@ -2236,9 +2277,9 @@ function togAutoAccept() {
 }
 
 function setFeeSource(src) {
-  gateSettings._activeTab = src;
+  gateSettings._activeTab = 'PRINTER';
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: src}));
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: 'PRINTER'}));
 }
 
 function setStopSource(src) {
@@ -2262,7 +2303,7 @@ function togCB(id) {
   if(!e) return;
   const isOpen = e.classList.toggle('open');
   // 화살표 업데이트
-  var arrowMap = {gate_body:'gatePanelArrow', auto_accept_body:'autoAcceptPanelArrow', stop_body:'stopPanelArrow'};
+  var arrowMap = {gate_body:'gatePanelArrow', time_mode_body:'timeModePanelArrow', auto_accept_body:'autoAcceptPanelArrow', stop_body:'stopPanelArrow'};
   var arrId = arrowMap[id];
   if(arrId) { var arr = document.getElementById(arrId); if(arr) arr.innerHTML = isOpen ? '&#9660;' : '&#9654;'; }
   // 접힘 상태 localStorage 저장
@@ -2316,23 +2357,24 @@ function getOrderElapsedColor(elapsed){
   return elapsed>=25?'#E74C3C':elapsed>=15?'#E67E22':'#9090A8';
 }
 function syncGateDashboardState() {
+  gateSettings.threshold=clampFeeThreshold(gateSettings.threshold);
+  gateSettings.fee=clampFeeValue(gateSettings.fee);
+  gateSettings.base=clampFeeValue(gateSettings.base);
+  gateSettings._activeTab='PRINTER';
   var threshold=gateSettings.threshold||8;
   var valid=gateSettings.valid||30;
   var validCount=gateSettings._validCount||0;
   var stopThreshold=gateSettings.threshold_stop||15;
   var stopCount=gateSettings._stopCount||0;
-  var activeTab=gateSettings._activeTab||'PRINTER';
   var stopMode=gateSettings._stopSource||'KDS';
-  var feeSource=activeTab==='KDS'?'KDS':'프린터';
+  var feeSource='프린터';
   var stopSource=stopMode==='PRINTER'?'프린터':'KDS';
   var feeRemain=Math.max(0,threshold-validCount);
   var stopRemain=Math.max(0,stopThreshold-stopCount);
   var feeCurrent=(gateSettings._stopDefending?(gateSettings.base||0):(gateSettings._isFeeDefending?(gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:(gateSettings.fee||0)):(gateSettings.base||0)))||0;
   var feeState=gateSettings._stopDefending?'정지중':gateSettings._isFeeDefending?'변경중':gateSettings.enabled?'ON':'OFF';
   var feePrinter=document.getElementById('src_printer');
-  var feeKds=document.getElementById('src_kds');
-  if(feePrinter){feePrinter.style.background=activeTab==='PRINTER'?'#2AC1BC':'#2A2A45';feePrinter.style.color=activeTab==='PRINTER'?'#FFF':'#E0E0EC';}
-  if(feeKds){feeKds.style.background=activeTab==='KDS'?'#2AC1BC':'#2A2A45';feeKds.style.color=activeTab==='KDS'?'#FFF':'#E0E0EC';}
+  if(feePrinter){feePrinter.style.background='#2AC1BC';feePrinter.style.color='#FFF';}
   var stopPrinter=document.getElementById('stop_src_printer');
   var stopKds=document.getElementById('stop_src_kds');
   if(stopPrinter){stopPrinter.style.background=stopMode==='PRINTER'?'#2AC1BC':'#2A2A45';stopPrinter.style.color=stopMode==='PRINTER'?'#FFF':'#E0E0EC';}
@@ -2389,10 +2431,16 @@ function syncGateDashboardState() {
 function renderFeeOrderList(orders){
   var list=document.getElementById('feeOrderList');
   if(!list)return;
+  var wrap=document.getElementById('feeOrderListWrap');
+  var expandBtn=document.getElementById('feeExpandBtn');
   if(!orders.length){
-    list.innerHTML='<div class="order-empty">대기</div>';
+    list.innerHTML='<div class="order-empty">주문 없음</div>';
+    if(wrap)wrap.style.maxHeight='40px';
+    if(expandBtn)expandBtn.style.display='none';
     return;
   }
+  if(wrap)wrap.style.maxHeight=_feeListOpen?(_feeListExpanded?'800px':'160px'):'0px';
+  if(expandBtn)expandBtn.style.display=_feeListOpen?'':'none';
   var html='';
   var validLimit=gateSettings.valid||30;
   orders.slice().sort(function(a,b){return (b.elapsed||0)-(a.elapsed||0);}).forEach(function(order){
@@ -2466,7 +2514,10 @@ function onGateSettingsUpdate(json) {
   try {
     const s = JSON.parse(json);
     gateSettings = Object.assign(gateSettings, s);
-    if(s.activeTab)gateSettings._activeTab=s.activeTab;
+    gateSettings.threshold=clampFeeThreshold(gateSettings.threshold);
+    gateSettings.fee=clampFeeValue(gateSettings.fee);
+    gateSettings.base=clampFeeValue(gateSettings.base);
+    gateSettings._activeTab='PRINTER';
     if(s.stopSource)gateSettings._stopSource=s.stopSource;
     if(s.stopEnabled!==undefined)gateSettings._stopEnabled=!!s.stopEnabled;
     if(s.threshold!=null){var gateThreshold=document.getElementById('gate_threshold');if(gateThreshold)gateThreshold.textContent=s.threshold+'건';var feeThreshold=document.getElementById('feeThresholdNum');if(feeThreshold)feeThreshold.textContent=s.threshold;}
@@ -2494,8 +2545,8 @@ function onGateStatusUpdate(jsonStr) {
   try {
     var s = JSON.parse(jsonStr);
     // gateSettings 동기화 (새로고침 후 복원)
-    if(s.thresholdFee) { gateSettings.threshold = s.thresholdFee; var el=document.getElementById('gate_threshold'); if(el) el.textContent=s.thresholdFee+'건'; }
-    if(s.thresholdFee) { var el3=document.getElementById('feeThresholdNum'); if(el3) el3.textContent=s.thresholdFee; }
+    if(s.thresholdFee) { gateSettings.threshold = clampFeeThreshold(s.thresholdFee); var el=document.getElementById('gate_threshold'); if(el) el.textContent=gateSettings.threshold+'건'; }
+    if(s.thresholdFee) { var el3=document.getElementById('feeThresholdNum'); if(el3) el3.textContent=gateSettings.threshold; }
     if(s.thresholdStop) {
       gateSettings.threshold_stop = s.thresholdStop;
       var el2=document.getElementById('stop_threshold');
@@ -2503,11 +2554,11 @@ function onGateStatusUpdate(jsonStr) {
       var el2b=document.getElementById('stop_threshold_disp');
       if(el2b) el2b.textContent=s.thresholdStop+'건';
     }
-    if(s.currentFee != null) gateSettings.fee = s.currentFee;
-    if(s.baseFee !== undefined) gateSettings.base = s.baseFee;
+    if(s.currentFee != null) gateSettings.fee = clampFeeValue(s.currentFee);
+    if(s.baseFee !== undefined) gateSettings.base = clampFeeValue(s.baseFee);
     if(s.gateEnabled !== undefined) gateSettings.enabled = s.gateEnabled;
     if(s.stopEnabled !== undefined) gateSettings._stopEnabled = s.stopEnabled;
-    if(s.activeTab) gateSettings._activeTab = s.activeTab;
+    gateSettings._activeTab = 'PRINTER';
     if(s.stopSource) gateSettings._stopSource = s.stopSource;
     gateSettings._isFeeDefending = !!s.isFeeDefending;
     gateSettings._stopDefending = !!s.isStopDefending;
@@ -2540,7 +2591,7 @@ function onGateStatusUpdate(jsonStr) {
         if(fcs) fcs.style.borderLeft = '3px solid #2ECC71';
       }
     }
-    // 방어 상태 (배달료 패널)
+    // 조정 상태 (배달료 패널)
     var gateStatus = document.getElementById('gate_status');
     if(gateStatus) {
       if(s.isStopDefending) { gateStatus.style.display=''; gateStatus.textContent='정지중'; gateStatus.style.color='#E74C3C'; }
@@ -2600,9 +2651,10 @@ function onCaptureStatusUpdate(jsonStr) {
   } catch(e) {}
 }
 
-// ═══ 수동 방어 ═══
+// ═══ 수동 배달료/영업 조정 ═══
 function manualDefense(action, fee) {
   var finalFee = action.includes('fee_up') ? String(parseInt(fee)||gateSettings.fee||4000) : String(fee||0);
+  if(action.includes('fee_up'))finalFee=String(clampFeeValue(finalFee));
   if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, finalFee);
 }
 let adOffOnPause = true;
