@@ -21,7 +21,7 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .icon-btn,.icon-btn-text{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg-input);color:var(--text-secondary);cursor:pointer;touch-action:manipulation;}
 .icon-btn{font-size:18px;padding:0;}
 .icon-btn-text{font-size:12px;font-weight:600;padding:0 12px;}
-.app-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:6px 0 8px;}
+.app-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:6px 0 8px;}
 .app-nav button{min-height:36px;border:1px solid var(--border);border-radius:8px;background:rgba(42,42,69,.82);color:var(--text-secondary);font-size:11px;font-weight:700;}
 .app-nav button:active{background:rgba(79,195,247,.16);color:var(--text-bright);}
 .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px 6px;}
@@ -54,8 +54,8 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .summary-detail{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .summary-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px;color:var(--text-muted);}
 .summary-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;font-size:10px;color:var(--text-muted);border-top:1px solid var(--bg-input);}
-.monitor-shell{display:flex;flex-direction:column;gap:8px;}
-.monitor-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.monitor-shell{display:flex;flex-direction:column;gap:6px;}
+.monitor-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
 .kicker{display:none;}
 .monitor-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .monitor-title{font-size:18px;font-weight:800;letter-spacing:-.03em;}
@@ -66,25 +66,37 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .monitor-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:160px;}
 .sync-cluster{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;}
 .sync-badge{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
-.hero-grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px;}
-.hero-panel{display:flex;flex-direction:column;gap:6px;padding:9px;border-radius:14px;background:rgba(12,16,30,.66);border:1px solid rgba(255,255,255,.06);min-height:88px;}
+.hero-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.hero-panel{display:flex;flex-direction:column;gap:4px;padding:7px;border-radius:8px;background:rgba(12,16,30,.66);border:1px solid rgba(255,255,255,.06);min-height:68px;}
 .hero-panel.primary{background:linear-gradient(135deg,rgba(79,195,247,.16),rgba(42,193,188,.10) 55%,rgba(12,16,30,.78));}
 .hero-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
 .hero-number-row{display:flex;align-items:flex-end;gap:6px;line-height:1;}
-.hero-number{font-size:36px;font-weight:800;letter-spacing:-.06em;}
-.hero-number-sm{font-size:24px;font-weight:800;letter-spacing:-.04em;}
+.hero-number{font-size:28px;font-weight:800;letter-spacing:-.06em;}
+.hero-number-sm{font-size:20px;font-weight:800;letter-spacing:-.04em;}
 .hero-unit{font-size:13px;color:var(--text-secondary);padding-bottom:4px;}
 .hero-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-secondary);line-height:1.35;}
 .hero-meta.strong{align-items:flex-start;font-weight:600;color:var(--text-bright);}
 .hero-meta.accent{color:var(--c-mid);}
-.prediction-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:8px;}
-.prediction-card{display:flex;flex-direction:column;gap:3px;padding:8px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
+.prediction-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.prediction-card{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
 .prediction-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
-.prediction-value{font-size:19px;font-weight:800;letter-spacing:-.04em;}
+.prediction-value{font-size:16px;font-weight:800;letter-spacing:-.04em;}
 .prediction-note{display:none;}
 .board-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 .board-refresh{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid rgba(79,195,247,.24);background:rgba(79,195,247,.10);color:#C6EBFF;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;}
 .board-last{font-size:10px;color:var(--text-secondary);}
+.ops-log-panel{border-top:1px solid var(--bg-input);padding-top:6px;}
+.ops-log-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.ops-log-title{font-size:11px;font-weight:800;color:var(--text-bright);}
+.ops-log-time{font-size:10px;color:var(--text-muted);}
+.ops-log-list{display:flex;flex-direction:column;gap:4px;max-height:190px;overflow-y:auto;}
+.ops-log-row{display:grid;grid-template-columns:58px minmax(0,1fr);gap:6px;align-items:start;padding:5px 6px;border:1px solid rgba(69,76,122,.38);border-radius:6px;background:rgba(18,18,37,.45);}
+.ops-log-row.live{border-color:rgba(79,195,247,.30);background:rgba(79,195,247,.07);}
+.ops-log-stamp{font-size:10px;font-weight:700;color:var(--text-muted);white-space:nowrap;}
+.ops-log-main{min-width:0;}
+.ops-log-name{font-size:11px;font-weight:800;color:var(--text-bright);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ops-log-meta{font-size:10px;color:var(--text-secondary);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ops-log-empty{padding:8px 0;text-align:center;font-size:11px;color:var(--text-muted);}
 .panel-shell{padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:4px;}
 .order-shell{border-bottom:1px solid var(--border);margin-bottom:4px;}
 .order-header{display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer;min-height:44px;}
@@ -213,12 +225,15 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 }
 @media (max-width:640px){
   .section-title{align-items:flex-start;flex-direction:column;padding-top:8px;}
-  .app-nav{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .app-nav{grid-template-columns:repeat(3,minmax(0,1fr));}
   .monitor-side{align-items:flex-start;min-width:0;}
   .compare-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .compare-grid .compare-box:last-child{grid-column:span 2;}
-  .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-  .hero-grid .hero-panel.primary{grid-column:span 2;}
+  .hero-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .hero-number{font-size:24px;}
+  .hero-number-sm{font-size:18px;}
+  .hero-unit{font-size:11px;}
+  .hero-meta{font-size:9px;}
   .prediction-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
   .prediction-title{font-size:9px;}
   .prediction-value{font-size:17px;}
@@ -239,7 +254,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <button type="button" onclick="jumpToCard('monitorCard')">상황</button>
     <button type="button" onclick="jumpToCard('adSettingCard')">제어</button>
     <button type="button" onclick="jumpToCard('gatePanel')">임계값</button>
-    <button type="button" onclick="jumpToCard('diagCard')">진단</button>
   </div>
   <div id="pullInd" style="display:none"></div>
   <div class="alert" id="alertB"></div>
@@ -319,6 +333,13 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div id="mLast" class="board-last">마지막: --</div>
       </div>
       <button class="board-refresh" onclick="doForceRefresh()">수집</button>
+    </div>
+    <div class="ops-log-panel">
+      <div class="ops-log-head">
+        <span class="ops-log-title">운영 로그</span>
+        <span id="opsLogUpdated" class="ops-log-time">--</span>
+      </div>
+      <div id="opsLogList" class="ops-log-list"><div class="ops-log-empty">수집 대기</div></div>
     </div>
     <div id="groupSummary" class="summary-grid border-top"></div>
   </div>
@@ -782,16 +803,16 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div class="section-title">
   <div class="section-title-block">
-    <span class="section-eyebrow">진단</span>
-    <span class="section-heading">진단 / 로그</span>
-    <span class="section-note">KDS, PosDelay, 덤프와 서브폰 활동 로그를 마지막에 모아 진단합니다.</span>
+    <span class="section-eyebrow">보조</span>
+    <span class="section-heading">원문 진단</span>
+    <span class="section-note">원문 로그와 차트는 장애 확인용으로만 접어 둡니다.</span>
   </div>
-  <span class="section-chip">Logs</span>
+  <span class="section-chip">Raw</span>
 </div>
 <!-- ═══ D. 진단 (차트 + 로그, 기본 접힘) ═══ -->
 <div class="card card-diag" id="diagCard">
   <div class="ch" onclick="togSec('diagB')">
-    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">진단</span>
+    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">원문 진단</span>
     <span id="diagSummary" class="acc-summary"></span>
     <span id="diagA" style="color:var(--text-secondary)">&#9654;</span>
   </div>
@@ -807,7 +828,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div class="tab active" onclick="sLt('kds',this)">KDS</div>
         <div class="tab" onclick="sLt('posdelay',this)">PosDelay</div>
         <div class="tab" onclick="sLt('dump',this)">Dump</div>
-        <div class="tab" onclick="sLt('activity',this)">활동</div>
       </div>
       <div class="logbox" id="logC">...</div>
     </div>
@@ -829,11 +849,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <button class="nbtn bn" onclick="nb('openAppSettings')">앱 정보 (제한해제)</button>
 </div>
 
-<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v4.2 (0528.ui)</div>
+<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v4.3 (0528.ops)</div>
 
 <script>
 const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
-let S={},aS={},kS={},stS={},hD=[],oT={},cLt='kds';
+let S={},aS={},kS={},stS={},hD=[],oT={},cLt='kds',opsLogEntries=[];
 let aTS=0;let sseLoaded=false;
 let _kdsLastChange=Date.now(),_kdsLastCount=-1; // 30분 강제보정용
 let lastKdsTime=0; // KDS가 마지막으로 보낸 시각 (epoch ms)
@@ -986,7 +1006,7 @@ function updMonitor(){
   var _mCd=document.getElementById('mCd');if(_mCd)_mCd.className='dot '+(co2===true?'dg':co2===false?'dr':'dd');
   var _mLast=document.getElementById('mLast');if(_mLast)_mLast.textContent='마지막: '+(aS.last_ad_action??'--');
   updCooldown();
-  updCkQueue();updGauges(c);updDelayPred();chkAlert(c);renderGroupSummary();
+  updCkQueue();updGauges(c);updDelayPred();chkAlert(c);renderGroupSummary();renderOpsLog();
 }
 
 // === 쿨타임 게이지 (상시 모니터링) ===
@@ -1576,6 +1596,80 @@ function buildActivityLog(ad,kds){
   }
   return txt;
 }
+function escHtml(value){
+  return String(value==null?'':value).replace(/[&<>"']/g,function(ch){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+  });
+}
+function fmtOpsStamp(value){
+  if(value==null||value==='')return '현재';
+  if(typeof value==='number'){
+    var d=new Date(value);
+    if(!isNaN(d))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  }
+  var text=String(value);
+  var m=text.match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
+  if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
+  return text.length>8?text.slice(-8):text;
+}
+function findZoneThresholdForOps(zones,offVal){
+  if(!Array.isArray(zones))return 0;
+  for(var i=0;i<zones.length;i++){if(zones[i]>=offVal)return i;}
+  return zones.length;
+}
+function addOpsRow(rows,stamp,name,meta,live){
+  rows.push({stamp:stamp,name:name,meta:meta||'-',live:!!live});
+}
+function normalizeOpsLogEntries(data){
+  if(Array.isArray(data))return data.filter(Boolean).map(function(item){
+    return {time:item.time||item.ts||item.updated_at||'',msg:item.msg||item.message||String(item)};
+  });
+  if(data&&typeof data==='object'){
+    return Object.keys(data).map(function(key){
+      var item=data[key];
+      if(item&&typeof item==='object')return {time:item.time||item.ts||item.updated_at||'',msg:item.msg||item.message||JSON.stringify(item)};
+      return {time:key,msg:String(item)};
+    });
+  }
+  return [];
+}
+function renderOpsLog(){
+  var list=document.getElementById('opsLogList');
+  if(!list)return;
+  var rows=[];
+  var c=getActiveCount()||0;
+  var bz=getZones('baemin'),cz=getZones('coupang');
+  var bAdTh=findZoneThresholdForOps(bz,3);
+  var cAdTh=findZoneThresholdForOps(cz,2);
+  var bBid=aS.baemin_current_bid;
+  var bBidText=bBid!=null&&bBid>0?bBid.toLocaleString()+'원':'-';
+  addOpsRow(rows,fmtOpsStamp(aS.time),'배민 광고','KDS '+c+'건 · 최소임계 '+bAdTh+'건 · 현재 '+bBidText+' · 설정 '+g(S,'baemin_amount',500)+'/'+g(S,'baemin_mid_amount',300)+'/'+g(S,'baemin_reduced_amount',50)+'원',true);
+  addOpsRow(rows,fmtOpsStamp(aS.time),'쿠팡 광고','KDS '+c+'건 · OFF 임계 '+cAdTh+'건 · 현재 '+(aS.coupang_current_on===true?'ON':aS.coupang_current_on===false?'OFF':'-'),true);
+  addOpsRow(rows,fmtOpsStamp(lastCaptureSnapshot.lastCaptureAt),'배달료 조정','프린터 '+(gateSettings._validCount||0)+'/'+(gateSettings.threshold||8)+'건 · 기준이상 '+(gateSettings.fee||0).toLocaleString()+'원 · 0건 '+(gateSettings.base||0).toLocaleString()+'원',true);
+  opsLogEntries.slice(-5).reverse().forEach(function(entry){
+    var msg=String(entry.msg||'').trim();
+    if(!msg)return;
+    addOpsRow(rows,fmtOpsStamp(entry.time),'실행 기록',msg,false);
+  });
+  var updated=document.getElementById('opsLogUpdated');
+  if(updated)updated.textContent='갱신 '+fmtOpsStamp(Date.now());
+  if(!rows.length){
+    list.innerHTML='<div class="ops-log-empty">기록 없음</div>';
+    return;
+  }
+  list.innerHTML=rows.slice(0,8).map(function(row){
+    return '<div class="ops-log-row'+(row.live?' live':'')+'">'+
+      '<div class="ops-log-stamp">'+escHtml(row.stamp)+'</div>'+
+      '<div class="ops-log-main"><div class="ops-log-name">'+escHtml(row.name)+'</div><div class="ops-log-meta">'+escHtml(row.meta)+'</div></div>'+
+      '</div>';
+  }).join('');
+}
+function loadOpsLogs(){
+  fetch(FB+'/posdelay/logs.json').then(function(r){return r.json();}).then(function(data){
+    opsLogEntries=normalizeOpsLogEntries(data);
+    renderOpsLog();
+  }).catch(function(){renderOpsLog();});
+}
 function refreshActivityLog(){
   var lc=document.getElementById('logC');
   if(cLt!=='activity'||!lc||!activitySnapshot.ad||!activitySnapshot.kds)return;
@@ -1602,6 +1696,8 @@ function sLt(tab,el){
     lc.scrollTop=lc.scrollHeight;
   }).catch(()=>{lc.textContent='로드 실패';});
 }
+setTimeout(loadOpsLogs,1000);
+setInterval(loadOpsLogs,30000);
 
 // === 유틸 ===
 function togSec(id){const e=document.getElementById(id),o=e.classList.toggle('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML=o?'&#9660;':'&#9654;';if(id==='diagB'&&o)setTimeout(drawChart,100);try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');if(o)delete c[id];else c[id]=1;localStorage.setItem('_collapsed',JSON.stringify(c));}catch(e){}}
@@ -2427,6 +2523,7 @@ function syncGateDashboardState() {
     ? (policySettings.time_mode_enabled?'피크설정':'항상일반')+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
     : 'OFF';
   if(document.getElementById('groupSummary'))renderGroupSummary();
+  renderOpsLog();
 }
 function renderFeeOrderList(orders){
   var list=document.getElementById('feeOrderList');
@@ -2675,7 +2772,7 @@ function renderEngineTasks(engineJson) {
     var enabled = tasks.filter(function(task){return task.enabled;}).length;
     var badge2 = document.getElementById('engineBadge2');
     if (badge2) badge2.textContent = tasks.length ? '엔진 '+enabled+'/'+tasks.length+(running>0?' · '+running+' 실행':'')+(failed>0?' · 실패 '+failed:'') : '';
-    refreshActivityLog();
+    refreshActivityLog();renderOpsLog();
   } catch(ex) { console.error('엔진 UI:', ex); }
 }
 
@@ -2689,7 +2786,7 @@ function updateSubphoneStatus(json) {
     var msg = '서브폰 ' + (latestSubphoneState.device||'S10+') + ' 배터리' + (latestSubphoneState.battery||'?') + '% KDS ' + (latestSubphoneState.kds_count>=0?latestSubphoneState.kds_count:'?') + '건 ' + ago + '초전';
     if (dot2) dot2.className = cls;
     if (txt2) txt2.textContent = msg;
-    refreshActivityLog();
+    refreshActivityLog();renderOpsLog();
   } catch(e) {}
 }
 
