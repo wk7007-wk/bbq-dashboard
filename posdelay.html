@@ -336,7 +336,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div class="ops-log-panel">
       <div class="ops-log-head">
-        <span class="ops-log-title">운영 로그</span>
+        <span class="ops-log-title">최근 동작</span>
         <span id="opsLogUpdated" class="ops-log-time">--</span>
       </div>
       <div id="opsLogList" class="ops-log-list"><div class="ops-log-empty">수집 대기</div></div>
@@ -817,7 +817,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <!-- 로그 -->
     <div style="border-top:1px solid var(--border);padding-top:8px">
       <div class="tabs">
-        <div class="tab active" onclick="sLt('kds',this)">KDS</div>
+        <div class="tab active" onclick="sLt('flow',this)">흐름</div>
+        <div class="tab" onclick="sLt('kds',this)">KDS</div>
         <div class="tab" onclick="sLt('posdelay',this)">PosDelay</div>
         <div class="tab" onclick="sLt('dump',this)">Dump</div>
       </div>
@@ -845,7 +846,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <script>
 const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
-let S={},aS={},kS={},stS={},hD=[],oT={},cLt='kds',opsLogEntries=[];
+let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
 let aTS=0;let sseLoaded=false;
 let _kdsLastChange=Date.now(),_kdsLastCount=-1; // 30분 강제보정용
 let lastKdsTime=0; // KDS가 마지막으로 보낸 시각 (epoch ms)
@@ -1593,72 +1594,117 @@ function escHtml(value){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
   });
 }
-function fmtOpsStamp(value){
-  if(value==null||value==='')return '현재';
-  if(typeof value==='number'){
-    var d=new Date(value);
-    if(!isNaN(d))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+function parseOpsTime(value,key){
+  if(typeof value==='number')return value<10000000000?value*1000:value;
+  var text=String(value||key||'').trim();
+  if(!text)return 0;
+  var normalized=/^\d{4}-\d{2}-\d{2} /.test(text)?text.replace(' ','T')+'+09:00':text;
+  var ts=Date.parse(normalized);
+  if(!isNaN(ts))return ts;
+  var keyText=String(key||'');
+  var keyMatch=keyText.match(/^(\d{8})_(\d{6})/);
+  if(keyMatch){
+    var d=keyMatch[1],t=keyMatch[2];
+    ts=Date.parse(d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)+'T'+t.slice(0,2)+':'+t.slice(2,4)+':'+t.slice(4,6)+'+09:00');
+    if(!isNaN(ts))return ts;
   }
-  var text=String(value);
-  var m=text.match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
-  if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-  return text.length>8?text.slice(-8):text;
+  return 0;
 }
-function findZoneThresholdForOps(zones,offVal){
-  if(!Array.isArray(zones))return 0;
-  for(var i=0;i<zones.length;i++){if(zones[i]>=offVal)return i;}
-  return zones.length;
+function fmtOpsStamp(value,key){
+  var ts=parseOpsTime(value,key);
+  if(ts){
+    try{
+      return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date(ts));
+    }catch(e){
+      var d=new Date(ts);
+      if(!isNaN(d))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+    }
+  }
+  return '현재';
 }
 function addOpsRow(rows,stamp,name,meta,live){
-  rows.push({stamp:stamp,name:name,meta:meta||'-',live:!!live});
+  rows.push({stamp:stamp,name:name,meta:meta||'-',live:!!live,ts:parseOpsTime(stamp)});
 }
 function normalizeOpsLogEntries(data){
   if(Array.isArray(data))return data.filter(Boolean).map(function(item){
-    return {time:item.time||item.ts||item.updated_at||'',msg:item.msg||item.message||String(item)};
+    var time=item.time||item.ts||item.updated_at||'';
+    return {time:time,ts:parseOpsTime(time),name:'로그',msg:item.msg||item.message||String(item)};
   });
   if(data&&typeof data==='object'){
     return Object.keys(data).map(function(key){
       var item=data[key];
-      if(item&&typeof item==='object')return {time:item.time||item.ts||item.updated_at||'',msg:item.msg||item.message||JSON.stringify(item)};
-      return {time:key,msg:String(item)};
+      if(item&&typeof item==='object'){
+        var time=item.time||item.ts||item.updated_at||key;
+        return {time:time,ts:parseOpsTime(time,key),name:'로그',msg:item.msg||item.message||JSON.stringify(item)};
+      }
+      return {time:key,ts:parseOpsTime(key,key),name:'로그',msg:String(item)};
     });
   }
   return [];
 }
+function normalizeOpsActionEntries(data){
+  if(!data||typeof data!=='object')return [];
+  return Object.keys(data).map(function(key){
+    var item=data[key];
+    if(!item||typeof item!=='object')return null;
+    var time=item.time||item.ts||key;
+    var task=String(item.task||item.taskId||'자동화');
+    var msg=String(item.message||item.msg||item.result||'완료').replace(/\s+/g,' ').trim();
+    if(task&&msg.indexOf(task)<0)msg=task+' · '+msg;
+    return {time:time,ts:parseOpsTime(time,key),name:'완료',msg:msg};
+  }).filter(Boolean);
+}
+function normalizeOpsErrorEntries(data){
+  if(!data||typeof data!=='object')return [];
+  return Object.keys(data).map(function(key){
+    var item=data[key];
+    if(!item||typeof item!=='object')return null;
+    var time=item.time||item.ts||key;
+    var name=item.type==='inactivity'?'주의':'오류';
+    var msg=item.type==='inactivity'
+      ? '무활동 '+(item.inactive_minutes||'?')+'분 · '+(item.reason||'원인 확인 필요')
+      : ((item.task?item.task+' · ':'')+(item.error||item.reason||item.groq_reason||'오류 기록'));
+    return {time:time,ts:parseOpsTime(time,key),name:name,msg:String(msg).replace(/\s+/g,' ').trim()};
+  }).filter(Boolean);
+}
 function renderOpsLog(){
   var list=document.getElementById('opsLogList');
   if(!list)return;
-  var rows=[];
-  var c=getActiveCount()||0;
-  var bz=getZones('baemin'),cz=getZones('coupang');
-  var bAdTh=findZoneThresholdForOps(bz,3);
-  var cAdTh=findZoneThresholdForOps(cz,2);
-  var bBid=aS.baemin_current_bid;
-  var bBidText=bBid!=null&&bBid>0?bBid.toLocaleString()+'원':'-';
-  addOpsRow(rows,fmtOpsStamp(aS.time),'배민 광고','KDS '+c+'건 · 최소임계 '+bAdTh+'건 · 현재 '+bBidText+' · 설정 '+g(S,'baemin_amount',500)+'/'+g(S,'baemin_mid_amount',300)+'/'+g(S,'baemin_reduced_amount',50)+'원',true);
-  addOpsRow(rows,fmtOpsStamp(aS.time),'쿠팡 광고','KDS '+c+'건 · OFF 임계 '+cAdTh+'건 · 현재 '+(aS.coupang_current_on===true?'ON':aS.coupang_current_on===false?'OFF':'-'),true);
-  addOpsRow(rows,fmtOpsStamp(lastCaptureSnapshot.lastCaptureAt),'배달료 조정','프린터 '+(gateSettings._validCount||0)+'/'+(gateSettings.threshold||8)+'건 · 기준이상 '+(gateSettings.fee||0).toLocaleString()+'원 · 0건 '+(gateSettings.base||0).toLocaleString()+'원',true);
-  opsLogEntries.slice(-5).reverse().forEach(function(entry){
-    var msg=String(entry.msg||'').trim();
-    if(!msg)return;
-    addOpsRow(rows,fmtOpsStamp(entry.time),'실행 기록',msg,false);
-  });
+  var rows=opsLogEntries.concat(opsActionEntries,opsErrorEntries)
+    .filter(function(entry){return entry&&String(entry.msg||'').trim();})
+    .sort(function(a,b){return (a.ts||0)-(b.ts||0);})
+    .slice(-14);
   var updated=document.getElementById('opsLogUpdated');
-  if(updated)updated.textContent='갱신 '+fmtOpsStamp(Date.now());
+  if(updated)updated.textContent=rows.length?rows.length+'건 · 최신 아래':'기록 없음';
   if(!rows.length){
     list.innerHTML='<div class="ops-log-empty">기록 없음</div>';
+    if(cLt==='flow'){var emptyLc=document.getElementById('logC');if(emptyLc)emptyLc.textContent='최근 동작 없음';}
     return;
   }
-  list.innerHTML=rows.slice(0,8).map(function(row){
-    return '<div class="ops-log-row'+(row.live?' live':'')+'">'+
-      '<div class="ops-log-stamp">'+escHtml(row.stamp)+'</div>'+
-      '<div class="ops-log-main"><div class="ops-log-name">'+escHtml(row.name)+'</div><div class="ops-log-meta">'+escHtml(row.meta)+'</div></div>'+
+  list.innerHTML=rows.map(function(row){
+    return '<div class="ops-log-row">'+
+      '<div class="ops-log-stamp">'+escHtml(fmtOpsStamp(row.time,row.time))+'</div>'+
+      '<div class="ops-log-main"><div class="ops-log-name">'+escHtml(row.name||'기록')+'</div><div class="ops-log-meta">'+escHtml(String(row.msg||'').slice(0,140))+'</div></div>'+
       '</div>';
   }).join('');
+  requestAnimationFrame(function(){list.scrollTop=list.scrollHeight;});
+  if(cLt==='flow'){
+    var lc=document.getElementById('logC');
+    if(lc){
+      lc.textContent=rows.map(function(row){return '['+fmtOpsStamp(row.time,row.time)+'] '+(row.name||'기록')+' '+String(row.msg||'');}).join('\n');
+      lc.scrollTop=lc.scrollHeight;
+    }
+  }
 }
 function loadOpsLogs(){
-  fetch(FB+'/posdelay/logs.json').then(function(r){return r.json();}).then(function(data){
-    opsLogEntries=normalizeOpsLogEntries(data);
+  Promise.all([
+    fetch(FB+'/posdelay/logs.json').then(function(r){return r.json();}).catch(function(){return [];}),
+    fetch(FB+'/posdelay/action_log.json?orderBy=%22%24key%22&limitToLast=90').then(function(r){return r.json();}).catch(function(){return {};}),
+    fetch(FB+'/posdelay/error_reports.json?orderBy=%22%24key%22&limitToLast=60').then(function(r){return r.json();}).catch(function(){return {};})
+  ]).then(function(res){
+    opsLogEntries=normalizeOpsLogEntries(res[0]);
+    opsActionEntries=normalizeOpsActionEntries(res[1]);
+    opsErrorEntries=normalizeOpsErrorEntries(res[2]);
     renderOpsLog();
   }).catch(function(){renderOpsLog();});
 }
@@ -1670,6 +1716,10 @@ function refreshActivityLog(){
 function sLt(tab,el){
   cLt=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');
   const lc=document.getElementById('logC');lc.textContent='로딩...';
+  if(tab==='flow'){
+    renderOpsLog();
+    return;
+  }
   if(tab==='activity'){
     Promise.all([
       fetch(FB+'/posdelay/ad_state.json').then(r=>r.json()),

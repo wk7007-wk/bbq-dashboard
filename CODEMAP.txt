@@ -27,3 +27,4 @@ bbq-dashboard — GitHub Pages 현황판
   - valid: min 10, max 60 분
   - fee/base: min 0, max 4000 원, 500원 단위. threshold 이상은 fee, threshold 미만과 0건은 base 적용
 - adjGate(key, delta) : 게이트 값 조정 함수
+- 최근 동작 타임라인: `/posdelay/logs`, `/posdelay/action_log`, `/posdelay/error_reports`를 병합해 상황판과 진단 `흐름` 탭에 시간순 표시
