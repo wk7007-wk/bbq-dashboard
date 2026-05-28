@@ -200,6 +200,28 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 .compact-cell input{width:42px!important;font-size:12px!important;padding:5px 3px!important;}
 .compact-cell b{font-size:9px;color:var(--text-muted);font-weight:700;}
 .compact-row-label{text-align:left!important;color:#C8C8DC!important;}
+.button-value-source{display:none!important;}
+.button-value-control{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:26px;}
+.button-value-btn{min-width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-primary);font-size:14px;font-weight:800;line-height:1;}
+.button-value-btn:active{transform:translateY(1px);background:var(--surface-muted);}
+.button-value-btn:disabled{opacity:.35;transform:none;}
+.button-value-text{min-width:44px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--surface-muted);font-size:12px;font-weight:800;color:var(--text-primary);padding:0 6px;white-space:nowrap;}
+.button-value-control.is-minute .button-value-text{min-width:48px;}
+.compact-cell .button-value-control{width:100%;}
+.compact-cell .button-value-text{flex:1;min-width:0;}
+.policy-control .button-value-control{margin-left:auto;}
+.card-fee .panel-shell{padding:8px;}
+.card-fee .compare-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+.card-fee .compare-box{min-height:0;padding:6px 8px;}
+.card-fee .compare-label{font-size:10px;}
+.card-fee .compare-value{font-size:20px;line-height:1.05;}
+.card-fee .hero-unit{font-size:11px;}
+.card-fee .compare-sub{font-size:10px;line-height:1.25;}
+.card-fee #feeChannelRow{margin-top:4px;gap:4px;}
+.card-fee .order-shell{margin-top:6px;}
+.card-fee .order-header{padding:6px 8px;}
+.card-fee #feeOrderListWrap{max-height:96px;overflow:auto;}
+.card-fee #feeOrderList{gap:4px;}
 .nbtn{width:100%;padding:8px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;color:#FFF;margin-top:6px;touch-action:manipulation;}
 .alert{padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;display:none;}
 .alert.warn{background:#E74C3C33;border:1px solid #E74C3C;color:#E74C3C;display:block;}
@@ -430,9 +452,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="gauge" id="bG"></div>
     <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
     <div class="sec" style="color:var(--c-baemin)">배민 금액</div>
-    <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-50)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-500)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',500)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-500)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',500)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-500)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',500)">+</button></div></div>
     <div class="sec">토글</div>
     <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
     <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
@@ -543,7 +565,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <div class="section-title-block">
     <span class="section-eyebrow">임계값</span>
     <span class="section-heading">배달료 조정 / 운영 임계값</span>
-    <span class="section-note">실제 건수와 설정 임계값을 같은 화면에서 비교하고 자동 조정 상태를 확인합니다.</span>
+    <span class="section-note">프린터 30분 활성건수 기준 · 금액 0~4000원/500원 단위</span>
   </div>
   <span class="section-chip">조정</span>
 </div>
@@ -1485,7 +1507,7 @@ function _autoSave(){
   });
   _lastSaveKeys=[];
 }
-function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;e.value=parseInt(e.value??0)+d;S[k]=parseInt(e.value);_lastSaveKeys=[k];updMonitor();_autoSave();}
+function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;const isFee=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);const step=isFee?500:1;const max=isFee?4000:9999;const cur=parseInt(e.value??0)||0;const next=Math.max(0,Math.min(max,Math.round((cur+d)/step)*step));e.value=next;S[k]=next;_lastSaveKeys=[k];updMonitor();_autoSave();}
 function adjCoupangDelayMin(v){S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
 function saveS(k,v){S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
 function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];_autoSave();}
@@ -2229,6 +2251,99 @@ function readPolicyInt(id,label,min,max,silent){
 
 function srcLabel(src){return src==='PRINTER'?'프린터':'KDS';}
 
+function buttonValueSpec(id){
+  if(/^policy_(baemin|store)_auto_min_[123]$/.test(id)){
+    const max=id.includes('baemin_auto')?70:30;
+    return {min:5,max,step:5,unit:'분',kind:'minute'};
+  }
+  const autoCount=id.match(/^policy_(baemin|store)_auto_(one_)?count_([123])$/);
+  if(autoCount){
+    return {min:0,max:99,step:1,unit:'건',locked:autoCount[3]==='1'};
+  }
+  if(/^policy_(baemin1|coupang)_(one_)?pause$/.test(id)) return {min:1,max:99,step:1,unit:'건'};
+  if(/^policy_(baemin1|coupang)_(one_)?resume$/.test(id)) return {min:0,max:98,step:1,unit:'건'};
+  return null;
+}
+
+function normalizeButtonValue(input,spec){
+  const raw=parseInt(input.value,10);
+  let value=Number.isFinite(raw)?raw:spec.min;
+  value=Math.max(spec.min,Math.min(spec.max,value));
+  value=Math.round(value/spec.step)*spec.step;
+  value=Math.max(spec.min,Math.min(spec.max,value));
+  if(spec.locked) value=spec.min;
+  input.value=value;
+  return value;
+}
+
+function syncButtonValueControl(input){
+  const spec=buttonValueSpec(input.id);
+  if(!spec) return;
+  const value=normalizeButtonValue(input,spec);
+  const control=document.querySelector(`[data-button-value-for="${input.id}"]`);
+  if(!control) return;
+  const text=control.querySelector('.button-value-text');
+  const minus=control.querySelector('[data-delta="-1"]');
+  const plus=control.querySelector('[data-delta="1"]');
+  if(text) text.textContent=`${value}${spec.unit||''}`;
+  if(minus) minus.disabled=spec.locked||value<=spec.min;
+  if(plus) plus.disabled=spec.locked||value>=spec.max;
+}
+
+function setButtonValue(input,delta){
+  const spec=buttonValueSpec(input.id);
+  if(!spec) return;
+  const current=normalizeButtonValue(input,spec);
+  input.value=current+(delta*spec.step);
+  normalizeButtonValue(input,spec);
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  input.dispatchEvent(new Event('change',{bubbles:true}));
+  syncButtonValueControl(input);
+}
+
+function initButtonValueControls(){
+  document.querySelectorAll('input[type="number"][id^="policy_"]').forEach(input=>{
+    const spec=buttonValueSpec(input.id);
+    if(!spec || document.querySelector(`[data-button-value-for="${input.id}"]`)) return;
+    input.readOnly=true;
+    input.classList.add('button-value-source');
+    const control=document.createElement('div');
+    control.className=`button-value-control${spec.kind==='minute'?' is-minute':''}`;
+    control.dataset.buttonValueFor=input.id;
+    const minus=document.createElement('button');
+    minus.type='button';
+    minus.className='button-value-btn';
+    minus.dataset.delta='-1';
+    minus.textContent='-';
+    const text=document.createElement('span');
+    text.className='button-value-text';
+    const plus=document.createElement('button');
+    plus.type='button';
+    plus.className='button-value-btn';
+    plus.dataset.delta='1';
+    plus.textContent='+';
+    minus.addEventListener('click',()=>setButtonValue(input,-1));
+    plus.addEventListener('click',()=>setButtonValue(input,1));
+    control.append(minus,text,plus);
+    input.insertAdjacentElement('afterend',control);
+    const unitNode=control.nextSibling;
+    if(unitNode && unitNode.nodeType===3 && unitNode.textContent.trim())unitNode.textContent='';
+    const unitEl=control.nextElementSibling;
+    if(unitEl && unitEl.tagName==='B')unitEl.style.display='none';
+    syncButtonValueControl(input);
+  });
+}
+
+function syncButtonValueControls(){
+  document.querySelectorAll('input.button-value-source').forEach(syncButtonValueControl);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  initButtonValueControls();
+  syncButtonValueControls();
+  setInterval(syncButtonValueControls,1000);
+});
+
 function readPolicySource(id){
   var el=document.getElementById(id);
   return el && el.value==='PRINTER' ? 'PRINTER' : 'KDS';
@@ -2304,6 +2419,8 @@ function loadPolicySettings() {
     Object.assign(policySettings, saved);
     normalizePolicySettings();
     applyPolicySettingsToUI();
+    initButtonValueControls();
+    syncButtonValueControls();
   } catch(e) {}
 }
 
@@ -2351,6 +2468,7 @@ function savePolicySettings(silent) {
     if(silent)setPolicySaveStatus('앱 전용','error');
     return false;
   }
+  syncButtonValueControls();
   var isSilent=!!silent;
   var peak1=validatePeakPair('policy_peak1_start','policy_peak1_end','피크1');
   if(!peak1.ok)return false;
