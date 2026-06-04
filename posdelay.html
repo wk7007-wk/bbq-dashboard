@@ -455,7 +455,6 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-500)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',500)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-500)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',500)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-500)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',500)">+</button></div></div>
-    <div class="sr"><span class="sl" style="color:var(--c-baemin)">0원+클럽</span><div class="tog" id="tog_baemin_club_auto_enabled" onclick="togS('baemin_club_auto_enabled')"></div></div>
     <div class="sec">토글</div>
     <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
     <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
@@ -677,6 +676,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bn" onclick="setGateBase(4000)">4,000</button>
       </div>
     </div>
+    <div class="sr"><span class="sl" style="color:var(--c-baemin)">미만 0원+클럽</span><div class="tog" id="tog_gate_club" onclick="togGateClub()"></div></div>
     <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
     <div id="gate_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:var(--c-mid)"></div>
   </div>
@@ -1040,17 +1040,24 @@ function getActiveCount(){
   return kS.count;
 }
 function isBaeminClubMode(){
-  return g(S,'baemin_reduced_amount',50)===0 && !!S.baemin_club_auto_enabled;
+  return false;
 }
 function baeminMinLabel(){
   const v=g(S,'baemin_reduced_amount',50);
-  if(v===0)return isBaeminClubMode()?'0원+클럽':'0원';
+  if(v===0)return '0원';
   return v+'원';
 }
 function baeminBidLabel(v){
   if(v!=null&&v>0)return v+'원';
   if(v===0&&g(S,'baemin_reduced_amount',50)===0)return '0원';
   return '-';
+}
+function isGateClubMode(){
+  return gateSettings && gateSettings.base===0 && !!gateSettings.clubAuto;
+}
+function gateBaseLabel(){
+  var v=gateSettings?clampFeeValue(gateSettings.base):0;
+  return v===0 && isGateClubMode() ? '0+클럽' : v.toLocaleString();
 }
 
 // === 모니터링 ===
@@ -1247,7 +1254,6 @@ function exAd(platform,action){
       else if(action==='mid')nb('executeAd','BAEMIN_SET_AMOUNT',bma);
       else{
         nb('executeAd','BAEMIN_SET_AMOUNT',bra);
-        if(isBaeminClubMode())nb('executeAd','BAEMIN_DISCOUNT_SET',-97);
       }
     }
   }else{
@@ -1256,7 +1262,6 @@ function exAd(platform,action){
     }else{
       const amounts={max:ba,mid:bma,min:bra};
       sendCmd('BAEMIN_SET_AMOUNT',amounts[action]);
-      if(action==='min'&&isBaeminClubMode())sendCmd('BAEMIN_DISCOUNT_SET',-97);
     }
   }
 }
@@ -1379,7 +1384,7 @@ function updSetUI(){
   var cdmd=document.getElementById('set_coupang_delay_minutes_disp');
   if(cdmd&&S.coupang_delay_minutes!=null)cdmd.textContent=S.coupang_delay_minutes+'분';
   updSchDisp();
-  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','baemin_club_auto_enabled','schedule_enabled','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
     const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
   });
   const se3=document.getElementById('tog_schedule_enabled3');if(se3)se3.className='tog'+(S.schedule_enabled?' on':'');
@@ -1471,7 +1476,7 @@ function renderGroupSummary(){
   // 배달료
   var feeThreshold=gateSettings.threshold||8;
   var baseFee=gateSettings.base||0;
-  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분',card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
+  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
   var stopCount=gateSettings._stopSource==='PRINTER'?(gateSettings._validCount||0):c2;
@@ -1526,10 +1531,10 @@ function _autoSave(){
   });
   _lastSaveKeys=[];
 }
-function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;const isFee=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);const step=isFee?500:1;const max=isFee?4000:9999;const cur=parseInt(e.value??0)||0;const next=Math.max(0,Math.min(max,Math.round((cur+d)/step)*step));e.value=next;S[k]=next;_lastSaveKeys=[k];if(k==='baemin_reduced_amount'&&next!==0&&S.baemin_club_auto_enabled){S.baemin_club_auto_enabled=false;const t=document.getElementById('tog_baemin_club_auto_enabled');if(t)t.className='tog';_lastSaveKeys=[k,'baemin_club_auto_enabled'];}updMonitor();_autoSave();}
+function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;const isFee=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);const step=isFee?500:1;const max=isFee?4000:9999;const cur=parseInt(e.value??0)||0;const next=Math.max(0,Math.min(max,Math.round((cur+d)/step)*step));e.value=next;S[k]=next;_lastSaveKeys=[k];updMonitor();_autoSave();}
 function adjCoupangDelayMin(v){S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
 function saveS(k,v){S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
-function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}if(k==='baemin_club_auto_enabled'&&S[k]){S.baemin_reduced_amount=0;const r=document.getElementById('set_baemin_reduced_amount');if(r)r.value=0;_lastSaveKeys=['baemin_reduced_amount',k];}else{_lastSaveKeys=[k];}updMonitor();_autoSave();}
+function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
 function togKdsOpen(){
   const paused=!stS.kds_paused;
   stS.kds_paused=paused;
@@ -2148,7 +2153,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ═══ 게이트(배달료) ═══
-let gateSettings = {threshold:8, valid:30, fee:4000, base:0, enabled:false, threshold_stop:15};
+let gateSettings = {threshold:8, valid:30, fee:4000, base:0, clubAuto:false, enabled:false, threshold_stop:15};
 let policySettings = {
   enabled:false,
   auto_accept_enabled:true,
@@ -2561,6 +2566,10 @@ function clampFeeThreshold(value){
   if(!Number.isFinite(n))n=8;
   return Math.max(1,Math.min(50,n));
 }
+function syncGateClubToggle(){
+  var el=document.getElementById('tog_gate_club');
+  if(el)el.className='tog'+(isGateClubMode()?' on':'');
+}
 
 // 페이지 로드 시 Kotlin에서 저장된 설정 복원
 try {
@@ -2583,6 +2592,7 @@ try {
     setTimeout(function(){setFeeSource('PRINTER');}, 300);
     document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
     syncGatePriceDisplay();
+    syncGateClubToggle();
     syncGateDashboardState();
   }
   // 프린터 주문 리스트 즉시 복원
@@ -2620,9 +2630,21 @@ function setGateFee(v) {
 }
 function setGateBase(v) {
   gateSettings.base = clampFeeValue(v);
+  if (gateSettings.base !== 0) gateSettings.clubAuto = false;
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+}
+
+function togGateClub() {
+  gateSettings.clubAuto = !gateSettings.clubAuto;
+  if (gateSettings.clubAuto) gateSettings.base = 0;
+  syncGatePriceDisplay();
+  syncGateClubToggle();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({
+    base: gateSettings.base,
+    clubAuto: gateSettings.clubAuto
+  }));
 }
 
 function togGate() {
@@ -2730,9 +2752,10 @@ function syncGatePriceDisplay() {
   var up=document.getElementById('fee_set_up');
   var base=document.getElementById('fee_set_base');
   if(up)up.textContent=upValue.toLocaleString();
-  if(base)base.textContent=baseValue.toLocaleString();
+  if(base)base.textContent=gateBaseLabel();
   highlightPresetButtons('#fee_presets', upValue);
   highlightPresetButtons('#base_presets', baseValue);
+  syncGateClubToggle();
   syncGateDashboardState();
 }
 function getOrderChannelColor(channel){
@@ -2806,7 +2829,7 @@ function syncGateDashboardState() {
     else stopLiveHint.textContent='-';
   }
   var gateSummary=document.getElementById('gateSummary');
-  if(gateSummary)gateSummary.textContent=feeCurrent.toLocaleString()+'원  임계'+threshold+'건';
+  if(gateSummary)gateSummary.textContent=feeCurrent.toLocaleString()+'원  임계'+threshold+'건'+(isGateClubMode()?' · 클럽':'');
   var stopSummary=document.getElementById('stopSummary');
   if(stopSummary)stopSummary.textContent=policySettings.enabled
     ? (policySettings.time_mode_enabled?'피크설정':'항상일반')+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
@@ -3016,7 +3039,7 @@ function onGateStatusUpdate(jsonStr) {
 
     // ═══ 접힌 헤더 요약값 업데이트 ═══
     var gateSummary = document.getElementById('gateSummary');
-    if(gateSummary) gateSummary.textContent = (s.currentFee||0).toLocaleString()+'원  임계'+(s.thresholdFee||8)+'건';
+    if(gateSummary) gateSummary.textContent = (s.currentFee||0).toLocaleString()+'원  임계'+(s.thresholdFee||8)+'건'+(isGateClubMode()?' · 클럽':'');
     var ss2 = document.getElementById('stopSummary');
     if(ss2) ss2.textContent = s.isStopDefending ? '정지중' : (gateSettings._stopEnabled ? 'ON  임계'+(s.thresholdStop||15)+'건' : 'OFF');
     syncGateDashboardState();
