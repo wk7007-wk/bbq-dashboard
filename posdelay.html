@@ -455,6 +455,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-500)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',500)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-500)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',500)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-500)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',500)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-baemin)">0원+클럽</span><div class="tog" id="tog_baemin_club_auto_enabled" onclick="togS('baemin_club_auto_enabled')"></div></div>
     <div class="sec">토글</div>
     <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
     <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
@@ -1038,6 +1039,19 @@ function getActiveCount(){
   if(stS.order_count!=null)return stS.order_count;
   return kS.count;
 }
+function isBaeminClubMode(){
+  return g(S,'baemin_reduced_amount',50)===0 && !!S.baemin_club_auto_enabled;
+}
+function baeminMinLabel(){
+  const v=g(S,'baemin_reduced_amount',50);
+  if(v===0)return isBaeminClubMode()?'0원+클럽':'0원';
+  return v+'원';
+}
+function baeminBidLabel(v){
+  if(v!=null&&v>0)return v+'원';
+  if(v===0&&g(S,'baemin_reduced_amount',50)===0)return '0원';
+  return '-';
+}
 
 // === 모니터링 ===
 function updMonitor(){
@@ -1054,8 +1068,8 @@ function updMonitor(){
     else{st.textContent='-';st.style.color='#A0A0BC';}
   }
   const b=aS.baemin_current_bid;
-  var _mBv=document.getElementById('mBv');if(_mBv)_mBv.textContent=b!=null&&b>0?b+'원':'-';
-  var _mBd=document.getElementById('mBd');if(_mBd)_mBd.className='dot '+(b>0?(b>=g(S,'baemin_amount',200)?'dg':b>=g(S,'baemin_mid_amount',100)?'do':'dr'):'dd');
+  var _mBv=document.getElementById('mBv');if(_mBv)_mBv.textContent=baeminBidLabel(b);
+  var _mBd=document.getElementById('mBd');if(_mBd)_mBd.className='dot '+(b>0?(b>=g(S,'baemin_amount',200)?'dg':b>=g(S,'baemin_mid_amount',100)?'do':'dr'):(b===0&&g(S,'baemin_reduced_amount',50)===0?'dr':'dd'));
   const co2=aS.coupang_current_on;
   var _mCv=document.getElementById('mCv');if(_mCv)_mCv.textContent=co2===true?'ON':co2===false?'OFF':'-';
   var _mCd=document.getElementById('mCd');if(_mCd)_mCd.className='dot '+(co2===true?'dg':co2===false?'dr':'dd');
@@ -1181,7 +1195,7 @@ function updGauges(c){
   const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
   if(c!=null){
     const bs2=bz[c];
-    document.getElementById('bSt').innerHTML=bs2===3?`<span style="color:#E74C3C">최소 ${bra}원</span>`:bs2===2?`<span style="color:#E67E22">중간 ${bma}원</span>`:bs2===1?`<span style="color:#2ECC71">최대 ${ba}원</span>`:'<span style="color:#A0A0BC">-</span>';
+    document.getElementById('bSt').innerHTML=bs2===3?`<span style="color:#E74C3C">최소 ${baeminMinLabel()}</span>`:bs2===2?`<span style="color:#E67E22">중간 ${bma}원</span>`:bs2===1?`<span style="color:#2ECC71">최대 ${ba}원</span>`:'<span style="color:#A0A0BC">-</span>';
   }
   // 게이지 아래 조리구간 범례
   const lgEl=document.getElementById('gaugeLegend');
@@ -1231,7 +1245,10 @@ function exAd(platform,action){
     }else{
       if(action==='max')nb('executeAd','BAEMIN_SET_AMOUNT',ba);
       else if(action==='mid')nb('executeAd','BAEMIN_SET_AMOUNT',bma);
-      else nb('executeAd','BAEMIN_SET_AMOUNT',bra);
+      else{
+        nb('executeAd','BAEMIN_SET_AMOUNT',bra);
+        if(isBaeminClubMode())nb('executeAd','BAEMIN_DISCOUNT_SET',-97);
+      }
     }
   }else{
     if(platform==='coupang'){
@@ -1239,6 +1256,7 @@ function exAd(platform,action){
     }else{
       const amounts={max:ba,mid:bma,min:bra};
       sendCmd('BAEMIN_SET_AMOUNT',amounts[action]);
+      if(action==='min'&&isBaeminClubMode())sendCmd('BAEMIN_DISCOUNT_SET',-97);
     }
   }
 }
@@ -1361,7 +1379,7 @@ function updSetUI(){
   var cdmd=document.getElementById('set_coupang_delay_minutes_disp');
   if(cdmd&&S.coupang_delay_minutes!=null)cdmd.textContent=S.coupang_delay_minutes+'분';
   updSchDisp();
-  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','baemin_club_auto_enabled','schedule_enabled','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
     const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
   });
   const se3=document.getElementById('tog_schedule_enabled3');if(se3)se3.className='tog'+(S.schedule_enabled?' on':'');
@@ -1374,7 +1392,7 @@ function updSetUI(){
   if(adSum){
     var bBid2=aS.baemin_current_bid;
     var adMaster=S.ad_enabled;
-    adSum.textContent=(adMaster?'ON':'OFF')+(bBid2>0?' '+bBid2+'원':'');
+    adSum.textContent=(adMaster?'ON':'OFF')+(baeminBidLabel(bBid2)!=='-'?' '+baeminBidLabel(bBid2):'');
     adSum.style.color=adMaster?'var(--c-on)':'var(--text-muted)';
   }
 }
@@ -1431,7 +1449,7 @@ function renderGroupSummary(){
   var bBid=aS.baemin_current_bid;
   var bz=getZones('baemin');var bAdTh=findZoneThreshold(bz,3);
   var bMax=g(S,'baemin_amount',500),bMid=g(S,'baemin_mid_amount',300),bMin=g(S,'baemin_reduced_amount',50);
-  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:bBid>0?bBid+'원':'OFF',setting:bMax+'/'+bMid+'/'+bMin,card:'adSettingCard',count:c2,threshold:bAdTh,exceeded:c2>=bAdTh&&bAdTh<=10});
+  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:baeminBidLabel(bBid)==='-'?'OFF':baeminBidLabel(bBid),setting:bMax+'/'+bMid+'/'+baeminMinLabel(),card:'adSettingCard',count:c2,threshold:bAdTh,exceeded:c2>=bAdTh&&bAdTh<=10});
   // 쿠팡 광고 (2=OFF)
   var cAdOn=S.coupang_auto_enabled;
   var cOn=aS.coupang_current_on;
@@ -1459,8 +1477,9 @@ function renderGroupSummary(){
   var stopCount=gateSettings._stopSource==='PRINTER'?(gateSettings._validCount||0):c2;
   items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'ON':'OFF',setting:(gateSettings._stopSource==='PRINTER'?'프린터':'KDS')+' · 임계'+stopThreshold+'건',card:'stopPanel',count:stopCount,threshold:stopThreshold});
   // 즉시할인
-  var discCur=g(S,'baemin_discount_current',0);
-  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0,detail:discCur===-1?'배달팁':discCur>0?discCur.toLocaleString()+'원':'OFF',card:'discountCard'});
+  var discCur=g(S,'baemin_discount_current',g(aS,'baemin_discount_current',0));
+  var clubTip=!!(S.baemin_club_tip_active||aS.baemin_club_tip_active);
+  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0||clubTip,detail:clubTip&&discCur>0?discCur.toLocaleString()+'원+팁':clubTip||discCur===-1?'배달팁':discCur>0?discCur.toLocaleString()+'원':'OFF',card:'discountCard'});
   items.sort(function(a,b){
     var ao=a.on?1:0, bo=b.on?1:0;
     if(ao!==bo)return bo-ao;
@@ -1507,10 +1526,10 @@ function _autoSave(){
   });
   _lastSaveKeys=[];
 }
-function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;const isFee=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);const step=isFee?500:1;const max=isFee?4000:9999;const cur=parseInt(e.value??0)||0;const next=Math.max(0,Math.min(max,Math.round((cur+d)/step)*step));e.value=next;S[k]=next;_lastSaveKeys=[k];updMonitor();_autoSave();}
+function adjS(k,d){const e=document.getElementById('set_'+k);if(!e)return;const isFee=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);const step=isFee?500:1;const max=isFee?4000:9999;const cur=parseInt(e.value??0)||0;const next=Math.max(0,Math.min(max,Math.round((cur+d)/step)*step));e.value=next;S[k]=next;_lastSaveKeys=[k];if(k==='baemin_reduced_amount'&&next!==0&&S.baemin_club_auto_enabled){S.baemin_club_auto_enabled=false;const t=document.getElementById('tog_baemin_club_auto_enabled');if(t)t.className='tog';_lastSaveKeys=[k,'baemin_club_auto_enabled'];}updMonitor();_autoSave();}
 function adjCoupangDelayMin(v){S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
 function saveS(k,v){S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
-function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];_autoSave();}
+function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}if(k==='baemin_club_auto_enabled'&&S[k]){S.baemin_reduced_amount=0;const r=document.getElementById('set_baemin_reduced_amount');if(r)r.value=0;_lastSaveKeys=['baemin_reduced_amount',k];}else{_lastSaveKeys=[k];}updMonitor();_autoSave();}
 function togKdsOpen(){
   const paused=!stS.kds_paused;
   stS.kds_paused=paused;
