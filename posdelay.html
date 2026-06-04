@@ -309,6 +309,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div class="monitor-title-row">
           <span class="monitor-title">상황</span>
           <span id="mStatus" class="hero-status">-</span>
+          <span id="mOutputTimer" class="hero-status" title="가동 타이머" style="min-width:48px;justify-content:center;font-family:monospace">--</span>
         </div>
         <div class="role-row">
           <span class="role-pill primary">개인폰 제어 · 서브폰 실행</span>
@@ -1958,6 +1959,7 @@ function updCkUI(){
     if(listArea)listArea.style.display=ckOn?'block':'none';
     if(settingsEl)settingsEl.innerHTML='<span style="color:#9898B0">대기중</span>';
     if(listEl&&ckOn)listEl.innerHTML='<div style="text-align:center;color:#9898B0;font-size:11px;padding:8px">주문 대기중</div>';
+    updateOutputTimer();
     return;
   }
   if(listArea)listArea.style.display='block';
@@ -2064,6 +2066,7 @@ function updCkUI(){
   else if(urgPkg.length)focusMsg=` <span style="color:#E74C3C;font-weight:bold">포장급함${urgPkg.length}</span>`;
   else if(cookFocus||busyCookFocus)focusMsg=` <span style="color:#E67E22;font-weight:bold">조리집중</span>`;
   if(settingsEl)settingsEl.innerHTML=`<span style="color:#9898B0">${activeOrders}건</span>`+(pkgOrders.length>0?` <span style="color:#E74C3C">포장${pkgOrders.length}</span>`:'')+`${focusMsg}${avgStr}`+(delayMsg.length>0?' <span style="font-weight:bold">지연 '+delayMsg.join(' ')+'</span>':'');
+  updateOutputTimer();
 }
 
 function ckDisp(k){const e=document.getElementById('ck_'+k);const d=document.getElementById('ck_'+k+'_disp');if(!e||!d)return;const v=parseInt(e.value)||0;const m=Math.floor(v/60),s=v%60;d.textContent=m+':'+String(s).padStart(2,'0');}
@@ -2879,6 +2882,32 @@ function renderFeeChannelBadges(orders){
   });
   row.innerHTML=html;
 }
+function updateOutputTimer(){
+  var timer=document.getElementById('mOutputTimer');
+  if(!timer)return;
+  if(!ckOn||!ckQ.length){
+    timer.textContent='--';
+    timer.style.color='#707088';
+    return;
+  }
+  var now=Date.now();
+  var tgtMs=(parseInt(document.getElementById('ck_target').value)||1500)*1000;
+  var midMs=(parseInt(document.getElementById('ck_mid').value)||1020)*1000;
+  var finMs=(parseInt(document.getElementById('ck_finish').value)||240)*1000;
+  var cookStartMs=tgtMs-midMs;
+  var pkgStartMs=tgtMs-finMs;
+  var active=ckQ.filter(function(o){
+    return o&&!o.delAt&&(o.onKds||o.doneAt)&&(!o.doneAt||now-o.doneAt<1500000);
+  }).sort(function(a,b){return (a.t||0)-(b.t||0);}).slice(0,6);
+  if(!active.length){
+    timer.textContent='--';
+    timer.style.color='#707088';
+    return;
+  }
+  timer.textContent=active.map(function(o){return String(o.num).slice(-1);}).join('');
+  var maxElapsed=active.reduce(function(max,o){return Math.max(max,now-(o.t||now));},0);
+  timer.style.color=maxElapsed>=pkgStartMs?'#E74C3C':maxElapsed>=cookStartMs?'#E67E22':'#E0E0EC';
+}
 function renderCaptureSnapshot(patch){
   lastCaptureSnapshot=Object.assign({}, lastCaptureSnapshot, patch||{});
   var orders=(lastCaptureSnapshot.orders||[]).filter(function(order){return order&&!order.expired;}).sort(function(a,b){return (b.elapsed||0)-(a.elapsed||0);});
@@ -2912,11 +2941,13 @@ function renderCaptureSnapshot(patch){
   if(feeValue)feeValue.textContent=orders.length;
   if(feeCount)feeCount.textContent=orders.length+'건';
   if(printerCount)printerCount.textContent=orders.length;
+  updateOutputTimer();
   if(feeGauge){feeGauge.style.width=feeGaugeRatio+'%';feeGauge.style.background=feeGaugeRatio>=100?'#E74C3C':feeGaugeRatio>70?'#E67E22':'#4FC3F7';}
   renderFeeOrderList(orders);
   renderFeeChannelBadges(orders);
   syncGateDashboardState();
 }
+setInterval(updateOutputTimer,1000);
 
 // NativeBridge에서 게이트 설정 수신
 function onGateSettingsUpdate(json) {
