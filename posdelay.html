@@ -41,6 +41,7 @@ linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-heigh
 .text-secondary{color:var(--text-secondary);}
 .text-xs{font-size:10px;}
 .note{font-size:10px;color:var(--text-muted);padding:4px 0;}
+.unit-hint{font-size:10px;line-height:1.35;color:var(--text-muted);font-weight:600;}
 .time-pill{display:inline-flex;align-items:center;justify-content:center;min-width:72px;min-height:44px;padding:0 12px;border-radius:10px;background:var(--bg-deep);border:1px solid var(--border);color:var(--text-bright);font-size:16px;font-weight:700;cursor:pointer;}
 .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:5px;padding-top:6px;}
 .summary-card{appearance:none;display:flex;flex-direction:column;gap:4px;width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:rgba(18,18,37,.56);color:inherit;text-align:left;font:inherit;cursor:pointer;touch-action:manipulation;}
@@ -328,8 +329,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="hero-grid">
       <div class="hero-panel primary">
         <span class="hero-label">처리</span>
-        <div class="hero-number-row"><span id="mCount" class="hero-number">--</span><span class="hero-unit">건</span></div>
+        <div class="hero-number-row"><span id="mCount" class="hero-number">--</span><span class="hero-unit">장</span></div>
         <div class="hero-meta strong">KDS</div>
+        <div id="kdsUnitHint" class="unit-hint">처리중 장수 · 자동화 3만원=1건</div>
       </div>
       <div class="hero-panel">
         <span class="hero-label">프린터</span>
@@ -639,6 +641,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_stop_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
       </div>
     </div>
+    <div id="gateUnitHint" class="unit-hint">가게배달=프린터 활성 · 영업정지(KDS)=3만원 환산</div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl" style="color:var(--c-mid)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>1건 이상부터 기준이상 금액</span><span>0건은 미만/0건 금액</span></div>
@@ -777,7 +780,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="stopPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
   </div>
   <div class="cb settings-panel" id="stop_body">
-    <div class="setting-hint">피크시간 안은 일반, 밖은 1인근무 · KDS 처리중 건수 기준</div>
+    <div id="stopUnitHint" class="setting-hint">피크시간 안은 일반, 밖은 1인근무 · 영업정지 KDS=3만원 환산, 자동수락 KDS=처리중 장수</div>
     <div class="threshold-grid">
       <div class="threshold-card">
         <div class="threshold-title">배민1</div>
@@ -1040,6 +1043,31 @@ function getActiveCount(){
   if(stS.order_count!=null)return stS.order_count;
   return kS.count;
 }
+function toCount(v){
+  var n=parseInt(v,10);
+  return isNaN(n)?0:Math.max(0,n);
+}
+function getKdsWeightedCount(){
+  if(stS.order_count_weighted!=null)return toCount(stS.order_count_weighted);
+  if(stS.weighted_count!=null)return toCount(stS.weighted_count);
+  if(kS.weighted_count!=null)return toCount(kS.weighted_count);
+  return toCount(getActiveCount());
+}
+function updateKdsUnitHints(){
+  var raw=getActiveCount();
+  var rawCount=raw!=null?toCount(raw):0;
+  var weighted=getKdsWeightedCount();
+  var kdsHint=document.getElementById('kdsUnitHint');
+  if(kdsHint)kdsHint.textContent='처리중 '+rawCount+'장 · 자동화 환산 '+weighted+'건 (3만원=1)';
+  var gateHint=document.getElementById('gateUnitHint');
+  if(gateHint){
+    var gs=null;
+    try{gs=gateSettings;}catch(e){gs=null;}
+    var stopSource=gs&&gs._stopSource==='PRINTER'?'프린터':'KDS환산';
+    var stopCount=gs&&gs._stopCount!=null?gs._stopCount:weighted;
+    gateHint.textContent='가게배달=프린터 '+(gs&&gs._validCount!=null?gs._validCount:0)+'건 · 영업정지='+stopSource+' '+stopCount+'건';
+  }
+}
 function isBaeminClubMode(){
   return false;
 }
@@ -1065,6 +1093,7 @@ function gateBaseLabel(){
 function updMonitor(){
   const c=getActiveCount();
   document.getElementById('mCount').textContent=c!=null?c:'--';
+  updateKdsUnitHints();
   const st=document.getElementById('mStatus');
   if(c!=null){
     const ci=Math.min(c,10);
@@ -1446,7 +1475,7 @@ function scrollToCard(id){
 function renderGroupSummary(){
   var gs=document.getElementById('groupSummary');
   if(!gs)return;
-  var c2=getActiveCount()||0;
+  var c2=getKdsWeightedCount();
   var items=[];
   // Zone에서 OFF/최소가 시작되는 건수 찾기
   function findZoneThreshold(zones,offVal){for(var i=0;i<zones.length;i++){if(zones[i]>=offVal)return i;}return zones.length;}
@@ -1455,33 +1484,34 @@ function renderGroupSummary(){
   var bBid=aS.baemin_current_bid;
   var bz=getZones('baemin');var bAdTh=findZoneThreshold(bz,3);
   var bMax=g(S,'baemin_amount',500),bMid=g(S,'baemin_mid_amount',300),bMin=g(S,'baemin_reduced_amount',50);
-  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:baeminBidLabel(bBid)==='-'?'OFF':baeminBidLabel(bBid),setting:bMax+'/'+bMid+'/'+baeminMinLabel(),card:'adSettingCard',count:c2,threshold:bAdTh,exceeded:c2>=bAdTh&&bAdTh<=10});
+  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:baeminBidLabel(bBid)==='-'?'OFF':baeminBidLabel(bBid),setting:bMax+'/'+bMid+'/'+baeminMinLabel(),card:'adSettingCard',count:c2,threshold:bAdTh,unit:'환산',exceeded:c2>=bAdTh&&bAdTh<=10});
   // 쿠팡 광고 (2=OFF)
   var cAdOn=S.coupang_auto_enabled;
   var cOn=aS.coupang_current_on;
   var cz=getZones('coupang');var cAdTh=findZoneThreshold(cz,2);
-  items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',setting:cAdTh+'건↑OFF',card:'coupangAdCard',count:c2,threshold:cAdTh,exceeded:c2>=cAdTh&&cAdTh<=10});
+  items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',setting:cAdTh+'건↑OFF',card:'coupangAdCard',count:c2,threshold:cAdTh,unit:'환산',exceeded:c2>=cAdTh&&cAdTh<=10});
   // 배민 지연
   var bdt=g(S,'baemin_delay_threshold',5);
   var btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
   var bDel=c2>0?Math.max(0,Math.round(c2*avgInterval+bfc-btt)):0;
   var bdOn=S.baemin_delay_enabled!==false;
-  items.push({name:'배민지연',color:'var(--c-baemin)',on:bdOn,detail:bDel+'분',setting:'목표'+btt+'분',card:'baeminDelayCard',count:c2,threshold:bdt,exceeded:bDel>0});
+  items.push({name:'배민지연',color:'var(--c-baemin)',on:bdOn,detail:bDel+'분',setting:'목표'+btt+'분',card:'baeminDelayCard',count:c2,threshold:bdt,unit:'환산',exceeded:bDel>0});
   // 쿠팡 지연
   var cdt=g(S,'coupang_delay_threshold',5);
   var ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
   var cDel=c2>0?Math.max(0,Math.round(c2*avgInterval+cfc-ctt)):0;
   var cdOn=S.coupang_delay_enabled!==false;
   var cdAuto=S.coupang_delay_auto;
-  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:cdOn,detail:cDel+'분',setting:'목표'+ctt+'분'+(cdAuto?' · 자동':''),card:'coupangDelayCard',count:c2,threshold:cdt,exceeded:cDel>0});
+  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:cdOn,detail:cDel+'분',setting:'목표'+ctt+'분'+(cdAuto?' · 자동':''),card:'coupangDelayCard',count:c2,threshold:cdt,unit:'환산',exceeded:cDel>0});
   // 배달료
   var feeThreshold=gateSettings.threshold||8;
   var baseFee=gateSettings.base||0;
-  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold});
+  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'프린터 · 임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold,unit:'프린터'});
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
-  var stopCount=gateSettings._stopSource==='PRINTER'?(gateSettings._validCount||0):c2;
-  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'ON':'OFF',setting:(gateSettings._stopSource==='PRINTER'?'프린터':'KDS')+' · 임계'+stopThreshold+'건',card:'stopPanel',count:stopCount,threshold:stopThreshold});
+  var stopPrinter=gateSettings._stopSource==='PRINTER';
+  var stopCount=stopPrinter?(gateSettings._validCount||0):(gateSettings._stopCount!=null?gateSettings._stopCount:c2);
+  items.push({name:'영업정지',color:'var(--c-off)',on:gateSettings._stopEnabled,detail:gateSettings._stopDefending?'정지중':gateSettings._stopEnabled?'ON':'OFF',setting:(stopPrinter?'프린터':'KDS환산')+' · 임계'+stopThreshold+'건',card:'stopPanel',count:stopCount,threshold:stopThreshold,unit:stopPrinter?'프린터':'환산'});
   // 즉시할인
   var discCur=g(S,'baemin_discount_current',g(aS,'baemin_discount_current',0));
   var clubTip=!!(S.baemin_club_tip_active||aS.baemin_club_tip_active);
@@ -1500,7 +1530,7 @@ function renderGroupSummary(){
     var fillColor=!it.on?'#555':ratio>=100||it.exceeded?'#E74C3C':ratio>70?'#E67E22':it.color;
     var detailColor=it.exceeded?'#E74C3C':it.on?'var(--text-bright)':'var(--text-muted)';
     var countText=hasGauge?(it.count||0)+'/'+it.threshold:(it.on?'ON':'OFF');
-    var metaLeft=hasGauge?(it.count||0)+'건':(it.on?'ON':'OFF');
+    var metaLeft=hasGauge?((it.unit?it.unit+' ':'')+(it.count||0)+'건'):(it.on?'ON':'OFF');
     var metaRight=it.setting||'-';
     h+='<button type="button" class="summary-card'+(it.on?'':' off')+'" onclick="scrollToCard(\''+it.card+'\')">';
     h+='<span class="summary-head"><span class="dot '+(it.on?'dg':'dd')+'"></span><span class="summary-name" style="color:'+(it.on?it.color:'#707088')+'">'+it.name+'</span><span class="summary-count" style="color:'+(it.on?fillColor:'#555')+'">'+countText+'</span></span>';
@@ -3010,6 +3040,7 @@ function onGateStatusUpdate(jsonStr) {
     var sc = document.getElementById('gate_stop_count');
     if(fc) fc.textContent = (s.validCount||0)+'건';
     if(sc) sc.textContent = gateSettings._stopCount+'건';
+    updateKdsUnitHints();
 
     // 게이지 바
     var fb = document.getElementById('gate_fee_bar');
