@@ -1,30 +1,40 @@
-bbq-dashboard — GitHub Pages 현황판
-=====================================
+bbq-dashboard — site/static-web 운영 현황판
+=========================================
 
 ## 구조
-- index.html          : 메인 랜딩 (앱 진입 카드)
-- dashboard.html      : 통합 대시보드
-- posdelay.html       : PosDelay 현황판 (상단 상황/제어/임계값, KDS 처리중 장수/3만원 환산건수 힌트, 운영 로그 리스트, 접힌 원문 진단, 배달료 조정/운영모드/자동수락/영업정지 임계값 포함)
-- POSDELAY_UI_STANDARDS.md : PosDelay 화면 카테고리/자동저장/임계값 카드 추가 기준
-- kds.html            : PosKDS 현황판
-- banktotal.html      : BankTotal 현황판
-- evidence.html       : 증거 페이지 (legal)
-- hikorea-guide.html  : HiKorea 가이드
-- saaya.html          : SaaYa 페이지
-- CODEX_HANDOFF.md    : Codex 인수인계 문서
+- index.html                : 메인 랜딩(앱 진입 카드)
+- dashboard.html            : 통합 대시보드
+- posdelay.html             : PosDelay 운영 대시보드(상태/임계값 표시)
+- kds.html                  : PosKDS 운영 대시보드
+- banktotal.html            : BankTotal 운영 대시보드
+- evidence.html             : 법적 증빙 페이지
+- hikorea-guide.html        : HiKorea 안내
+- saaya.html                : SaaYa 페이지
+- POSDELAY_UI_STANDARDS.md  : PosDelay UI 카테고리·카드 가이드
+- CODEX_HANDOFF.md          : 최근 Codex 전달 메모
+- APP_INTENT.md            : 앱/대시보드 목적 및 완료 기준
+- AI_HANDOFF.md            : 현재 상태/다음 큐 포인터
+- CLAUDE.md                : 세션 운영 규칙
+- README.md                : 저장소 문서 개요
 
 ## 배포
-- GitHub Pages 자동 반영 (main 브랜치 push 시)
+- hosted/public 정적 호스팅(주로 GitHub Pages)로 노출
 - 로컬 빌드 불필요
 
 ## 주요 의존
-- Firebase RTDB (읽기 전용, 현황 표시용)
-- SSE 스트림 (실시간 갱신)
+- Firebase RTDB Read-only 사용(표시/판독 전용)
+- SSE 스트림(실시간 갱신)
 
-## posdelay.html 주요 섹션
-- gateSettings : 배달료 조정 설정 (threshold/valid/fee/base)
-  - threshold: min 1, max 50 (프린터 30분 활성건수 기준)
-  - valid: min 10, max 60 분
-  - fee/base: min 0, max 4000 원, 500원 단위. threshold 이상은 fee, threshold 미만과 0건은 base 적용
-- adjGate(key, delta) : 게이트 값 조정 함수
-- 최근 동작 타임라인: `/posdelay/logs`, `/posdelay/action_log`, `/posdelay/error_reports`를 병합해 상황판과 진단 `흐름` 탭에 시간순 표시
+## 경계
+- `bbq-dashboard`는 site/static-web 기준의 정적 운영 대시보드임.
+- `Dashboard(Android WebView)`는 별도 런타임/프로젝트이며 본 저장소와 소유권/동작 경로를 혼동하지 않음.
+- Firebase Write, 배포 실행, 카카오/ADB/LIVE action은 별도 승인 범위 또는 별도 작업 흐름으로 분리.
+
+## MCP 정렬
+- 검증 체계: Firebase MCP(Read-only), Playwright(스크린샷), Axe(접근성).
+- 문서 기준 완료 조건: desktop/mobile 스크린샷 보유, Axe 결과 보유, hosted/public URL 확인, Firebase read-only 경계 확인
+
+## posdelay.html 핵심 영역
+- `/posdelay/logs`, `/posdelay/action_log`, `/posdelay/error_reports` 병합 타임라인
+- 배달료 게이트: threshold/valid/fee/base 경로의 표시/조정 상태
+- 공지/진단: 접힘/펼침 및 활동 로그
