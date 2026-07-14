@@ -1506,7 +1506,8 @@ function renderGroupSummary(){
   // 배달료
   var feeThreshold=gateSettings.threshold||8;
   var baseFee=gateSettings.base||0;
-  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:((gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:baseFee)||0).toLocaleString()+'원',setting:'프린터 · 임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold,unit:'프린터'});
+  var confirmedFee=gateSettings._lastAppliedFee;
+  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:confirmedFee!=null?confirmedFee.toLocaleString()+'원':'확인 중',setting:'프린터 · 임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold,unit:'프린터'});
   // 영업정지
   var stopThreshold=gateSettings.threshold_stop||15;
   var stopPrinter=gateSettings._stopSource==='PRINTER';
@@ -2812,7 +2813,7 @@ function syncGateDashboardState() {
   var stopSource=stopMode==='PRINTER'?'프린터':'KDS';
   var feeRemain=Math.max(0,threshold-validCount);
   var stopRemain=Math.max(0,stopThreshold-stopCount);
-  var feeCurrent=(gateSettings._stopDefending?(gateSettings.base||0):(gateSettings._isFeeDefending?(gateSettings._currentFeeApplied!=null?gateSettings._currentFeeApplied:(gateSettings.fee||0)):(gateSettings.base||0)))||0;
+  var feeCurrent=gateSettings._lastAppliedFee;
   var feeState=gateSettings._stopDefending?'정지중':gateSettings._isFeeDefending?'변경중':gateSettings.enabled?'ON':'OFF';
   var feePrinter=document.getElementById('src_printer');
   if(feePrinter){feePrinter.style.background='#2AC1BC';feePrinter.style.color='#FFF';}
@@ -2835,7 +2836,7 @@ function syncGateDashboardState() {
   var feeLiveState=document.getElementById('feeLiveState');
   if(feeLiveState)feeLiveState.textContent=feeState;
   var heroFeeCurrent=document.getElementById('heroFeeCurrent');
-  if(heroFeeCurrent)heroFeeCurrent.textContent=feeCurrent.toLocaleString()+'원';
+  if(heroFeeCurrent)heroFeeCurrent.textContent=feeCurrent!=null?feeCurrent.toLocaleString()+'원':'확인 중';
   var heroFeeMode=document.getElementById('heroFeeMode');
   if(heroFeeMode){
     heroFeeMode.textContent=feeState;
@@ -2862,7 +2863,7 @@ function syncGateDashboardState() {
     else stopLiveHint.textContent='-';
   }
   var gateSummary=document.getElementById('gateSummary');
-  if(gateSummary)gateSummary.textContent=feeCurrent.toLocaleString()+'원  임계'+threshold+'건'+(isGateClubMode()?' · 클럽':'');
+  if(gateSummary)gateSummary.textContent=(feeCurrent!=null?feeCurrent.toLocaleString()+'원':'확인 중')+'  임계'+threshold+'건'+(isGateClubMode()?' · 클럽':'');
   var stopSummary=document.getElementById('stopSummary');
   if(stopSummary)stopSummary.textContent=policySettings.enabled
     ? (policySettings.time_mode_enabled?'피크설정':'항상일반')+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
@@ -3026,13 +3027,14 @@ function onGateStatusUpdate(jsonStr) {
     }
     if(s.currentFee != null) gateSettings.fee = clampFeeValue(s.currentFee);
     if(s.baseFee !== undefined) gateSettings.base = clampFeeValue(s.baseFee);
+    if(Object.prototype.hasOwnProperty.call(s,'lastAppliedFee')) gateSettings._lastAppliedFee = s.lastAppliedFee;
     if(s.gateEnabled !== undefined) gateSettings.enabled = s.gateEnabled;
     if(s.stopEnabled !== undefined) gateSettings._stopEnabled = s.stopEnabled;
     gateSettings._activeTab = 'PRINTER';
     if(s.stopSource) gateSettings._stopSource = s.stopSource;
     gateSettings._isFeeDefending = !!s.isFeeDefending;
     gateSettings._stopDefending = !!s.isStopDefending;
-    gateSettings._currentFeeApplied = s.isFeeDefending ? (s.currentFee||0) : (s.baseFee!=null?s.baseFee:(gateSettings.base||0));
+    gateSettings._currentFeeApplied = gateSettings._lastAppliedFee;
     gateSettings._stopCount = gateSettings._stopSource==='PRINTER' ? (s.validCount||0) : (s.totalCount||0);
     syncGatePriceDisplay();
     // 건수 표시
@@ -3052,12 +3054,16 @@ function onGateStatusUpdate(jsonStr) {
     var fcv = document.getElementById('fee_current_value');
     var fcs = document.getElementById('fee_current_status');
     if(fcv) {
-      if(s.isFeeDefending) {
-        fcv.textContent = (s.currentFee||0).toLocaleString()+'원';
+      if(gateSettings._lastAppliedFee==null) {
+        fcv.textContent = '확인 중';
+        fcv.style.color = '#E67E22';
+        if(fcs) fcs.style.borderLeft = '3px solid #E67E22';
+      } else if(s.isFeeDefending) {
+        fcv.textContent = gateSettings._lastAppliedFee.toLocaleString()+'원';
         fcv.style.color = '#E74C3C';
         if(fcs) fcs.style.borderLeft = '3px solid #E74C3C';
       } else {
-        fcv.textContent = (s.baseFee||0).toLocaleString()+'원';
+        fcv.textContent = gateSettings._lastAppliedFee.toLocaleString()+'원';
         fcv.style.color = '#2ECC71';
         if(fcs) fcs.style.borderLeft = '3px solid #2ECC71';
       }
@@ -3101,7 +3107,7 @@ function onGateStatusUpdate(jsonStr) {
 
     // ═══ 접힌 헤더 요약값 업데이트 ═══
     var gateSummary = document.getElementById('gateSummary');
-    if(gateSummary) gateSummary.textContent = (s.currentFee||0).toLocaleString()+'원  임계'+(s.thresholdFee||8)+'건'+(isGateClubMode()?' · 클럽':'');
+    if(gateSummary) gateSummary.textContent = (gateSettings._lastAppliedFee!=null?gateSettings._lastAppliedFee.toLocaleString()+'원':'확인 중')+'  임계'+(s.thresholdFee||8)+'건'+(isGateClubMode()?' · 클럽':'');
     var ss2 = document.getElementById('stopSummary');
     if(ss2) ss2.textContent = s.isStopDefending ? '정지중' : (gateSettings._stopEnabled ? 'ON  임계'+(s.thresholdStop||15)+'건' : 'OFF');
     syncGateDashboardState();
@@ -3124,7 +3130,11 @@ function onCaptureStatusUpdate(jsonStr) {
 
 // ═══ 수동 배달료/영업 조정 ═══
 function manualDefense(action, fee) {
-  var finalFee = action.includes('fee_up') ? String(parseInt(fee)||gateSettings.fee||4000) : String(fee||0);
+  var parsedFee=parseInt(fee,10);
+  var configuredFee=parseInt(gateSettings.fee,10);
+  var finalFee=action.includes('fee_up')
+    ? String(Number.isFinite(parsedFee)?parsedFee:(Number.isFinite(configuredFee)?configuredFee:4000))
+    : String(Number.isFinite(parsedFee)?parsedFee:0);
   if(action.includes('fee_up'))finalFee=String(clampFeeValue(finalFee));
   if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, finalFee);
 }
