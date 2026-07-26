@@ -41,12 +41,23 @@ function element() {
 const elements = new Map();
 const calls = [];
 const gateWrites = [];
+const FIXED_NOW = 1785038400000;
+const NativeDate = Date;
+class FixedDate extends NativeDate {
+  static now() { return FIXED_NOW; }
+  static parse(value) { return NativeDate.parse(value); }
+}
 const context = {
   console,
+  Date: FixedDate,
   JSON,
   Math,
   Number,
   Object,
+  String,
+  aS: {},
+  S: {},
+  gateClubMode: false,
   gateSettings: { threshold: 1, threshold_stop: 11, fee: 3000, base: 2000, enabled: true },
   stopChannels: {},
   lastCaptureSnapshot: { orders: [], thresholdFee: 1 },
@@ -65,13 +76,17 @@ const context = {
   updateKdsUnitHints() {},
   renderCaptureSnapshot() {},
   syncGateDashboardState() {},
-  isGateClubMode() { return false; },
+  isGateClubMode() { return context.gateClubMode; },
   NativeBridge: {
     manualDefense(action, fee) { calls.push([action, fee]); },
     updateGateSettings(json) { gateWrites.push(JSON.parse(json)); }
   }
 };
 vm.createContext(context);
+vm.runInContext(extractFunction('parseClubReadbackTimestamp'), context);
+vm.runInContext(extractFunction('isFreshClubReadback'), context);
+vm.runInContext(extractFunction('gateClubStatusModel'), context);
+vm.runInContext(extractFunction('syncGateClubToggle'), context);
 vm.runInContext(extractFunction('onGateStatusUpdate'), context);
 vm.runInContext(extractFunction('manualDefense'), context);
 vm.runInContext(extractFunction('adjStop'), context);
@@ -113,4 +128,94 @@ assert.deepStrictEqual(gateWrites.pop(), { threshold_stop: 12 });
 context.setStopSource('PRINTER');
 assert.deepStrictEqual(gateWrites.pop(), { stopSource: 'PRINTER' });
 
-console.log('PASS posdelay fee/stop UI native readback and write contract');
+function clubEvidence(active, overrides = {}) {
+  return {
+    baemin_club_tip_active: active,
+    baemin_club_tip_verified_at: FIXED_NOW - 60 * 1000,
+    baemin_club_tip_verification_source: 'baemin_api_readback',
+    baemin_club_tip_verification_fresh: true,
+    phone_role: 'kitchen',
+    engine_role: 'PRIMARY',
+    updated_at_ms: FIXED_NOW - 30 * 1000,
+    ...overrides
+  };
+}
+
+assert.strictEqual(
+  context.gateClubStatusModel(false, clubEvidence(true), FIXED_NOW).text,
+  '클럽 자동 미사용'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, { baemin_club_tip_active: true }, FIXED_NOW).text,
+  '서버 상태 확인 중'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true), FIXED_NOW).text,
+  '배민클럽 ON · 서버 확인'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(false), FIXED_NOW).text,
+  '현재 OFF · 조건 충족 시 자동 ON'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true, {
+    baemin_club_tip_verified_at: FIXED_NOW - 10 * 60 * 1000,
+    updated_at_ms: FIXED_NOW - 10 * 60 * 1000
+  }), FIXED_NOW).text,
+  '배민클럽 ON · 서버 확인'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true, {
+    baemin_club_tip_verified_at: FIXED_NOW - 10 * 60 * 1000 - 1
+  }), FIXED_NOW).text,
+  '서버 상태 확인 중'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true, {
+    updated_at_ms: FIXED_NOW - 10 * 60 * 1000 - 1
+  }), FIXED_NOW).text,
+  '서버 상태 확인 중'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true, {
+    baemin_club_tip_verification_source: 'local_cache'
+  }), FIXED_NOW).text,
+  '서버 상태 확인 중'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true, {
+    phone_role: 'main',
+    engine_role: 'STANDBY'
+  }), FIXED_NOW).text,
+  '서버 상태 확인 중'
+);
+assert.strictEqual(
+  context.gateClubStatusModel(true, clubEvidence(true, {
+    phone_role: 'main',
+    engine_role: 'TAKEOVER'
+  }), FIXED_NOW).text,
+  '배민클럽 ON · 서버 확인'
+);
+
+context.gateClubMode = true;
+context.aS = clubEvidence(true);
+context.syncGateClubToggle();
+assert.strictEqual(elements.get('tog_gate_club').className, 'tog on');
+assert.strictEqual(elements.get('gateClubApplyStatus').textContent, '배민클럽 ON · 서버 확인');
+context.aS = clubEvidence(false);
+context.syncGateClubToggle();
+assert.strictEqual(elements.get('gateClubApplyStatus').textContent, '현재 OFF · 조건 충족 시 자동 ON');
+context.aS = clubEvidence(true, { baemin_club_tip_verification_fresh: false });
+context.syncGateClubToggle();
+assert.strictEqual(elements.get('gateClubApplyStatus').textContent, '서버 상태 확인 중');
+context.gateClubMode = false;
+context.syncGateClubToggle();
+assert.strictEqual(elements.get('tog_gate_club').className, 'tog');
+assert.strictEqual(elements.get('gateClubApplyStatus').textContent, '클럽 자동 미사용');
+
+const forbiddenLabels = ['미적용', '서버 적용 확인됨'];
+forbiddenLabels.forEach((label) => {
+  assert(!source.slice(source.indexOf('function syncGateClubToggle'), source.indexOf('// 페이지 로드 시')).includes(label));
+});
+
+console.log('PASS posdelay fee/stop and Baemin Club readback UI contracts');
