@@ -40,6 +40,7 @@ function element() {
 
 const elements = new Map();
 const calls = [];
+const gateWrites = [];
 const context = {
   console,
   JSON,
@@ -65,11 +66,16 @@ const context = {
   renderCaptureSnapshot() {},
   syncGateDashboardState() {},
   isGateClubMode() { return false; },
-  NativeBridge: { manualDefense(action, fee) { calls.push([action, fee]); } }
+  NativeBridge: {
+    manualDefense(action, fee) { calls.push([action, fee]); },
+    updateGateSettings(json) { gateWrites.push(JSON.parse(json)); }
+  }
 };
 vm.createContext(context);
 vm.runInContext(extractFunction('onGateStatusUpdate'), context);
 vm.runInContext(extractFunction('manualDefense'), context);
+vm.runInContext(extractFunction('adjStop'), context);
+vm.runInContext(extractFunction('setStopSource'), context);
 
 const baseStatus = {
   thresholdFee: 1,
@@ -79,6 +85,7 @@ const baseStatus = {
   gateEnabled: true,
   activeTab: 'PRINTER',
   stopSource: 'KDS',
+  defenseMode: 'BA',
   validCount: 4,
   totalCount: 1,
   isFeeDefending: true,
@@ -89,6 +96,10 @@ const baseStatus = {
 context.onGateStatusUpdate(JSON.stringify({ ...baseStatus, lastAppliedFee: 3000 }));
 assert.strictEqual(elements.get('fee_current_value').textContent, '3,000원');
 assert.strictEqual(elements.get('gateSummary').textContent, '3,000원  임계1건');
+assert.strictEqual(context.gateSettings.threshold_stop, 11);
+assert.strictEqual(context.gateSettings._stopSource, 'KDS');
+assert.strictEqual(context.gateSettings._defenseMode, 'BA');
+assert.strictEqual(context.gateSettings._stopCount, 1);
 
 context.onGateStatusUpdate(JSON.stringify({ ...baseStatus, lastAppliedFee: null }));
 assert.strictEqual(elements.get('fee_current_value').textContent, '확인 중');
@@ -97,4 +108,9 @@ assert.strictEqual(elements.get('gateSummary').textContent, '확인 중  임계1
 context.manualDefense('fee_up', 0);
 assert.deepStrictEqual(calls.pop(), ['fee_up', '0']);
 
-console.log('PASS posdelay fee UI readback/null/zero');
+context.adjStop('threshold', 1);
+assert.deepStrictEqual(gateWrites.pop(), { threshold_stop: 12 });
+context.setStopSource('PRINTER');
+assert.deepStrictEqual(gateWrites.pop(), { stopSource: 'PRINTER' });
+
+console.log('PASS posdelay fee/stop UI native readback and write contract');

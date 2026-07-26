@@ -24,11 +24,10 @@ assert.deepStrictEqual(missingClickHandlers, [], `missing click handlers: ${miss
 
 const removedIds = [
   'pullInd', 'gaugeCard', 'mBd', 'mBv', 'mCd', 'mCv',
-  'stop_src_printer', 'stop_src_kds', 'stop_src_label', 'stop_kds_count',
-  'stopLiveCountHint', 'stop_threshold', 'stop_threshold_disp', 'stopLiveThreshold',
-  'stopLiveState', 'stopLiveHint', 'stop_kds_bar', 'stop_status',
+  'stop_kds_count', 'stopLiveCountHint', 'stop_threshold',
+  'stop_kds_bar', 'stop_status',
   'tog_pause_own', 'tog_pause_agency', 'tog_pause_visit', 'tog_pause_coupang',
-  'tog_pause_yogiyo', 'gate_stop_label', 'gate_stop_count', 'gate_stop_bar'
+  'tog_pause_yogiyo'
 ];
 for (const id of removedIds) {
   assert(!source.includes(`id="${id}"`), `dead hidden node returned: ${id}`);
@@ -36,8 +35,7 @@ for (const id of removedIds) {
 }
 
 const removedFunctions = [
-  'hSet', 'doCheck', 'saveAll', 'addOpsRow', 'adjStop', 'setStopSource',
-  'togChannel', 'togAdOffOnPause'
+  'hSet', 'doCheck', 'saveAll', 'addOpsRow', 'togChannel', 'togAdOffOnPause'
 ];
 for (const name of removedFunctions) {
   assert(!source.includes(`function ${name}(`), `dead function returned: ${name}`);
@@ -66,6 +64,15 @@ assert(source.includes('원문 진단 (운영 설정의 접힌 보조 카드)'))
 assert(source.includes("on:policySettings.enabled"), 'stop summary must use the visible policy settings source');
 assert(!source.includes('legacy dead UI'), 'legacy compatibility shell must stay removed');
 assert(source.includes("Object.prototype.hasOwnProperty.call(aS,'baemin_club_tip_active')"), 'server club state must override stale local state');
+for (const id of ['stop_src_printer', 'stop_src_kds', 'stop_src_label', 'stop_threshold_disp', 'stopLiveThreshold', 'stopLiveState', 'stopLiveHint', 'gate_stop_label', 'gate_stop_count', 'gate_stop_bar']) {
+  assert(ids.includes(id), `live DefenseEngine control/state node missing: ${id}`);
+}
+assert(source.includes('function adjStop('), 'threshold_stop is a live NativeBridge field and must remain connected');
+assert(source.includes('function setStopSource('), 'stopSource is a live NativeBridge field and must remain connected');
+assert(source.includes("NativeBridge.updateGateSettings(JSON.stringify({threshold_stop:gateSettings.threshold_stop}))"));
+assert(source.includes("NativeBridge.updateGateSettings(JSON.stringify({stopSource:gateSettings._stopSource}))"));
+assert(source.includes("if(s.defenseMode)gateSettings._defenseMode=s.defenseMode;"), 'runtime defense mode must be rendered');
+assert(source.includes("gateSettings._stopCount = gateSettings._stopSource==='PRINTER'"), 'runtime stop count must follow selected source');
 const adStateHandlerStart = source.indexOf('function hASt(');
 const adStateHandlerEnd = source.indexOf('function hStatus(', adStateHandlerStart);
 assert(adStateHandlerStart >= 0 && adStateHandlerEnd > adStateHandlerStart, 'ad state callback block missing');

@@ -640,6 +640,31 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_fee_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
     </div>
     <div id="gateUnitHint" class="unit-hint">가게배달=프린터 30분 활성건수</div>
+    <div class="settings-block" id="gateStopDefensePanel" style="margin-top:8px">
+      <div class="settings-title">
+        <span>배달료 연동 자동정지</span>
+        <small id="stopModeLabel">모드 확인 중</small>
+      </div>
+      <div class="setting-hint">플랫폼별 정책 영업정지와 별도입니다. 현재 운영 모드가 자동정지를 포함할 때만 이 기준을 사용합니다.</div>
+      <div class="sr">
+        <span class="sl">건수 소스</span>
+        <div class="sv" style="gap:4px">
+          <button class="btn bs" id="stop_src_printer" type="button" onclick="setStopSource('PRINTER')">프린터</button>
+          <button class="btn bs" id="stop_src_kds" type="button" onclick="setStopSource('KDS')">KDS 환산</button>
+        </div>
+      </div>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span id="gate_stop_label">연동 영업정지</span><span id="gate_stop_count" style="color:var(--c-off);font-weight:bold">0건</span></div>
+        <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_stop_bar" style="height:100%;width:0%;background:var(--c-off);transition:width .3s"></div></div>
+      </div>
+      <div class="sr"><span class="sl">정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold_disp" style="color:var(--c-off);font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+      <div class="badge-row">
+        <span class="badge"><span id="stop_src_label">KDS 환산</span></span>
+        <span class="badge">상태 <b id="stopLiveState">OFF</b></span>
+        <span class="badge" id="stopLiveThreshold">임계 15건</span>
+        <span class="badge" id="stopLiveHint">대기</span>
+      </div>
+    </div>
     <div style="margin:8px 0">
       <div class="sr"><span class="sl" style="color:var(--c-mid)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>1건 이상부터 기준이상 금액</span><span>0건은 미만/0건 금액</span></div>
@@ -1467,10 +1492,14 @@ function renderGroupSummary(){
   var feeThreshold=gateSettings.threshold||8;
   var confirmedFee=gateSettings._lastAppliedFee;
   items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:confirmedFee!=null?confirmedFee.toLocaleString()+'원':'확인 중',setting:'프린터 · 임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold,unit:'프린터'});
-  // 영업정지: 현재 설정 UI의 policySettings가 단일 표시 소스다.
+  // 정책 영업정지와 로컬 DefenseEngine 연동 정지는 서로 다른 실행 경로다.
   var stopMode=policySettings.time_mode_enabled?'피크설정':'항상일반';
   var stopSetting=stopMode+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at;
-  items.push({name:'영업정지',color:'var(--c-off)',on:policySettings.enabled,detail:gateSettings._stopDefending?'정지중':policySettings.enabled?'ON':'OFF',setting:stopSetting,card:'stopPanel'});
+  items.push({name:'정책 영업정지',color:'var(--c-off)',on:policySettings.enabled,detail:policySettings.enabled?'정책 ON':'OFF',setting:stopSetting,card:'stopPanel'});
+  var defenseStopMode=gateSettings._defenseMode||gateSettings.mode||'B';
+  if(defenseStopMode==='A'||defenseStopMode==='BA'||gateSettings._stopDefending){
+    items.push({name:'배달료 연동정지',color:'var(--c-off)',on:gateSettings.enabled,detail:gateSettings._stopDefending?'정지중':gateSettings.enabled?'대기':'OFF',setting:defenseStopMode+' · '+(gateSettings._stopSource==='PRINTER'?'프린터':'KDS환산')+' · 임계'+(gateSettings.threshold_stop||15)+'건',card:'gatePanel'});
+  }
   // 즉시할인
   var discCur=g(S,'baemin_discount_current',g(aS,'baemin_discount_current',0));
   var clubTip=!!(S.baemin_club_tip_active||aS.baemin_club_tip_active);
@@ -2146,7 +2175,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ═══ 게이트(배달료) ═══
-let gateSettings = {threshold:8, valid:30, fee:4000, base:0, clubAuto:false, enabled:false};
+let gateSettings = {threshold:8, threshold_stop:15, valid:30, fee:4000, base:0, clubAuto:false, enabled:false, _stopSource:'KDS', _defenseMode:'B'};
 let policySettings = {
   enabled:false,
   auto_accept_enabled:true,
@@ -2580,9 +2609,12 @@ try {
     gateSettings.fee = clampFeeValue(gateSettings.fee);
     gateSettings.base = clampFeeValue(gateSettings.base);
     gateSettings._activeTab='PRINTER';
+    gateSettings._stopSource=saved.stopSource||gateSettings._stopSource||'KDS';
+    gateSettings._defenseMode=saved.mode||gateSettings._defenseMode||'B';
     // UI 즉시 반영
     document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건';
     document.getElementById('gate_valid').textContent = gateSettings.valid+'분';
+    document.getElementById('stop_threshold_disp').textContent = (gateSettings.threshold_stop||15)+'건';
     document.getElementById('feeThresholdNum').textContent = gateSettings.threshold;
     setTimeout(function(){setFeeSource('PRINTER');}, 300);
     document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
@@ -2604,6 +2636,16 @@ function adjGate(key, delta) {
   if (key==='base') { gateSettings.base = clampFeeValue((gateSettings.base||0)+delta); syncGatePriceDisplay(); }
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+}
+
+function adjStop(key, delta) {
+  if(key!=='threshold')return;
+  var min=Math.max(4,(gateSettings.threshold||8)+1);
+  gateSettings.threshold_stop=Math.max(min,Math.min(100,(gateSettings.threshold_stop||15)+delta));
+  var display=document.getElementById('stop_threshold_disp');
+  if(display)display.textContent=gateSettings.threshold_stop+'건';
+  syncGateDashboardState();
+  if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({threshold_stop:gateSettings.threshold_stop}));
 }
 
 function setGateFee(v) {
@@ -2673,6 +2715,12 @@ function setFeeSource(src) {
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: 'PRINTER'}));
 }
 
+function setStopSource(src) {
+  gateSettings._stopSource=src==='PRINTER'?'PRINTER':'KDS';
+  syncGateDashboardState();
+  if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({stopSource:gateSettings._stopSource}));
+}
+
 function togCB(id) {
   const e = document.getElementById(id);
   if(!e) return;
@@ -2740,12 +2788,22 @@ function syncGateDashboardState() {
   var threshold=gateSettings.threshold||8;
   var valid=gateSettings.valid||30;
   var validCount=gateSettings._validCount||0;
+  var stopThreshold=gateSettings.threshold_stop||15;
+  var stopMode=gateSettings._defenseMode||gateSettings.mode||'B';
+  var stopEnabledByMode=stopMode==='A'||stopMode==='BA';
+  var stopSource=gateSettings._stopSource==='PRINTER'?'프린터':'KDS 환산';
+  var stopCount=gateSettings._stopCount||0;
+  var stopRemain=Math.max(0,stopThreshold-stopCount);
   var feeSource='프린터';
   var feeRemain=Math.max(0,threshold-validCount);
   var feeCurrent=gateSettings._lastAppliedFee;
   var feeState=gateSettings._stopDefending?'정지중':gateSettings._isFeeDefending?'변경중':gateSettings.enabled?'ON':'OFF';
   var feePrinter=document.getElementById('src_printer');
   if(feePrinter){feePrinter.style.background='#2AC1BC';feePrinter.style.color='#FFF';}
+  var stopPrinter=document.getElementById('stop_src_printer');
+  var stopKds=document.getElementById('stop_src_kds');
+  if(stopPrinter){stopPrinter.style.background=gateSettings._stopSource==='PRINTER'?'#2AC1BC':'#2A2A45';stopPrinter.style.color=gateSettings._stopSource==='PRINTER'?'#FFF':'#E0E0EC';}
+  if(stopKds){stopKds.style.background=gateSettings._stopSource==='KDS'?'#2AC1BC':'#2A2A45';stopKds.style.color=gateSettings._stopSource==='KDS'?'#FFF':'#E0E0EC';}
   var feeLiveSource=document.getElementById('feeLiveSource');
   if(feeLiveSource)feeLiveSource.textContent=feeSource;
   var feeThresholdNum=document.getElementById('feeThresholdNum');
@@ -2767,6 +2825,22 @@ function syncGateDashboardState() {
     heroFeeMode.textContent=feeState;
     heroFeeMode.style.color=gateSettings._stopDefending?'#E74C3C':gateSettings._isFeeDefending?'#E67E22':'var(--text-secondary)';
   }
+  var stopModeLabel=document.getElementById('stopModeLabel');
+  if(stopModeLabel)stopModeLabel.textContent=stopMode+(stopEnabledByMode?' · 자동정지 사용':' · 배달료 전용');
+  var stopSrcLabel=document.getElementById('stop_src_label');
+  if(stopSrcLabel)stopSrcLabel.textContent=stopSource;
+  var stopCountEl=document.getElementById('gate_stop_count');
+  if(stopCountEl)stopCountEl.textContent=stopCount+'건';
+  var stopThresholdEl=document.getElementById('stop_threshold_disp');
+  if(stopThresholdEl)stopThresholdEl.textContent=stopThreshold+'건';
+  var stopLiveThreshold=document.getElementById('stopLiveThreshold');
+  if(stopLiveThreshold)stopLiveThreshold.textContent='임계 '+stopThreshold+'건';
+  var stopLiveState=document.getElementById('stopLiveState');
+  if(stopLiveState)stopLiveState.textContent=gateSettings._stopDefending?'정지중':stopEnabledByMode&&gateSettings.enabled?'대기':'OFF';
+  var stopLiveHint=document.getElementById('stopLiveHint');
+  if(stopLiveHint)stopLiveHint.textContent=!stopEnabledByMode?'B 모드 미사용':gateSettings._stopDefending?'임계 도달':stopRemain>0?stopRemain+'건 남음':'도달';
+  var stopBar=document.getElementById('gate_stop_bar');
+  if(stopBar){var stopRatio=Math.min(stopCount/Math.max(1,stopThreshold)*100,150);stopBar.style.width=stopRatio+'%';stopBar.style.background=gateSettings._stopDefending?'#E74C3C':stopRatio>70?'#E67E22':'#4FC3F7';}
   var gateSummary=document.getElementById('gateSummary');
   if(gateSummary)gateSummary.textContent=(feeCurrent!=null?feeCurrent.toLocaleString()+'원':'확인 중')+'  임계'+threshold+'건'+(isGateClubMode()?' · 클럽':'');
   var stopSummary=document.getElementById('stopSummary');
@@ -2894,6 +2968,9 @@ function onGateSettingsUpdate(json) {
     gateSettings.fee=clampFeeValue(gateSettings.fee);
     gateSettings.base=clampFeeValue(gateSettings.base);
     gateSettings._activeTab='PRINTER';
+    if(s.stopSource)gateSettings._stopSource=s.stopSource==='PRINTER'?'PRINTER':'KDS';
+    if(s.mode)gateSettings._defenseMode=s.mode;
+    if(s.threshold_stop!=null||s.thresholdStop!=null)gateSettings.threshold_stop=s.threshold_stop!=null?s.threshold_stop:s.thresholdStop;
     if(s.threshold!=null){var gateThreshold=document.getElementById('gate_threshold');if(gateThreshold)gateThreshold.textContent=s.threshold+'건';var feeThreshold=document.getElementById('feeThresholdNum');if(feeThreshold)feeThreshold.textContent=s.threshold;}
     if(s.valid!=null){var gateValid=document.getElementById('gate_valid');if(gateValid)gateValid.textContent=s.valid+'분';}
     syncGatePriceDisplay();
@@ -2914,13 +2991,17 @@ function onGateStatusUpdate(jsonStr) {
     // gateSettings 동기화 (새로고침 후 복원)
     if(s.thresholdFee) { gateSettings.threshold = clampFeeThreshold(s.thresholdFee); var el=document.getElementById('gate_threshold'); if(el) el.textContent=gateSettings.threshold+'건'; }
     if(s.thresholdFee) { var el3=document.getElementById('feeThresholdNum'); if(el3) el3.textContent=gateSettings.threshold; }
+    if(s.thresholdStop) gateSettings.threshold_stop=s.thresholdStop;
     if(s.currentFee != null) gateSettings.fee = clampFeeValue(s.currentFee);
     if(s.baseFee !== undefined) gateSettings.base = clampFeeValue(s.baseFee);
     if(Object.prototype.hasOwnProperty.call(s,'lastAppliedFee')) gateSettings._lastAppliedFee = s.lastAppliedFee;
     if(s.gateEnabled !== undefined) gateSettings.enabled = s.gateEnabled;
     gateSettings._activeTab = 'PRINTER';
+    if(s.stopSource)gateSettings._stopSource=s.stopSource==='PRINTER'?'PRINTER':'KDS';
+    if(s.defenseMode)gateSettings._defenseMode=s.defenseMode;
     gateSettings._isFeeDefending = !!s.isFeeDefending;
     gateSettings._stopDefending = !!s.isStopDefending;
+    gateSettings._stopCount = gateSettings._stopSource==='PRINTER' ? (s.validCount||0) : (s.totalCount||0);
     gateSettings._currentFeeApplied = gateSettings._lastAppliedFee;
     syncGatePriceDisplay();
     // 건수 표시
