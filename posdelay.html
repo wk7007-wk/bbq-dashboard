@@ -2850,6 +2850,7 @@ function syncGateDashboardState() {
   if(document.getElementById('groupSummary'))renderGroupSummary();
   renderOpsLog();
 }
+setTimeout(syncGateDashboardState,0);
 function renderFeeOrderList(orders){
   var list=document.getElementById('feeOrderList');
   if(!list)return;
