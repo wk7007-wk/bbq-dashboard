@@ -57,6 +57,12 @@ assert.deepStrictEqual(
   'top navigation must contain the five daily operation destinations in order'
 );
 for (const id of navTargets) assert(ids.includes(id), `navigation target missing: ${id}`);
+const jumpStart = source.indexOf('function jumpToCard(');
+const jumpEnd = source.indexOf('\n}', jumpStart);
+const jumpSource = source.slice(jumpStart, jumpEnd + 2);
+assert(jumpSource.includes("document.querySelector('.page-sticky')"), 'navigation must account for the sticky header height');
+assert(jumpSource.includes('getBoundingClientRect().height'), 'navigation offset must adapt to desktop/mobile header height');
+assert(jumpSource.includes('window.scrollTo({top:top'), 'navigation must land below the sticky header');
 
 assert(source.includes('<span class="section-heading">플랫폼 지연 설정</span>'));
 assert(!/<span class="section-heading">[^<]*진단/.test(source), 'diagnostics must not be a top-level section');

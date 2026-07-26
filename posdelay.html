@@ -950,7 +950,10 @@ function doCapture(){if(!window.NativeBridge)return;var h=Math.min(document.body
 function jumpToCard(id){
   var el=document.getElementById(id);
   if(!el)return;
-  try{el.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){location.hash=id;}
+  var sticky=document.querySelector('.page-sticky');
+  var offset=(sticky?sticky.getBoundingClientRect().height:0)+8;
+  var top=Math.max(0,el.getBoundingClientRect().top+window.pageYOffset-offset);
+  try{window.scrollTo({top:top,behavior:'smooth'});}catch(e){window.scrollTo(0,top);}
 }
 
 function nb(fn,...args){
