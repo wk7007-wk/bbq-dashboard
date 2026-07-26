@@ -458,7 +458,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div class="gauge" id="bG"></div>
     <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
-    <div class="sec" style="color:var(--c-baemin)">배민 광고비 <span class="unit-hint">50원 단위 · 0~1,000원</span></div>
+    <div class="sec" style="color:var(--c-baemin)">배민 광고비 <span class="unit-hint">50원 단위 · 0~1,000원 · 0원=현재값 유지</span></div>
     <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
     <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-50)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',50)">+</button></div></div>
@@ -1078,7 +1078,7 @@ function updateKdsUnitHints(){
 }
 function baeminMinLabel(){
   const v=g(S,'baemin_reduced_amount',50);
-  if(v===0)return '0원';
+  if(v===0)return '0원(유지)';
   return v+'원';
 }
 function baeminBidLabel(v){
