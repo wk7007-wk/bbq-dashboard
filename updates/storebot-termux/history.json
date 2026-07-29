@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "releases": [
+    {
+      "appVersionCode": 1074,
+      "appVersionName": "0.118.3-storebot-kst0727.t0832",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/StoreBotTermux_latest.bin?v=1074",
+      "sha256": "fa7c9fb6fdcfc22aade345f8989e1bcab8bde0c09081c4a85a657873d54da32b",
+      "sizeBytes": 125837664,
+      "packageName": "com.sbotux",
+      "certificateSha256": "b6da01480eefd5fbf2cd3771b8d1021ec791304bdd6c4bf41d3faabad48ee5e1",
+      "enabled": true,
+      "releaseNotes": "카카오 채팅 화면 이미지 분석, 15분 맥락 추론, 당일 뉴스 헤드라인 전용",
+      "updatedAt": "2026-07-30T01:10:00+09:00"
+    }
+  ]
+}

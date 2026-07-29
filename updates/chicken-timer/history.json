@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "releases": [
+    {
+      "appVersionCode": 29755714,
+      "appVersionName": "0730.0134",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29755714",
+      "sha256": "b0b228cd31b57613deacc615453c028f842dff2c7825e6f65e933dad43b37d5b",
+      "sizeBytes": 1425253,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "최신 웹 보드 보존 및 GitHub 자동업데이트 채널 전환",
+      "updatedAt": "2026-07-30T01:37:31+09:00"
+    }
+  ]
+}
