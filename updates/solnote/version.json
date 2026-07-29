@@ -1,0 +1,13 @@
+{
+  "appVersionCode": 262100255,
+  "appVersionName": "0729.0255",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/SolNote_latest.bin?v=262100255",
+  "sha256": "5d439709c928b687b14463a07beef0ddba9c2078eb5d41499be8d3b010bb437f",
+  "sizeBytes": 12235420,
+  "packageName": "com.wonmux.solnote.personal",
+  "certificateSha256": "67599082e102541ac86386c181dfd3f5f6349448e113d5deb34fc5ee39ae7599",
+  "enabled": true,
+  "releaseNotes": "원격 만료 판정 직후 자동 재발행 연결",
+  "updatedAt": "2026-07-30T01:10:00+09:00",
+  "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/solnote/history.json"
+}

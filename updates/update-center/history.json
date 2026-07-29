@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "releases": [
+    {
+      "appVersionCode": 29755682,
+      "appVersionName": "0730.0102",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29755682",
+      "sha256": "c50b5a236ac68a85f4b6ace8dbc6a8b4f8b9ce01248cdd0f670aff1ea8135d41",
+      "sizeBytes": 1555056,
+      "packageName": "com.appupdatecenter.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "GitHub Pages metadata와 rolling release APK 신뢰경계 전환",
+      "updatedAt": "2026-07-30T01:10:00+09:00"
+    }
+  ]
+}

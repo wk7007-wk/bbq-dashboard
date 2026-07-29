@@ -17,10 +17,14 @@ bbq-dashboard — site/static-web 운영 현황판
 - AI_HANDOFF.md            : 현재 상태/다음 큐 포인터
 - CLAUDE.md                : 세션 운영 규칙
 - README.md                : 저장소 문서 개요
+- updates/catalog.json     : AppUpdateCenter remote catalog. 퇴역 앱 제외, 최신 미검증 앱의 과거 APK 대체 금지
+- updates/<app>/version.json, history.json : GitHub Pages update metadata. APK 본체는 Release `app-updates`
+- updates/index.html       : metadata/release 안내 진입점
 
 ## 배포
 - hosted/public 정적 호스팅(주로 GitHub Pages)로 노출
 - 로컬 빌드 불필요
+- update metadata는 PR merge 뒤 Pages, APK는 exact rolling Release asset으로 분리 검증
 
 ## 주요 의존
 - Firebase RTDB Read-only 사용(표시/판독 전용)
