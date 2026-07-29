@@ -18,7 +18,7 @@ bbq-dashboard — site/static-web 운영 현황판
 - CLAUDE.md                : 세션 운영 규칙
 - README.md                : 저장소 문서 개요
 - updates/catalog.json     : AppUpdateCenter remote catalog. 퇴역 앱 제외, 최신 미검증 앱의 과거 APK 대체 금지
-- updates/<app>/version.json, history.json : GitHub Pages update metadata. APK 본체는 Release `app-updates`
+- updates/<app>/version.json, history.json : GitHub Pages update metadata. AppUpdateCenter index는 사용자용 `.apk`, 내부 updater metadata는 `.bin` Release asset을 가리킨다.
 - updates/index.html       : metadata/release 안내 진입점
 
 ## 배포

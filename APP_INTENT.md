@@ -6,7 +6,7 @@
 
 ## 범위
 - 정적 HTML 및 문서 정렬/명세 정비.
-- `/updates`는 AppUpdateCenter catalog/version/history metadata의 정적 원천이다. APK는 repo에 넣지 않고 GitHub Release `app-updates` asset으로 분리한다.
+- `/updates`는 AppUpdateCenter catalog/version/history metadata의 정적 원천이다. 사용자 설치 링크는 Release `.apk`, 내부 updater의 `version.json`은 동일 SHA의 `.bin` asset을 유지한다.
 - 퇴역 NotallyX·legacy StoreBot은 catalog에서 제외하고, 최신 검증 asset이 없는 앱은 과거 APK로 대체하지 않는다.
 - Firebase 읽기 경로는 `read-only` 기준으로만 다루며, write 동작은 이 저장소 범위에서 구현하지 않는다.
 - Android WebView 대시보드(별도 런타임)는 본 저장소 범위 밖으로 구분한다.
