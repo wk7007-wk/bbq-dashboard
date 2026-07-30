@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29756688,
-  "appVersionName": "0730.1748",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29756688",
-  "sha256": "0c31aa7d3e42c0993e55847f3847787ac0ebdaea371f233adbc361abadabaf6e",
-  "sizeBytes": 1425673,
+  "appVersionCode": 29756911,
+  "appVersionName": "0730.2131",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29756911",
+  "sha256": "68b39947bf8ffcd39233d2bb528bce2206687180980dc251c2f1c9a12a714213",
+  "sizeBytes": 1425755,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "Note9 가로 +10/+60 카운터 위 한 줄 정렬 및 오프라인 fallback 동기화",
-  "updatedAt": "2026-07-30T17:48:43+09:00",
+  "releaseNotes": "Note9 시작 직후 ghost 터치 일시정지 방지 및 수동복구 APK 확장자 제공",
+  "updatedAt": "2026-07-30T21:31:31+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
