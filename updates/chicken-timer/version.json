@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29756911,
-  "appVersionName": "0730.2131",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29756911",
-  "sha256": "68b39947bf8ffcd39233d2bb528bce2206687180980dc251c2f1c9a12a714213",
-  "sizeBytes": 1425755,
+  "appVersionCode": 29759008,
+  "appVersionName": "0801.0828",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29759008",
+  "sha256": "edd25e501723f76312bbc5ce8ed43c02e832cec473df98605d1e76334506cc6c",
+  "sizeBytes": 1429229,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "Note9 시작 직후 ghost 터치 일시정지 방지 및 수동복구 APK 확장자 제공",
-  "updatedAt": "2026-07-30T21:31:31+09:00",
+  "releaseNotes": "Note9·서브노트북 6칸 레이아웃, OV 카운터·완료 로그, 분할 타이머 원본시간 보존 개선",
+  "updatedAt": "2026-08-01T08:28:35+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
