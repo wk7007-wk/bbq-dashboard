@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29700618,
-  "appVersionName": "0621.1918",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29700618",
-  "sha256": "643371d05e7e4b9876af1d3b30365878c7d898cb50d7907f140285c92b3c549d",
-  "sizeBytes": 32863413,
+  "appVersionCode": 29760310,
+  "appVersionName": "0802.0610",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760310",
+  "sha256": "8a7754cb31ae5f12afaffdd44e754cbdfdded26671feb06103cc5118de2586f5",
+  "sizeBytes": 31431516,
   "packageName": "com.deliveryhelper.app",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "Codex 재검토 schema v2 안전반영",
-  "updatedAt": "2026-07-30T01:10:00+09:00",
+  "releaseNotes": "네이버 지도 인증키 누락 복구",
+  "updatedAt": "2026-08-02T06:39:14+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/history.json"
 }
