@@ -206,6 +206,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 .button-value-btn{min-width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-primary);font-size:14px;font-weight:800;line-height:1;}
 .button-value-btn:active{transform:translateY(1px);background:var(--surface-muted);}
 .button-value-btn:disabled{opacity:.35;transform:none;}
+.native-control:disabled{opacity:.42;cursor:not-allowed;filter:saturate(.35);}
+.standalone-readonly{display:none;margin:0 0 8px;padding:8px 10px;border:1px solid rgba(230,126,34,.45);border-radius:8px;background:rgba(230,126,34,.10);color:#F4C27A;font-size:11px;font-weight:700;}
 .button-value-text{min-width:44px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--surface-muted);font-size:12px;font-weight:800;color:var(--text-primary);padding:0 6px;white-space:nowrap;}
 .button-value-control.is-minute .button-value-text{min-width:48px;}
 .compact-cell .button-value-control{width:100%;}
@@ -388,6 +390,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <span class="section-chip">Control</span>
 </div>
+<div id="standaloneReadOnlyNotice" class="standalone-readonly" role="status">공개 웹은 읽기 전용입니다. 제어는 PosDelay 앱에서만 할 수 있습니다.</div>
 <!-- ═══ 2-0. 메인 PC 전원 ═══ -->
 <div class="card card-power" id="pcPowerCard">
   <div class="row" style="justify-content:space-between; margin-bottom:10px">
@@ -398,8 +401,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="pcStatusPill" class="hero-status">-- 확인 중</span>
   </div>
   <div class="row" style="gap:8px">
-    <button id="pcOnBtn"  class="btn bg" style="flex:1; min-height:48px; font-size:14px; font-weight:700">켜기</button>
-    <button id="pcOffBtn" class="btn bred" style="flex:1; min-height:48px; font-size:14px; font-weight:700">끄기</button>
+    <button id="pcOnBtn" data-native-control class="btn bg native-control" style="flex:1; min-height:48px; font-size:14px; font-weight:700">켜기</button>
+    <button id="pcOffBtn" data-native-control class="btn bred native-control" style="flex:1; min-height:48px; font-size:14px; font-weight:700">끄기</button>
   </div>
   <div id="pcLastHb" class="note" style="text-align:right; margin-top:6px">박동 --</div>
 </div>
@@ -451,9 +454,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="bSt" style="font-size:11px"></span>
       <div class="row" style="gap:6px">
-        <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
-        <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
-        <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
+        <button data-native-control class="btn bs bor native-control" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
+        <button data-native-control class="btn bs bred native-control" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
       </div>
     </div>
     <div class="gauge" id="bG"></div>
@@ -488,8 +491,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="cSt" style="font-size:11px"></span>
       <div class="row" style="gap:6px">
-        <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
-        <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
+        <button data-native-control class="btn bs bred native-control" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
       </div>
     </div>
     <div class="gauge" id="cG"></div>
@@ -534,11 +537,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="discSt" style="font-size:11px"></span>
       <div class="row" style="gap:3px;flex-wrap:wrap">
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1000)">1천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1500)">1.5천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2000)">2천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2500)">2.5천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1000)">1천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1500)">1.5천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2000)">2천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2500)">2.5천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
       </div>
     </div>
     <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">정액</div>
@@ -552,15 +555,15 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:space-between">
         <span style="font-size:11px;color:var(--text-secondary)">가게배달 팁</span>
-        <button class="btn bs bg" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
+        <button data-native-control class="btn bs bg native-control" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
       </div>
       <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">전액</div>
     </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:flex-end;gap:4px">
-        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-98)">금액 종료</button>
-        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
-        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-98)">금액 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
       </div>
       <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민배달</div>
     </div>
@@ -934,7 +937,21 @@ let cookLog=[]; // 완료 기록: {num, t, doneAt, cookDur}
 let latestEngineState=null,latestSubphoneState=null;
 let activitySnapshot={ad:null,kds:null};
 let lastCaptureSnapshot={orders:[],printerConnected:false,status:'',lastCaptureAt:'--',thresholdFee:8};
-const isApp=typeof NativeBridge!=='undefined';
+function hasNativeBridge(){
+  try{return typeof window!=='undefined'&&!!window.NativeBridge&&typeof window.NativeBridge.executeAd==='function';}catch(e){return false;}
+}
+const isApp=hasNativeBridge();
+function applyStandaloneReadOnly(){
+  if(isApp)return;
+  document.querySelectorAll('[data-native-control]').forEach(function(button){
+    button.disabled=true;
+    button.setAttribute('aria-disabled','true');
+    button.title='공개 웹은 읽기 전용입니다. PosDelay 앱에서만 제어할 수 있습니다.';
+  });
+  var notice=document.getElementById('standaloneReadOnlyNotice');
+  if(notice)notice.style.display='block';
+}
+applyStandaloneReadOnly();
 // null-safe getter: 0도 유효한 값으로 처리
 function g(obj,key,def){const v=obj[key];return v!=null?v:def;}
 function setAppVersionText(version){
@@ -1246,6 +1263,7 @@ function updGauges(c){
 
 // === Firebase 명령 전송 (웹→Firebase→앱) ===
 function sendCmd(action,amount){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return false;}
   const cmd={action:action,amount:amount||0,time:Date.now(),source:'web'};
   fetch(FB+'/posdelay/command.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cmd)})
     .then(()=>toast('완료','ok'))
@@ -1285,6 +1303,7 @@ function exAd(platform,action){
 }
 var _discBusy=false;
 function exDiscount(amount){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   if(_discBusy){return;}
   _discBusy=true;setTimeout(function(){_discBusy=false;},5000);
   if(isApp){
@@ -3275,6 +3294,7 @@ function pcResetButtons(){
 }
 
 function pcOnClickWake(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   var btn=document.getElementById('pcOnBtn');
   if(!btn)return;
   // wol_relay 점이 회색이면 경고만 출력 (다이얼로그 없이)
@@ -3364,6 +3384,7 @@ function pcShowCountdown(){
 }
 
 function pcSendShutdown(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   var now=Date.now();
   // 최신 boot_id 확보 후 명령 PUT
   fetch(FB+'/packhelper/heartbeat/main_pc.json',{cache:'no-store'})
