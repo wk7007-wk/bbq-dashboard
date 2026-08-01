@@ -170,6 +170,22 @@ body {
   margin-top: 2px;
 }
 
+.attendance-item {
+  gap: 8px;
+  align-items: flex-start !important;
+}
+
+.attendance-summary {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.attendance-times {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
 /* 카드별 아이콘 배경 */
 .icon-pc { background: rgba(79,195,247,0.15); color: var(--accent-blue); }
 .icon-weather { background: rgba(255,167,38,0.15); color: var(--accent-orange); }
@@ -516,27 +532,71 @@ function updateWeather() {
     '<div class="card-sub">' + esc(now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false})) + '</div>';
 }
 
-// 근무표
-function updateSchedule() {
-  var today = new Date().toISOString().slice(0,10);
-  fb('/packhelper/storebot_attendance/' + today).then(function(data) {
-    var el = document.getElementById('schedule-body');
-    if (!data) { el.innerHTML = badge('오늘 출근 기록 없음', 'info'); return; }
-    var html = '';
-    Object.entries(data).forEach(function(kv) {
-      var emp = kv[0]; var info = kv[1];
-      if (typeof info === 'object') {
-        var start = info.start || info.check_in || '';
-        var end = info.end || info.check_out || '';
-        var status = end ? badge('퇴근', 'info') : badge('근무중', 'ok');
-        html += '<div class="item"><span>' + esc(emp) + ' ' + esc(start) + '</span>' + status + '</div>';
-      } else {
-        html += '<div class="item"><span>' + esc(emp) + '</span><span>' + esc(String(info)) + '</span></div>';
-      }
+// --- canonical attendance helpers ---
+function kstDateKey(now) {
+  var parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(now || new Date());
+  var values = {};
+  parts.forEach(function(part) { values[part.type] = part.value; });
+  return values.year + '-' + values.month + '-' + values.day;
+}
+
+function attendanceRowDisplayName(info) {
+  if (!info || typeof info !== 'object') return '';
+  var value = info.display_name || info.employee_name || '';
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function resolveAttendanceName(empId, info) {
+  var displayName = attendanceRowDisplayName(info);
+  if (displayName) return Promise.resolve(displayName);
+  return fb('/workschedule_v2/employees/' + encodeURIComponent(empId) + '/name')
+    .then(function(name) {
+      return typeof name === 'string' && name.trim() ? name.trim() : empId;
     });
-    el.innerHTML = html || badge('기록 없음', 'info');
+}
+
+function renderAttendanceRows(rows) {
+  var html = '';
+  rows.forEach(function(row) {
+    var info = row.info;
+    var start = typeof info.actual_start === 'string' ? info.actual_start : '';
+    var end = typeof info.actual_end === 'string' ? info.actual_end : '';
+    var status = end ? badge('퇴근', 'info') : start ? badge('근무중', 'ok') : badge('시간 미기록', 'warn');
+    html += '<div class="item attendance-item"><span class="attendance-summary">' + esc(row.name) +
+      '<span class="attendance-times">출근 ' + esc(start || '--') + ' · 퇴근 ' + esc(end || '--') +
+      '</span></span>' + status + '</div>';
+  });
+  return html;
+}
+
+// 근무표: canonical 실근태 read-only
+function updateSchedule(now) {
+  var today = kstDateKey(now);
+  return fb('/workschedule_v2/attendance/' + today).then(function(data) {
+    var el = document.getElementById('schedule-body');
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      el.innerHTML = badge('오늘 출근 기록 없음', 'info');
+      return;
+    }
+    var entries = Object.entries(data).filter(function(kv) {
+      return kv[1] && typeof kv[1] === 'object';
+    });
+    if (entries.length === 0) {
+      el.innerHTML = badge('오늘 출근 기록 없음', 'info');
+      return;
+    }
+    return Promise.all(entries.map(function(kv) {
+      return resolveAttendanceName(kv[0], kv[1]).then(function(name) {
+        return { empId: kv[0], name: name, info: kv[1] };
+      });
+    })).then(function(rows) {
+      el.innerHTML = renderAttendanceRows(rows) || badge('오늘 출근 기록 없음', 'info');
+    });
   });
 }
+// --- end canonical attendance helpers ---
 
 // 주문 현황
 function updateOrder() {
