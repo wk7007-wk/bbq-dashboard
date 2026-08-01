@@ -103,6 +103,10 @@ async function run() {
   assert.ok(source.includes("info.actual_start"));
   assert.ok(source.includes("info.actual_end"));
   assert.ok(source.includes("/workschedule_v2/employees/"));
+  assert.ok(source.includes('grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)'));
+  assert.match(source, /\.column\s*\{[^}]*min-width:\s*0/s);
+  assert.match(source, /\.bottom-wide\s*\{[^}]*min-width:\s*0/s);
+  assert.match(source, /\.card\s*\{[^}]*min-width:\s*0/s);
 
   console.log('dashboard attendance canonical fixture: PASS');
   console.log('calls=' + calls.length + ' legacy_calls=0 writes=0');
