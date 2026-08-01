@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29759465,
+      "appVersionName": "0801.1605",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29759465",
+      "sha256": "d5d8ff5f5829a7b950d7d30124036f88a26c0a98639ad44c1e5006473101f616",
+      "sizeBytes": 1555628,
+      "packageName": "com.appupdatecenter.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "전체 확인 진행바를 모든 확인·다운로드 완료까지 유지",
+      "updatedAt": "2026-08-01T16:18:04+09:00"
+    },
+    {
       "appVersionCode": 29759342,
       "appVersionName": "0801.1402",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29759342",
