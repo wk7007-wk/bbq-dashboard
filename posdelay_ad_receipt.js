@@ -42,6 +42,13 @@
     try{if(storage)storage.setItem(STORAGE_KEY,JSON.stringify(rows.slice(-LOG_LIMIT)));}catch(e){}
   }
 
+  function hasValidBaseline(snapshot){
+    if(!snapshot||typeof snapshot!=='object')return false;
+    var rawBid=snapshot.baemin_current_bid;
+    return parseKstTimestamp(snapshot.time)>0&&Object.prototype.hasOwnProperty.call(snapshot,'last_ad_action')&&
+      rawBid!==null&&rawBid!==undefined&&rawBid!==''&&Number.isFinite(Number(rawBid));
+  }
+
   function createReceiptController(options){
     options=options||{};
     var now=options.now||function(){return Date.now();};
@@ -53,7 +60,7 @@
     var onChange=typeof options.onChange==='function'?options.onChange:function(){};
     var rows=readLog(storage),active=null,timer=null,sequence=0,readback={};
     var state=hasBridge()
-      ?{state:'idle',label:'최근 요청 없음',detail:'버튼을 누르면 실제 확인 상태가 여기에 표시됩니다.',at:now()}
+      ?{state:'readback_wait',label:'적용 상태 읽는 중',detail:'현재 광고 상태를 확인한 뒤 실행 버튼이 열립니다.',at:now()}
       :{state:'app_only',label:'앱에서만 실행',detail:'공개 웹에서는 광고 동작을 만들지 않습니다.',at:now()};
 
     function copy(value){return JSON.parse(JSON.stringify(value));}
@@ -77,6 +84,10 @@
         update({state:'app_only',label:'앱에서만 실행',detail:'공개 웹에서는 광고 동작을 만들지 않습니다.',at:now(),action:action,target:target},true);
         return false;
       }
+      if(!hasValidBaseline(readback)){
+        update({state:'readback_wait',label:'적용 상태 읽는 중',detail:'현재 광고 상태 확인 전에는 요청을 보내지 않습니다.',at:now(),action:action,target:target},true);
+        return false;
+      }
       if(active){
         state.detail='이미 '+actionLabel(active.action,active.target)+' 요청을 확인 중입니다. 중복 요청은 보내지 않았습니다.';
         emit();return false;
@@ -86,7 +97,7 @@
         return false;
       }
       var issuedAt=now();
-      active={id:'baemin-ad-'+issuedAt+'-'+(++sequence),action:action,target:target,issuedAt:issuedAt,baselineTime:String(readback.time||''),baselineAction:String(readback.last_ad_action||''),baselineReady:!!(readback.time&&readback.last_ad_action)};
+      active={id:'baemin-ad-'+issuedAt+'-'+(++sequence),action:action,target:target,issuedAt:issuedAt,baselineTime:String(readback.time||''),baselineAction:String(readback.last_ad_action||''),baselineReady:hasValidBaseline(readback)};
       update({state:'pending',label:'요청 중 · '+actionLabel(action,target),detail:'앱에 전달했습니다. 실제 광고 상태 확인을 기다립니다.',at:issuedAt,requestId:active.id,action:action,target:target},true);
       timer=setTimer(function(){finish('needs_check','정해진 시간 안에 확인되지 않음 · 앱의 광고 상태를 확인해 주세요.');},timeoutMs);
       try{
@@ -100,10 +111,15 @@
     }
     function observe(snapshot){
       readback=snapshot&&typeof snapshot==='object'?Object.assign({},snapshot):{};
-      if(!active)return;
+      if(!active){
+        if(hasBridge()&&hasValidBaseline(readback)&&state.state==='readback_wait'){
+          update({state:'idle',label:'실행 준비됨',detail:'현재 적용 상태를 읽었습니다. 실행 후 실제 결과를 다시 확인합니다.',at:now()},false);
+        }
+        return;
+      }
       var evidenceTime=String(readback.time||''),lastAction=String(readback.last_ad_action||'');
       if(!active.baselineReady){
-        if(evidenceTime&&lastAction){active.baselineTime=evidenceTime;active.baselineAction=lastAction;active.baselineReady=true;}
+        if(hasValidBaseline(readback)){active.baselineTime=evidenceTime;active.baselineAction=lastAction;active.baselineReady=true;}
         return;
       }
       var evidenceAt=parseKstTimestamp(evidenceTime),issuedSecond=Math.floor(active.issuedAt/1000)*1000;
@@ -141,13 +157,13 @@
       if(panel)panel.setAttribute('data-state',next.state);
       if(status)status.textContent=next.label;
       if(detail)detail.textContent=next.detail;
-      buttons.forEach(function(button){button.disabled=next.state==='pending';button.setAttribute('aria-disabled',next.state==='pending'?'true':'false');});
+      buttons.forEach(function(button){var disabled=next.state==='pending'||next.state==='readback_wait';button.disabled=disabled;button.setAttribute('aria-disabled',disabled?'true':'false');});
       if(log){
         while(log.firstChild)log.removeChild(log.firstChild);
         if(!rows.length){var empty=root.createElement('li');empty.textContent='기록 없음';log.appendChild(empty);}
         rows.slice().reverse().forEach(function(row){
           var item=root.createElement('li');
-          item.textContent=clockLabel(row.at)+' · '+(row.state==='applied'?'적용됨':row.state==='pending'?'요청 중':row.state==='app_only'?'앱 전용':'확인 필요')+(row.target!=null?' · '+row.target+'원':'');
+          item.textContent=clockLabel(row.at)+' · '+(row.state==='applied'?'적용됨':row.state==='pending'?'요청 중':row.state==='readback_wait'?'상태 읽는 중':row.state==='app_only'?'앱 전용':'확인 필요')+(row.target!=null?' · '+row.target+'원':'');
           log.appendChild(item);
         });
       }

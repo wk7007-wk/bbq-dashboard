@@ -1,7 +1,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const { createReceiptController, parseKstTimestamp } = require('../posdelay_ad_receipt.js');
+const { createReceiptController, mount, parseKstTimestamp } = require('../posdelay_ad_receipt.js');
 
 const START = Date.parse('2026-08-01T16:30:00+09:00');
 
@@ -41,6 +41,69 @@ const baseline = {
 };
 
 assert.strictEqual(parseKstTimestamp('2026-08-01 16:30:05'), Date.parse('2026-08-01T16:30:05+09:00'));
+
+{
+  const h = harness();
+  let invoked = false;
+  assert.strictEqual(h.controller.getState().state, 'readback_wait');
+  assert.match(h.controller.getState().label, /적용 상태 읽는 중/);
+  assert.strictEqual(h.controller.request('max', 200, () => { invoked = true; }), false);
+  assert.strictEqual(invoked, false, 'bridge must not run before a pre-action baseline exists');
+  assert.strictEqual(h.timer(), null, 'blocked pre-baseline request must not arm a timeout');
+  assert.strictEqual(h.controller.getLog().at(-1).state, 'readback_wait');
+  h.controller.observe(baseline);
+  assert.strictEqual(h.controller.getState().state, 'idle');
+}
+
+{
+  const h = harness();
+  const calls = [];
+  h.controller.observe({
+    baemin_current_bid: 0,
+    last_ad_action: '',
+    time: '2026-08-01 16:20:05'
+  });
+  assert.strictEqual(h.controller.getState().state, 'idle', 'fresh-install empty action is a completed baseline');
+  assert.strictEqual(h.controller.request('max', 200, (action, amount) => calls.push([action, amount])), true);
+  assert.deepStrictEqual(calls, [['BAEMIN_SET_AMOUNT', 200]]);
+  h.controller.observe({
+    baemin_current_bid: 200,
+    last_ad_action: '16:30 배민 광고 금액 200원 변경',
+    time: '2026-08-01 16:30:05'
+  });
+  assert.strictEqual(h.controller.getState().state, 'applied');
+}
+
+function domHarness() {
+  function element() {
+    return {
+      textContent: '', disabled: false, attributes: {}, children: [],
+      setAttribute(key, value) { this.attributes[key] = value; },
+      appendChild(child) { this.children.push(child); this.firstChild = this.children[0] || null; },
+      removeChild(child) { this.children.splice(this.children.indexOf(child), 1); this.firstChild = this.children[0] || null; }
+    };
+  }
+  const ids = new Map(['baeminAdReceipt', 'baeminAdReceiptStatus', 'baeminAdReceiptDetail', 'baeminAdReceiptLog'].map(id => [id, element()]));
+  const buttons = [element(), element(), element()];
+  const root = {
+    getElementById(id) { return ids.get(id) || null; },
+    querySelectorAll(selector) { return selector === '[data-baemin-ad-action]' ? buttons : []; },
+    createElement() { return element(); }
+  };
+  const controller = mount({ root, hasBridge: () => true, now: () => START });
+  return { controller, buttons };
+}
+
+{
+  const h = domHarness();
+  assert.deepStrictEqual(h.buttons.map(button => button.disabled), [true, true, true]);
+  assert.deepStrictEqual(h.buttons.map(button => button.attributes['aria-disabled']), ['true', 'true', 'true']);
+  h.controller.observe({ baemin_current_bid: 100, time: baseline.time });
+  assert.deepStrictEqual(h.buttons.map(button => button.disabled), [true, true, true], 'incomplete baseline must stay disabled');
+  h.controller.observe(baseline);
+  assert.deepStrictEqual(h.buttons.map(button => button.disabled), [false, false, false]);
+  assert.deepStrictEqual(h.buttons.map(button => button.attributes['aria-disabled']), ['false', 'false', 'false']);
+}
 
 {
   const h = harness();
