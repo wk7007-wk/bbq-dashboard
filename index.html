@@ -1,8 +1,285 @@
-<!DOCTYPE html><html lang="ko"><body>
-<h2>BBQ Dashboard</h2>
-<ul>
-<li><a href="banktotal.html">BankTotal</a></li>
-<li><a href="posdelay.html">PosDelay</a></li>
-<li><a href="kds.html">KDS</a></li>
-</ul>
-</body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16213e">
+<meta name="description" content="BBQ 매장 운영 화면을 빠르게 여는 대시보드 홈">
+<title>BBQ 운영 홈</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --surface-hover: #1c2b4c;
+  --border: #315b8c;
+  --text: #f4f7fb;
+  --muted: #b7c3d4;
+  --accent: #4fc3f7;
+  --green: #73d17c;
+  --orange: #ffb34d;
+  --pink: #f0719c;
+  --purple: #c678dd;
+  --radius: 16px;
+  --gap: 14px;
+  --font: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--bg); }
+
+body {
+  min-width: 280px;
+  min-height: 100vh;
+  margin: 0;
+  padding: calc(20px + env(safe-area-inset-top, 0px))
+           calc(16px + env(safe-area-inset-right, 0px))
+           calc(24px + env(safe-area-inset-bottom, 0px))
+           calc(16px + env(safe-area-inset-left, 0px));
+  overflow-wrap: anywhere;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(79, 195, 247, 0.13), transparent 34rem),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+a { color: inherit; }
+
+.shell {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 6vw, 2.45rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.intro {
+  max-width: 42rem;
+  margin: 10px 0 22px;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.primary-link,
+.app-link {
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.primary-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 116px;
+  margin-bottom: var(--gap);
+  padding: 20px;
+  border: 1px solid #4076a6;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #17325a, #16213e 68%);
+  box-shadow: 0 16px 36px rgba(4, 11, 29, 0.24);
+}
+
+.primary-label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.primary-title,
+.app-title {
+  display: block;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.primary-title { font-size: 1.25rem; }
+
+.primary-copy,
+.app-copy {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.87rem;
+  line-height: 1.45;
+}
+
+.arrow {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #071521;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.section-title {
+  margin: 24px 2px 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.app-link {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 104px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.app-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(79, 195, 247, 0.14);
+  color: var(--accent);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.app-mark.delay { background: rgba(255, 179, 77, 0.14); color: var(--orange); }
+.app-mark.bank { background: rgba(115, 209, 124, 0.14); color: var(--green); }
+.app-mark.kds { background: rgba(240, 113, 156, 0.14); color: var(--pink); }
+.app-mark.update { background: rgba(198, 120, 221, 0.14); color: var(--purple); }
+
+.app-title { margin-top: 1px; font-size: 1rem; }
+
+.utility-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.utility-links a {
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(22, 33, 62, 0.62);
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.primary-link:hover,
+.app-link:hover,
+.utility-links a:hover { background-color: var(--surface-hover); }
+
+.primary-link:active,
+.app-link:active,
+.utility-links a:active { transform: translateY(1px); }
+
+a:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 540px) {
+  .app-grid { grid-template-columns: 1fr; }
+  .primary-link { min-height: 108px; padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary-link:active,
+  .app-link:active,
+  .utility-links a:active { transform: none; }
+}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header>
+    <p class="eyebrow">BBQ OPERATIONS</p>
+    <h1>매장 운영 홈</h1>
+    <p class="intro">필요한 현황판과 관리 화면을 한 번에 엽니다.</p>
+  </header>
+
+  <nav aria-label="주요 운영 화면">
+    <a class="primary-link" href="dashboard.html">
+      <span>
+        <span class="primary-label">가장 많이 사용</span>
+        <span class="primary-title">통합 현황판</span>
+        <span class="primary-copy">근무·주문·매장 상태를 한 화면에서 확인</span>
+      </span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+
+    <p class="section-title">업무별 바로가기</p>
+    <div class="app-grid">
+      <a class="app-link" href="posdelay.html">
+        <span class="app-mark delay" aria-hidden="true">POS</span>
+        <span>
+          <span class="app-title">PosDelay</span>
+          <span class="app-copy">배달료·지연·광고 상태</span>
+        </span>
+      </a>
+      <a class="app-link" href="banktotal.html">
+        <span class="app-mark bank" aria-hidden="true">₩</span>
+        <span>
+          <span class="app-title">BankTotal</span>
+          <span class="app-copy">입출금·정산 현황</span>
+        </span>
+      </a>
+      <a class="app-link" href="kds.html">
+        <span class="app-mark kds" aria-hidden="true">KDS</span>
+        <span>
+          <span class="app-title">KDS 현황</span>
+          <span class="app-copy">주방 주문 상태 확인</span>
+        </span>
+      </a>
+      <a class="app-link" href="updates/">
+        <span class="app-mark update" aria-hidden="true">UP</span>
+        <span>
+          <span class="app-title">앱 업데이트</span>
+          <span class="app-copy">최신 버전과 설치 파일 확인</span>
+        </span>
+      </a>
+    </div>
+
+    <p class="section-title">자료와 안내</p>
+    <div class="utility-links">
+      <a href="evidence.html">증빙 분석</a>
+      <a href="hikorea-guide.html">HiKorea 안내</a>
+      <a href="saaya.html">직원 안내</a>
+    </div>
+  </nav>
+</main>
+</body>
+</html>
