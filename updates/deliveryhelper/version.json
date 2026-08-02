@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29760488,
-  "appVersionName": "0802.0908",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760488",
-  "sha256": "449cd13761d49d3d946ed91af583533e0f3ec450b33c7e638f9d574f2f7dc29a",
-  "sizeBytes": 31431516,
+  "appVersionCode": 29760776,
+  "appVersionName": "0802.1356",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760776",
+  "sha256": "6b5af6d528b7629716fa88decbdd163f43e508736756f0e1c61f3d408490e963",
+  "sizeBytes": 31439708,
   "packageName": "com.deliveryhelper.app",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "네이버 지도 설정 저장 즉시 반영",
-  "updatedAt": "2026-08-02T09:12:51+09:00",
+  "releaseNotes": "네이버 지도 설정 적용 상태 및 검증 로그",
+  "updatedAt": "2026-08-02T14:06:32+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/history.json"
 }
