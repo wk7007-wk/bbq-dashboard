@@ -3358,7 +3358,7 @@ function pcOnClickWake(){
 function pcShowOverlay(html){
   var ov=document.getElementById('pcOverlay');
   if(!ov)return;
-  ov.innerHTML='<div class="pc-dialog">'+html+'</div>';
+  ov.innerHTML='<div class="pc-dialog" role="dialog" aria-modal="true" aria-label="PC 원격 제어 확인">'+html+'</div>';
   ov.classList.add('show');
 }
 function pcHideOverlay(){
@@ -3370,11 +3370,12 @@ function pcHideOverlay(){
 }
 
 function pcOnClickShutdown(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   pcShowOverlay(
-    '<div class="pc-dialog-title">메인 PC 종료 확인</div>'+
+    '<div class="pc-dialog-title" id="pcShutdownDialogTitle">메인 PC 종료 확인</div>'+
     '<div class="pc-dialog-msg">메인 PC를 끄시겠습니까?</div>'+
     '<div class="pc-dialog-row">'+
-      '<button class="btn bn" id="pcCancel1">취소</button>'+
+      '<button class="btn bn" id="pcCancel1" autofocus>취소</button>'+
       '<button class="btn bred" id="pcConfirm1">확인 → 계속</button>'+
     '</div>'
   );
@@ -3386,8 +3387,8 @@ function pcOnClickShutdown(){
 
 function pcShowCountdown(){
   pcShowOverlay(
-    '<div class="pc-dialog-title">PC를 종료합니다</div>'+
-    '<div class="pc-dialog-count" id="cdCountText">5초 후 명령 전송...</div>'+
+    '<div class="pc-dialog-title" id="pcCountdownDialogTitle">PC를 종료합니다</div>'+
+    '<div class="pc-dialog-count" id="cdCountText" aria-live="assertive">5초 후 명령 전송...</div>'+
     '<button class="btn bn" id="pcCdCancel" style="width:100%; min-height:52px; font-size:14px; font-weight:700">취소</button>'
   );
   var cancel=document.getElementById('pcCdCancel');

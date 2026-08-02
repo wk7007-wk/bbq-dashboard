@@ -21,6 +21,9 @@ assert(source.includes('const isApp=hasNativeBridge();'), 'app mode must require
 assert(!/navigator\.|location\.search|userAgent/i.test(source.slice(source.indexOf('function hasNativeBridge'), source.indexOf('function g('))), 'bridge detection must not trust browser-identifying input');
 assert(source.includes('공개 웹은 읽기 전용입니다. 제어는 PosDelay 앱에서만 할 수 있습니다.'), 'standalone must explain the Korean read-only boundary');
 assert(source.includes("document.querySelectorAll('[data-native-control]')"), 'standalone controls must be disabled');
+assert(source.includes("function pcOnClickShutdown(){\n  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}"), 'shutdown confirmation must fail closed outside the app');
+assert(source.includes('role="dialog" aria-modal="true" aria-label="PC 원격 제어 확인"'), 'PC confirmation overlay must expose dialog semantics');
+assert(source.includes('aria-live="assertive"'), 'shutdown countdown must announce changing state');
 for (const name of [
   'tapGauge', 'adjS', 'adjCoupangDelayMin', 'saveS', 'togS', 'togKdsOpen',
   'pickTime', 'updDiscDt', 'adjGate', 'adjStop', 'setGateFee', 'setGateBase',
