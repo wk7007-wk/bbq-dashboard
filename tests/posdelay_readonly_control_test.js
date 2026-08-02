@@ -21,6 +21,15 @@ assert(source.includes('const isApp=hasNativeBridge();'), 'app mode must require
 assert(!/navigator\.|location\.search|userAgent/i.test(source.slice(source.indexOf('function hasNativeBridge'), source.indexOf('function g('))), 'bridge detection must not trust browser-identifying input');
 assert(source.includes('공개 웹은 읽기 전용입니다. 제어는 PosDelay 앱에서만 할 수 있습니다.'), 'standalone must explain the Korean read-only boundary');
 assert(source.includes("document.querySelectorAll('[data-native-control]')"), 'standalone controls must be disabled');
+for (const name of [
+  'tapGauge', 'adjS', 'adjCoupangDelayMin', 'saveS', 'togS', 'togKdsOpen',
+  'pickTime', 'updDiscDt', 'adjGate', 'adjStop', 'setGateFee', 'setGateBase',
+  'togGateClub', 'togGate', 'togStop', 'togAutoAccept', 'setFeeSource',
+  'setStopSource', 'manualDefense', 'setButtonValue', 'ckTapDel'
+]) {
+  const body = extractFunction(name);
+  assert(body.indexOf('requireAppControl()') >= 0, `${name} must fail closed outside the app`);
+}
 
 for (const [name, endpoint] of [
   ['sendCmd', '/posdelay/command.json'],
@@ -45,12 +54,17 @@ const context = {
   pcState: {},
   pcRand6() { return 'abcdef'; }
 };
+context.requireAppControl = () => false;
+context.g = (obj, key, fallback) => obj[key] ?? fallback;
+context.S = {};
 vm.createContext(context);
-for (const name of ['sendCmd', 'exDiscount', 'pcOnClickWake', 'pcSendShutdown']) {
+for (const name of ['sendCmd', 'exDiscount', 'exAd', 'pcOnClickWake', 'pcSendShutdown']) {
   vm.runInContext(extractFunction(name), context);
 }
 context.sendCmd('BAEMIN_SET_AMOUNT', 100);
 context.exDiscount(1000);
+context.exAd('baemin', 'max');
+context.exAd('coupang', 'on');
 context.pcOnClickWake();
 context.pcSendShutdown();
 assert.deepStrictEqual(requests, [], 'standalone calls must not issue any request to a control endpoint');

@@ -986,6 +986,11 @@ function nb(fn,...args){
     else if(fn==='trackUsage')NativeBridge.trackUsage(args[0]);
   }catch(e){}
 }
+function requireAppControl(){
+  if(isApp)return true;
+  toast('공개 웹은 읽기 전용입니다.','warn');
+  return false;
+}
 
 if(isApp){
   document.getElementById('permCard').style.display='block';
@@ -1201,12 +1206,14 @@ function getZones(platform){
   return z.slice();
 }
 function setZones(platform,zones){
+  if(!requireAppControl())return false;
   const key=platform==='coupang'?'coupang_zones':'baemin_zones';
   S[key]=zones;
   updGauges(getActiveCount());
   _lastSaveKeys=[key];_autoSave();
 }
 function tapGauge(platform,idx){
+  if(!requireAppControl())return false;
   nb('trackUsage','gauge_paint_'+platform+'_'+idx);
   const zones=getZones(platform);
   const next=platform==='coupang'?CZ_NEXT:BZ_NEXT;
@@ -1317,6 +1324,7 @@ function exDiscount(amount){
   if(el)el.innerHTML='<span style="color:var(--c-warn)">'+msg+'</span>';
 }
 function updDiscDt(){
+  if(!requireAppControl())return false;
   var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
   var sel=types.filter(function(t){var cb=document.getElementById('dt_'+t);return cb&&cb.checked;});
   var csv=sel.join(',');
@@ -1573,6 +1581,7 @@ function _autoSave(){
   _lastSaveKeys=[];
 }
 function adjS(k,d){
+  if(!requireAppControl())return false;
   const e=document.getElementById('set_'+k);if(!e)return;
   const isBid=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);
   const step=isBid?50:1,max=isBid?1000:9999;
@@ -1581,10 +1590,11 @@ function adjS(k,d){
   const next=Math.max(min,Math.min(max,Math.round((cur+d)/step)*step));
   e.value=next;S[k]=next;_lastSaveKeys=[k];updMonitor();_autoSave();
 }
-function adjCoupangDelayMin(v){S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
-function saveS(k,v){S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
-function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
+function adjCoupangDelayMin(v){if(!requireAppControl())return false;S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
+function saveS(k,v){if(!requireAppControl())return false;S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
+function togS(k){if(!requireAppControl())return false;S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
 function togKdsOpen(){
+  if(!requireAppControl())return false;
   const paused=!stS.kds_paused;
   stS.kds_paused=paused;
   const e=document.getElementById('tog_kds_open');
@@ -1597,6 +1607,7 @@ function togKdsOpen(){
 // === 스케줄 시간 ===
 let _pickTarget='';
 function pickTime(which){
+  if(!requireAppControl())return false;
   _pickTarget=which;
   const pk=document.getElementById('schTimePicker');
   pk.style.pointerEvents='auto';pk.focus();pk.click();
@@ -1910,7 +1921,7 @@ function toast(m,type){
 // === 조리모드 (주문번호 기반) ===
 let ckOn=false,ckQ=[]; // ckQ: {num, t, onKds, ma, fa, da}
 
-function togCookMode(){ckOn=!ckOn;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');if(!ckOn){ckQ=[];updCkUI();}saveCk();}
+function togCookMode(){if(!requireAppControl())return false;ckOn=!ckOn;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');if(!ckOn){ckQ=[];updCkUI();}saveCk();}
 
 function updCkQueue(){
   if(!ckOn)return;
@@ -2111,9 +2122,9 @@ function updCkUI(){
 }
 
 function ckDisp(k){const e=document.getElementById('ck_'+k);const d=document.getElementById('ck_'+k+'_disp');if(!e||!d)return;const v=parseInt(e.value)||0;const m=Math.floor(v/60),s=v%60;d.textContent=m+':'+String(s).padStart(2,'0');}
-function adjCk(k,d){const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
+function adjCk(k,d){if(!requireAppControl())return false;const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
 function saveCk(){try{const t=parseInt(document.getElementById('ck_target').value)||1500,m=parseInt(document.getElementById('ck_mid').value)||1020,f=parseInt(document.getElementById('ck_finish').value)||240;localStorage.setItem('ck',JSON.stringify({on:ckOn,t:t,m:m,f:f,q:ckQ,cl:cookLog}));if(isApp)try{NativeBridge.syncCookSettings(ckOn,t,m,f);}catch(e){}}catch(e){}}
-function ckTapDel(num){const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
+function ckTapDel(num){if(!requireAppControl())return false;const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
 function loadCk(){try{const s=JSON.parse(localStorage.getItem('ck'));if(s){ckOn=!!s.on;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');
   // 구버전 분단위(< 100) → 초단위 자동변환
   const t=s.t||1500;const m=s.m||1020;const f=s.f||240;
@@ -2359,6 +2370,7 @@ function syncButtonValueControl(input){
 }
 
 function setButtonValue(input,delta){
+  if(!requireAppControl())return false;
   const spec=buttonValueSpec(input.id);
   if(!spec) return;
   const current=normalizeButtonValue(input,spec);
@@ -2531,6 +2543,7 @@ function bindPolicyAutoSave(){
 setTimeout(bindPolicyAutoSave, 0);
 
 function savePolicySettings(silent) {
+  if(!requireAppControl())return false;
   if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
     if(!silent)toast('앱 전용','warn');
     if(silent)setPolicySaveStatus('앱 전용','error');
@@ -2682,6 +2695,7 @@ try {
 } catch(e) {}
 
 function adjGate(key, delta) {
+  if(!requireAppControl())return false;
   if (key==='threshold') { gateSettings.threshold = clampFeeThreshold((gateSettings.threshold||8)+delta); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
   if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
   if (key==='fee') { gateSettings.fee = clampFeeValue((gateSettings.fee||0)+delta); syncGatePriceDisplay(); }
@@ -2691,6 +2705,7 @@ function adjGate(key, delta) {
 }
 
 function adjStop(key, delta) {
+  if(!requireAppControl())return false;
   if(key!=='threshold')return;
   var min=Math.max(4,(gateSettings.threshold||8)+1);
   gateSettings.threshold_stop=Math.max(min,Math.min(100,(gateSettings.threshold_stop||15)+delta));
@@ -2701,12 +2716,14 @@ function adjStop(key, delta) {
 }
 
 function setGateFee(v) {
+  if(!requireAppControl())return false;
   gateSettings.fee = clampFeeValue(v);
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 function setGateBase(v) {
+  if(!requireAppControl())return false;
   gateSettings.base = clampFeeValue(v);
   if (gateSettings.base !== 0) gateSettings.clubAuto = false;
   syncGatePriceDisplay();
@@ -2715,6 +2732,7 @@ function setGateBase(v) {
 }
 
 function togGateClub() {
+  if(!requireAppControl())return false;
   gateSettings.clubAuto = !gateSettings.clubAuto;
   if (gateSettings.clubAuto) gateSettings.base = 0;
   syncGatePriceDisplay();
@@ -2726,6 +2744,7 @@ function togGateClub() {
 }
 
 function togGate() {
+  if(!requireAppControl())return false;
   // 배달료 조정 ON/OFF
   gateSettings.enabled = !gateSettings.enabled;
   gateSettings._activeTab = 'PRINTER';
@@ -2736,6 +2755,7 @@ function togGate() {
 }
 
 function togStop() {
+  if(!requireAppControl())return false;
   var prev = policySettings.enabled;
   policySettings.enabled = !policySettings.enabled;
   syncPolicySummary();
@@ -2749,6 +2769,7 @@ function togStop() {
 }
 
 function togAutoAccept() {
+  if(!requireAppControl())return false;
   var prev = policySettings.auto_accept_enabled;
   policySettings.auto_accept_enabled = !policySettings.auto_accept_enabled;
   syncPolicySummary();
@@ -2762,12 +2783,14 @@ function togAutoAccept() {
 }
 
 function setFeeSource(src) {
+  if(!requireAppControl())return false;
   gateSettings._activeTab = 'PRINTER';
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: 'PRINTER'}));
 }
 
 function setStopSource(src) {
+  if(!requireAppControl())return false;
   gateSettings._stopSource=src==='PRINTER'?'PRINTER':'KDS';
   syncGateDashboardState();
   if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({stopSource:gateSettings._stopSource}));
@@ -3127,6 +3150,7 @@ function onCaptureStatusUpdate(jsonStr) {
 
 // ═══ 수동 배달료/영업 조정 ═══
 function manualDefense(action, fee) {
+  if(!requireAppControl())return false;
   var parsedFee=parseInt(fee,10);
   var configuredFee=parseInt(gateSettings.fee,10);
   var finalFee=action.includes('fee_up')

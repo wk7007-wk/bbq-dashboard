@@ -49,6 +49,7 @@ class FixedDate extends NativeDate {
 }
 const context = {
   console,
+  requireAppControl() { return true; },
   Date: FixedDate,
   JSON,
   Math,
