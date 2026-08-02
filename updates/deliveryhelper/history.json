@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29760958,
+      "appVersionName": "0802.1658",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760958",
+      "sha256": "cdc55278af142c6c7673bd6c80ffb9113c143b0446b242ff00176e03ded49da6",
+      "sizeBytes": 31439708,
+      "packageName": "com.deliveryhelper.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "기존 네이버클라우드 지도 스타일 연결 복구 및 실제 로드 확인",
+      "updatedAt": "2026-08-02T17:02:04+09:00"
+    },
+    {
       "appVersionCode": 29760776,
       "appVersionName": "0802.1356",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760776",
