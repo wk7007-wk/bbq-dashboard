@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29761322,
+      "appVersionName": "0802.2346",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29761322",
+      "sha256": "5f51af99003e4c64d69bcb99a1f47f15403adfc1b7a8320d3c61d30535885ae3",
+      "sizeBytes": 1460098,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "Note9 가로 로그 최신 1줄·영역 축소, OV 숫자 보호판 18%, 설치형 TTS 알람 경로·고음/고속·큰 대체음, APK 가로 고정, 웹 기존 전자음 유지",
+      "updatedAt": "2026-08-03T00:01:53+09:00"
+    },
+    {
       "appVersionCode": 29761321,
       "appVersionName": "0802.2301",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29761321",
