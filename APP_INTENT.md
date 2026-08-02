@@ -9,6 +9,7 @@
 - `/updates`는 AppUpdateCenter catalog/version/history metadata의 정적 원천이다. 사용자 설치 링크는 Release `.apk`, 내부 updater의 `version.json`은 동일 SHA의 `.bin` asset을 유지한다.
 - 퇴역 NotallyX·legacy StoreBot은 catalog에서 제외하고, 최신 검증 asset이 없는 앱은 과거 APK로 대체하지 않는다.
 - Firebase 읽기 경로는 `read-only` 기준으로만 다루며, write 동작은 이 저장소 범위에서 구현하지 않는다.
+- RSS proxy가 실패한 뉴스/트렌드 카드는 공식 Google 검색/트렌드 페이지 링크와 해당 카드만 다시 읽는 재시도를 제공해, 외부 데이터 장애에도 사용자가 진행할 수 있어야 한다.
 - Android WebView 대시보드(별도 런타임)는 본 저장소 범위 밖으로 구분한다.
 - PosDelay 배달료 표시는 설정된 high/base 값을 실제 적용값처럼 추정하지 않고, Android가 GET readback으로 확인한 `lastAppliedFee`만 금액으로 보여준다. 확인 전/null은 `확인 중`, 사용자가 입력한 `0원`은 fallback 값으로 바꾸지 않는다.
 
