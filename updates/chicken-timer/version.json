@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29762849,
-  "appVersionName": "0804.0029",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29762849",
-  "sha256": "7b7e28d454b78a0596a289d71fab79f8c4298b458440e1b9a1d1a97a6779138f",
-  "sizeBytes": 1436335,
+  "appVersionCode": 29762931,
+  "appVersionName": "0804.0151",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29762931",
+  "sha256": "630edcda28bc9d7e97f16cc78d759c2e24e388c358b978b1ba79b69a99ec34b7",
+  "sizeBytes": 1436350,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "Note9 구형 WebView 터치 보조 및 중복 실행 방지 개선",
-  "updatedAt": "2026-08-04T00:29:44+09:00",
+  "releaseNotes": "Note9 방향 회귀 해제 및 canonical 업데이트센터 복구",
+  "updatedAt": "2026-08-04T01:55:41+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
