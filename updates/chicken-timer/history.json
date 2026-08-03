@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29762545,
+      "appVersionName": "0803.1925",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29762545",
+      "sha256": "34e711ab93fdd66e89172158a8254e90efba3d37b3c6dcb9f1e65e1fecddcccc",
+      "sizeBytes": 1468405,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "Note9 구형 WebView 터치 fallback 및 중복 실행 방지",
+      "updatedAt": "2026-08-03T19:25:45+09:00"
+    },
+    {
       "appVersionCode": 29761323,
       "appVersionName": "0803.0005",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29761323",

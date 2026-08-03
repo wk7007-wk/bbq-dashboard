@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29761323,
-  "appVersionName": "0803.0005",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29761323",
-  "sha256": "5708e02b40968c7167ade46fdb24aab0b5c43679022ef12c647a3d84b5761112",
-  "sizeBytes": 1463856,
+  "appVersionCode": 29762545,
+  "appVersionName": "0803.1925",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29762545",
+  "sha256": "34e711ab93fdd66e89172158a8254e90efba3d37b3c6dcb9f1e65e1fecddcccc",
+  "sizeBytes": 1468405,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "Note9 가로 로그 최신 1줄·OV 보호판 18%, 설치형 TTS 알람 경로·고음/고속·큰 대체음, 가로 고정, 공식 GitHub 업데이트 채널 연결, 웹 기존 전자음 유지",
-  "updatedAt": "2026-08-03T00:09:22+09:00",
+  "releaseNotes": "Note9 구형 WebView 터치 fallback 및 중복 실행 방지",
+  "updatedAt": "2026-08-03T19:25:45+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
