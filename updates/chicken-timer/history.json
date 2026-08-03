@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "releases": [
     {
-      "appVersionCode": 29756688,
-      "appVersionName": "0730.1748",
-      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29756688",
-      "sha256": "0c31aa7d3e42c0993e55847f3847787ac0ebdaea371f233adbc361abadabaf6e",
-      "sizeBytes": 1425673,
+      "appVersionCode": 29762849,
+      "appVersionName": "0804.0029",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29762849",
+      "sha256": "7b7e28d454b78a0596a289d71fab79f8c4298b458440e1b9a1d1a97a6779138f",
+      "sizeBytes": 1436335,
       "packageName": "com.chickentimer.board.v2",
       "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
       "enabled": true,
-      "releaseNotes": "Note9 가로 +10/+60 카운터 위 한 줄 정렬 및 오프라인 fallback 동기화",
-      "updatedAt": "2026-07-30T17:48:43+09:00"
+      "releaseNotes": "Note9 구형 WebView 터치 보조 및 중복 실행 방지 개선",
+      "updatedAt": "2026-08-04T00:29:44+09:00"
     }
   ]
 }
