@@ -2,6 +2,54 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29760600,
+      "appVersionName": "0802.1100",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29760600",
+      "sha256": "cb71edae0efd7ad2e33593acaf1565b4812f4b30009a47f53b10e920fd5e3e69",
+      "sizeBytes": 1559524,
+      "packageName": "com.appupdatecenter.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "검증된 APK 다시 열기 전 무결성 재검증과 설치 화면 재시도 복구",
+      "updatedAt": "2026-08-02T11:07:05+09:00"
+    },
+    {
+      "appVersionCode": 29759465,
+      "appVersionName": "0801.1605",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29759465",
+      "sha256": "d5d8ff5f5829a7b950d7d30124036f88a26c0a98639ad44c1e5006473101f616",
+      "sizeBytes": 1555628,
+      "packageName": "com.appupdatecenter.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "전체 확인 진행바를 모든 확인·다운로드 완료까지 유지",
+      "updatedAt": "2026-08-01T16:18:04+09:00"
+    },
+    {
+      "appVersionCode": 29759342,
+      "appVersionName": "0801.1402",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29759342",
+      "sha256": "2bfaa235f6fa866ff74be5d874033635108b10d22a70c5783dcf974e4bbbb96e",
+      "sizeBytes": 1555040,
+      "packageName": "com.appupdatecenter.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "비설치형 WorkSchedule을 업데이트 목록에서 제거하고 재유입 방지",
+      "updatedAt": "2026-08-01T14:04:02+09:00"
+    },
+    {
+      "appVersionCode": 29758380,
+      "appVersionName": "0731.2200",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29758380",
+      "sha256": "223a58ab5b45ab46eae0b0f492775c1dca50983d6f73b8f520f73cc8c63c3e29",
+      "sizeBytes": 1554960,
+      "packageName": "com.appupdatecenter.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "퇴역 StoreBot/NotallyX 패키지 노출 제거와 catalog 재유입 방지",
+      "updatedAt": "2026-07-31T22:24:15+09:00"
+    },
+    {
       "appVersionCode": 29755682,
       "appVersionName": "0730.0102",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29755682",

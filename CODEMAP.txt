@@ -2,8 +2,10 @@ bbq-dashboard — site/static-web 운영 현황판
 =========================================
 
 ## 구조
-- index.html                : 메인 랜딩(앱 진입 카드)
+- index.html                : 메인 랜딩(통합 현황판 우선 + 업무별 앱 진입 카드, mobile 1열/desktop 2열)
+- tests/landing_page_contract.js : 랜딩 semantic navigation·정확한 내부 경로·44px touch target·script/write-free 회귀 검사
 - dashboard.html            : 통합 대시보드
+- tests/dashboard_news_fallback_test.js : RSS proxy 실패 시 공식 fallback 링크·카드별 재시도·read-only 경계 회귀 검사
 - posdelay.html             : PosDelay 운영 대시보드(상태/임계값 표시). 배달료는 Android readback `lastAppliedFee`만 실제값으로 표시하고 null은 `확인 중`, 수동 0원은 0원 그대로 NativeBridge 전달
 - tests/posdelay_fee_ui_test.js : Node VM 기반 배달료 확인값/null/0원 회귀 테스트
 - kds.html                  : PosKDS 운영 대시보드

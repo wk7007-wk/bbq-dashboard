@@ -77,7 +77,7 @@ body {
 /* 2열 레이아웃: 좌측 생활정보 + 우측 운영모니터링 */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--gap);
   max-width: 600px;
   margin: 0 auto;
@@ -87,6 +87,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
+  min-width: 0;
 }
 
 .bottom-wide {
@@ -94,6 +95,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
+  min-width: 0;
 }
 
 .card {
@@ -105,6 +107,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: background 0.2s;
+  min-width: 0;
 }
 
 .card:active {
@@ -140,6 +143,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .card-value {
@@ -164,10 +168,33 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.card-body .item > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .card-list .item + .item {
   margin-top: 2px;
+}
+
+.attendance-item {
+  gap: 8px;
+  align-items: flex-start !important;
+}
+
+.attendance-summary {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.attendance-times {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
 }
 
 /* 카드별 아이콘 배경 */
@@ -216,6 +243,59 @@ body {
 
 .news-link:active {
   color: var(--accent-blue);
+}
+
+/* RSS proxy failure: keep the official source and retry action usable. */
+.source-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.source-fallback-message {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.source-fallback-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.source-fallback-link,
+.source-fallback-retry {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.source-fallback-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  border: 1px solid rgba(79,195,247,0.55);
+  padding: 6px 10px;
+}
+
+.source-fallback-retry {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-card);
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.source-fallback-link:focus-visible,
+.source-fallback-retry:focus-visible {
+  outline: 3px solid var(--accent-yellow);
+  outline-offset: 2px;
 }
 
 /* 로딩 스켈레톤 */
@@ -421,6 +501,10 @@ var FB = 'https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app
 var PROXY = 'https://api.allorigins.win/get?url=';
 var NEWS_RSS = 'https://news.google.com/rss/search?q=%ED%95%98%EC%9D%B4%EB%8B%89%EC%8A%A4+OR+%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90+OR+AI&hl=ko&gl=KR&ceid=KR:ko';
 var TRENDS_RSS = 'https://trends.google.co.kr/trending/rss?geo=KR';
+var OFFICIAL_FALLBACK_DESTINATIONS = {
+  news: 'https://news.google.com/search?q=%ED%95%98%EC%9D%B4%EB%8B%89%EC%8A%A4+OR+%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90+OR+AI&hl=ko&gl=KR&ceid=KR:ko',
+  sns: 'https://trends.google.com/trending?geo=KR'
+};
 
 // 뉴스 갱신 간격 (5분) -- 30초 주기와 별도 관리
 var NEWS_INTERVAL_MS = 5 * 60 * 1000;
@@ -451,6 +535,33 @@ function agoStr(ts) {
 
 function badge(text, type) {
   return '<span class="badge badge-' + type + '">' + esc(text) + '</span>';
+}
+
+function sourceFallback(kind) {
+  var isNews = kind === 'news';
+  var title = isNews ? '뉴스 로딩 실패' : '트렌드 로딩 실패';
+  var description = isNews
+    ? '뉴스를 가져오지 못했습니다. Google 뉴스에서 바로 확인하거나 다시 시도하세요.'
+    : '트렌드를 가져오지 못했습니다. Google 트렌드에서 바로 확인하거나 다시 시도하세요.';
+  var destination = OFFICIAL_FALLBACK_DESTINATIONS[kind];
+  var linkText = isNews ? 'Google 뉴스에서 보기' : 'Google 트렌드에서 보기';
+  return '<div class="source-fallback" role="status">' +
+    badge(title, 'warn') +
+    '<p class="source-fallback-message">' + esc(description) + '</p>' +
+    '<div class="source-fallback-actions">' +
+    '<a class="source-fallback-link" href="' + destination + '" target="_blank" rel="noopener">' + linkText + '</a>' +
+    '<button class="source-fallback-retry" type="button" data-source-retry="' + kind + '">다시 시도</button>' +
+    '</div></div>';
+}
+
+if (document.addEventListener) {
+  document.addEventListener('click', function(event) {
+    var retry = event.target.closest ? event.target.closest('[data-source-retry]') : null;
+    if (!retry) return;
+    event.preventDefault();
+    if (retry.getAttribute('data-source-retry') === 'news') updateNews();
+    if (retry.getAttribute('data-source-retry') === 'sns') updateSNS();
+  });
 }
 
 // Firebase fetch 헬퍼
@@ -516,27 +627,71 @@ function updateWeather() {
     '<div class="card-sub">' + esc(now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false})) + '</div>';
 }
 
-// 근무표
-function updateSchedule() {
-  var today = new Date().toISOString().slice(0,10);
-  fb('/packhelper/storebot_attendance/' + today).then(function(data) {
-    var el = document.getElementById('schedule-body');
-    if (!data) { el.innerHTML = badge('오늘 출근 기록 없음', 'info'); return; }
-    var html = '';
-    Object.entries(data).forEach(function(kv) {
-      var emp = kv[0]; var info = kv[1];
-      if (typeof info === 'object') {
-        var start = info.start || info.check_in || '';
-        var end = info.end || info.check_out || '';
-        var status = end ? badge('퇴근', 'info') : badge('근무중', 'ok');
-        html += '<div class="item"><span>' + esc(emp) + ' ' + esc(start) + '</span>' + status + '</div>';
-      } else {
-        html += '<div class="item"><span>' + esc(emp) + '</span><span>' + esc(String(info)) + '</span></div>';
-      }
+// --- canonical attendance helpers ---
+function kstDateKey(now) {
+  var parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(now || new Date());
+  var values = {};
+  parts.forEach(function(part) { values[part.type] = part.value; });
+  return values.year + '-' + values.month + '-' + values.day;
+}
+
+function attendanceRowDisplayName(info) {
+  if (!info || typeof info !== 'object') return '';
+  var value = info.display_name || info.employee_name || '';
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function resolveAttendanceName(empId, info) {
+  var displayName = attendanceRowDisplayName(info);
+  if (displayName) return Promise.resolve(displayName);
+  return fb('/workschedule_v2/employees/' + encodeURIComponent(empId) + '/name')
+    .then(function(name) {
+      return typeof name === 'string' && name.trim() ? name.trim() : empId;
     });
-    el.innerHTML = html || badge('기록 없음', 'info');
+}
+
+function renderAttendanceRows(rows) {
+  var html = '';
+  rows.forEach(function(row) {
+    var info = row.info;
+    var start = typeof info.actual_start === 'string' ? info.actual_start : '';
+    var end = typeof info.actual_end === 'string' ? info.actual_end : '';
+    var status = end ? badge('퇴근', 'info') : start ? badge('근무중', 'ok') : badge('시간 미기록', 'warn');
+    html += '<div class="item attendance-item"><span class="attendance-summary">' + esc(row.name) +
+      '<span class="attendance-times">출근 ' + esc(start || '--') + ' · 퇴근 ' + esc(end || '--') +
+      '</span></span>' + status + '</div>';
+  });
+  return html;
+}
+
+// 근무표: canonical 실근태 read-only
+function updateSchedule(now) {
+  var today = kstDateKey(now);
+  return fb('/workschedule_v2/attendance/' + today).then(function(data) {
+    var el = document.getElementById('schedule-body');
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      el.innerHTML = badge('오늘 출근 기록 없음', 'info');
+      return;
+    }
+    var entries = Object.entries(data).filter(function(kv) {
+      return kv[1] && typeof kv[1] === 'object';
+    });
+    if (entries.length === 0) {
+      el.innerHTML = badge('오늘 출근 기록 없음', 'info');
+      return;
+    }
+    return Promise.all(entries.map(function(kv) {
+      return resolveAttendanceName(kv[0], kv[1]).then(function(name) {
+        return { empId: kv[0], name: name, info: kv[1] };
+      });
+    })).then(function(rows) {
+      el.innerHTML = renderAttendanceRows(rows) || badge('오늘 출근 기록 없음', 'info');
+    });
   });
 }
+// --- end canonical attendance helpers ---
 
 // 주문 현황
 function updateOrder() {
@@ -646,7 +801,7 @@ function updateNews() {
   var el = document.getElementById('news-body');
   fetchRSS(NEWS_RSS, 5).then(function(items) {
     if (items.length === 0) {
-      el.innerHTML = badge('뉴스 로딩 실패', 'warn');
+      el.innerHTML = sourceFallback('news');
       return;
     }
     var html = '';
@@ -667,7 +822,7 @@ function updateSNS() {
   var el = document.getElementById('sns-body');
   fetchRSS(TRENDS_RSS, 5).then(function(items) {
     if (items.length === 0) {
-      el.innerHTML = badge('트렌드 로딩 실패', 'warn');
+      el.innerHTML = sourceFallback('sns');
       return;
     }
     var html = '';

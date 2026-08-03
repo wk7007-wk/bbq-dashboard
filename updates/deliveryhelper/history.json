@@ -2,6 +2,66 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29762718,
+      "appVersionName": "0803.2218",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29762718",
+      "sha256": "d84ec0b3f1b87f5fa2e7878e0fc7654c88eecd947db7796592b6b9906ad8a921",
+      "sizeBytes": 31431516,
+      "packageName": "com.deliveryhelper.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "DeliveryHelper 자동 업데이트",
+      "updatedAt": "2026-08-03T22:21:51+09:00"
+    },
+    {
+      "appVersionCode": 29760958,
+      "appVersionName": "0802.1658",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760958",
+      "sha256": "cdc55278af142c6c7673bd6c80ffb9113c143b0446b242ff00176e03ded49da6",
+      "sizeBytes": 31439708,
+      "packageName": "com.deliveryhelper.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "기존 네이버클라우드 지도 스타일 연결 복구 및 실제 로드 확인",
+      "updatedAt": "2026-08-02T17:02:04+09:00"
+    },
+    {
+      "appVersionCode": 29760776,
+      "appVersionName": "0802.1356",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760776",
+      "sha256": "6b5af6d528b7629716fa88decbdd163f43e508736756f0e1c61f3d408490e963",
+      "sizeBytes": 31439708,
+      "packageName": "com.deliveryhelper.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "네이버 지도 설정 적용 상태 및 검증 로그",
+      "updatedAt": "2026-08-02T14:06:32+09:00"
+    },
+    {
+      "appVersionCode": 29760488,
+      "appVersionName": "0802.0908",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760488",
+      "sha256": "449cd13761d49d3d946ed91af583533e0f3ec450b33c7e638f9d574f2f7dc29a",
+      "sizeBytes": 31431516,
+      "packageName": "com.deliveryhelper.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "네이버 지도 설정 저장 즉시 반영",
+      "updatedAt": "2026-08-02T09:12:51+09:00"
+    },
+    {
+      "appVersionCode": 29760310,
+      "appVersionName": "0802.0610",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29760310",
+      "sha256": "8a7754cb31ae5f12afaffdd44e754cbdfdded26671feb06103cc5118de2586f5",
+      "sizeBytes": 31431516,
+      "packageName": "com.deliveryhelper.app",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "네이버 지도 인증키 누락 복구",
+      "updatedAt": "2026-08-02T06:39:14+09:00"
+    },
+    {
       "appVersionCode": 29700618,
       "appVersionName": "0621.1918",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29700618",

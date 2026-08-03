@@ -9,7 +9,6 @@
     {"id":"banktotal","label":"BankTotal","apkName":"BankTotal_latest.bin","packages":["com.banktotal.app"],"enabled":true},
     {"id":"deliveryhelper","label":"DeliveryHelper","apkName":"DeliveryHelper_latest.bin","packages":["com.deliveryhelper.app"],"enabled":true},
     {"id":"storebot-termux","label":"StoreBotTermux","apkName":"StoreBotTermux_latest.bin","packages":["com.sbotux"],"enabled":true},
-    {"id":"workschedule","label":"근무스케줄","apkName":"WorkSchedule_latest.bin","packages":["com.workschedule.app"],"enabled":true},
     {"id":"chicken-timer","label":"치킨타이머","apkName":"ChickenTimer_latest.bin","packages":["com.chickentimer.board.v2"],"enabled":true}
   ]
 }

@@ -207,6 +207,17 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 .button-value-btn:active{transform:translateY(1px);background:var(--surface-muted);}
 .button-value-btn:disabled{opacity:.35;transform:none;}
 .button-value-text{min-width:44px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--surface-muted);font-size:12px;font-weight:800;color:var(--text-primary);padding:0 6px;white-space:nowrap;}
+.ad-receipt{margin-top:8px;padding:8px 10px;border:1px solid rgba(144,144,168,.42);border-radius:8px;background:rgba(12,16,30,.66);color:#C8C8DC;}
+.ad-receipt-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.ad-receipt-title{font-size:10px;font-weight:800;color:#C8C8DC;}
+.ad-receipt-status{font-size:11px;font-weight:900;color:#BFD8FF;}
+.ad-receipt[data-state="pending"] .ad-receipt-status{color:#FFD27A;}
+.ad-receipt[data-state="applied"] .ad-receipt-status{color:#75E79C;}
+.ad-receipt[data-state="needs_check"] .ad-receipt-status{color:#FF9B94;}
+.ad-receipt-detail{margin-top:3px;font-size:10px;line-height:1.4;color:#C8C8DC;}
+.ad-receipt details{margin-top:5px;border-top:1px solid rgba(144,144,168,.28);padding-top:5px;}
+.ad-receipt summary{min-height:28px;display:flex;align-items:center;cursor:pointer;font-size:10px;font-weight:800;color:#BFD8FF;}
+.ad-receipt-log{display:grid;gap:3px;padding:3px 0 0 18px;color:#C8C8DC;font-size:10px;line-height:1.35;}
 .button-value-control.is-minute .button-value-text{min-width:48px;}
 .compact-cell .button-value-control{width:100%;}
 .compact-cell .button-value-text{flex:1;min-width:0;}
@@ -450,11 +461,16 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <!-- 배민 수동 버튼 + 상태 -->
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="bSt" style="font-size:11px"></span>
-      <div class="row" style="gap:6px">
-        <button class="btn bs bg" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
-        <button class="btn bs bor" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
-        <button class="btn bs bred" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
+      <div class="row" id="baeminAdControls" role="group" aria-label="배민 광고 즉시 적용" style="gap:6px">
+        <button type="button" data-baemin-ad-action="max" class="btn bs bg" style="min-width:36px" aria-describedby="baeminAdReceiptStatus" onclick="exAd('baemin','max')">최대</button>
+        <button type="button" data-baemin-ad-action="mid" class="btn bs bor" style="min-width:36px" aria-describedby="baeminAdReceiptStatus" onclick="exAd('baemin','mid')">중간</button>
+        <button type="button" data-baemin-ad-action="min" class="btn bs bred" style="min-width:36px" aria-describedby="baeminAdReceiptStatus" onclick="exAd('baemin','min')">최소</button>
       </div>
+    </div>
+    <div class="ad-receipt" id="baeminAdReceipt" data-state="idle">
+      <div class="ad-receipt-head"><span class="ad-receipt-title">실행 확인</span><strong class="ad-receipt-status" id="baeminAdReceiptStatus" role="status" aria-live="polite">확인 준비 중</strong></div>
+      <div class="ad-receipt-detail" id="baeminAdReceiptDetail">실제 적용 상태만 표시합니다.</div>
+      <details><summary>최근 요청 기록</summary><ol class="ad-receipt-log" id="baeminAdReceiptLog"></ol></details>
     </div>
     <div class="gauge" id="bG"></div>
     <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
@@ -923,6 +939,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v4.4 (0528.verify)</div>
 
+<script src="posdelay_ad_receipt.js"></script>
 <script>
 const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
 let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
@@ -935,6 +952,12 @@ let latestEngineState=null,latestSubphoneState=null;
 let activitySnapshot={ad:null,kds:null};
 let lastCaptureSnapshot={orders:[],printerConnected:false,status:'',lastCaptureAt:'--',thresholdFee:8};
 const isApp=typeof NativeBridge!=='undefined';
+const baeminAdReceipt=window.PosDelayAdReceipt?window.PosDelayAdReceipt.mount({
+  root:document,
+  storage:window.localStorage,
+  timeoutMs:50000,
+  hasBridge:function(){return typeof window.NativeBridge!=='undefined'&&typeof window.NativeBridge.executeAd==='function';}
+}):null;
 // null-safe getter: 0도 유효한 값으로 처리
 function g(obj,key,def){const v=obj[key];return v!=null?v:def;}
 function setAppVersionText(version){
@@ -1019,6 +1042,7 @@ const _AD_NOTIFY_SKIP=['서킷','쿨다운','CHECK','이미','retry','wait','스
 function hASt(m){
   if(!m.data||m.data==='null')return;
   if(m.path==='/')Object.assign(aS,m.data);else aS[m.path.slice(1)]=m.data;
+  if(baeminAdReceipt)baeminAdReceipt.observe(aS);
   const cur=aS.last_ad_action;
   if(cur&&cur!==_lastAdAction){
     if(_lastAdAction!==null){
@@ -1262,24 +1286,24 @@ function doForceRefresh(){
 // === 실행 버튼 ===
 function exAd(platform,action){
   const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
+  if(platform==='baemin'){
+    const amounts={max:ba,mid:bma,min:bra},target=amounts[action];
+    if(!baeminAdReceipt){toast('실행 확인 UI를 불러오지 못했습니다.','warn');return;}
+    baeminAdReceipt.request(action,target,function(nativeAction,nativeAmount){
+      nb('trackUsage','exec_baemin_'+action);
+      window.NativeBridge.executeAd(nativeAction,nativeAmount);
+    });
+    return;
+  }
   if(isApp){
     nb('trackUsage','exec_'+platform+'_'+action);
     if(platform==='coupang'){
       if(action==='on')nb('executeAd','COUPANG_AD_ON',0);
       else nb('executeAd','COUPANG_AD_OFF',0);
-    }else{
-      if(action==='max')nb('executeAd','BAEMIN_SET_AMOUNT',ba);
-      else if(action==='mid')nb('executeAd','BAEMIN_SET_AMOUNT',bma);
-      else{
-        nb('executeAd','BAEMIN_SET_AMOUNT',bra);
-      }
     }
   }else{
     if(platform==='coupang'){
       sendCmd(action==='on'?'COUPANG_AD_ON':'COUPANG_AD_OFF');
-    }else{
-      const amounts={max:ba,mid:bma,min:bra};
-      sendCmd('BAEMIN_SET_AMOUNT',amounts[action]);
     }
   }
 }
