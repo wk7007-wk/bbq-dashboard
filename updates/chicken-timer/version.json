@@ -6,7 +6,7 @@
   "sizeBytes": 1436350,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-  "enabled": true,
+  "enabled": false,
   "releaseNotes": "Note9 방향 회귀 해제 및 canonical 업데이트센터 복구",
   "updatedAt": "2026-08-04T01:55:41+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
