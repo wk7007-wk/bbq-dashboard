@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29766737,
+      "appVersionName": "0806.1717",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29766737",
+      "sha256": "11254b632be2d39b1bb3b14e29f73b0c4ee18546dab413aa9b8d5107e111ba99",
+      "sizeBytes": 1450498,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "OV 카드와 복구·레시피·동기화 버튼 공간을 비율형 utility rail로 재배치하고 7개 화면 레이아웃 계약을 통과함",
+      "updatedAt": "2026-08-06T17:57:46+09:00"
+    },
+    {
       "appVersionCode": 29766494,
       "appVersionName": "0806.1314",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29766494",
