@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29768613,
+      "appVersionName": "0808.0033",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29768613",
+      "sha256": "85ced009d19d1c3d7c399fa473782f47ee1da113c29d0d92b03a627f32f373c7",
+      "sizeBytes": 1460019,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "카운트 숫자 크기와 한줄·두줄 배치를 화면 높이와 분할 상태에 맞게 조정하고 10개 화면 계약을 통과함",
+      "updatedAt": "2026-08-08T01:11:43+09:00"
+    },
+    {
       "appVersionCode": 29766737,
       "appVersionName": "0806.1717",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29766737",
