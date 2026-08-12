@@ -4,6 +4,7 @@
     {"id":"solnote","label":"SolNote 개인노트 (정식)","apkName":"SolNote_latest.bin","packages":["com.wonmux.solnote.personal","com.wonmux.solnote"],"enabled":true},
     {"id":"wonmux-browser","label":"Wonmux Browser","apkName":"WonmuxBrowser_latest.bin","packages":["com.wonmux.browser"],"enabled":true},
     {"id":"update-center","label":"업데이트 센터","apkName":"AppUpdateCenter_latest.bin","packages":["com.appupdatecenter.app"],"enabled":true},
+    {"id":"wonmux","label":"Wonmux","apkName":"Wonmux_latest.bin","packages":["com.wonmux"],"enabled":true},
     {"id":"posdelay","label":"PosDelay","apkName":"PosDelay_latest.bin","packages":["com.posdelay.app"],"enabled":true},
     {"id":"poskds","label":"PosKDS","apkName":"PosKDS_latest.bin","packages":["com.poskds.app"],"enabled":true},
     {"id":"banktotal","label":"BankTotal","apkName":"BankTotal_latest.bin","packages":["com.banktotal.app"],"enabled":true},
