@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "releases": [
+    {
+      "appVersionCode": 29780005,
+      "appVersionName": "0.118.3-wonmux.20260812.2",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/Wonmux_latest.bin?v=29780005",
+      "sha256": "668208315bdc251858e7585e13c70f9f187458c5a5bb78409528a42316086733",
+      "sizeBytes": 118233755,
+      "packageName": "com.wonmux",
+      "certificateSha256": "b6da01480eefd5fbf2cd3771b8d1021ec791304bdd6c4bf41d3faabad48ee5e1",
+      "enabled": true,
+      "releaseNotes": "Codex context rollover and bounded handoff automation",
+      "updatedAt": "2026-08-12T23:04:43+09:00"
+    }
+  ]
+}
