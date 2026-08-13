@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29777419,
+      "appVersionName": "0814.0319",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29777419",
+      "sha256": "27ec71da42fdef567fd483edff68ab2a82d8fd8733c7bbb8cfd6ec86387a55d1",
+      "sizeBytes": 1553159,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "실기기 화면 캡처 및 원문 영수증 자동 회수 파이프라인, 기존 타이머 UI와 동작 보존",
+      "updatedAt": "2026-08-14T03:22:22+09:00"
+    },
+    {
       "appVersionCode": 29777391,
       "appVersionName": "0814.0251",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29777391",
