@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29768613,
-  "appVersionName": "0808.0033",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29768613",
-  "sha256": "85ced009d19d1c3d7c399fa473782f47ee1da113c29d0d92b03a627f32f373c7",
-  "sizeBytes": 1460019,
+  "appVersionCode": 29777391,
+  "appVersionName": "0814.0251",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29777391",
+  "sha256": "4fd9cb94b0a4981c1ffa9cdc989cdbea074b6e551427f976b3683d429e6b7e6d",
+  "sizeBytes": 1553038,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "카운트 숫자 크기와 한줄·두줄 배치를 화면 높이와 분할 상태에 맞게 조정하고 10개 화면 계약을 통과함",
-  "updatedAt": "2026-08-08T01:11:43+09:00",
+  "releaseNotes": "실기기 화면 캡처 전용 파이프라인 추가, 기존 타이머 UI와 동작 보존",
+  "updatedAt": "2026-08-14T02:57:05+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
