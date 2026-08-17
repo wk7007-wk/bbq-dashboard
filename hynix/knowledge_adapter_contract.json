@@ -1,0 +1,537 @@
+{
+    "schema_version": "operation_knowledge_write.v1",
+    "mode": "write_enabled",
+    "site_surface": "AttendanceBoard/docs/hynix",
+    "raw_item_fields": [
+        "source",
+        "channel",
+        "text",
+        "author",
+        "timestamp",
+        "tags"
+    ],
+    "structured_fields": [
+        "summary",
+        "key_points",
+        "category",
+        "audience",
+        "source_ids",
+        "citations",
+        "confidence",
+        "status"
+    ],
+    "output_variants": [
+        "staff_brief",
+        "manager_checklist",
+        "search_answer",
+        "kakao_reply",
+        "site_manual_section"
+    ],
+    "write_paths": {
+        "raw_inputs_path": "/packhelper/ops_knowledge/raw_items",
+        "structured_summaries_path": "/packhelper/ops_knowledge/structured_summaries",
+        "output_variants_path": "/packhelper/ops_knowledge/output_variants",
+        "delete_requests_path": "/packhelper/ops_knowledge/delete_requests",
+        "queue_path": "/packhelper/ops_knowledge/queue",
+        "audit_path": "/packhelper/ops_knowledge/audit"
+    },
+    "source_separation": {
+        "raw_inputs_path": "/packhelper/ops_knowledge/raw_items",
+        "structured_summaries_path": "/packhelper/ops_knowledge/structured_summaries",
+        "output_variants_path": "/packhelper/ops_knowledge/output_variants",
+        "ops_manual_source": "/packhelper/ops_manual",
+        "canonical_schedule_source": "/workschedule_v2",
+        "attendance_source": "/workschedule_v2/attendance",
+        "summary_as_schedule_source_allowed": false
+    },
+    "safety": {
+        "required_auth": "operator_or_owner",
+        "audit_required": true,
+        "soft_delete_first": true,
+        "hard_delete_disabled": true,
+        "no_blocking_ai_on_ingest": true,
+        "async_processing": true,
+        "immediate_ack": true,
+        "kakao_send_enabled": true,
+        "kakao_send_default_no_send": true,
+        "explicit_action_required": true,
+        "room_guard_required": true,
+        "mass_send_disabled": true
+    },
+    "preview_sample": {
+        "raw_items": [
+            {
+                "source": "hynix_site_form",
+                "channel": "site",
+                "text": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4.",
+                "author": "operator",
+                "timestamp": "2026-07-07T09:00:00+09:00",
+                "tags": [
+                    "schedule",
+                    "ops_manual"
+                ],
+                "source_path": "",
+                "raw_preserved": true,
+                "id": "raw_b9d868bf7921ada4",
+                "status": "active"
+            },
+            {
+                "source": "storebot_kakao",
+                "channel": "kakao",
+                "text": "\ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+                "author": "staff",
+                "timestamp": "2026-07-07T09:03:00+09:00",
+                "tags": [
+                    "schedule"
+                ],
+                "source_path": "",
+                "raw_preserved": true,
+                "id": "raw_7bf13a1b8649d39e",
+                "status": "active"
+            }
+        ],
+        "structured_summary": {
+            "id": "summary_71d2da93444a4b4a",
+            "summary": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4. / \ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+            "key_points": [
+                "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4.",
+                "\ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4."
+            ],
+            "category": "schedule_request",
+            "audience": "manager",
+            "source_ids": [
+                "raw_b9d868bf7921ada4",
+                "raw_7bf13a1b8649d39e"
+            ],
+            "citations": [
+                {
+                    "source_id": "raw_b9d868bf7921ada4",
+                    "source": "hynix_site_form",
+                    "channel": "site",
+                    "author": "operator",
+                    "timestamp": "2026-07-07T09:00:00+09:00",
+                    "source_path": ""
+                },
+                {
+                    "source_id": "raw_7bf13a1b8649d39e",
+                    "source": "storebot_kakao",
+                    "channel": "kakao",
+                    "author": "staff",
+                    "timestamp": "2026-07-07T09:03:00+09:00",
+                    "source_path": ""
+                }
+            ],
+            "confidence": 0.72,
+            "status": "active",
+            "source_contract": {
+                "raw_preserved": true,
+                "summary_is_derived": true,
+                "summary_is_canonical_source": false,
+                "canonical_schedule_source": "/workschedule_v2",
+                "attendance_source": "/workschedule_v2/attendance",
+                "summary_as_schedule_source_allowed": false
+            }
+        },
+        "output_variants": {
+            "staff_brief": {
+                "text": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4. / \ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+                "source_ids": [
+                    "raw_b9d868bf7921ada4",
+                    "raw_7bf13a1b8649d39e"
+                ],
+                "citations": [
+                    {
+                        "source_id": "raw_b9d868bf7921ada4",
+                        "source": "hynix_site_form",
+                        "channel": "site",
+                        "author": "operator",
+                        "timestamp": "2026-07-07T09:00:00+09:00",
+                        "source_path": ""
+                    },
+                    {
+                        "source_id": "raw_7bf13a1b8649d39e",
+                        "source": "storebot_kakao",
+                        "channel": "kakao",
+                        "author": "staff",
+                        "timestamp": "2026-07-07T09:03:00+09:00",
+                        "source_path": ""
+                    }
+                ]
+            },
+            "manager_checklist": {
+                "items": [
+                    "\ud655\uc778: \uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4.",
+                    "\ud655\uc778: \ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4."
+                ],
+                "source_ids": [
+                    "raw_b9d868bf7921ada4",
+                    "raw_7bf13a1b8649d39e"
+                ],
+                "citations": [
+                    {
+                        "source_id": "raw_b9d868bf7921ada4",
+                        "source": "hynix_site_form",
+                        "channel": "site",
+                        "author": "operator",
+                        "timestamp": "2026-07-07T09:00:00+09:00",
+                        "source_path": ""
+                    },
+                    {
+                        "source_id": "raw_7bf13a1b8649d39e",
+                        "source": "storebot_kakao",
+                        "channel": "kakao",
+                        "author": "staff",
+                        "timestamp": "2026-07-07T09:03:00+09:00",
+                        "source_path": ""
+                    }
+                ]
+            },
+            "search_answer": {
+                "query": "\uadfc\ubb34 \ubcc0\uacbd \uc694\uccad",
+                "answer": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4. / \ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+                "source_ids": [
+                    "raw_b9d868bf7921ada4",
+                    "raw_7bf13a1b8649d39e"
+                ],
+                "citations": [
+                    {
+                        "source_id": "raw_b9d868bf7921ada4",
+                        "source": "hynix_site_form",
+                        "channel": "site",
+                        "author": "operator",
+                        "timestamp": "2026-07-07T09:00:00+09:00",
+                        "source_path": ""
+                    },
+                    {
+                        "source_id": "raw_7bf13a1b8649d39e",
+                        "source": "storebot_kakao",
+                        "channel": "kakao",
+                        "author": "staff",
+                        "timestamp": "2026-07-07T09:03:00+09:00",
+                        "source_path": ""
+                    }
+                ]
+            },
+            "kakao_reply": {
+                "text": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4. / \ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+                "send_enabled": true,
+                "send_guard": {
+                    "explicit_action_required": true,
+                    "room_guard_required": true,
+                    "mass_send_disabled": true,
+                    "audit_required": true
+                },
+                "source_ids": [
+                    "raw_b9d868bf7921ada4",
+                    "raw_7bf13a1b8649d39e"
+                ],
+                "citations": [
+                    {
+                        "source_id": "raw_b9d868bf7921ada4",
+                        "source": "hynix_site_form",
+                        "channel": "site",
+                        "author": "operator",
+                        "timestamp": "2026-07-07T09:00:00+09:00",
+                        "source_path": ""
+                    },
+                    {
+                        "source_id": "raw_7bf13a1b8649d39e",
+                        "source": "storebot_kakao",
+                        "channel": "kakao",
+                        "author": "staff",
+                        "timestamp": "2026-07-07T09:03:00+09:00",
+                        "source_path": ""
+                    }
+                ]
+            },
+            "site_manual_section": {
+                "title": "schedule_request",
+                "summary": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4. / \ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+                "body": "\uc6b4\uc601\uba54\ubaa8: \uc57c\uac04 \uadfc\ubb34\ud45c \ubcc0\uacbd \uc694\uccad\uc740 \uc6d0\ubb38\uc744 \ubcf4\uc874\ud558\uace0 \uad00\ub9ac\uc790 \ud655\uc778\uc6a9 \uccb4\ud06c\ub9ac\uc2a4\ud2b8\ub85c \uba3c\uc800 \ubcf4\uc5ec\uc900\ub2e4.\n\ub0b4\uc77c \uadfc\ubb34 \ubc14\uafd4 \ub2ec\ub77c\ub294 \uce74\ud1a1\uc740 \ucd9c\ucc98\uc640 \uc694\uccad \ub0b4\uc6a9\uc744 \ub0a8\uae34 \ub4a4 \ud655\uc778\uc6a9\uc73c\ub85c \uc815\ub9ac\ud55c\ub2e4.",
+                "source_ids": [
+                    "raw_b9d868bf7921ada4",
+                    "raw_7bf13a1b8649d39e"
+                ],
+                "citations": [
+                    {
+                        "source_id": "raw_b9d868bf7921ada4",
+                        "source": "hynix_site_form",
+                        "channel": "site",
+                        "author": "operator",
+                        "timestamp": "2026-07-07T09:00:00+09:00",
+                        "source_path": ""
+                    },
+                    {
+                        "source_id": "raw_7bf13a1b8649d39e",
+                        "source": "storebot_kakao",
+                        "channel": "kakao",
+                        "author": "staff",
+                        "timestamp": "2026-07-07T09:03:00+09:00",
+                        "source_path": ""
+                    }
+                ]
+            }
+        }
+    },
+    "mcp_adapter_contract": {
+        "schema_version": "mcp_adapter_contract.v2",
+        "mode": "write_enabled",
+        "standard_concepts": [
+            "resources",
+            "tools",
+            "prompts"
+        ],
+        "resources": [
+            {
+                "name": "operation_knowledge.raw_items",
+                "uri": "firebase://packhelper/ops_knowledge/raw_items",
+                "source_path": "/packhelper/ops_knowledge/raw_items",
+                "read_only": false,
+                "canonical": false,
+                "purpose": "preserve raw inputs with source metadata"
+            },
+            {
+                "name": "operation_knowledge.structured_summaries",
+                "uri": "firebase://packhelper/ops_knowledge/structured_summaries",
+                "source_path": "/packhelper/ops_knowledge/structured_summaries",
+                "read_only": false,
+                "canonical": false,
+                "purpose": "derived summaries and classifications"
+            },
+            {
+                "name": "operation_knowledge.output_variants",
+                "uri": "firebase://packhelper/ops_knowledge/output_variants",
+                "source_path": "/packhelper/ops_knowledge/output_variants",
+                "read_only": false,
+                "canonical": false,
+                "purpose": "derived output variants for site/search/Kakao"
+            },
+            {
+                "name": "operation_knowledge.delete_requests",
+                "uri": "firebase://packhelper/ops_knowledge/delete_requests",
+                "source_path": "/packhelper/ops_knowledge/delete_requests",
+                "read_only": false,
+                "canonical": false,
+                "purpose": "reviewable delete requests and soft-delete intents"
+            },
+            {
+                "name": "operation_knowledge.queue",
+                "uri": "firebase://packhelper/ops_knowledge/queue",
+                "source_path": "/packhelper/ops_knowledge/queue",
+                "read_only": false,
+                "canonical": false,
+                "purpose": "background jobs for summaries, classification, and output variants"
+            },
+            {
+                "name": "operation_knowledge.audit",
+                "uri": "firebase://packhelper/ops_knowledge/audit",
+                "source_path": "/packhelper/ops_knowledge/audit",
+                "read_only": true,
+                "canonical": false,
+                "purpose": "append-only action audit records"
+            },
+            {
+                "name": "workschedule.canonical_schedule",
+                "uri": "firebase://workschedule_v2",
+                "source_path": "/workschedule_v2",
+                "read_only": true,
+                "canonical": true,
+                "purpose": "canonical schedule data source"
+            },
+            {
+                "name": "ops_manual.entries",
+                "uri": "firebase://packhelper/ops_manual/entries",
+                "source_path": "/packhelper/ops_manual/entries",
+                "read_only": false,
+                "canonical": true,
+                "purpose": "approved operations manual entries"
+            }
+        ],
+        "tools": [
+            {
+                "name": "operation_knowledge.preview_structure",
+                "description": "Normalize raw items and return a derived summary without writing.",
+                "annotations": {
+                    "readOnlyHint": true
+                },
+                "side_effects": "none",
+                "mutates": false,
+                "risk_level": "low"
+            },
+            {
+                "name": "operation_knowledge.ingest",
+                "description": "Persist a raw site/Kakao/manual input, audit, and pending background job without waiting for summary generation.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "operator",
+                "audit_required": true,
+                "no_blocking_ai_on_ingest": true,
+                "async_processing": true,
+                "immediate_ack": true
+            },
+            {
+                "name": "operation_knowledge.process_job",
+                "description": "Process one pending queue job into derived summary and output variants.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "worker",
+                "audit_required": true
+            },
+            {
+                "name": "operation_knowledge.process_queue",
+                "description": "Process pending operation knowledge queue jobs in priority order.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "worker",
+                "audit_required": true
+            },
+            {
+                "name": "operation_knowledge.upsert_summary",
+                "description": "Persist a structured summary derived from preserved raw input.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "operator",
+                "audit_required": true
+            },
+            {
+                "name": "operation_knowledge.upsert_output_variant",
+                "description": "Persist a staff, manager, search, Kakao, or site output variant.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "operator",
+                "audit_required": true
+            },
+            {
+                "name": "operation_knowledge.request_delete",
+                "description": "Create a reviewable delete request without hard deleting data.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "operator",
+                "audit_required": true,
+                "hard_delete_disabled": true
+            },
+            {
+                "name": "operation_knowledge.soft_delete",
+                "description": "Mark a raw input, summary, or output as deleted while preserving audit.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "high",
+                "required_auth": "owner",
+                "audit_required": true,
+                "hard_delete_disabled": true
+            },
+            {
+                "name": "operation_knowledge.restore",
+                "description": "Restore a soft-deleted raw input, summary, or output.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "medium",
+                "required_auth": "owner",
+                "audit_required": true
+            },
+            {
+                "name": "kakao.send_reply",
+                "description": "Queue one explicit StoreBotTermux Kakao reply for a guarded room/action.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "kakao_send_queue",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "high",
+                "required_auth": "explicit_action",
+                "audit_required": true,
+                "room_guard_required": true,
+                "mass_send_disabled": true
+            },
+            {
+                "name": "workschedule.apply_change",
+                "description": "Schedule writes stay on the existing confirmed schedule flow.",
+                "annotations": {
+                    "readOnlyHint": false
+                },
+                "side_effects": "db_write",
+                "mutates": true,
+                "enabled": true,
+                "risk_level": "high",
+                "required_auth": "confirmed_schedule_flow",
+                "audit_required": true,
+                "summary_as_schedule_source": false
+            }
+        ],
+        "prompts": [
+            {
+                "name": "operation_knowledge.summarize_with_citations",
+                "description": "Summarize raw inputs while preserving source ids and citations.",
+                "read_only": false,
+                "write_tool_allowed": "operation_knowledge.upsert_summary",
+                "audit_required": true
+            },
+            {
+                "name": "operation_knowledge.output_variant",
+                "description": "Create output variants and optionally persist them.",
+                "read_only": false,
+                "write_tool_allowed": "operation_knowledge.upsert_output_variant",
+                "kakao_send_requires_explicit_action": true
+            }
+        ],
+        "guards": {
+            "read_only": false,
+            "writes_enabled": true,
+            "firebase_writes_enabled": true,
+            "no_blocking_ai_on_ingest": true,
+            "async_processing": true,
+            "immediate_ack": true,
+            "kakao_send_enabled": true,
+            "kakao_send_default_no_send": true,
+            "explicit_action_required": true,
+            "room_guard_required": true,
+            "mass_send_disabled": true,
+            "audit_required": true,
+            "soft_delete_first": true,
+            "hard_delete_disabled": true,
+            "hard_delete_explicit_confirm_prefix": "hard-delete:",
+            "canonical_schedule_source": "/workschedule_v2",
+            "attendance_source": "/workschedule_v2/attendance",
+            "summary_as_schedule_source_allowed": false
+        }
+    }
+}

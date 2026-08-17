@@ -1,0 +1,421 @@
+/* V15 preview-only balance overlay. The deployed original DOM and handlers
+ * remain the sole owners; this file changes presentation only. */
+
+body[data-countdown-layout="v15-original-final"] {
+  --v15-main-idle-font: 1.0625rem;
+  --v15-ov-idle-font: 1.4375rem;
+  --v15-main-counter-font: 2.25rem;
+  --v15-ov-counter-font: 2.1875rem;
+  --v15-main-counter-height: 5.75rem;
+  --v15-ov-counter-height: 5.75rem;
+}
+
+/* Current app.js keeps the rejected V13 projection nodes available for its
+ * explicit V13 branch. They are inert implementation details in the legacy
+ * V15 branch and must not consume original card geometry. */
+body[data-countdown-layout="v15-original-final"]
+  :is(.v13-panel-actions, .v13-log-overlay, .v13-controls-overlay, .v13-accessible-history) {
+  display: none !important;
+}
+
+/* Adaptive arrays reuse the original buttons and source order. */
+body[data-countdown-layout="v15-original-final"]
+  .zone-group:not([data-zone="oven"])
+  .slot-body > .preset-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 0.2rem;
+}
+
+body[data-countdown-layout="v15-original-final"]
+  .zone-group[data-zone="oven"]
+  .slot-body > .preset-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  padding: 0;
+}
+
+/* The deployed stylesheet suppresses five OV choices in landscape and three
+ * in portrait. V15 reveals the already-created, already-bound buttons so the
+ * requested 15-value array fills its third row; no node or handler is added. */
+body[data-countdown-layout="v15-original-final"]
+  .zone-group[data-zone="oven"]
+  .slot-body > .preset-grid > .minute-button {
+  display: flex !important;
+  order: initial !important;
+  grid-area: auto !important;
+}
+
+/* Preserve the deployed semantic value order even when an inherited preview
+ * build arranged its dormant OV button creation order differently. */
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="2"] { order: 1 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="3"] { order: 2 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="1"] { order: 3 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="4"] { order: 4 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="4.2"] { order: 5 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="5"] { order: 6 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="5.0"] { order: 7 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="6"] { order: 8 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="7"] { order: 9 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="8"] { order: 10 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="9"] { order: 11 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="10"] { order: 12 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="11"] { order: 13 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="13"] { order: 14 !important; }
+body[data-countdown-layout="v15-original-final"] .slot-card[data-slot-id="slot-6"] > .slot-body > .preset-grid > .minute-button[data-minute="15"] { order: 15 !important; }
+
+body[data-countdown-layout="v15-original-final"]
+  .slot-body > .preset-grid .minute-value {
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-countdown-layout="v15-original-final"]
+  .zone-group:not([data-zone="oven"])
+  .slot-body > .preset-grid .minute-value {
+  font-size: var(--v15-main-idle-font);
+  line-height: 1;
+}
+
+body[data-countdown-layout="v15-original-final"]
+  .zone-group[data-zone="oven"]
+  .slot-body > .preset-grid .minute-value {
+  font-size: var(--v15-ov-idle-font);
+  line-height: 1;
+}
+
+/* The original readout already owns separate minute/second spans. At profiles
+ * where its fitter chooses the legacy one-line mode, present those same spans
+ * as a restrained two-line stack without replacing nodes or handlers. */
+body[data-countdown-layout="v15-original-final"]
+  .timer-readout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  width: min(100%, 6.2rem) !important;
+  height: var(--v15-main-counter-height) !important;
+  min-height: 0 !important;
+  min-block-size: 0 !important;
+  padding: 0 !important;
+  font-size: var(--v15-main-counter-font) !important;
+  line-height: 0.9 !important;
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  place-self: center !important;
+  margin: auto !important;
+}
+
+body[data-countdown-layout="v15-original-final"]
+  .timer-readout .countdown-separator {
+  display: none !important;
+}
+
+body[data-countdown-layout="v15-original-final"]
+  .timer-readout .countdown-minutes,
+body[data-countdown-layout="v15-original-final"]
+  .timer-readout .countdown-seconds {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  line-height: 0.9 !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  .readout-cluster > .timer-readout,
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"] .split-timer-readout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  width: min(100%, 6.2rem) !important;
+  height: var(--v15-main-counter-height) !important;
+  min-height: 0 !important;
+  min-block-size: 0 !important;
+  padding: 0 !important;
+  font-size: var(--v15-main-counter-font) !important;
+  line-height: 0.9 !important;
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  place-self: center !important;
+  margin: auto !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  .countdown-separator {
+  display: none !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  .countdown-minutes,
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  .countdown-seconds {
+  grid-column: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  line-height: 0.9 !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone="oven"] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout) {
+  font-size: var(--v15-ov-counter-font) !important;
+  height: var(--v15-ov-counter-height) !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone="oven"] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  :is(.countdown-minutes, .countdown-seconds) {
+  font-size: var(--v15-ov-counter-font) !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  :is(.countdown-minutes, .countdown-seconds)::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Keep the original perimeter owners and target sizes, but balance their
+ * tracks so the unchanged readout cluster sits on the card's visual axis. */
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group:not([data-zone="oven"])
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-add-mode="false"][data-has-split="false"] {
+  grid-template-columns: minmax(2.55rem, 1fr) minmax(0, 1.55fr) minmax(2.55rem, 1fr) !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone="oven"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-add-mode="false"][data-has-split="false"] {
+  grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 2fr) minmax(5.5rem, 0.8fr) !important;
+}
+
+/* Both original readout owners expose a real stage. Center the unchanged
+ * numeric node inside that stage; split controls remain in their own rails. */
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  :is(.readout-cluster, .split-readout-cluster) {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  :is(.readout-cluster, .split-readout-cluster)
+  > :is(.timer-readout, .split-timer-readout) {
+  position: absolute !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  .readout-cluster > .timer-total {
+  position: absolute !important;
+  right: auto !important;
+  bottom: 2px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"]
+  > .adjust-controls > .readout-cluster > .timer-total {
+  position: absolute !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: 2px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone="oven"] .slot-card
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"]
+  > .adjust-controls > .readout-cluster > .timer-total {
+  right: 4px !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="true"]
+  .split-timer-unit > .split-readout-cluster {
+  position: relative !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"]
+  :is(.readout-cluster, .split-readout-cluster)
+  > :is(.timer-readout, .split-timer-readout) {
+  position: absolute !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"]
+  .readout-cluster > .timer-readout {
+  transform: translate(-50%, calc(-50% + 1px)) !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  .countdown-minutes {
+  grid-row: 1 !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .zone-group[data-zone] .slot-card
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  .countdown-seconds {
+  grid-row: 2 !important;
+}
+
+@media (orientation: landscape) and (min-width: 1200px) {
+  body[data-countdown-layout="v15-original-final"] {
+    --v15-main-idle-font: 1.9375rem;
+    --v15-ov-idle-font: 2.25rem;
+    --v15-main-counter-font: 2.25rem;
+    --v15-ov-counter-font: 3.5rem;
+    --v15-main-counter-height: 5.75rem;
+    --v15-ov-counter-height: 8.75rem;
+  }
+}
+
+@media (orientation: portrait) {
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"] {
+    --v15-main-idle-font: 2rem;
+    --v15-ov-idle-font: 2.25rem;
+    --v15-main-counter-font: 3.75rem;
+    --v15-ov-counter-font: 3.75rem;
+    --v15-main-counter-height: 9.25rem;
+    --v15-ov-counter-height: 9.25rem;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .board {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    grid-template-areas: none;
+    grid-auto-flow: row;
+    gap: 0.42rem;
+    padding: 0.42rem 5rem 0.42rem 0.42rem;
+    position: relative;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .zone-group,
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .zone-slot-grid {
+    display: contents;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .slot-card {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .board-utility-rail {
+    position: absolute;
+    inset-block-start: 0.42rem;
+    inset-inline-end: 0.42rem;
+    width: 4.2rem;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .slot-body > .preset-grid,
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"][data-source^="android"]
+    .slot-body > .preset-grid,
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .zone-group[data-zone="oven"] .slot-body > .preset-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 0.24rem;
+    padding: 0.18rem;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"]
+    .zone-group[data-zone="oven"] .slot-body > .preset-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+/* Note9 landscape size correction. The V22 DOM, handlers, state colors and
+ * labels stay frozen; only idle/readout scale changes. */
+@media (orientation: landscape) and (min-width: 800px) and (max-width: 1199px)
+  and (min-height: 361px) and (max-height: 520px) {
+  body[data-countdown-layout="v15-original-final"] {
+    --v15-main-idle-font: 1.1875rem;
+    --v15-ov-idle-font: 1.5rem;
+    --v15-main-counter-font: 2.5rem;
+    --v15-ov-counter-font: 2.5rem;
+    --v15-main-counter-height: 6.25rem;
+    --v15-ov-counter-height: 6.25rem;
+  }
+}

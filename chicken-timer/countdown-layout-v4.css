@@ -1,0 +1,113 @@
+/* Dedicated V4 portrait owner; loaded after auth.css and scoped to explicit body opt-in. */
+@media (orientation: portrait) {
+  body[data-countdown-layout="v4"] .board {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) auto !important;
+    grid-template-areas: none !important;
+    gap: clamp(0.28rem, 0.8vw, 0.48rem) !important;
+  }
+  body[data-countdown-layout="v4"] .board > .zone-group {
+    display: contents !important;
+  }
+  body[data-countdown-layout="v4"] .board > .zone-group > .zone-slot-grid {
+    display: contents !important;
+  }
+  body[data-countdown-layout="v4"] .board > .zone-group > .zone-header,
+  body[data-countdown-layout="v4"] .board > .zone-group > .zone-rail {
+    display: none !important;
+  }
+  body[data-countdown-layout="v4"] .board > .board-utility-rail {
+    grid-column: 1 / -1 !important;
+    min-height: 1.6rem !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) > .slot-info {
+    flex: 0 0 clamp(3.2rem, 9cqh, 4.4rem) !important;
+    min-height: 0 !important;
+    max-height: clamp(3.2rem, 9cqh, 4.4rem) !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) > .slot-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-panel {
+    display: grid !important;
+    grid-template-columns: minmax(2.2rem, auto) minmax(0, 1fr) minmax(3.2rem, auto) !important;
+    grid-template-areas: "positive adjust actions" !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .adjust-controls {
+    grid-area: adjust !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .readout-cluster,
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-readout {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-readout {
+    font-size: clamp(3.25rem, min(34cqh, 34cqw), 9rem) !important;
+    line-height: 0.9 !important;
+  }
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-positive-rail,
+  body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions {
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  @media (min-width: 601px) {
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-panel {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) !important;
+      grid-template-rows: minmax(0, 1fr) clamp(44px, 7cqh, 56px) !important;
+      grid-template-areas: "adjust adjust" "positive actions" !important;
+    }
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .adjust-controls {
+      grid-area: adjust !important;
+    }
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-positive-rail {
+      grid-area: positive !important;
+      position: static !important;
+      inset: auto !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-rows: 1fr !important;
+      writing-mode: horizontal-tb !important;
+    }
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions {
+      grid-area: actions !important;
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      grid-template-rows: 1fr !important;
+      position: static !important;
+      inset: auto !important;
+    }
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions > .timer-primary-actions,
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions > .adjust-row[data-tone="down"],
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-positive-rail > .adjust-row[data-tone="up"] {
+      display: contents !important;
+    }
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions {
+      grid-auto-flow: column !important;
+      grid-auto-columns: minmax(0, 1fr) !important;
+    }
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions button,
+    body[data-countdown-layout="v4"] .board .slot-card[data-state="running"]:not([data-add-mode="true"]):not(:has(.split-timer-unit)) .timer-actions .adjust-button {
+      grid-area: auto !important;
+      grid-column: auto !important;
+      grid-row: auto !important;
+      position: static !important;
+      inset: auto !important;
+      transform: none !important;
+      writing-mode: horizontal-tb !important;
+    }
+  }
+}
