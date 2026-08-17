@@ -1,0 +1,69 @@
+{
+  "schema_version": "workschedule.calendar_sync_contract.v2",
+  "mode": "two_way_shared_intersection",
+  "canonical": {
+    "root": "/workschedule_v2",
+    "google_calendar_is_source_of_truth": false
+  },
+  "shared_fields": [
+    "employee_identity",
+    "work_date",
+    "start_time",
+    "end_time",
+    "role",
+    "off",
+    "clear_or_delete",
+    "date_move"
+  ],
+  "identity_policy": {
+    "employee_mapping_is_stable": true,
+    "google_title_rename_reassigns_employee": false
+  },
+  "manual_oauth": {
+    "surface": "personal_phone_browser",
+    "button_id": "calendarConnectButton",
+    "setup_page": "/hynix/calendar-connect.html",
+    "public_config_path": "/workschedule_v2/meta/calendar_core/google/public_config",
+    "oauth_start_path": "/api/workschedule/calendar/oauth/start",
+    "same_origin_only": true,
+    "owner_auth_required": true,
+    "token_storage": "worker_encrypted_secret_store"
+  },
+  "outbound": {
+    "outbox_path": "/workschedule_v2/meta/calendar_core/google/outbox",
+    "calendar_selector": "primary",
+    "sync_profile": "shared_schedule_intersection_v1",
+    "core_write_must_succeed_first": true
+  },
+  "inbound": {
+    "change_fetch": "incremental_sync_token",
+    "conflict_path": "/workschedule_v2/meta/calendar_core/google/conflicts",
+    "apply_only_when_base_revision_matches": true,
+    "past_date_writes_allowed": false,
+    "periodic_reconciliation_required": true
+  },
+  "google_only_never_import": [
+    "description",
+    "location",
+    "recurrence",
+    "attendees",
+    "reminders",
+    "transparency",
+    "visibility",
+    "event_color"
+  ],
+  "hynix_only_never_export": [
+    "weather",
+    "holiday_display",
+    "sunrise_sunset_gradient",
+    "overlap_gauge",
+    "weekend_color",
+    "off_color"
+  ],
+  "live_activation": {
+    "feature_enabled_default": false,
+    "kill_switch_default": true,
+    "dedicated_google_account_required": true,
+    "worker_secret_store_only": true
+  }
+}

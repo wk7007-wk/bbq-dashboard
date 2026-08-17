@@ -1,0 +1,226 @@
+/* ChickenTimer V17: stable, fast-recognition controls.
+ * One panel grid owns all six unsplit-running cells. Existing DOM text and
+ * handlers remain authoritative; pseudo-elements are visual only. */
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"] {
+  --v17-control-gap: var(--v3-layout-gap, 3px);
+  --v17-arrow-ratio: 0.68;
+  --v17-down-fine-bg: #4b252b;
+  --v17-down-coarse-bg: #71313b;
+  --v17-down-solid-bg: #9b3442;
+  --v17-down-border: #ef8b96;
+  --v17-up-fine-bg: #183a59;
+  --v17-up-coarse-bg: #1d5685;
+  --v17-up-solid-bg: #126b9d;
+  --v17-up-border: #82c8f3;
+  --v17-control-text: #ffffff;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr) minmax(0, 1fr) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-areas: none !important;
+  grid-auto-rows: 0 !important;
+  column-gap: var(--v17-control-gap) !important;
+  row-gap: 0 !important;
+}
+
+/* Full sync details remain in the DOM and accessibility tree. A fixed rail
+ * and state-only visual projection keep every V17 profile geometrically
+ * stable while the runtime changes those details asynchronously. */
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .board-utility-rail {
+  inline-size: 4.5rem !important;
+  min-inline-size: 4.5rem !important;
+  max-inline-size: 4.5rem !important;
+  contain: inline-size !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .board-utility-rail .sync-status {
+  display: inline-flex !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .board-utility-rail .sync-status::before {
+  content: "보정중" / "";
+  color: #ffe4a8;
+  font-size: 0.58rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .board-utility-rail .sync-status[data-state="synced"]::before {
+  content: "동기화됨" / "";
+  color: #d9f8dc;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .board-utility-rail .sync-status[data-state="offline"]::before {
+  content: "오프라인" / "";
+  color: #ffd2ca;
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    .slot-card[data-state="running"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
+    grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+    grid-template-rows: repeat(3, minmax(44px, 1fr)) !important;
+    column-gap: 0 !important;
+    row-gap: 0 !important;
+    padding-block: 0 !important;
+  }
+}
+
+/* Note9 landscape keeps the same two side columns and three semantic rows,
+ * but gives every existing action a usable 44px cell. Extra height comes
+ * from proportional board tracks; no action, state or color owner changes. */
+@media (orientation: landscape) and (min-width: 800px) and (max-width: 1199px)
+  and (min-height: 361px) and (max-height: 520px) {
+  body[data-display-profile="primary-phone"] .board {
+    grid-template-rows: 54% minmax(0, 1fr) !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    .zone-group:not([data-zone="oven"])
+    .slot-card[data-state="running"] .slot-body {
+    padding-inline: 0 !important;
+  }
+
+  body[data-display-profile="primary-phone"]
+    .zone-group[data-zone="oven"] .slot-card {
+    height: calc(132px + 0.875rem) !important;
+    min-height: calc(132px + 0.875rem) !important;
+  }
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .zone-group[data-zone="oven"] .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr) minmax(0, 0.8fr) !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"]
+  > :is(.timer-positive-rail, .timer-actions),
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"]
+  > .timer-positive-rail > .adjust-row,
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"]
+  > .timer-actions > :is(.timer-primary-actions, .adjust-row) {
+  display: contents !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"]
+  > .adjust-controls {
+  grid-column: 2 !important;
+  grid-row: 1 / 4 !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .adjust-button[data-delta-seconds="-10"] { grid-column: 1; grid-row: 1; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .adjust-button[data-delta-seconds="-60"] { grid-column: 1; grid-row: 2; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .timer-primary-actions > [data-role="primary"] { grid-column: 1; grid-row: 3; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .adjust-button[data-delta-seconds="10"] { grid-column: 3; grid-row: 1; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .adjust-button[data-delta-seconds="60"] { grid-column: 3; grid-row: 2; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .timer-primary-actions > [data-role="split"] { grid-column: 3; grid-row: 3; }
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  :is(.adjust-button, .timer-primary-actions > button) {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.12rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  font-size: clamp(0.72rem, min(5cqh, 7cqw), 1rem) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds] {
+  color: transparent !important;
+  font-size: 0 !important;
+  gap: 0.12rem;
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+  display: inline-block;
+  color: var(--v17-control-text);
+  line-height: 1;
+  font-weight: 800;
+  text-shadow: none;
+}
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before { font-size: 0.68rem; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after { font-size: 1rem; font-variant-numeric: tabular-nums; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="-10"]::before { content: "▼"; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="-60"]::before { content: "▼▼"; letter-spacing: -0.18em; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="10"]::before { content: "▲"; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="60"]::before { content: "▲▲"; letter-spacing: -0.18em; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds$="10"]::after { content: "10"; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds$="60"]::after { content: "60"; }
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="-10"] { background: var(--v17-down-fine-bg) !important; border-color: var(--v17-down-border) !important; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="-60"] { background: var(--v17-down-coarse-bg) !important; border-color: var(--v17-down-border) !important; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="10"] { background: var(--v17-up-fine-bg) !important; border-color: var(--v17-up-border) !important; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds="60"] { background: var(--v17-up-coarse-bg) !important; border-color: var(--v17-up-border) !important; }
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"] [data-role="primary"] {
+  background: var(--v17-down-solid-bg) !important;
+  border-color: var(--v17-down-border) !important;
+  color: var(--v17-control-text) !important;
+}
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"] [data-role="split"] {
+  background: var(--v17-up-solid-bg) !important;
+  border-color: var(--v17-up-border) !important;
+  color: var(--v17-control-text) !important;
+}

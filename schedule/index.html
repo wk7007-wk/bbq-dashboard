@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule</title>
+  <link rel="stylesheet" href="./style.css?v=0601-schedule">
+</head>
+<body>
+  <header class="dash-topbar">
+    <div class="dash-brand">
+      <strong>Schedule</strong>
+      <span id="dashStatus">대기</span>
+    </div>
+    <div class="dash-controls">
+      <button type="button" class="dash-btn" id="prevMonth" aria-label="이전 달">&lt;</button>
+      <input type="month" id="monthInput" class="month-input">
+      <button type="button" class="dash-btn" id="nextMonth" aria-label="다음 달">&gt;</button>
+      <button type="button" class="dash-btn" id="todayButton">오늘</button>
+      <button type="button" class="dash-btn is-primary" id="refreshButton">새로고침</button>
+    </div>
+    <nav class="dash-tabs" aria-label="대시보드 탭">
+      <button type="button" class="dash-tab is-active" data-view="overview">운영판</button>
+      <button type="button" class="dash-tab" data-view="calendar">근무달력</button>
+      <button type="button" class="dash-tab" data-view="attendance">출근기록</button>
+    </nav>
+  </header>
+
+  <main class="dash-shell">
+    <section class="dash-view is-active" id="view-overview">
+      <section class="metric-grid" id="metricGrid"></section>
+      <section class="overview-layout">
+        <section class="dash-panel calendar-panel">
+          <div class="panel-head">
+            <h1 id="overviewTitle">근무달력</h1>
+            <div class="legend">
+              <span><i class="dot ok"></i>출근</span>
+              <span><i class="dot warn"></i>미출근</span>
+              <span><i class="dot bad"></i>지각</span>
+            </div>
+          </div>
+          <div class="calendar" id="monthCalendar"></div>
+        </section>
+        <aside class="side-column">
+          <section class="dash-panel">
+            <div class="panel-head">
+              <h2 id="selectedDateTitle">오늘 근무</h2>
+            </div>
+            <div class="roster-list" id="selectedRoster"></div>
+          </section>
+          <section class="dash-panel">
+            <div class="panel-head">
+              <h2>주의 목록</h2>
+              <span class="head-count" id="issueCount">0</span>
+            </div>
+            <div class="issue-list" id="issueList"></div>
+          </section>
+        </aside>
+      </section>
+    </section>
+
+    <section class="dash-view" id="view-calendar">
+      <section class="dash-panel full-panel">
+        <div class="panel-head">
+          <h1 id="calendarTitle">근무달력</h1>
+          <div class="legend">
+            <span><i class="dot ok"></i>출근</span>
+            <span><i class="dot warn"></i>미출근</span>
+            <span><i class="dot bad"></i>지각</span>
+          </div>
+        </div>
+        <div class="calendar is-large" id="fullCalendar"></div>
+      </section>
+    </section>
+
+    <section class="dash-view" id="view-attendance">
+      <section class="dash-panel full-panel">
+        <div class="panel-head split">
+          <h1 id="attendanceTitle">출근기록</h1>
+          <div class="filter-tabs" id="filterTabs">
+            <button type="button" class="filter-tab is-active" data-filter="all">전체</button>
+            <button type="button" class="filter-tab" data-filter="missing">미출근</button>
+            <button type="button" class="filter-tab" data-filter="late">지각</button>
+            <button type="button" class="filter-tab" data-filter="open">퇴근미기록</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="record-table">
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>직원</th>
+                <th>예정</th>
+                <th>출근</th>
+                <th>퇴근</th>
+                <th>상태</th>
+                <th>출처</th>
+              </tr>
+            </thead>
+            <tbody id="recordRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="dash-toast" id="dashToast"></div>
+  <script src="./schedule_merge_logic.js?v=0704-merge"></script>
+  <script src="./app.js?v=0601-schedule"></script>
+</body>
+</html>

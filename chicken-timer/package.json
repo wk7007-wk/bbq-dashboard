@@ -1,0 +1,16 @@
+{
+  "name": "chicken-timer-board-tests",
+  "private": true,
+  "scripts": {
+    "test:core": "node tests/timer_core_state_test.js",
+    "test:sync": "node tests/timer_sync_traffic_test.js",
+    "test:smoke": "node tests/web_smoke_test.js",
+    "test:web": "playwright test",
+    "test:web:headed": "playwright test --headed",
+    "test:web:update-snapshots": "playwright test --update-snapshots",
+    "test:web:install-browser": "playwright install --only-shell chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}

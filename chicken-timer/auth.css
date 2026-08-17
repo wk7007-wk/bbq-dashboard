@@ -1,0 +1,86 @@
+body[data-auth-state="locked"] .app-shell {
+  opacity: 0.08;
+  pointer-events: none;
+  filter: blur(4px);
+}
+
+.auth-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at top, rgba(255, 136, 108, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(7, 10, 14, 0.92), rgba(7, 10, 14, 0.96));
+}
+
+.auth-panel {
+  width: min(100%, 22rem);
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.1rem 1rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    rgba(21, 27, 35, 0.94);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.34);
+}
+
+.auth-title {
+  margin: 0;
+  font-size: 1.32rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #fff2e8;
+}
+
+.auth-hint {
+  margin: 0;
+  color: rgba(246, 242, 233, 0.7);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.auth-pin-input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.86rem;
+  padding: 0.82rem 0.9rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f6f2e9;
+  font: inherit;
+  font-size: 1.02rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.auth-pin-input::placeholder {
+  letter-spacing: 0;
+  color: rgba(246, 242, 233, 0.34);
+}
+
+.auth-submit {
+  appearance: none;
+  border: 1px solid rgba(255, 163, 129, 0.34);
+  border-radius: 0.86rem;
+  padding: 0.78rem 0.9rem;
+  background: linear-gradient(180deg, #ffb38b, #dd7048);
+  color: #2d140b;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.auth-error {
+  min-height: 1.1rem;
+  color: #ffb0a2;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-align: center;
+}

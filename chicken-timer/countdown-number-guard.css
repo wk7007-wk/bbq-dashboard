@@ -1,0 +1,157 @@
+/* Balance: moderate countdown in the cell, original arrows visible,
+ * rails wide enough for ▼10 / ▲▲60. Arrangement stays 2x3. */
+
+body[data-countdown-layout="v15-original-final"] {
+  --countdown-rail-width: 58px;
+  --countdown-min-font: 1.35rem;
+  --countdown-max-font: 2.15rem;
+}
+
+body[data-countdown-layout="v15-original-final"][data-display-profile="primary-phone"] {
+  --countdown-rail-width: 56px;
+  --countdown-min-font: 1.3rem;
+  --countdown-max-font: 2rem;
+}
+
+body[data-countdown-layout="v15-original-final"][data-display-profile="primary-tablet"] {
+  --countdown-rail-width: 64px;
+  --countdown-min-font: 1.5rem;
+  --countdown-max-font: 2.35rem;
+}
+
+body[data-countdown-layout="v15-original-final"][data-display-profile="primary-subnotebook"] {
+  --countdown-rail-width: 68px;
+  --countdown-min-font: 1.7rem;
+  --countdown-max-font: 2.6rem;
+}
+
+body[data-countdown-layout="v15-original-final"][data-display-profile="fallback-responsive"] {
+  --countdown-rail-width: 58px;
+  --countdown-min-font: 1.35rem;
+  --countdown-max-font: 2.15rem;
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  body[data-countdown-layout="v15-original-final"] {
+    --countdown-rail-width: 52px;
+    --countdown-min-font: 1.2rem;
+    --countdown-max-font: 1.85rem;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 1400px) and (max-height: 820px) {
+  body[data-countdown-layout="v15-original-final"] {
+    --countdown-rail-width: 56px;
+    --countdown-min-font: 1.3rem;
+    --countdown-max-font: 2rem;
+  }
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"],
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .zone-group[data-zone="oven"] .slot-card[data-state="running"]
+  .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
+  grid-template-columns: var(--countdown-rail-width) minmax(0, 1fr) var(--countdown-rail-width) !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  :is(.readout-cluster, .split-readout-cluster) {
+  container-type: size;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Digits sit in the middle of the leftover cell. They do not fill the box. */
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout) {
+  box-sizing: border-box !important;
+  width: min(78%, 5.4rem) !important;
+  max-width: 86% !important;
+  height: min(72%, 4.6rem) !important;
+  max-height: 76% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  font-size: clamp(
+    var(--countdown-min-font),
+    min(28cqh, 24cqw),
+    var(--countdown-max-font)
+  ) !important;
+}
+
+body[data-countdown-layout="v15-original-final"] .board
+  .timer-panel[data-layout-owner="v3"]
+  :is(.timer-readout, .split-timer-readout)
+  :is(.countdown-minutes, .countdown-seconds) {
+  font-size: 1em !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Keep original V17 arrows. Do not shrink button type or clip the glyphs. */
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  :is(.adjust-button, .timer-primary-actions > button) {
+  overflow: visible !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds] {
+  color: transparent !important;
+  font-size: 0 !important;
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.08rem !important;
+  overflow: visible !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+  display: block !important;
+  color: #ffffff !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before {
+  font-size: clamp(0.85rem, 3.4cqh, 1.15rem) !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+  font-size: clamp(0.78rem, 3.1cqh, 1.05rem) !important;
+}
+
+body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+  .timer-primary-actions > button {
+  overflow: hidden !important;
+  font-size: clamp(0.68rem, 2.8cqh, 0.88rem) !important;
+  white-space: nowrap !important;
+}
+
+@media (orientation: portrait) {
+  body[data-countdown-layout="v15-original-final"]
+    .zone-group[data-zone="oven"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-add-mode="false"][data-has-split="true"]
+    .timer-actions .action-button,
+  body[data-countdown-layout="v15-original-final"]
+    .zone-group[data-zone="oven"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-add-mode="false"][data-has-split="true"]
+    .adjust-row .adjust-button {
+    min-height: 36px !important;
+    height: auto !important;
+  }
+}
