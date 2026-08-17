@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29782862,
-  "appVersionName": "0817.2202",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29782862",
-  "sha256": "f9704e9523ece2449f04d40aa94b57ebc5bcf7051db25b66c64aefc94d0d86ed",
+  "appVersionCode": 29782898,
+  "appVersionName": "0817.2238",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29782898",
+  "sha256": "5f45a963251383b578db7e3f0b971c0295c573c647a7d8414ea9b75c64c90eab",
   "sizeBytes": 31431516,
   "packageName": "com.deliveryhelper.app",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
   "releaseNotes": "DeliveryHelper 자동 업데이트",
-  "updatedAt": "2026-08-17T22:05:34+09:00",
+  "updatedAt": "2026-08-17T22:41:44+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/history.json"
 }
