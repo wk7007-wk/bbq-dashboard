@@ -22,9 +22,9 @@
       "update.catalog": "https://wk7007-wk.github.io/bbq-dashboard/updates/catalog.json"
     },
     "fallback": {
-      "pages_base": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw",
-      "kds_ocr": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/kds_status.json",
-      "kds_ocr_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb",
+      "pages_base": "https://rentry.co/bbqkdsstatus",
+      "kds_ocr": "https://rentry.co/bbqkdsstatus",
+      "kds_ocr_write": "https://rentry.co/api/edit/bbqkdsstatus",
       "chicken_timer_board": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken-timer/",
       "posdelay_dashboard": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay.html",
       "storebot_bundle": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/bundle.json",
