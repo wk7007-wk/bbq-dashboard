@@ -1,0 +1,682 @@
+{
+  "bundle_sha256": "93b7a27a156c57e8218d5b5590d021d4a7800662b7d2fbdfb703daa69d668883",
+  "bundle_size": 893328,
+  "bundle_url": "https://wk7007-ops-static-2026.web.app/storebot-codex/StoreBotCodexWorker_latest.zip",
+  "changes": [
+    "Bound exact completed and blocked token-overrun receipts to the same rejected child before rearm."
+  ],
+  "enabled": true,
+  "files": [
+    {
+      "executable": true,
+      "path": "codex_hook_policy_probe.py",
+      "sha256": "112f2489f13bbc4e532437b86666fe6821bc2915c299d4f6b2c036494f4ea060",
+      "size": 14087
+    },
+    {
+      "executable": true,
+      "path": "codex_fresh_hook_receipt_verifier.py",
+      "sha256": "c8af7849f411f9501bde03fb564b348963de1ffddfb30852df1fc8af9f29abb8",
+      "size": 9315
+    },
+    {
+      "executable": true,
+      "path": "codex_hooks/minimal_managed_lifecycle.py",
+      "sha256": "0b27aa5267213c8df4bb6bc63b80166408dc0cf5485d52d9956a650731dc8018",
+      "size": 35417
+    },
+    {
+      "executable": true,
+      "path": "codex_ops_enqueue.py",
+      "sha256": "301af6cc6db46ec3949bdb74ce9c8f31c945a28d57ece5927885e75cb7ecbc50",
+      "size": 24728
+    },
+    {
+      "executable": true,
+      "path": "codex_ops_worker.py",
+      "sha256": "6ee588386578d1ec7ece52e06080d9d774876fcf76e0e3d9d81a70fcc46646cc",
+      "size": 150577
+    },
+    {
+      "executable": true,
+      "path": "codex_ops_adb_check.py",
+      "sha256": "f532e2f81614015c3949d52656b0ef8f4fff17b9e4f52133ad1882c627575c0e",
+      "size": 12627
+    },
+    {
+      "executable": true,
+      "path": "codex_ops_kakao_wake.py",
+      "sha256": "88a62b2eb8032eacc91bc2306f6eb6485ec71720c6a11fc0074792afaf96f082",
+      "size": 14959
+    },
+    {
+      "executable": true,
+      "path": "codex_ops_posdelay_watchdog.py",
+      "sha256": "18226e658d1167568a1292bf6050af3faad884235b0fb4012a3a1f66953a22a0",
+      "size": 30082
+    },
+    {
+      "executable": true,
+      "path": "codex_ops_storebottermux_watchdog.py",
+      "sha256": "005d805e8ffe48ec71b2a2598ece913f66d1b4d86acb907aaa1d6f184b0b8764",
+      "size": 36964
+    },
+    {
+      "executable": true,
+      "path": "codex_sdk_runner.py",
+      "sha256": "2cf62877e54d9d39483ea24bb950fd5a87ed691f9ce34eed47b7db40dd9ba65a",
+      "size": 13215
+    },
+    {
+      "executable": true,
+      "path": "ai_ops_common_monitor.py",
+      "sha256": "60b84e19fd3a40917fc0b8f0ea8c51375091e4d4f57f2ebb521336aa71b0b9e9",
+      "size": 184931
+    },
+    {
+      "executable": true,
+      "path": "automation_goal_dispatcher.py",
+      "sha256": "61437521f9d65ad44d4921ef9ebf52069c54b66d56df4e816b15955ec7215098",
+      "size": 49149
+    },
+    {
+      "executable": true,
+      "path": "automation_goal_seed.py",
+      "sha256": "254a5f4b132b9e271fb200d84ca95c65ec3299a5f5516da7c9a0c3f56f5dd46c",
+      "size": 8827
+    },
+    {
+      "executable": true,
+      "path": "automation_goal_program_compiler.py",
+      "sha256": "b9cd90e15411ba8c5e305ddfc4caf48615d1ff2951a9ae97f506c22259ac9740",
+      "size": 15898
+    },
+    {
+      "executable": true,
+      "path": "automation_goal_program_firebase_publish.py",
+      "sha256": "3432ccf60a77eac3c7a9f57ed7d434fb4fbecbdf46d51a790c854dc85f28d98a",
+      "size": 9509
+    },
+    {
+      "executable": true,
+      "path": "automation_goal_dispatch_firebase.py",
+      "sha256": "58b59ed943b117fa88d5fb53d88933a20b03fc275e773b824b79516678c9ff70",
+      "size": 69847
+    },
+    {
+      "executable": true,
+      "path": "automation_learning_firebase_publish.py",
+      "sha256": "ea297c0b66dc499750230c3af4576e36bc795e0fe6ed738b60dd68f10d86a088",
+      "size": 9877
+    },
+    {
+      "executable": true,
+      "path": "diagnostic_redaction.py",
+      "sha256": "e85f5323d401feeb6c04885c6835aad987d09e7efea55777ed430095b83756e8",
+      "size": 22400
+    },
+    {
+      "executable": false,
+      "path": "secure_ca_env.sh",
+      "sha256": "4cb9a9eba8eb8c2fe83800209cedfd90a7b04b236ba46c06095dfe80c93cea14",
+      "size": 3068
+    },
+    {
+      "executable": true,
+      "path": "pc_codex_cli_enqueue.py",
+      "sha256": "d18d0d30e0de5c212efe58b949f34813f4776c6b7f899cff2ba8217df0679f34",
+      "size": 17829
+    },
+    {
+      "executable": true,
+      "path": "telegram_openclaw_codex_gate.py",
+      "sha256": "0e70f585805be3a8f024c0b7860503c9b637fc82ff7254b489e92f6f3ff6b3a5",
+      "size": 113481
+    },
+    {
+      "executable": true,
+      "path": "project_telegram_ca_lifecycle.py",
+      "sha256": "3638a3d915fbdc783dc8f9c4eec0127d01e1b614e9dea86eef8db9a8c3c5dcb9",
+      "size": 28810
+    },
+    {
+      "executable": true,
+      "path": "storebot_ca_log.py",
+      "sha256": "6c5ed443b3b39fd9199093ee89f98eec753f948c8336ba3a98117d297ddf079a",
+      "size": 29028
+    },
+    {
+      "executable": true,
+      "path": "manage_storebot_ca_activation.py",
+      "sha256": "78c481916d123057bacbe342f06b397c866175523a1403235fda6aaed41eac29",
+      "size": 23189
+    },
+    {
+      "executable": false,
+      "path": "posdelay_ca_log.py",
+      "sha256": "c9cbaca487c44b3e443ee4fd0817dd5c6351b78ad058b954d16a1540f6294995",
+      "size": 98327
+    },
+    {
+      "executable": false,
+      "path": "config/telegram_openclaw_room_registry.json",
+      "sha256": "60c1ce1e7ce3397d80a10e36c0b81f93eab6b122be67b5e07aba7527ebf38849",
+      "size": 511
+    },
+    {
+      "executable": false,
+      "path": "config/telegram_project_ca_registry.json",
+      "sha256": "631fa2262fe0d1e24934f44ef417606d29c44155c8101e598c5c43a6010e2785",
+      "size": 1160
+    },
+    {
+      "executable": false,
+      "path": "config/automation_goal_dispatch_policy.json",
+      "sha256": "486f98eb7ffb8e8b885e23570f96237bd3b9aabf9a088c64032e59ae9affd947",
+      "size": 2170
+    },
+    {
+      "executable": false,
+      "path": "config/automation_goal_programs.json",
+      "sha256": "6229aad63892d5123340d3c36fd9762d5d8c68b39bf20052f15a52721ff12d28",
+      "size": 1089
+    },
+    {
+      "executable": false,
+      "path": "config/automation_goal_runtime.json",
+      "sha256": "02d6ea4b080c14834ca60e34947f2d00ad3cd09b3d21422c0e67595b399a3ef4",
+      "size": 656
+    },
+    {
+      "executable": true,
+      "path": "write_update_manifest.py",
+      "sha256": "5de8d30e1797c7ca9943ced4db489f603172dfffdab7e0effb5d6ae097315858",
+      "size": 3777
+    },
+    {
+      "executable": true,
+      "path": "deliveryhelper_gpt_reanalyze_worker.py",
+      "sha256": "5bdcb7057a1cc673f06b47c115ac949ac9ad7750f955ba377cc74f1ac302e925",
+      "size": 49721
+    },
+    {
+      "executable": true,
+      "path": "deploy_banktotal_update.sh",
+      "sha256": "1d484f65debbaa392ccea3467c1e299604e94346167a6fade88d92cd7d82363a",
+      "size": 2810
+    },
+    {
+      "executable": true,
+      "path": "deploy_deliveryhelper_update.sh",
+      "sha256": "66c9b9c9cb41c434dba5ebbaf5c5dd4f59b5e2ed2a46592382aa852e650e2eef",
+      "size": 2787
+    },
+    {
+      "executable": true,
+      "path": "deploy_posdelay_update.sh",
+      "sha256": "c553c1b33a70a461d0250a731b2c1d21b30755b760d2a14b70ee272979642315",
+      "size": 3042
+    },
+    {
+      "executable": true,
+      "path": "deploy_storebot_update.sh",
+      "sha256": "503b4fbcbb363d5ce80a7251a4ca0a00902f7c81c199387a0300e5e45d5ade73",
+      "size": 2657
+    },
+    {
+      "executable": true,
+      "path": "deploy_all_update_channels.sh",
+      "sha256": "ecfed86a5810a7fa31707c4c5b9c967013c001e019135018381ec499451c99be",
+      "size": 3602
+    },
+    {
+      "executable": true,
+      "path": "operation_knowledge_adapter.py",
+      "sha256": "3f32622b59093e1997eeb90ebd2d014b77be720a2f4ef5c00bd263e8c7a2d0b2",
+      "size": 66012
+    },
+    {
+      "executable": true,
+      "path": "storebot_telegram_projection.py",
+      "sha256": "5ab9100001a48d65b1c1b2972aa1b24a950ef2776e7854970d3be474dfec6c30",
+      "size": 16602
+    },
+    {
+      "executable": true,
+      "path": "storebot_telegram_backplane.py",
+      "sha256": "f37b1b73ec6d4350fa91956c7c2e274ca2ba006e5a9f166ef238a2bc0bf1bc1e",
+      "size": 17039
+    },
+    {
+      "executable": true,
+      "path": "storebot_telegram_chat_contract.py",
+      "sha256": "bb530e15683defe84adc038f4fcb596388fabd8189357c9783be5f0669a21195",
+      "size": 23694
+    },
+    {
+      "executable": true,
+      "path": "storebot_telegram_ops_log.py",
+      "sha256": "336e3fbe46d4448e37b52b9883490758b5da1f320ed4bed1c6774b7944056b94",
+      "size": 43938
+    },
+    {
+      "executable": true,
+      "path": "storebot_telegram_worker_adapter.py",
+      "sha256": "74eb6ddc083a1b366731feff00652b0a903f8bb9a065d1f9588753f0a476b793",
+      "size": 39284
+    },
+    {
+      "executable": true,
+      "path": "storebot_codex_worker.py",
+      "sha256": "e40e692d16b02658f3509ce830ce497af0b60b457c04d3800dbd0d2704894320",
+      "size": 866852
+    },
+    {
+      "executable": true,
+      "path": "storebot_codex_replay_chat.py",
+      "sha256": "89a4a52c3661d05802f1203e1734b0e965b699ddf5f48faed9b5e8479c6d067d",
+      "size": 6152
+    },
+    {
+      "executable": true,
+      "path": "storebot_direct_inject.py",
+      "sha256": "fb3c1b2b29c028c47357a57fa31d7860b938ae0075e51928d7f5f0a601590e9c",
+      "size": 7358
+    },
+    {
+      "executable": true,
+      "path": "storebot_kakao_live_diag.py",
+      "sha256": "e5c93315b7051985a20c5bacd6f4aec4d68704c6a423cd3d91a20129e6c87927",
+      "size": 24735
+    },
+    {
+      "executable": true,
+      "path": "storebot_manual_reply.py",
+      "sha256": "647f6f9c24b08dc06b41e093b1586bef2beec38e6ca8bb486189ebc9c6ddea91",
+      "size": 5941
+    },
+    {
+      "executable": false,
+      "path": "STOREBOT_CODEX_WORKER.md",
+      "sha256": "543e15de5dcbe33f5f9cf274856c226ce810797f883081ebbf2273b8d74acf44",
+      "size": 22129
+    },
+    {
+      "executable": false,
+      "path": "STOREBOT_CODEX_BRIDGE.md",
+      "sha256": "c4c802b89f627078d46caca849cd2ec658179b8095622c1bccb1223496b09b2d",
+      "size": 47686
+    },
+    {
+      "executable": true,
+      "path": "start_storebot_codex_worker.sh",
+      "sha256": "254e73d10e08977ab0fe59f2e81143771cf0d269723d5e4e14977361f588f79d",
+      "size": 10224
+    },
+    {
+      "executable": true,
+      "path": "run_storebot_codex_worker.sh",
+      "sha256": "886bab8aa6b28ef396477302f14dea8ece4988eee181f0d35185b9a25f16efa1",
+      "size": 3308
+    },
+    {
+      "executable": true,
+      "path": "launch_storebot_codex_background.sh",
+      "sha256": "7dcf1d2743104bb26f12533350f84b963b73a55d1f90a13c222b6295715234c9",
+      "size": 15859
+    },
+    {
+      "executable": true,
+      "path": "restart_storebot_codex_worker.sh",
+      "sha256": "0b74dc21abfcb13dbbc91aafe4193bbec97374b42e8819877efea6c1472e37bf",
+      "size": 6776
+    },
+    {
+      "executable": true,
+      "path": "admin_update_codex_cli_0_145_0.sh",
+      "sha256": "c437868158a27654345a8bec3f2211e12ea94eea0ea10f1e03193e072299f0ea",
+      "size": 12101
+    },
+    {
+      "executable": true,
+      "path": "restart_ca_live_runtime.sh",
+      "sha256": "3bf050339c81132de5de8579061f0a60ef7251ae7df29fb7a8693b7083cc9cde",
+      "size": 14303
+    },
+    {
+      "executable": true,
+      "path": "watch_storebot_codex_worker.sh",
+      "sha256": "64a47708ce61e13b77b5f4a5c03ca4ad4c6bca781ce0f7032aaa397e01335186",
+      "size": 4300
+    },
+    {
+      "executable": true,
+      "path": "watch_storebot_kakao_stack.sh",
+      "sha256": "cee2c80d2df6b76551ff56b15126616ed5ac83b37aeabe4bd7de5f533d0d77d1",
+      "size": 18731
+    },
+    {
+      "executable": true,
+      "path": "setup_storebot_codex_autostart.sh",
+      "sha256": "ed7ec6fafbc4cd7cd86e0239a1cd51ba06043cdad4efc31308db7aa53da65466",
+      "size": 5657
+    },
+    {
+      "executable": true,
+      "path": "harden_storebottermux_power.sh",
+      "sha256": "b5eb5b28de9bbc84d4b7d2ec3ea2f1c9825937e47cecf8d1df95b644aaa2678f",
+      "size": 5390
+    },
+    {
+      "executable": true,
+      "path": "start_codex_ops_worker.sh",
+      "sha256": "72558d13eafb98ca812a37fceec5b1932dc2718afdd2f4119d633442f3edb8aa",
+      "size": 4406
+    },
+    {
+      "executable": true,
+      "path": "start_ai_ops_monitor.sh",
+      "sha256": "47a3175330771d256ca3c7e74323643159b06869348f19b886ff8d6fcad01a53",
+      "size": 8095
+    },
+    {
+      "executable": true,
+      "path": "start_automation_goal_dispatcher.sh",
+      "sha256": "e3cf2b81e7515601b8c2e1a6db2ce0b4c3565579cdb192fad5f02d81036a2067",
+      "size": 10862
+    },
+    {
+      "executable": true,
+      "path": "start_deliveryhelper_gpt_reanalyze_worker.sh",
+      "sha256": "5942373cf038fa82d8c3057ed695698960ca32ffdac03d20fe41b9ae1beb0205",
+      "size": 3147
+    },
+    {
+      "executable": true,
+      "path": "watch_deliveryhelper_gpt_reanalyze_worker.sh",
+      "sha256": "dfd8844f46b66799b7e7a9eaf7962c2e21ffb53fe175699835d382852285966a",
+      "size": 3996
+    },
+    {
+      "executable": true,
+      "path": "setup_deliveryhelper_gpt_autostart.sh",
+      "sha256": "498dc846ae5c702e3e1368adc529a7e02a457b1fc1779159718e0471541304ba",
+      "size": 849
+    },
+    {
+      "executable": true,
+      "path": "check_storebot_codex_worker.sh",
+      "sha256": "0d4fedd2fecd00fc003964e410b9146663d2c1e783ff5ef18bc7dc095e382f3c",
+      "size": 3347
+    },
+    {
+      "executable": true,
+      "path": "storebot_manual_reply.sh",
+      "sha256": "9741571254f81ba7bc87d3207d5965ff88975f93714191edf659f91e322f2ce1",
+      "size": 236
+    },
+    {
+      "executable": true,
+      "path": "install_storebot_codex_termux.sh",
+      "sha256": "38a191d74e9284df35ba1be06076da5dfc067c0aa75e6d1395b1d0cc5478d55a",
+      "size": 19147
+    },
+    {
+      "executable": true,
+      "path": "fix_storebot_codex_copy.sh",
+      "sha256": "6284c30fa7c421a77b61ab62c5354c69c8edd871dd59540a8c34126a4cf5c688",
+      "size": 18804
+    },
+    {
+      "executable": false,
+      "path": "skills/storebot-kakao-reply/SKILL.md",
+      "sha256": "6af42ae7f83e9b4e548fda6cad9810293ad549f11f99bf29685ec6532c8fd07e",
+      "size": 37855
+    },
+    {
+      "executable": false,
+      "path": "skills/deliveryhelper-reanalyze/SKILL.md",
+      "sha256": "fbc7566d4d2cc7f68b543cabd200ae7e5c29e51b86a785f5fbbc61fa2a2f362d",
+      "size": 10892
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/INDEX.md",
+      "sha256": "b68a53ea79ac67f11c38ed9a112a63ba0f70f2b16e59c5b68f5b8901eca8b665",
+      "size": 3293
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/root/AGENTS.md",
+      "sha256": "87114980e4fa3c8a85b6b03f5fa8b6600766f09f2837dd2787d97ff6f1910eb6",
+      "size": 65244
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/root/CODEX_BRIEF.md",
+      "sha256": "58d4acf7b2fd0b48e15134404c2801d734e66a9e15fd6f23baede9d300643a19",
+      "size": 26916
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/root/AI_HANDOFF.md",
+      "sha256": "a3c7f59d0a2ad538e43aa3583a2e78910da67e25af214e3487291e037faf55d9",
+      "size": 119521
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/root/CODEMAP.txt",
+      "sha256": "456b6da3478d331accb4b1ffa910bc5bb57c1e9f74090bf057f291b0af6a1efb",
+      "size": 75421
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/root/rules/ai_ops_prompt_contract.txt",
+      "sha256": "e1fc8f782421fe6ec1eaf68ac672b39cc70640bd248bc5787fcc28d3bd90e67b",
+      "size": 11417
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/root/planning/app_intent_template.md",
+      "sha256": "4125a85b8bca88ad56d138c1c606df549f6d50b6dfca68c5a28206de4c0563d9",
+      "size": 730
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/DeliveryHelper/APP_INTENT.md",
+      "sha256": "b29a46476da77b23a6264b2d079ff7b3131f35da784cb3f71fa1a2fabce245ba",
+      "size": 10084
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/DeliveryHelper/CODEMAP.txt",
+      "sha256": "20713adeca3d46f85e3f148dad0229e170fe4d79fd8e2e952c18b614628ece9f",
+      "size": 47202
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/PosDelay/APP_INTENT.md",
+      "sha256": "639adeefd5b7f195633abeecf55c60d63b7a1876ed3c61adbbf178419c8c5ab1",
+      "size": 20759
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/PosDelay/CODEMAP.txt",
+      "sha256": "d475c9369b549420e574d5f7fd49e495eb6540d79391bcfcc8eff0586b2842be",
+      "size": 35966
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/PosKDS/APP_INTENT.md",
+      "sha256": "99083554167a37f353637ae01703e21ed6b03053df3600523cf8c4f40ad98cc8",
+      "size": 3289
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/PosKDS/CODEMAP.txt",
+      "sha256": "cd6e842361fde9d1e1e9c3f631cbe6fbb29236ef628ffe77451bc383eda95872",
+      "size": 7261
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/StoreBot/APP_INTENT.md",
+      "sha256": "09f7c82afb0be5373ceeabc36df45a70a23235b30621e860ec1a0200966b015f",
+      "size": 38686
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/StoreBot/CODEMAP.txt",
+      "sha256": "4b9d5635d2627e3a3264de3a4fcd8b279a9c4ecddcf6da50b15088780dab3284",
+      "size": 65486
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/StoreBotTermux/APP_INTENT.md",
+      "sha256": "ac81a12dd7a38a57aa42a07dbb120b87848632bbe2f27a207f0a4da3987eba80",
+      "size": 35908
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/StoreBotTermux/CODEMAP.txt",
+      "sha256": "b1845330c065eb063f281f3b2865f13946b740e76d8d5929e8e8b6b9cf7a3eb4",
+      "size": 24689
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/PackHelper/APP_INTENT.md",
+      "sha256": "70c3be27602b592795711b60c67dbe8ab6248e89e214edd0cbfe47e18cfb30bc",
+      "size": 4497
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/PackHelper/CODEMAP.txt",
+      "sha256": "eb754006dada9d0a2183ec0fe2fd37baf2292d67d4a549b9ee48a2c81a87ac76",
+      "size": 17166
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/SiteBot/APP_INTENT.md",
+      "sha256": "a6fa8d79874533d48453374a8949cea1a700cd346d6138cad4e5b8261ec41c5f",
+      "size": 4131
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/SiteBot/CODEMAP.txt",
+      "sha256": "681c78fc95ad539f631b2ce204f7976735bccc346f03b23fa0b467835f768b80",
+      "size": 13450
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/OrderHelper/APP_INTENT.md",
+      "sha256": "9c9a3569ab69c68770c618c7b7a3a9fbb4238e95e90e392b29d7af2a7ef83e05",
+      "size": 26364
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/OrderHelper/CODEMAP.txt",
+      "sha256": "2d0fe6a9613c8bd5f17964c14d861e0af6fef9abbb610d420de0ed3975430532",
+      "size": 14057
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/WorkSchedule/APP_INTENT.md",
+      "sha256": "5ff27f634aba25131ab618841c5ee003eb159331c07fa92f422cce79bc4cfdf8",
+      "size": 11735
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/WorkSchedule/CODEMAP.txt",
+      "sha256": "d6a2f9d83fe3f4aa4726942176b667a144bb37a017368ce0e39220b62fccfdda",
+      "size": 9324
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/BankTotal/APP_INTENT.md",
+      "sha256": "e8de4fcd4b22021a102ae4e2e67b633799a4bb82789666bbd781eb645c0c86f1",
+      "size": 11933
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/BankTotal/CODEMAP.txt",
+      "sha256": "333028bfe4a52d5edb226c6ca6154acd6183f547150c6a738f62d6f86ef49ddb",
+      "size": 22048
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/NotallyX/APP_INTENT.md",
+      "sha256": "6336c836731970eade630d0f56af81b5234b68369d12d475e4c17224a7d09bbf",
+      "size": 4003
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/NotallyX/CODEMAP.txt",
+      "sha256": "caaffcd627f71a1db5b3544f5340c5e2fac2d766eb2cd93336d984b375794044",
+      "size": 2356
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/AppUpdateCenter/APP_INTENT.md",
+      "sha256": "84204ab5b4d23863607ce4d03f37e4d12e39dde4e3418e8536f3ccf11d617977",
+      "size": 4774
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/AppUpdateCenter/CODEMAP.txt",
+      "sha256": "9b592fbbc7a705587bd9c4e56c39bc8843b707cf31d69420eebb4e04988b4a0a",
+      "size": 3375
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/ChickenTimerBoard/APP_INTENT.md",
+      "sha256": "1b9dc4af831deeff96ec85708e2fd0246c80209c1f9556d6ed4a0d9dffd7b9ce",
+      "size": 17646
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/ChickenTimerBoard/CODEMAP.txt",
+      "sha256": "bf2193f0e3cb46cb5fcc8f96ce8d50399968b814e22c5022fe9c425655b5e02a",
+      "size": 4723
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/ChickenTimerApp/APP_INTENT.md",
+      "sha256": "6a32e9fc7239fdf6d27340ea9f9f2111d34694215ce17a03982af37d0ab7f402",
+      "size": 6307
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/ChickenTimerApp/CODEMAP.txt",
+      "sha256": "e00f1959e64511a30ca46c46b4da3a58422912f5ed8a5d25c178bb4c27e1e0f5",
+      "size": 2956
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/Schedule/APP_INTENT.md",
+      "sha256": "700c965180a342633253fd255581131794fd1904efc1e8eed4a4583929282b27",
+      "size": 2241
+    },
+    {
+      "executable": false,
+      "path": "ai_ops_context/Schedule/CODEMAP.txt",
+      "sha256": "aa43ed728b2c05574deb72b87424d7ba3122bd45320cfb9e7af583a2e18f8a38",
+      "size": 956
+    }
+  ],
+  "historyUrl": "https://wk7007-ops-static-2026.web.app/storebot-codex/history.json",
+  "history_url": "https://wk7007-ops-static-2026.web.app/storebot-codex/history.json",
+  "hook_policy": {
+    "active_mutation_performed": false,
+    "adoption_plane": "out_of_band_hooks_list_config_batchWrite",
+    "policy_version": "minimal-managed-hooks-v2.1",
+    "probe_path": "codex_hook_policy_probe.py",
+    "source_path": "codex_hooks/minimal_managed_lifecycle.py",
+    "source_sha256": "0b27aa5267213c8df4bb6bc63b80166408dc0cf5485d52d9956a650731dc8018",
+    "worker_ignore_user_config": true,
+    "worker_sha256": "6ee588386578d1ec7ece52e06080d9d774876fcf76e0e3d9d81a70fcc46646cc"
+  },
+  "legacy_compatible": false,
+  "releaseNotes": "Permit exact rejected terminal and blocked token-overrun projections to rearm once; conflicting projections stay blocked.",
+  "source_revision": "839e136a6cf7",
+  "updatedAt": "2026-07-31T11:37:59+0900",
+  "version": "0731.1137-automation-budget-rearm"
+}
