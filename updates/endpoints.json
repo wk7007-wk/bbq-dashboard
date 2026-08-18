@@ -1,0 +1,40 @@
+{
+  "schema": "hosting_move_endpoints/v2",
+  "active": "primary",
+  "health": {
+    "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+    "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+  },
+  "sets": {
+    "primary": {
+      "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
+      "kds_ocr": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/kds_status.json",
+      "kds_ocr_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb",
+      "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/",
+      "posdelay_dashboard": "https://wk7007-wk.github.io/bbq-dashboard/posdelay.html",
+      "storebot_bundle": "https://wk7007-wk.github.io/bbq-dashboard/storebot-codex/bundle.json",
+      "storebot_zip": "https://wk7007-wk.github.io/bbq-dashboard/storebot-codex/StoreBotCodexWorker_latest.zip",
+      "update.poskds": "https://wk7007-wk.github.io/bbq-dashboard/updates/poskds/version.json",
+      "update.posdelay": "https://wk7007-wk.github.io/bbq-dashboard/updates/posdelay/version.json",
+      "update.deliveryhelper": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/version.json",
+      "update.chicken-timer": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/version.json",
+      "update.storebot-termux": "https://wk7007-wk.github.io/bbq-dashboard/updates/storebot-termux/version.json",
+      "update.catalog": "https://wk7007-wk.github.io/bbq-dashboard/updates/catalog.json"
+    },
+    "fallback": {
+      "pages_base": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw",
+      "kds_ocr": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/kds_status.json",
+      "kds_ocr_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb",
+      "chicken_timer_board": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken-timer/",
+      "posdelay_dashboard": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay.html",
+      "storebot_bundle": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/bundle.json",
+      "storebot_zip": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/StoreBotCodexWorker_latest.zip",
+      "update.poskds": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/poskds-version.json",
+      "update.posdelay": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay-version.json",
+      "update.deliveryhelper": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/deliveryhelper-version.json",
+      "update.chicken-timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken-timer-version.json",
+      "update.storebot-termux": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/storebot-termux-version.json",
+      "update.catalog": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/catalog.json"
+    }
+  }
+}
