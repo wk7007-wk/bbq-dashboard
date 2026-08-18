@@ -3,7 +3,8 @@
   "active": "primary",
   "health": {
     "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
-    "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
+    "factory": "http://218.147.118.71:2421/health"
   },
   "sets": {
     "primary": {
@@ -39,6 +40,14 @@
       "update.catalog": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/catalog.json",
       "posdelay_bus": "https://rentry.co/bbqposdelaybus",
       "posdelay_bus_write": "https://rentry.co/api/edit/bbqposdelaybus"
+    },
+    "factory": {
+      "pages_base": "http://218.147.118.71:2421",
+      "kds_ocr": "http://218.147.118.71:2421/kds_status.json",
+      "kds_ocr_write": "http://218.147.118.71:2421/kds_status.json",
+      "posdelay_bus": "http://218.147.118.71:2421/posdelay_bus.json",
+      "posdelay_bus_write": "http://218.147.118.71:2421/posdelay_bus.json",
+      "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/"
     }
   }
 }
