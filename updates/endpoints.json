@@ -19,7 +19,9 @@
       "update.deliveryhelper": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/version.json",
       "update.chicken-timer": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/version.json",
       "update.storebot-termux": "https://wk7007-wk.github.io/bbq-dashboard/updates/storebot-termux/version.json",
-      "update.catalog": "https://wk7007-wk.github.io/bbq-dashboard/updates/catalog.json"
+      "update.catalog": "https://wk7007-wk.github.io/bbq-dashboard/updates/catalog.json",
+      "posdelay_bus": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay_bus.json",
+      "posdelay_bus_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb"
     },
     "fallback": {
       "pages_base": "https://rentry.co/bbqkdsstatus",
@@ -34,7 +36,9 @@
       "update.deliveryhelper": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/deliveryhelper-version.json",
       "update.chicken-timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken-timer-version.json",
       "update.storebot-termux": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/storebot-termux-version.json",
-      "update.catalog": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/catalog.json"
+      "update.catalog": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/catalog.json",
+      "posdelay_bus": "https://rentry.co/bbqposdelaybus",
+      "posdelay_bus_write": "https://rentry.co/api/edit/bbqposdelaybus"
     }
   }
 }
