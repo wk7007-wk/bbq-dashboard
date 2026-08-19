@@ -4,10 +4,34 @@
   const document = global.document;
   if (!document || !document.body) return;
 
-  const FIREBASE_URL = "https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app";
-  const RECIPES_BASE = "/packhelper/recipes";
-  const RECIPES_PATH = RECIPES_BASE + ".json";
+  const RECIPE_URLS = [
+    "http://218.147.118.71:2421/recipes.json",
+    "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/recipes.json",
+  ];
   const REFRESH_MS = 5 * 60 * 1000;
+
+  function fetchFirstRecipeJson() {
+    let chain = Promise.reject(new Error("empty"));
+    RECIPE_URLS.forEach((url) => {
+      chain = chain.catch(() => global.fetch(url, { cache: "no-store" }).then((response) => {
+        if (!response || !response.ok) throw new Error("HTTP " + (response ? response.status : ""));
+        return response.json();
+      }));
+    });
+    return chain;
+  }
+
+  function putRecipes(nextRecipes) {
+    return global.fetch(RECIPE_URLS[0], {
+      method: "PUT",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "token chicken-timer",
+      },
+      body: JSON.stringify(nextRecipes || {}),
+    });
+  }
 
   let recipes = {};
   let selectedKey = "";
@@ -228,11 +252,8 @@
       return Promise.resolve();
     }
     refs.status.textContent = "불러오는 중";
-    return global.fetch(FIREBASE_URL + RECIPES_PATH, { cache: "no-store" })
-      .then((response) => {
-        if (!response || !response.ok) throw new Error("HTTP " + (response ? response.status : ""));
-        return response.json();
-      })
+    return fetchFirstRecipeJson()
+      .then((data) => data)
       .then((data) => {
         recipes = sanitizeRecipes(data || {});
         loadedAt = Date.now();
@@ -280,14 +301,12 @@
     };
 
     refs.status.textContent = "저장 중";
-    global.fetch(FIREBASE_URL + RECIPES_BASE + "/" + encodeURIComponent(writeKey) + ".json", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
+    const nextRecipes = Object.assign({}, recipes);
+    nextRecipes[writeKey] = Object.assign({}, previous, payload);
+    putRecipes(nextRecipes)
       .then((response) => {
         if (!response || !response.ok) throw new Error("HTTP " + (response ? response.status : ""));
-        recipes[writeKey] = Object.assign({}, previous, payload);
+        recipes = nextRecipes;
         selectedKey = writeKey;
         loadedAt = Date.now();
         refs.status.textContent = "저장 완료";

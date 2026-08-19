@@ -199,7 +199,11 @@
     const actorId = options.actorId;
     const profile = options.profile;
     const syncKey = options.syncKey;
-    const stateUrl = `${FB_BASE_URL}/${SYNC_ROOT}/${syncKey}.json`;
+    const stateUrls = [
+      "http://218.147.118.71:2421/chicken_timer.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json",
+    ];
+    const stateUrl = stateUrls[0];
     const auditRootUrl = `${FB_BASE_URL}/${AUDIT_ROOT}/${syncKey}`;
     const refreshUrl = `${FB_BASE_URL}/${UI_REFRESH_ROOT}/${syncKey}.json`;
     let applyRemoteState = null;
@@ -338,6 +342,16 @@
             return true;
           })
           .catch(() => {
+            const native = global.ChickenTimerNative;
+            if (native && typeof native.publishTimerBoard === "function") {
+              try {
+                native.publishTimerBoard(JSON.stringify(envelope));
+                markStateOk();
+                markDirtyDelivered();
+                notifyStatus();
+                return true;
+              } catch (_) {}
+            }
             markError();
             dirtyConflict = false;
             writeDirtyEnvelope(storage, syncKey, envelope, auditDetails);
@@ -377,20 +391,7 @@
     }
 
     function audit(type, details) {
-      const at = getNow();
-      const dateKey = formatKstDateKey(at);
-      const event = createAuditEvent({
-        actorId,
-        details,
-        profile,
-        revision: lastRevision,
-        syncKey,
-        type,
-        at,
-      });
-      return postJson(`${auditRootUrl}/${dateKey}.json`, event)
-        .then(() => true)
-        .catch(() => false);
+      return Promise.resolve(false);
     }
 
     function auditPublish(reason, envelope, auditDetails) {
@@ -404,7 +405,7 @@
 
     function pullRemote(isInitial) {
       if (isConstrainedAndroidClient()) peekUiRefresh();
-      return fetchJson(stateUrl)
+      return fetchFirstJson(stateUrls)
         .then((rawEnvelope) => {
           const envelope = sanitizeEnvelope(rawEnvelope);
           markStateOk();
@@ -480,6 +481,17 @@
               auditPublish(dirty.envelope.meta.reason || "retry", dirty.envelope, dirty.audit || {});
               notifyStatus();
               return true;
+            })
+            .catch(() => {
+              const native = global.ChickenTimerNative;
+              if (native && typeof native.publishTimerBoard === "function") {
+                native.publishTimerBoard(JSON.stringify(dirty.envelope));
+                markStateOk();
+                markDirtyDelivered();
+                notifyStatus();
+                return true;
+              }
+              throw new Error("native unavailable");
             });
         })
         .catch(() => {
@@ -575,6 +587,9 @@
     }
 
     function startStream() {
+      // 파이어 SSE 안 씀. 공장/gist 폴링만.
+      scheduleFallbackPoll(visibleFallbackBaseMs());
+      return;
       if (closed || eventSource) return;
       if (typeof global.EventSource !== "function") {
         scheduleFallbackPoll(visibleFallbackBaseMs());
@@ -628,9 +643,7 @@
       if (uiRefreshHandler) uiRefreshHandler({ nonce, at: raw.at, actor: raw.actor || "" });
     }
 
-    function peekUiRefresh() {
-      fetchJson(refreshUrl).then(handleUiRefreshSignal).catch(() => {});
-    }
+    function peekUiRefresh() {}
 
     function cancelUiRefreshPoll() {
       if (uiRefreshPollTimerId && typeof global.clearTimeout === "function") {
@@ -651,6 +664,7 @@
     }
 
     function startUiRefreshWatch() {
+      return;
       if (closed) return;
       peekUiRefresh();
       if (isConstrainedAndroidClient()) {
@@ -761,43 +775,29 @@
 
     function refreshOffset() {
       if (clockRefreshPromise) return clockRefreshPromise;
-      const attempts = [];
-      for (let index = 0; index < CLOCK_SAMPLE_COUNT; index += 1) {
-        attempts.push(requestFirebaseClockSample().catch(() => null));
-      }
-      const firebaseSamplePromise = Promise.all(attempts)
-        .then((samples) => {
-          return samples
-            .filter(Boolean)
-            .sort((left, right) => left.rttMs - right.rttMs)[0] || null;
-        });
       const pending = requestHostingClockSample()
         .catch(() => null)
         .then((hostingSample) => {
           if (hostingSample) {
             applyClockSample(hostingSample);
             notifyStatus();
-            // Firebase resolves millisecond server time. Let a low-latency
-            // sample refine the fast same-origin Date anchor in background.
-            firebaseSamplePromise.then((firebaseSample) => {
-              if (!firebaseSample || firebaseSample.rttMs > MAX_FIREBASE_CLOCK_RTT_MS) return;
-              applyClockSample(firebaseSample);
-              notifyStatus();
-            }).catch(() => null);
             return hostingSample;
           }
-          // Android asset WebViews have no same-origin hosting Date header.
-          // In that lane even a slow midpoint sample is safer than allowing
-          // each device's wall clock skew to define a shared endAt value.
-          return firebaseSamplePromise.then((firebaseSample) => {
-            if (!firebaseSample) return null;
-            applyClockSample(firebaseSample);
-            notifyStatus();
-            return firebaseSample;
-          });
+          return null;
         })
         .then((sample) => {
-          if (!sample) return false;
+          if (!sample) {
+            applyClockSample(createClockSample({
+              source: "local-fallback",
+              serverMs: Date.now(),
+              sentAtMonoMs: getMonotonicNow(),
+              receivedAtMonoMs: getMonotonicNow(),
+              sentAtLocalMs: Date.now(),
+              receivedAtLocalMs: Date.now(),
+            }));
+            notifyStatus();
+            return true;
+          }
           return isOffsetFresh();
         })
         .catch(() => {
@@ -1005,14 +1005,14 @@
       const hasOffset = Boolean(clockSample && clockSample.sampledAtMonoMs >= 0);
       const offsetAgeMs = hasOffset ? Math.max(0, monoNow - clockSample.sampledAtMonoMs) : 0;
       if (offline) {
-        return { state: "offline", label: "오프라인", source: "firebase", clockSource, fresh: false, hasOffset, offsetMs, offsetAgeMs };
+        return { state: "offline", label: "오프라인", source: "move", clockSource, fresh: false, hasOffset, offsetMs, offsetAgeMs };
       }
       if (!offsetFresh) {
         return {
           state: "correcting",
           label: "보정중",
           detail: hasOffset ? "서버시간 갱신" : "서버시간 확인",
-          source: "firebase",
+          source: "move",
           clockSource,
           fresh: false,
           hasOffset,
@@ -1025,7 +1025,7 @@
           state: "correcting",
           label: "보정중",
           detail: "연결 확인",
-          source: "firebase",
+          source: "move",
           clockSource,
           fresh: false,
           hasOffset,
@@ -1033,7 +1033,7 @@
           offsetAgeMs,
         };
       }
-      return { state: "synced", label: "동기화됨", source: "firebase", clockSource, fresh: true, hasOffset, offsetMs, offsetAgeMs };
+      return { state: "synced", label: "동기화됨", source: "move", clockSource, fresh: true, hasOffset, offsetMs, offsetAgeMs };
     }
 
     function markStateOk() {
@@ -1148,6 +1148,10 @@
 
   function sanitizeEnvelope(rawEnvelope) {
     if (!rawEnvelope || typeof rawEnvelope !== "object") return null;
+    if (rawEnvelope.boards && typeof rawEnvelope.boards === "object") {
+      const nested = rawEnvelope.boards.main || rawEnvelope.boards[DEFAULT_SYNC_KEY];
+      if (nested && typeof nested === "object") rawEnvelope = nested;
+    }
     const meta = rawEnvelope.meta && typeof rawEnvelope.meta === "object" ? rawEnvelope.meta : {};
     const revision = Math.max(0, Number(meta.revision) || 0);
     if (revision <= 0) return null;
@@ -1466,17 +1470,37 @@
     if (typeof global.fetch !== "function") {
       return Promise.reject(new Error("fetch unavailable"));
     }
+    const factory = url.indexOf("218.147.118.71") >= 0;
+    const ctrl = typeof global.AbortController === "function" ? new global.AbortController() : null;
+    const timer = ctrl && typeof global.setTimeout === "function"
+      ? global.setTimeout(() => { try { ctrl.abort(); } catch (_) {} }, factory ? 1500 : 5000)
+      : 0;
     return global.fetch(appendCacheBust(url), {
       cache: "no-store",
       headers: {
         Accept: "application/json",
       },
+      signal: ctrl ? ctrl.signal : undefined,
     }).then((response) => {
+      if (timer && typeof global.clearTimeout === "function") global.clearTimeout(timer);
       if (!response || !response.ok) {
         throw new Error(`http ${response ? response.status : 0}`);
       }
       return response.json();
+    }).catch((err) => {
+      if (timer && typeof global.clearTimeout === "function") global.clearTimeout(timer);
+      throw err;
     });
+  }
+
+  function fetchFirstJson(urls) {
+    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
+    if (!list.length) return Promise.reject(new Error("no urls"));
+    let chain = Promise.reject(new Error("empty"));
+    list.forEach((url) => {
+      chain = chain.catch(() => fetchJson(url));
+    });
+    return chain;
   }
 
   function putJson(url, value) {
@@ -1488,6 +1512,7 @@
       cache: "no-store",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "token chicken-timer",
       },
       body: JSON.stringify(value),
     }).then((response) => {

@@ -14,8 +14,10 @@
       "posdelay_bus": "http://218.147.118.71:2421/posdelay_bus.json",
       "posdelay_bus_write": "http://218.147.118.71:2421/posdelay_bus.json",
       "printer_capture": "http://218.147.118.71:2421/printer_capture.json",
+      "grok_ops": "http://218.147.118.71:2421/grok_ops.json",
       "delivery_bus": "http://218.147.118.71:2421/delivery_bus.json",
-      "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/"
+      "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/",
+      "chicken_timer": "http://218.147.118.71:2421/chicken_timer.json"
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
@@ -34,6 +36,8 @@
       "posdelay_bus": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay_bus.json",
       "posdelay_bus_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb",
       "printer_capture": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/printer_capture.json",
+      "grok_ops": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/grok_ops.json",
+      "chicken_timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json",
       "delivery_bus": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/delivery_bus.json"
     },
     "fallback": {
@@ -51,7 +55,8 @@
       "update.storebot-termux": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/storebot-termux-version.json",
       "update.catalog": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/catalog.json",
       "posdelay_bus": "https://rentry.co/bbqposdelaybus",
-      "posdelay_bus_write": "https://rentry.co/api/edit/bbqposdelaybus"
+      "posdelay_bus_write": "https://rentry.co/api/edit/bbqposdelaybus",
+      "chicken_timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json"
     }
   }
 }
