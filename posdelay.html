@@ -206,18 +206,9 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 .button-value-btn{min-width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-primary);font-size:14px;font-weight:800;line-height:1;}
 .button-value-btn:active{transform:translateY(1px);background:var(--surface-muted);}
 .button-value-btn:disabled{opacity:.35;transform:none;}
+.native-control:disabled{opacity:.42;cursor:not-allowed;filter:saturate(.35);}
+.standalone-readonly{display:none;margin:0 0 8px;padding:8px 10px;border:1px solid rgba(230,126,34,.45);border-radius:8px;background:rgba(230,126,34,.10);color:#F4C27A;font-size:11px;font-weight:700;}
 .button-value-text{min-width:44px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--surface-muted);font-size:12px;font-weight:800;color:var(--text-primary);padding:0 6px;white-space:nowrap;}
-.ad-receipt{margin-top:8px;padding:8px 10px;border:1px solid rgba(144,144,168,.42);border-radius:8px;background:rgba(12,16,30,.66);color:#C8C8DC;}
-.ad-receipt-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.ad-receipt-title{font-size:10px;font-weight:800;color:#C8C8DC;}
-.ad-receipt-status{font-size:11px;font-weight:900;color:#BFD8FF;}
-.ad-receipt[data-state="pending"] .ad-receipt-status{color:#FFD27A;}
-.ad-receipt[data-state="applied"] .ad-receipt-status{color:#75E79C;}
-.ad-receipt[data-state="needs_check"] .ad-receipt-status{color:#FF9B94;}
-.ad-receipt-detail{margin-top:3px;font-size:10px;line-height:1.4;color:#C8C8DC;}
-.ad-receipt details{margin-top:5px;border-top:1px solid rgba(144,144,168,.28);padding-top:5px;}
-.ad-receipt summary{min-height:28px;display:flex;align-items:center;cursor:pointer;font-size:10px;font-weight:800;color:#BFD8FF;}
-.ad-receipt-log{display:grid;gap:3px;padding:3px 0 0 18px;color:#C8C8DC;font-size:10px;line-height:1.35;}
 .button-value-control.is-minute .button-value-text{min-width:48px;}
 .compact-cell .button-value-control{width:100%;}
 .compact-cell .button-value-text{flex:1;min-width:0;}
@@ -399,6 +390,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <span class="section-chip">Control</span>
 </div>
+<div id="standaloneReadOnlyNotice" class="standalone-readonly" role="status">공개 웹은 읽기 전용입니다. 제어는 PosDelay 앱에서만 할 수 있습니다.</div>
 <!-- ═══ 2-0. 메인 PC 전원 ═══ -->
 <div class="card card-power" id="pcPowerCard">
   <div class="row" style="justify-content:space-between; margin-bottom:10px">
@@ -409,8 +401,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <span id="pcStatusPill" class="hero-status">-- 확인 중</span>
   </div>
   <div class="row" style="gap:8px">
-    <button id="pcOnBtn"  class="btn bg" style="flex:1; min-height:48px; font-size:14px; font-weight:700">켜기</button>
-    <button id="pcOffBtn" class="btn bred" style="flex:1; min-height:48px; font-size:14px; font-weight:700">끄기</button>
+    <button id="pcOnBtn" data-native-control class="btn bg native-control" style="flex:1; min-height:48px; font-size:14px; font-weight:700">켜기</button>
+    <button id="pcOffBtn" data-native-control class="btn bred native-control" style="flex:1; min-height:48px; font-size:14px; font-weight:700">끄기</button>
   </div>
   <div id="pcLastHb" class="note" style="text-align:right; margin-top:6px">박동 --</div>
 </div>
@@ -461,16 +453,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <!-- 배민 수동 버튼 + 상태 -->
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="bSt" style="font-size:11px"></span>
-      <div class="row" id="baeminAdControls" role="group" aria-label="배민 광고 즉시 적용" style="gap:6px">
-        <button type="button" data-baemin-ad-action="max" class="btn bs bg" style="min-width:36px" aria-describedby="baeminAdReceiptStatus" onclick="exAd('baemin','max')">최대</button>
-        <button type="button" data-baemin-ad-action="mid" class="btn bs bor" style="min-width:36px" aria-describedby="baeminAdReceiptStatus" onclick="exAd('baemin','mid')">중간</button>
-        <button type="button" data-baemin-ad-action="min" class="btn bs bred" style="min-width:36px" aria-describedby="baeminAdReceiptStatus" onclick="exAd('baemin','min')">최소</button>
+      <div class="row" style="gap:6px">
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
+        <button data-native-control class="btn bs bor native-control" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
+        <button data-native-control class="btn bs bred native-control" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
       </div>
-    </div>
-    <div class="ad-receipt" id="baeminAdReceipt" data-state="idle">
-      <div class="ad-receipt-head"><span class="ad-receipt-title">실행 확인</span><strong class="ad-receipt-status" id="baeminAdReceiptStatus" role="status" aria-live="polite">확인 준비 중</strong></div>
-      <div class="ad-receipt-detail" id="baeminAdReceiptDetail">실제 적용 상태만 표시합니다.</div>
-      <details><summary>최근 요청 기록</summary><ol class="ad-receipt-log" id="baeminAdReceiptLog"></ol></details>
     </div>
     <div class="gauge" id="bG"></div>
     <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:4px;border-top:1px solid var(--bg-input);margin-top:4px"></div>
@@ -504,8 +491,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="cSt" style="font-size:11px"></span>
       <div class="row" style="gap:6px">
-        <button class="btn bs bg" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
-        <button class="btn bs bred" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
+        <button data-native-control class="btn bs bred native-control" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
       </div>
     </div>
     <div class="gauge" id="cG"></div>
@@ -550,11 +537,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div class="row" style="justify-content:space-between;margin-bottom:4px">
       <span id="discSt" style="font-size:11px"></span>
       <div class="row" style="gap:3px;flex-wrap:wrap">
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1000)">1천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1500)">1.5천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2000)">2천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2500)">2.5천</button>
-        <button class="btn bs bg" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1000)">1천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1500)">1.5천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2000)">2천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2500)">2.5천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
       </div>
     </div>
     <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">정액</div>
@@ -568,15 +555,15 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:space-between">
         <span style="font-size:11px;color:var(--text-secondary)">가게배달 팁</span>
-        <button class="btn bs bg" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
+        <button data-native-control class="btn bs bg native-control" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
       </div>
       <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">전액</div>
     </div>
     <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
       <div class="row" style="justify-content:flex-end;gap:4px">
-        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-98)">금액 종료</button>
-        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
-        <button class="btn bs bred" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-98)">금액 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
       </div>
       <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민배달</div>
     </div>
@@ -719,7 +706,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <button class="btn bs bn" onclick="setGateBase(4000)">4,000</button>
       </div>
     </div>
-    <div class="sr"><span class="sl" style="color:var(--c-baemin)">미만값 0원일 때 클럽 배달팁</span><div class="tog" id="tog_gate_club" onclick="togGateClub()"></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-baemin)">미만값 0원일 때 클럽 배달팁</span><div class="tog" id="tog_gate_club" role="switch" tabindex="0" aria-checked="false" onclick="togGateClub()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togGateClub()}"></div></div>
     <div id="gateClubApplyStatus" class="unit-hint">클럽 자동 미사용</div>
     <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
     <div id="gate_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:var(--c-mid)"></div>
@@ -937,11 +924,22 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   <button class="nbtn bn" onclick="nb('openAppSettings')">앱 정보 (제한해제)</button>
 </div>
 
-<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v4.4 (0528.verify)</div>
+<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">PosDelay Dashboard v4.5 (0819.track)</div>
 
-<script src="posdelay_ad_receipt.js"></script>
 <script>
-const FB='https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
+const TRACK={
+  kds:[
+    'http://218.147.118.71:2421/kds_status.json',
+    'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/kds_status.json',
+    'https://rentry.co/bbqkdsstatus/raw'
+  ],
+  bus:[
+    'http://218.147.118.71:2421/posdelay_bus.json',
+    'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay_bus.json',
+    'https://rentry.co/bbqposdelaybus/raw'
+  ]
+};
+let _bus={},_kds=null;
 let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
 let aTS=0;let sseLoaded=false;
 let _kdsLastChange=Date.now(),_kdsLastCount=-1; // 30분 강제보정용
@@ -951,13 +949,21 @@ let cookLog=[]; // 완료 기록: {num, t, doneAt, cookDur}
 let latestEngineState=null,latestSubphoneState=null;
 let activitySnapshot={ad:null,kds:null};
 let lastCaptureSnapshot={orders:[],printerConnected:false,status:'',lastCaptureAt:'--',thresholdFee:8};
-const isApp=typeof NativeBridge!=='undefined';
-const baeminAdReceipt=window.PosDelayAdReceipt?window.PosDelayAdReceipt.mount({
-  root:document,
-  storage:window.localStorage,
-  timeoutMs:50000,
-  hasBridge:function(){return typeof window.NativeBridge!=='undefined'&&typeof window.NativeBridge.executeAd==='function';}
-}):null;
+function hasNativeBridge(){
+  try{return typeof window!=='undefined'&&!!window.NativeBridge&&typeof window.NativeBridge.executeAd==='function';}catch(e){return false;}
+}
+const isApp=hasNativeBridge();
+function applyStandaloneReadOnly(){
+  if(isApp)return;
+  document.querySelectorAll('[data-native-control]').forEach(function(button){
+    button.disabled=true;
+    button.setAttribute('aria-disabled','true');
+    button.title='공개 웹은 읽기 전용입니다. PosDelay 앱에서만 제어할 수 있습니다.';
+  });
+  var notice=document.getElementById('standaloneReadOnlyNotice');
+  if(notice)notice.style.display='block';
+}
+applyStandaloneReadOnly();
 // null-safe getter: 0도 유효한 값으로 처리
 function g(obj,key,def){const v=obj[key];return v!=null?v:def;}
 function setAppVersionText(version){
@@ -992,6 +998,11 @@ function nb(fn,...args){
     else if(fn==='trackUsage')NativeBridge.trackUsage(args[0]);
   }catch(e){}
 }
+function requireAppControl(){
+  if(isApp)return true;
+  toast('공개 웹은 읽기 전용입니다.','warn');
+  return false;
+}
 
 if(isApp){
   document.getElementById('permCard').style.display='block';
@@ -1005,16 +1016,48 @@ if(isApp){
   }catch(e){}},3000);
 }
 
-// === SSE (generation counter로 백그라운드 복귀 시 중복 방지) ===
+function busPath(obj,path){
+  if(!obj||!path)return null;
+  var cur=obj;
+  String(path).replace(/^\//,'').replace(/\.json$/,'')
+    .split('/').filter(Boolean).forEach(function(p){cur=cur&&typeof cur==='object'?cur[p]:null;});
+  return cur==null?null:cur;
+}
+function parseTrackJson(text){
+  var t=(text||'').trim();
+  if(!t||t==='null')throw new Error('empty');
+  if(t.charAt(0)==='{')return JSON.parse(t);
+  var i=t.indexOf('{');
+  if(i<0)throw new Error('nojson');
+  var depth=0;
+  for(var j=i;j<t.length;j++){
+    if(t[j]==='{')depth++;
+    else if(t[j]==='}'){depth--;if(depth===0)return JSON.parse(t.slice(i,j+1));}
+  }
+  throw new Error('nojson');
+}
+function fetchJson(url){
+  return fetch(url+(url.indexOf('?')>=0?'&':'?')+'t='+Date.now(),{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error(String(r.status));return r.text();})
+    .then(parseTrackJson);
+}
+function fetchFirst(urls){
+  var p=Promise.reject(new Error('none'));
+  urls.forEach(function(u){p=p.catch(function(){return fetchJson(u);});});
+  return p;
+}
+// === 주소판 폴링 (파이어 SSE 없음). 공장 HTTP → gist → rentry ===
 let _sseConns=[],_sseGen=0;
 function sse(path,cb){
-  const gen=_sseGen;
-  const es=new EventSource(FB+path);
-  _sseConns.push({es,path,cb,gen});
-  es.onopen=()=>{document.getElementById('cD').className='dot dg';const t=document.getElementById('cT');t.textContent='실시간';t.style.color='#2ECC71';}; // UI만 갱신, _sseOk는 데이터 도착 시
-  es.onerror=()=>{updC(false);es.close();_sseConns=_sseConns.filter(s=>s.es!==es);if(gen===_sseGen)setTimeout(()=>{if(gen===_sseGen)sse(path,cb);},10000);};
-  es.addEventListener('put',e=>{_sseOk=true;cb(JSON.parse(e.data));});
-  es.addEventListener('patch',e=>{_sseOk=true;cb(JSON.parse(e.data));});
+  _sseConns.push({path:path,cb:cb,gen:_sseGen});
+}
+function dispatchBus(){
+  _sseConns.forEach(function(s){
+    var path=String(s.path||'').replace(/^\//,'').replace(/\.json$/,'');
+    var data=path==='kds_status'?_kds:busPath(_bus,path);
+    if(data==null||data==='null')return;
+    try{s.cb({path:'/',data:data});}catch(e){}
+  });
 }
 function updC(ok){
   document.getElementById('cD').className='dot '+(ok?'dg':'dr');
@@ -1042,7 +1085,6 @@ const _AD_NOTIFY_SKIP=['서킷','쿨다운','CHECK','이미','retry','wait','스
 function hASt(m){
   if(!m.data||m.data==='null')return;
   if(m.path==='/')Object.assign(aS,m.data);else aS[m.path.slice(1)]=m.data;
-  if(baeminAdReceipt)baeminAdReceipt.observe(aS);
   const cur=aS.last_ad_action;
   if(cur&&cur!==_lastAdAction){
     if(_lastAdAction!==null){
@@ -1208,12 +1250,14 @@ function getZones(platform){
   return z.slice();
 }
 function setZones(platform,zones){
+  if(!requireAppControl())return false;
   const key=platform==='coupang'?'coupang_zones':'baemin_zones';
   S[key]=zones;
   updGauges(getActiveCount());
   _lastSaveKeys=[key];_autoSave();
 }
 function tapGauge(platform,idx){
+  if(!requireAppControl())return false;
   nb('trackUsage','gauge_paint_'+platform+'_'+idx);
   const zones=getZones(platform);
   const next=platform==='coupang'?CZ_NEXT:BZ_NEXT;
@@ -1268,12 +1312,10 @@ function updGauges(c){
   }
 }
 
-// === Firebase 명령 전송 (웹→Firebase→앱) ===
 function sendCmd(action,amount){
-  const cmd={action:action,amount:amount||0,time:Date.now(),source:'web'};
-  fetch(FB+'/posdelay/command.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cmd)})
-    .then(()=>toast('완료','ok'))
-    .catch(()=>toast('오류','warn'));
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return false;}
+  toast('앱 버튼으로 실행하세요.','warn');
+  return false;
 }
 function doForceRefresh(){
   if(isApp){nb('forceRefresh');}
@@ -1286,29 +1328,30 @@ function doForceRefresh(){
 // === 실행 버튼 ===
 function exAd(platform,action){
   const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
-  if(platform==='baemin'){
-    const amounts={max:ba,mid:bma,min:bra},target=amounts[action];
-    if(!baeminAdReceipt){toast('실행 확인 UI를 불러오지 못했습니다.','warn');return;}
-    baeminAdReceipt.request(action,target,function(nativeAction,nativeAmount){
-      nb('trackUsage','exec_baemin_'+action);
-      window.NativeBridge.executeAd(nativeAction,nativeAmount);
-    });
-    return;
-  }
   if(isApp){
     nb('trackUsage','exec_'+platform+'_'+action);
     if(platform==='coupang'){
       if(action==='on')nb('executeAd','COUPANG_AD_ON',0);
       else nb('executeAd','COUPANG_AD_OFF',0);
+    }else{
+      if(action==='max')nb('executeAd','BAEMIN_SET_AMOUNT',ba);
+      else if(action==='mid')nb('executeAd','BAEMIN_SET_AMOUNT',bma);
+      else{
+        nb('executeAd','BAEMIN_SET_AMOUNT',bra);
+      }
     }
   }else{
     if(platform==='coupang'){
       sendCmd(action==='on'?'COUPANG_AD_ON':'COUPANG_AD_OFF');
+    }else{
+      const amounts={max:ba,mid:bma,min:bra};
+      sendCmd('BAEMIN_SET_AMOUNT',amounts[action]);
     }
   }
 }
 var _discBusy=false;
 function exDiscount(amount){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   if(_discBusy){return;}
   _discBusy=true;setTimeout(function(){_discBusy=false;},5000);
   if(isApp){
@@ -1322,6 +1365,7 @@ function exDiscount(amount){
   if(el)el.innerHTML='<span style="color:var(--c-warn)">'+msg+'</span>';
 }
 function updDiscDt(){
+  if(!requireAppControl())return false;
   var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
   var sel=types.filter(function(t){var cb=document.getElementById('dt_'+t);return cb&&cb.checked;});
   var csv=sel.join(',');
@@ -1578,6 +1622,7 @@ function _autoSave(){
   _lastSaveKeys=[];
 }
 function adjS(k,d){
+  if(!requireAppControl())return false;
   const e=document.getElementById('set_'+k);if(!e)return;
   const isBid=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);
   const step=isBid?50:1,max=isBid?1000:9999;
@@ -1586,10 +1631,11 @@ function adjS(k,d){
   const next=Math.max(min,Math.min(max,Math.round((cur+d)/step)*step));
   e.value=next;S[k]=next;_lastSaveKeys=[k];updMonitor();_autoSave();
 }
-function adjCoupangDelayMin(v){S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
-function saveS(k,v){S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
-function togS(k){S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
+function adjCoupangDelayMin(v){if(!requireAppControl())return false;S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
+function saveS(k,v){if(!requireAppControl())return false;S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
+function togS(k){if(!requireAppControl())return false;S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
 function togKdsOpen(){
+  if(!requireAppControl())return false;
   const paused=!stS.kds_paused;
   stS.kds_paused=paused;
   const e=document.getElementById('tog_kds_open');
@@ -1602,6 +1648,7 @@ function togKdsOpen(){
 // === 스케줄 시간 ===
 let _pickTarget='';
 function pickTime(which){
+  if(!requireAppControl())return false;
   _pickTarget=which;
   const pk=document.getElementById('schTimePicker');
   pk.style.pointerEvents='auto';pk.focus();pk.click();
@@ -1830,16 +1877,12 @@ function renderOpsLog(){
   }
 }
 function loadOpsLogs(){
-  Promise.all([
-    fetch(FB+'/posdelay/logs.json').then(function(r){return r.json();}).catch(function(){return [];}),
-    fetch(FB+'/posdelay/action_log.json?orderBy=%22%24key%22&limitToLast=90').then(function(r){return r.json();}).catch(function(){return {};}),
-    fetch(FB+'/posdelay/error_reports.json?orderBy=%22%24key%22&limitToLast=60').then(function(r){return r.json();}).catch(function(){return {};})
-  ]).then(function(res){
-    opsLogEntries=normalizeOpsLogEntries(res[0]);
-    opsActionEntries=normalizeOpsActionEntries(res[1]);
-    opsErrorEntries=normalizeOpsErrorEntries(res[2]);
+  try{
+    opsLogEntries=normalizeOpsLogEntries(busPath(_bus,'posdelay/logs')||[]);
+    opsActionEntries=normalizeOpsActionEntries(busPath(_bus,'posdelay/action_log')||{});
+    opsErrorEntries=normalizeOpsErrorEntries(busPath(_bus,'posdelay/error_reports')||{});
     renderOpsLog();
-  }).catch(function(){renderOpsLog();});
+  }catch(e){renderOpsLog();}
 }
 function refreshActivityLog(){
   var lc=document.getElementById('logC');
@@ -1854,22 +1897,17 @@ function sLt(tab,el){
     return;
   }
   if(tab==='activity'){
-    Promise.all([
-      fetch(FB+'/posdelay/ad_state.json').then(r=>r.json()),
-      fetch(FB+'/kds_status.json').then(r=>r.json())
-    ]).then(([ad,kds])=>{
-      activitySnapshot={ad:ad||{},kds:kds||{}};
-      refreshActivityLog();
-    }).catch(()=>{lc.textContent='로드 실패';});
+    activitySnapshot={ad:busPath(_bus,'posdelay/ad_state')||aS||{},kds:_kds||kS||{}};
+    refreshActivityLog();
     return;
   }
-  const urls={kds:FB+'/kds_log.json',posdelay:FB+'/posdelay/logs.json',dump:FB+'/kds_dump.json'};
-  fetch(urls[tab]).then(r=>r.json()).then(d=>{
-    if(tab==='kds')lc.textContent=typeof d==='string'?d:JSON.stringify(d,null,2);
-    else if(tab==='dump')lc.textContent=d&&d.tree?`[${d.time}] ${d.lines}줄\n${d.tree}`:'덤프 없음';
-    else if(tab==='posdelay')lc.textContent=Array.isArray(d)?d.map(e=>`[${e.time}] ${e.msg}`).join('\n'):(d?JSON.stringify(d,null,2):'로그 없음');
+  if(tab==='kds'){lc.textContent='KDS 로그는 공개 주소판에 없습니다.';return;}
+  if(tab==='dump'){lc.textContent='덤프는 공개 주소판에 없습니다.';return;}
+  if(tab==='posdelay'){
+    var d=busPath(_bus,'posdelay/logs');
+    lc.textContent=Array.isArray(d)?d.map(function(e){return '['+(e.time||'')+'] '+(e.msg||'');}).join('\n'):(d?JSON.stringify(d,null,2):'로그 없음');
     lc.scrollTop=lc.scrollHeight;
-  }).catch(()=>{lc.textContent='로드 실패';});
+  }
 }
 setTimeout(loadOpsLogs,1000);
 setInterval(loadOpsLogs,30000);
@@ -1915,7 +1953,7 @@ function toast(m,type){
 // === 조리모드 (주문번호 기반) ===
 let ckOn=false,ckQ=[]; // ckQ: {num, t, onKds, ma, fa, da}
 
-function togCookMode(){ckOn=!ckOn;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');if(!ckOn){ckQ=[];updCkUI();}saveCk();}
+function togCookMode(){if(!requireAppControl())return false;ckOn=!ckOn;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');if(!ckOn){ckQ=[];updCkUI();}saveCk();}
 
 function updCkQueue(){
   if(!ckOn)return;
@@ -2116,9 +2154,9 @@ function updCkUI(){
 }
 
 function ckDisp(k){const e=document.getElementById('ck_'+k);const d=document.getElementById('ck_'+k+'_disp');if(!e||!d)return;const v=parseInt(e.value)||0;const m=Math.floor(v/60),s=v%60;d.textContent=m+':'+String(s).padStart(2,'0');}
-function adjCk(k,d){const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
+function adjCk(k,d){if(!requireAppControl())return false;const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
 function saveCk(){try{const t=parseInt(document.getElementById('ck_target').value)||1500,m=parseInt(document.getElementById('ck_mid').value)||1020,f=parseInt(document.getElementById('ck_finish').value)||240;localStorage.setItem('ck',JSON.stringify({on:ckOn,t:t,m:m,f:f,q:ckQ,cl:cookLog}));if(isApp)try{NativeBridge.syncCookSettings(ckOn,t,m,f);}catch(e){}}catch(e){}}
-function ckTapDel(num){const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
+function ckTapDel(num){if(!requireAppControl())return false;const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
 function loadCk(){try{const s=JSON.parse(localStorage.getItem('ck'));if(s){ckOn=!!s.on;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');
   // 구버전 분단위(< 100) → 초단위 자동변환
   const t=s.t||1500;const m=s.m||1020;const f=s.f||240;
@@ -2160,44 +2198,40 @@ sse('/posdelay/alert.json',m=>{
     new Notification('이상신호',{body:d.message,tag:'anomaly'});
   }
 });
-fetch(FB+'/kds_log.json').then(r=>r.json()).then(d=>{document.getElementById('logC').textContent=typeof d==='string'?d:JSON.stringify(d,null,2);}).catch(()=>{});
-// 10초 폴링 (SSE 백업)
+// 5초 폴링 — 공장/gist/rentry. 파이어 없음.
 let _sseOk=false;
 function pollAll(force){
-  if(!force&&_sseOk)return; // SSE 정상+강제아님 → 스킵
-  Promise.all([
-    fetch(FB+'/kds_status.json').then(r=>r.json()),
-    fetch(FB+'/posdelay/ad_state.json').then(r=>r.json()),
-    fetch(FB+'/posdelay/status.json').then(r=>r.json()),
-  ]).then(([k,a,st])=>{
-    if(k){kS={...k};if(!Array.isArray(kS.orders))kS.orders=[];}
-    if(a){Object.assign(aS,a);}
-    if(st)Object.assign(stS,st);
-    updSyncStatus();updMonitor();
-  }).catch(()=>{});
+  Promise.allSettled([
+    fetchFirst(TRACK.kds),
+    fetchFirst(TRACK.bus)
+  ]).then(function(res){
+    var got=false;
+    if(res[0].status==='fulfilled'&&res[0].value){_kds=res[0].value;got=true;}
+    if(res[1].status==='fulfilled'&&res[1].value){_bus=res[1].value;got=true;}
+    if(got){
+      _sseOk=true;
+      updC(true);
+      dispatchBus();
+      if(_kds){kS={..._kds};if(!Array.isArray(kS.orders))kS.orders=[];}
+      var a=busPath(_bus,'posdelay/ad_state');if(a)Object.assign(aS,a);
+      var st=busPath(_bus,'posdelay/status');if(st)Object.assign(stS,st);
+      updSyncStatus();updMonitor();
+    }else{
+      updC(false);
+    }
+  }).catch(function(){updC(false);});
 }
-setInterval(pollAll,10000);
-setTimeout(pollAll,2000); // 2초 후 첫 폴링
-// Gist 교차보정 삭제 — KDS Firebase SSE 단일 소스
+setInterval(pollAll,5000);
+setTimeout(pollAll,400);
 setInterval(()=>{
   const ls=stS.kds_sync??0;
   if(ls>0){const ago=Math.floor((Date.now()-ls)/1000);const rem=Math.max(0,90-ago%90);document.getElementById('mRefresh').textContent='수집 '+rem+'초';}
 },1000);
 window.addEventListener('resize',drawChart);
-// 백그라운드→포그라운드 전환: SSE 즉시 재연결 + 조리큐 재동기
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden){
-    // SSE 전부 닫고 재연결 (stale connection 방지)
-    _sseGen++;
-    const prev=_sseConns.map(s=>({path:s.path,cb:s.cb}));
-    _sseConns.forEach(s=>{try{s.es.close();}catch(e){}});
-    _sseConns=[];
-    _sseOk=false;
-    prev.forEach(s=>sse(s.path,s.cb));
-    // 조리큐 즉시 갱신 + 알림 갭 리셋
     if(ckOn){_lastCkCheck=0;updCkQueue();updCkUI();}
-    // 강제 폴링 (SSE 연결 후 데이터 도착 전 갭 메우기)
-    setTimeout(()=>pollAll(true),500);
+    pollAll(true);
   }
 });
 
@@ -2364,6 +2398,7 @@ function syncButtonValueControl(input){
 }
 
 function setButtonValue(input,delta){
+  if(!requireAppControl())return false;
   const spec=buttonValueSpec(input.id);
   if(!spec) return;
   const current=normalizeButtonValue(input,spec);
@@ -2536,6 +2571,7 @@ function bindPolicyAutoSave(){
 setTimeout(bindPolicyAutoSave, 0);
 
 function savePolicySettings(silent) {
+  if(!requireAppControl())return false;
   if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
     if(!silent)toast('앱 전용','warn');
     if(silent)setPolicySaveStatus('앱 전용','error');
@@ -2646,7 +2682,10 @@ function gateClubStatusModel(autoEnabled,adState,nowMs){
 function syncGateClubToggle(){
   var autoEnabled=isGateClubMode();
   var el=document.getElementById('tog_gate_club');
-  if(el)el.className='tog'+(autoEnabled?' on':'');
+  if(el){
+    el.className='tog'+(autoEnabled?' on':'');
+    if(el.setAttribute)el.setAttribute('aria-checked',autoEnabled?'true':'false');
+  }
   var status=document.getElementById('gateClubApplyStatus');
   if(status){
     var hasServerState=typeof aS!=='undefined'&&Object.prototype.hasOwnProperty.call(aS,'baemin_club_tip_active');
@@ -2687,6 +2726,7 @@ try {
 } catch(e) {}
 
 function adjGate(key, delta) {
+  if(!requireAppControl())return false;
   if (key==='threshold') { gateSettings.threshold = clampFeeThreshold((gateSettings.threshold||8)+delta); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
   if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
   if (key==='fee') { gateSettings.fee = clampFeeValue((gateSettings.fee||0)+delta); syncGatePriceDisplay(); }
@@ -2696,6 +2736,7 @@ function adjGate(key, delta) {
 }
 
 function adjStop(key, delta) {
+  if(!requireAppControl())return false;
   if(key!=='threshold')return;
   var min=Math.max(4,(gateSettings.threshold||8)+1);
   gateSettings.threshold_stop=Math.max(min,Math.min(100,(gateSettings.threshold_stop||15)+delta));
@@ -2706,12 +2747,14 @@ function adjStop(key, delta) {
 }
 
 function setGateFee(v) {
+  if(!requireAppControl())return false;
   gateSettings.fee = clampFeeValue(v);
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
 }
 function setGateBase(v) {
+  if(!requireAppControl())return false;
   gateSettings.base = clampFeeValue(v);
   if (gateSettings.base !== 0) gateSettings.clubAuto = false;
   syncGatePriceDisplay();
@@ -2720,6 +2763,7 @@ function setGateBase(v) {
 }
 
 function togGateClub() {
+  if(!requireAppControl())return false;
   gateSettings.clubAuto = !gateSettings.clubAuto;
   if (gateSettings.clubAuto) gateSettings.base = 0;
   syncGatePriceDisplay();
@@ -2731,6 +2775,7 @@ function togGateClub() {
 }
 
 function togGate() {
+  if(!requireAppControl())return false;
   // 배달료 조정 ON/OFF
   gateSettings.enabled = !gateSettings.enabled;
   gateSettings._activeTab = 'PRINTER';
@@ -2741,6 +2786,7 @@ function togGate() {
 }
 
 function togStop() {
+  if(!requireAppControl())return false;
   var prev = policySettings.enabled;
   policySettings.enabled = !policySettings.enabled;
   syncPolicySummary();
@@ -2754,6 +2800,7 @@ function togStop() {
 }
 
 function togAutoAccept() {
+  if(!requireAppControl())return false;
   var prev = policySettings.auto_accept_enabled;
   policySettings.auto_accept_enabled = !policySettings.auto_accept_enabled;
   syncPolicySummary();
@@ -2767,12 +2814,14 @@ function togAutoAccept() {
 }
 
 function setFeeSource(src) {
+  if(!requireAppControl())return false;
   gateSettings._activeTab = 'PRINTER';
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: 'PRINTER'}));
 }
 
 function setStopSource(src) {
+  if(!requireAppControl())return false;
   gateSettings._stopSource=src==='PRINTER'?'PRINTER':'KDS';
   syncGateDashboardState();
   if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({stopSource:gateSettings._stopSource}));
@@ -3132,6 +3181,7 @@ function onCaptureStatusUpdate(jsonStr) {
 
 // ═══ 수동 배달료/영업 조정 ═══
 function manualDefense(action, fee) {
+  if(!requireAppControl())return false;
   var parsedFee=parseInt(fee,10);
   var configuredFee=parseInt(gateSettings.fee,10);
   var finalFee=action.includes('fee_up')
@@ -3262,10 +3312,12 @@ function pcTryNativeWake(target){
 }
 
 function pollPcPower(){
-  Promise.all([
-    fetch(FB+'/packhelper/heartbeat/main_pc.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;}),
-    fetch(FB+'/packhelper/heartbeat/wol_relay.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;})
-  ]).then(function(arr){
+  Promise.resolve().then(function(){
+    return [
+      busPath(_bus,'packhelper/heartbeat/main_pc'),
+      busPath(_bus,'packhelper/heartbeat/wol_relay')
+    ];
+  }).then(function(arr){
     var mp=arr[0]||{}, wr=arr[1]||{};
     var prevHb=pcState.lastHb;
     var hb=(typeof mp.ts_epoch_ms==='number')?mp.ts_epoch_ms:0;
@@ -3299,6 +3351,28 @@ function pcResetButtons(){
 }
 
 function pcOnClickWake(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  pcShowWakeConfirm();
+}
+
+function pcShowWakeConfirm(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  pcShowOverlay(
+    '<div class="pc-dialog-title" id="pcWakeDialogTitle">메인 PC 켜기 확인</div>'+
+    '<div class="pc-dialog-msg">메인 PC를 켜시겠습니까?</div>'+
+    '<div class="pc-dialog-row">'+
+      '<button class="btn bn" id="pcWakeCancel" autofocus>취소</button>'+
+      '<button class="btn bg" id="pcWakeConfirm">확인 → 켜기</button>'+
+    '</div>'
+  );
+  var c=document.getElementById('pcWakeCancel');
+  var k=document.getElementById('pcWakeConfirm');
+  if(c)c.addEventListener('click',pcHideOverlay);
+  if(k)k.addEventListener('click',pcSendWake);
+}
+
+function pcSendWake(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   var btn=document.getElementById('pcOnBtn');
   if(!btn)return;
   // wol_relay 점이 회색이면 경고만 출력 (다이얼로그 없이)
@@ -3307,38 +3381,23 @@ function pcOnClickWake(){
     console.warn('[pcPower] wol_relay 비활성 — 명령은 보내지만 깨우지 못할 수 있음');
   }
   var now=Date.now();
-  var cmd={
-    cmd_id:'wol_'+now+'_'+pcRand6(),
-    action:'wake',
-    ts_ms:now,
-    expires_at:now+60000,
-    source:'posdelay_dash',
-    status:'pending'
-  };
-  fetch(FB+'/packhelper/wol_cmd/main_pc.json',{
-    method:'PUT',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(cmd)
-  }).catch(function(){});
   btn.textContent='깨우는 중...';
   btn.style.opacity='.45';
   btn.style.pointerEvents='none';
   pcState.wakingUntil=now+60000;
   pcState.fastUntil=now+120000;
   pcApplyStatus('WAKING');
-  fetch(FB+'/packhelper/wol_targets/main_pc.json',{cache:'no-store'})
-    .then(function(r){return r.json();})
-    .then(function(target){ pcTryNativeWake(target||null); })
-    .catch(function(){});
+  pcTryNativeWake(busPath(_bus,'packhelper/wol_targets/main_pc')||null);
   // 가속 폴링 즉시 시작
   if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+  pcHideOverlay();
   setTimeout(pollPcPower, 1500);
 }
 
 function pcShowOverlay(html){
   var ov=document.getElementById('pcOverlay');
   if(!ov)return;
-  ov.innerHTML='<div class="pc-dialog">'+html+'</div>';
+  ov.innerHTML='<div class="pc-dialog" role="dialog" aria-modal="true" aria-label="PC 원격 제어 확인">'+html+'</div>';
   ov.classList.add('show');
 }
 function pcHideOverlay(){
@@ -3350,11 +3409,12 @@ function pcHideOverlay(){
 }
 
 function pcOnClickShutdown(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   pcShowOverlay(
-    '<div class="pc-dialog-title">메인 PC 종료 확인</div>'+
+    '<div class="pc-dialog-title" id="pcShutdownDialogTitle">메인 PC 종료 확인</div>'+
     '<div class="pc-dialog-msg">메인 PC를 끄시겠습니까?</div>'+
     '<div class="pc-dialog-row">'+
-      '<button class="btn bn" id="pcCancel1">취소</button>'+
+      '<button class="btn bn" id="pcCancel1" autofocus>취소</button>'+
       '<button class="btn bred" id="pcConfirm1">확인 → 계속</button>'+
     '</div>'
   );
@@ -3366,8 +3426,8 @@ function pcOnClickShutdown(){
 
 function pcShowCountdown(){
   pcShowOverlay(
-    '<div class="pc-dialog-title">PC를 종료합니다</div>'+
-    '<div class="pc-dialog-count" id="cdCountText">5초 후 명령 전송...</div>'+
+    '<div class="pc-dialog-title" id="pcCountdownDialogTitle">PC를 종료합니다</div>'+
+    '<div class="pc-dialog-count" id="cdCountText" aria-live="assertive">5초 후 명령 전송...</div>'+
     '<button class="btn bn" id="pcCdCancel" style="width:100%; min-height:52px; font-size:14px; font-weight:700">취소</button>'
   );
   var cancel=document.getElementById('pcCdCancel');
@@ -3388,27 +3448,12 @@ function pcShowCountdown(){
 }
 
 function pcSendShutdown(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
   var now=Date.now();
   // 최신 boot_id 확보 후 명령 PUT
-  fetch(FB+'/packhelper/heartbeat/main_pc.json',{cache:'no-store'})
-    .then(function(r){return r.json();})
-    .catch(function(){return null;})
+  Promise.resolve(busPath(_bus,'packhelper/heartbeat/main_pc'))
     .then(function(mp){
-      var target=(mp&&mp.boot_id)?mp.boot_id:(pcState.bootId||null);
-      var cmd={
-        cmd_id:'shdn_'+now+'_'+pcRand6(),
-        action:'shutdown',
-        ts_ms:now,
-        expires_at:now+60000,
-        boot_id_target:target,
-        source:'posdelay_dash',
-        status:'pending'
-      };
-      fetch(FB+'/packhelper/shutdown_cmd/main_pc.json',{
-        method:'PUT',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(cmd)
-      }).catch(function(){});
+      toast('종료 명령은 파이어 없이 보내지 않습니다. 메인 PC에서 끄세요.','warn');
       pcHideOverlay();
       var btn=document.getElementById('pcOffBtn');
       if(btn){
