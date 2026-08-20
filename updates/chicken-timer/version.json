@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29783201,
-  "appVersionName": "0818.0341",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29783201",
-  "sha256": "ff1cbb1ef1859b051c7b28f8c96e5c3b6048cd5a4b84a506446f9548e9b9e1e5",
-  "sizeBytes": 1568295,
+  "appVersionCode": 29787751,
+  "appVersionName": "0821.0751",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29787751",
+  "sha256": "7529a2a22dd7171190f25d6789bd9764872265b89970f44b128054e426777755",
+  "sizeBytes": 1489194,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "한 번 설치로 끝. 노트9/탭 직통(기억된 주소 재시도)+파이어 먹통 안전망+안드로이드 캡처. 타이머 데이터 보존",
-  "updatedAt": "2026-08-18T03:41:01+09:00",
+  "releaseNotes": "최신 웹 보드 보존 및 GitHub 자동업데이트 채널 전환",
+  "updatedAt": "2026-08-21T08:16:02+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
