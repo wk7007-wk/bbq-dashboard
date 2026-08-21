@@ -32,6 +32,9 @@
   const slotViews = new Map();
   const PRESS_GUARD_MS = 700;
   const RESTART_AFTER_CLEAR_GUARD_MS = 1200;
+  // Preset start swaps the number grid for running rails in-place. A leftover
+  // pointerup/touchend/click on the same coordinates must not pause or 삭제;
+  // portrait 2x6 10분 sits where 삭제 appears after start.
   const READOUT_AFTER_START_GUARD_MS = 900;
   const TIMER_FAMILY_BY_PRESET = {
     "7": "seven",
@@ -49,7 +52,7 @@
     { id: "oven", label: "오븐", shortLabel: "OV", accent: "oven", slotIds: ["slot-6"] },
   ];
   const DISPLAY_PROFILE_SPECS = [
-    { name: "primary-phone", targetLabel: "Samsung Galaxy Note9", shortSide: 393, longSide: 852, shortTolerance: 24, longTolerance: 40 },
+    { name: "primary-phone", targetLabel: "Samsung Galaxy Note9", shortSide: 393, longSide: 852, shortTolerance: 48, longTolerance: 130 },
     { name: "primary-tablet", targetLabel: "Samsung Galaxy Tab A 8.0 (2019)", shortSide: 800, longSide: 1280, shortTolerance: 48, longTolerance: 64 },
     { name: "primary-subnotebook", targetLabel: "서브 노트북 1085x1885", shortSide: 1085, longSide: 1885, shortTolerance: 48, longTolerance: 80 },
   ];
@@ -345,6 +348,7 @@
     const visualViewport = global.visualViewport || null;
     appendCandidate(visualViewport && visualViewport.width, visualViewport && visualViewport.height);
     appendCandidate(global.innerWidth, global.innerHeight);
+    appendCandidate(global.screen && global.screen.width, global.screen && global.screen.height);
 
     let bestMatch = null;
     candidates.forEach((candidate) => {
@@ -2450,7 +2454,16 @@
     });
   }
 
+  function isActionBlockedAfterStart(slotId) {
+    const guardKey = String(slotId || "");
+    const blockedUntil = Math.max(0, Number(readoutToggleBlockedUntilBySlot.get(guardKey)) || 0);
+    if (blockedUntil > Date.now()) return true;
+    if (blockedUntil > 0) readoutToggleBlockedUntilBySlot.delete(guardKey);
+    return false;
+  }
+
   function clearMainTimer(slotId) {
+    if (isActionBlockedAfterStart(slotId)) return false;
     const changed = triggerChange(() => store.clear(slotId));
     if (changed) {
       restartBlockedUntilBySlot.set(String(slotId), Date.now() + RESTART_AFTER_CLEAR_GUARD_MS);
@@ -2538,10 +2551,7 @@
   }
 
   function handleReadoutToggle(slotId) {
-    const guardKey = String(slotId || "");
-    const blockedUntil = Math.max(0, Number(readoutToggleBlockedUntilBySlot.get(guardKey)) || 0);
-    if (blockedUntil > Date.now()) return false;
-    if (blockedUntil > 0) readoutToggleBlockedUntilBySlot.delete(guardKey);
+    if (isActionBlockedAfterStart(slotId)) return false;
     const slot = getMainSlot(slotId);
     if (!slot) return false;
     if (isTestSlot(slot)) return false;

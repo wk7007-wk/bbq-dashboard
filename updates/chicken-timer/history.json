@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29788804,
+      "appVersionName": "0822.0104",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788804",
+      "sha256": "6076e9b05987709acaccdc1a6dc7d3238ce5ee3017b398cda37d30c2947662f4",
+      "sizeBytes": 1579940,
+      "packageName": "com.chickentimer.board.v2",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "enabled": true,
+      "releaseNotes": "노트9 가로 큰 숫자 복원(레일 26px), 앱-웹 같은 방",
+      "updatedAt": "2026-08-22T01:04:54+09:00"
+    },
+    {
       "appVersionCode": 29788789,
       "appVersionName": "0822.0049",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788789",
