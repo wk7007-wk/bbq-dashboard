@@ -159,24 +159,34 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
 /* Note9 landscape: 56px side rails ate the leftover cell so MM:SS vanished.
  * Keep the same 3x3 owners. Shrink only the two side columns. */
 @media (orientation: landscape) and (max-height: 520px) {
-  /* Note9 WebView often misses the 393x852 named profile. Keep the accepted
-   * thin-rail / large MM:SS size for any short landscape, including fallback. */
-  body[data-countdown-layout="v15-original-final"] {
-    --countdown-rail-width: 26px;
-    --countdown-min-font: 1.55rem;
-    --countdown-max-font: 2.55rem;
+  /* Beat the named-profile 56px token. Note9 WebView is primary-phone at
+   * 780x387; without this extra attribute the 26px landscape size loses. */
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-phone"],
+  body[data-countdown-layout="v15-original-final"][data-display-profile="fallback-responsive"] {
+    --countdown-rail-width: 26px !important;
+    --countdown-min-font: 1.55rem !important;
+    --countdown-max-font: 2.55rem !important;
   }
 
-  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
     .slot-card[data-state="running"]
     .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"],
-  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
+    .slot-card[data-state="running"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"],
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
+    .zone-group[data-zone="oven"] .slot-card[data-state="running"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"],
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
     .zone-group[data-zone="oven"] .slot-card[data-state="running"]
     .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
     grid-template-columns: 26px minmax(0, 1fr) 26px !important;
   }
 
-  body[data-countdown-layout="v15-original-final"] .board
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-phone"] .board
+    .timer-panel[data-layout-owner="v3"]
+    :is(.timer-readout, .split-timer-readout),
+  body[data-countdown-layout="v15-original-final"][data-display-profile="fallback-responsive"] .board
     .timer-panel[data-layout-owner="v3"]
     :is(.timer-readout, .split-timer-readout) {
     position: relative !important;
@@ -187,14 +197,20 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
     max-height: 92% !important;
   }
 
-  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
+    .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+    :is(.adjust-button, .timer-primary-actions > button),
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
     .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
     :is(.adjust-button, .timer-primary-actions > button) {
     overflow: hidden !important;
     z-index: 1 !important;
   }
 
-  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
+    .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+    .timer-primary-actions > button,
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
     .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
     .timer-primary-actions > button {
     font-size: 0.52rem !important;
@@ -202,12 +218,16 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
     letter-spacing: -0.04em !important;
   }
 
-  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
+    :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
     :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before {
     font-size: 0.55rem !important;
   }
 
-  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
+    :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after,
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
     :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
     font-size: 0.58rem !important;
   }
