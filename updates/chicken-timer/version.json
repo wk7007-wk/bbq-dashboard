@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29788778,
-  "appVersionName": "0822.0038",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788778",
-  "sha256": "d9d795c02de5e4db6feca88d104e6befe8032f1cc90bcf07baefa3966e11b70b",
-  "sizeBytes": 1581189,
+  "appVersionCode": 29788789,
+  "appVersionName": "0822.0049",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788789",
+  "sha256": "194032c231cc1505046f979a50069525ed9dc081915f0eb55e3e6f143c4e8047",
+  "sizeBytes": 1579854,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "공장 404 때 깃허브 웹으로 연동, 10분 시작 직후 삭제 고스트 차단",
-  "updatedAt": "2026-08-22T00:40:32+09:00",
+  "releaseNotes": "숫자/레일 크기 복원(note9-rail-27), 앱-웹 같은 방, 10분 삭제 고스트 차단",
+  "updatedAt": "2026-08-22T00:50:05+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/history.json"
 }
