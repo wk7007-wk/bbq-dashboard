@@ -1522,6 +1522,7 @@ body.site-locked .site-lock-screen {
 .matrix-cell.is-open {
   background: var(--brand-soft);
   box-shadow: inset 0 0 0 1px #9edfd3;
+  min-height: 0;
 }
 
 .matrix-cell.is-selected {

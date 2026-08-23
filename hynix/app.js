@@ -1531,7 +1531,6 @@
     };
     removeScheduleEditorOverlay();
     paintScheduleCell(dateKey, empId);
-    restoreCellEditFocus();
   }
 
   function editorDraftValue() {
@@ -1561,16 +1560,9 @@
     return String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
   }
 
-  function restoreCellEditFocus() {
-    var input = document.querySelector('[data-cell-inline="1"]');
-    if (!input) return;
-    input.focus();
-    input.select();
-  }
-
   async function commitOpenCellFromInput(moveCol, moveRow) {
     var parsed = parseCellDraft(editorDraftValue());
-    if (!parsed) { setText('scheduleStatus', '시간 형식'); restoreCellEditFocus(); return false; }
+    if (!parsed) { setText('scheduleStatus', '시간 형식'); return false; }
     Object.assign(state.scheduleEditor, parsed, { preset: parsed.action === 'off' ? 'off' : 'custom' });
     var saved = await submitScheduleInlineEdit();
     if (saved && (moveCol || moveRow)) { moveScheduleSelection(moveCol, moveRow); openScheduleEditor(state.scheduleSelection.dateKey, state.scheduleSelection.empId); }
@@ -4152,6 +4144,7 @@
       }
       var scheduleOpen = event.target.closest('[data-schedule-edit-open]');
       if (event.target.closest('.cell-inline-input')) return;
+      if (event.target.closest('[data-schedule-editor-field], [data-schedule-editor-quick], [data-schedule-editor-action]')) return;
       if (scheduleOpen && !event.target.closest('.schedule-edit-panel') && !event.target.closest('[data-schedule-editor-overlay]')) {
         if (state.scheduleEditor.open) {
           var nextDateKey = scheduleOpen.getAttribute('data-schedule-edit-open');
@@ -4160,6 +4153,10 @@
           return;
         }
         handleScheduleCellPointer(scheduleOpen.getAttribute('data-schedule-edit-open'), scheduleOpen.getAttribute('data-schedule-edit-emp'));
+        return;
+      }
+      if (state.scheduleEditor.open && !$('scheduleGrid').contains(event.target)) {
+        commitOpenCellFromInput(0, 0);
         return;
       }
       var schedulePreset = event.target.closest('[data-schedule-editor-preset]');
@@ -4223,7 +4220,7 @@
         var scheduleField = target.getAttribute('data-schedule-editor-field');
         if (scheduleField) {
           updateScheduleEditorField(scheduleField, target.type === 'checkbox' ? target.checked : target.value);
-          renderSchedule();
+          if (target.type !== 'time') renderSchedule();
           return;
         }
       }
