@@ -32,8 +32,6 @@
 
   function planning(tree) {
     if (!tree || typeof tree !== 'object') return false;
-    var meta = tree.meta && typeof tree.meta === 'object' ? tree.meta : {};
-    if (String(meta.schema || '') === 'workschedule_live_v1') return true;
     var employees = tree.employees;
     var fixed = tree.fixed_schedules;
     return (employees && typeof employees === 'object' && Object.keys(employees).length > 0)
@@ -54,7 +52,8 @@
   async function load(force) {
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
     var sources = [
-      { name: 'factory', url: URL, timeout: 1500 }
+      { name: 'factory', url: URL, timeout: 1500 },
+      { name: 'pages', url: './workschedule.json', timeout: 2500 }
     ];
     var empty = {};
     for (var i = 0; i < sources.length; i++) {

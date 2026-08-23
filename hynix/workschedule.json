@@ -1,0 +1,129 @@
+{
+  "employees": {
+    "emp_li": {
+      "active": true,
+      "name": "리",
+      "short_name": "리",
+      "sort_order": 0,
+      "input_mode": "fixed",
+      "source": "hynix_initial"
+    },
+    "emp_gyu": {
+      "active": true,
+      "name": "규",
+      "short_name": "규",
+      "sort_order": 1,
+      "input_mode": "fixed",
+      "source": "hynix_initial"
+    },
+    "emp_hio": {
+      "active": true,
+      "name": "히오",
+      "short_name": "히오",
+      "sort_order": 2,
+      "input_mode": "fixed",
+      "source": "hynix_initial"
+    },
+    "emp_yeonok": {
+      "active": true,
+      "name": "연옥",
+      "short_name": "연옥",
+      "sort_order": 3,
+      "input_mode": "manual",
+      "source": "hynix_initial"
+    },
+    "emp_jaehoon": {
+      "active": true,
+      "name": "재훈",
+      "short_name": "재훈",
+      "sort_order": 4,
+      "input_mode": "manual",
+      "source": "hynix_initial"
+    },
+    "emp_wonhee": {
+      "active": true,
+      "name": "원희",
+      "short_name": "원희",
+      "sort_order": 5,
+      "input_mode": "manual",
+      "source": "hynix_initial"
+    },
+    "emp_yongbyung": {
+      "active": true,
+      "name": "용병",
+      "short_name": "용병",
+      "sort_order": 6,
+      "input_mode": "manual",
+      "source": "hynix_initial"
+    }
+  },
+  "fixed_schedules": {
+    "emp_li": {
+      "kind": "fixed",
+      "type": "fixed",
+      "start": "08:00",
+      "end": "20:00",
+      "days": [
+        "sun",
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "매일 08-20"
+    },
+    "emp_gyu": {
+      "kind": "fixed",
+      "type": "fixed",
+      "start": "17:00",
+      "end": "04:00",
+      "days": [
+        "sun",
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "매일 17-04"
+    },
+    "emp_hio": {
+      "kind": "fixed",
+      "type": "fixed",
+      "start": "17:00",
+      "end": "04:00",
+      "days": [
+        "sun",
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat"
+      ],
+      "note": "매일 17-04 규와같음"
+    }
+  },
+  "overrides": {},
+  "status": {},
+  "aliases": {
+    "리": "emp_li",
+    "규": "emp_gyu",
+    "히오": "emp_hio",
+    "연옥": "emp_yeonok",
+    "재훈": "emp_jaehoon",
+    "원희": "emp_wonhee",
+    "김원희": "emp_wonhee",
+    "용병": "emp_yongbyung"
+  },
+  "meta": {
+    "schema": "workschedule_live_v1",
+    "write_ready": true,
+    "source": "hynix_initial_2026-08-23",
+    "updated_at": "2026-08-23T21:44:03+09:00",
+    "note": "최초입력. 리 08-20 매일, 규/히오 17-04 매일, 연옥/재훈/원희/용병 수동"
+  }
+}

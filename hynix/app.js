@@ -1070,7 +1070,8 @@
     if (selected) marks += '<span class="cell-select-mark" aria-hidden="true"></span>';
     if (copied) marks += '<span class="cell-copy-mark" aria-hidden="true"></span>';
     return '<button class="matrix-cell-button" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
-      (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty">·</span>') +
+      outputGaugeHtml(shift) +
+      (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty">수동</span>') +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
@@ -1987,7 +1988,7 @@
   }
 
   function outputGaugeHtml(shift) {
-    if (!shift) return '<div class="out-track is-empty" title="수동"></div>';
+    if (!shift) return '<div class="out-track is-empty"><span>수동</span></div>';
     if (shift.state === 'off') return '<div class="out-track is-off"><span>휴무</span></div>';
     var segs = timestampBarSegments(shift).map(function (style) {
       return '<span class="out-seg" style="' + style + '"></span>';
