@@ -763,7 +763,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  padding: 10px 14px;
+  padding: 6px 10px;
 }
 
 .aux-section > summary {
@@ -780,8 +780,8 @@ body.site-locked .site-lock-screen {
 
 .aux-stack {
   display: grid;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .locked-panel,
@@ -824,7 +824,12 @@ body.site-locked .site-lock-screen {
 
 .edit-workbench {
   display: grid;
-  gap: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.edit-workbench > .mode-segment {
+  grid-column: 1 / -1;
 }
 
 .mode-segment {
@@ -867,12 +872,15 @@ body.site-locked .site-lock-screen {
 .edit-band {
   display: grid;
   gap: 12px;
-  padding: 16px 0;
-  border-top: 1px solid var(--line);
+  padding: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .edit-band:first-of-type {
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .confirm-band {
@@ -883,7 +891,7 @@ body.site-locked .site-lock-screen {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
 }
 
 .band-head h3 {
@@ -936,7 +944,7 @@ body.site-locked .site-lock-screen {
 }
 
 .field-grid select[multiple] {
-  min-height: 128px;
+  min-height: 96px;
 }
 
 .choice-block {
@@ -2701,7 +2709,8 @@ body.site-locked .site-lock-screen {
   .hero-grid,
   .manual-overview,
   .field-grid,
-  .request-grid {
+  .request-grid,
+  .edit-workbench {
     grid-template-columns: minmax(0, 1fr);
   }
 

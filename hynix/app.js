@@ -2973,6 +2973,8 @@
     ensureEditDefaults();
     var edit = state.edit;
     var summary = editSummary();
+    var fixedScope = edit.scope === 'fixed';
+    var weekdayBlock = '<div class="choice-block"><span>요일</span><div class="choice-row">' + weekdayChipsHtml() + '</div></div>';
     var dateFields = (
       '<label><span>날짜 시작</span><input id="editStartDateInput" data-edit-field="startDate" type="date" value="' + escapeHtml(edit.startDate) + '"></label>' +
       '<label><span>날짜 끝</span><input id="editEndDateInput" data-edit-field="endDate" type="date" value="' + escapeHtml(edit.endDate) + '"></label>'
@@ -2983,12 +2985,14 @@
       '<button class="mini-button' + (edit.preset === 'custom' ? ' is-active' : '') + '" type="button" data-edit-preset="custom">시간</button></div>';
     $('editPortalBody').innerHTML =
       '<div class="edit-workbench">' +
+      '<div class="mode-segment" role="tablist" aria-label="근무 수정 범위"><button class="segmented-option' + (!fixedScope ? ' is-active' : '') + '" type="button" data-edit-scope="override">날짜별</button><button class="segmented-option' + (fixedScope ? ' is-active' : '') + '" type="button" data-edit-scope="fixed">기본표</button></div>' +
       '<div class="edit-band">' +
-      '<div class="band-head"><h3>대상 선택</h3></div>' +
+      '<div class="band-head"><h3>대상</h3></div>' +
       '<div class="field-grid target-grid">' +
       dateFields +
       '<label class="employee-select-field"><span>직원 선택</span><select id="editEmployeeSelect" multiple size="5">' + activeEmployeeOptions(edit.employeeIds) + '</select></label>' +
       '</div>' +
+      weekdayBlock +
       '<div class="choice-row compact"><button class="mini-button" type="button" data-edit-action="employees-all">전체</button><button class="mini-button" type="button" data-edit-action="employees-clear">해제</button></div>' +
       '</div>' +
       '<div class="edit-band">' +
@@ -2996,13 +3000,18 @@
       '<div class="field-grid content-grid">' +
       '<label><span>시작</span><input id="editStartInput" data-edit-field="start" type="time" value="' + escapeHtml(edit.start) + '"' + (edit.off || edit.clear ? ' disabled' : '') + '></label>' +
       '<label><span>종료</span><input id="editEndInput" data-edit-field="end" type="time" value="' + escapeHtml(edit.end) + '"' + (edit.off || edit.clear ? ' disabled' : '') + '></label>' +
+      '<label class="toggle-field"><input id="editOffInput" data-edit-field="off" type="checkbox"' + (edit.off ? ' checked' : '') + '><span>휴무</span></label>' +
+      '<label class="toggle-field"><input id="editClearInput" data-edit-field="clear" type="checkbox"' + (edit.clear ? ' checked' : '') + '><span>비우기</span></label>' +
       '</div>' +
+      '<div class="choice-block"><span>역할</span><div class="choice-row">' + roleChipsHtml() + '</div></div>' +
+      (!fixedScope ? '<div class="choice-block"><span>적용</span><div class="mode-segment small">' + applyModeHtml() + '</div></div>' : '') +
       '</div>' +
       '<div class="edit-band confirm-band">' +
       '<div class="request-actions">' +
       '<button class="request-button" type="button" data-request-action="edit"' + (edit.submitting ? ' disabled' : '') + '>' + (edit.submitting ? '반영 중' : '반영') + '</button>' +
       '<span class="request-status" id="editRequestStatus">' + escapeHtml(edit.statusMessage || '') + '</span>' +
       '</div>' +
+      '<span class="edit-summary-inline">' + escapeHtml(summary.who + ' · ' + summary.when + ' · ' + summary.what + ' · ' + summary.count + '건') + '</span>' +
       editPendingHtml() +
       '</div>' +
       '</div>';
