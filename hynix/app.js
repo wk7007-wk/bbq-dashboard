@@ -18,6 +18,7 @@
     { role: 'pos', email: 'pos@attendance.local' }
   ];
   var WORKSCHEDULE_BASE = '/workschedule_v2';
+  var SCHEDULE_SOURCE = 'http://218.147.118.71:2421/workschedule.json';
   var OPS_MANUAL_PATH = '/packhelper/ops_manual';
   var ATTENDANCE_PATH = '/workschedule_v2/attendance';
   var CALENDAR_OUTBOX_PATH = WORKSCHEDULE_BASE + '/meta/calendar_core/google/outbox';
@@ -186,13 +187,61 @@
     }
   }
 
-  async function readJson(path) {
+  function scheduleRest(path) {
+    if (!window.FactorySchedule) return null;
+    return window.FactorySchedule.restFrom(path, ['/workschedule_v2', 'workschedule_v2']);
+  }
+
+  async function readFirebaseJson(path) {
     var token = await authToken();
     var response = await fetch(firebaseUrl(path, token), { cache: 'no-store' });
     if (!response.ok) {
       throw new Error('데이터를 불러오지 못했습니다.');
     }
     return response.json();
+  }
+
+  async function fetchFirebaseScheduleTree() {
+    async function one(path) {
+      try {
+        var val = await readFirebaseJson(path);
+        return val && typeof val === 'object' ? val : {};
+      } catch (e) {
+        return {};
+      }
+    }
+    var parts = await Promise.all([
+      one(WORKSCHEDULE_BASE + '/employees'),
+      one(WORKSCHEDULE_BASE + '/fixed_schedules'),
+      one(WORKSCHEDULE_BASE + '/overrides'),
+      one(WORKSCHEDULE_BASE + '/status')
+    ]);
+    return {
+      employees: parts[0] || {},
+      fixed_schedules: parts[1] || {},
+      overrides: parts[2] || {},
+      status: parts[3] || {}
+    };
+  }
+
+  async function ensureScheduleTree() {
+    var tree = {};
+    try {
+      tree = await window.FactorySchedule.load(false) || {};
+    } catch (e) {
+      tree = {};
+    }
+    if (window.FactorySchedule.planning(tree)) return tree;
+    return tree;
+  }
+
+  async function readJson(path) {
+    var rest = scheduleRest(path);
+    if (rest !== null) {
+      var tree = await ensureScheduleTree();
+      return rest ? window.FactorySchedule.dig(tree, rest) : tree;
+    }
+    return readFirebaseJson(path);
   }
 
   async function loadKnowledgeContract() {
@@ -213,6 +262,14 @@
   }
 
   async function putJson(path, payload) {
+    var rest = scheduleRest(path);
+    if (rest !== null) {
+      var tree = await window.FactorySchedule.load(true);
+      var next = rest ? window.FactorySchedule.setPath(tree || {}, rest, payload) : payload;
+      var ok = await window.FactorySchedule.save(next);
+      if (!ok) throw new Error('요청을 보내지 못했습니다.');
+      return payload;
+    }
     var token = await authToken();
     var response = await fetch(firebaseUrl(path, token), {
       method: 'PUT',
@@ -226,6 +283,16 @@
   }
 
   async function patchJson(path, payload) {
+    var rest = scheduleRest(path);
+    if (rest !== null) {
+      var tree = await window.FactorySchedule.load(true);
+      var cur = rest ? window.FactorySchedule.dig(tree, rest) : tree;
+      var merged = (cur && typeof cur === 'object') ? Object.assign({}, cur, payload) : payload;
+      var next = rest ? window.FactorySchedule.setPath(tree || {}, rest, merged) : merged;
+      var ok = await window.FactorySchedule.save(next);
+      if (!ok) throw new Error('요청을 보내지 못했습니다.');
+      return payload;
+    }
     var token = await authToken();
     var response = await fetch(firebaseUrl(path, token), {
       method: 'PATCH',
@@ -737,12 +804,35 @@
     return formatClock(parsed + Number(deltaMinutes || 0));
   }
 
+  function siteUnlocked() {
+    return state.auth.authenticated && !state.auth.checking;
+  }
+
+  function applySiteLock() {
+    var unlocked = siteUnlocked();
+    document.body.classList.toggle('site-locked', !unlocked);
+    var lock = $('siteLockScreen');
+    var content = $('portalContent');
+    if (lock) lock.hidden = unlocked;
+    if (content) content.hidden = !unlocked;
+  }
+
+  function clearSiteData() {
+    state.employees = {};
+    state.fixedSchedules = {};
+    state.overrides = {};
+    state.statuses = {};
+    state.manualEntries = [];
+    state.attendanceToday = null;
+    state.attendanceOperational = null;
+  }
+
   function scheduleEditorAccessInfo() {
     var params = new URLSearchParams(window.location.search || '');
-    var forcedPreview = params.get('readonly') === '1' || params.get('testAuth') === '1';
+    var forcedPreview = siteUnlocked() && (params.get('readonly') === '1' || params.get('testAuth') === '1');
     var rolePreview = state.auth.authenticated && state.auth.role === 'readonly';
     var previewOnly = forcedPreview || rolePreview;
-    var canOpen = state.auth.authenticated && !state.auth.checking;
+    var canOpen = siteUnlocked();
     var canWrite = canOpen && !previewOnly && ['blocked', 'readonly'].indexOf(state.auth.role) < 0;
     return {
       previewOnly: previewOnly,
@@ -1382,11 +1472,12 @@
   }
 
   function renderAuthPanel() {
-    var status = state.auth.checking ? '권한 확인 중' : (state.auth.authenticated ? state.auth.roleLabel : '수정 권한 인증 필요');
+    var status = state.auth.checking ? '접속 확인 중' : (state.auth.authenticated ? state.auth.roleLabel : '접속 비밀번호 필요');
     var detail = state.auth.error ? ' · ' + state.auth.error : '';
     setText('authState', status + detail);
     if ($('authLoginRow')) $('authLoginRow').hidden = state.auth.authenticated;
     if ($('authSignOutButton')) $('authSignOutButton').hidden = !state.auth.authenticated;
+    applySiteLock();
     renderCalendarConnect();
   }
 
@@ -1439,9 +1530,15 @@
   }
 
   function setAuthState(nextState) {
+    var wasUnlocked = siteUnlocked();
     state.auth = Object.assign({}, state.auth, nextState);
     renderAuthPanel();
     renderPortalSections();
+    if (!siteUnlocked()) {
+      if (!wasUnlocked) clearSiteData();
+    } else if (!wasUnlocked) {
+      refreshPage();
+    }
     if (state.auth.authenticated && state.auth.role === 'owner') loadCalendarPublicConfig();
   }
 
@@ -1495,7 +1592,6 @@
           roleLabel: roleLabel(role),
           error: ''
         });
-        refreshPage();
       }).catch(function () {
         setAuthState({
           checking: false,
@@ -1505,7 +1601,6 @@
           roleLabel: roleLabel('authenticated'),
           error: ''
         });
-        refreshPage();
       });
     });
   }
@@ -1621,7 +1716,7 @@
   }
 
   function lockedPanel(title) {
-    var reason = state.auth.checking ? '권한 확인 중입니다.' : '근무 수정 권한 인증이 필요합니다.';
+    var reason = state.auth.checking ? '접속 확인 중입니다.' : '접속 비밀번호가 필요합니다.';
     if (state.auth.authenticated && state.auth.role === 'readonly') {
       reason = '조회 권한으로는 요청할 수 없습니다.';
     }
@@ -1629,7 +1724,7 @@
       '<div class="lock-mark">잠김</div>' +
       '<h3>' + escapeHtml(title) + '</h3>' +
       '<p>' + escapeHtml(reason) + '</p>' +
-      '<p class="locked-hint">상단에서 비밀번호 인증을 완료하면 이 화면 안에서 확인할 수 있습니다.</p>' +
+      '<p class="locked-hint">상단에서 비밀번호만 맞으면 이 화면을 볼 수 있습니다. GPS·단말·IP는 쓰지 않습니다.</p>' +
       '</div>';
   }
 
@@ -3102,6 +3197,10 @@
   }
 
   async function loadAll() {
+    if (!siteUnlocked()) {
+      applySiteLock();
+      return;
+    }
     var info = operationalInfo();
     renderStaticLabels();
     renderBoundary(info);
@@ -3140,6 +3239,11 @@
   }
 
   async function refreshPage() {
+    if (!siteUnlocked()) {
+      applySiteLock();
+      renderPortalSections();
+      return;
+    }
     try {
       await loadAll();
     } catch (error) {
@@ -3302,6 +3406,6 @@
 
   bindEvents();
   renderPortalSections();
+  applySiteLock();
   initFirebaseAuth();
-  refreshPage();
 })();

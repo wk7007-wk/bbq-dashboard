@@ -121,6 +121,44 @@ h1 {
   max-width: 460px;
 }
 
+.site-lock-screen {
+  display: none;
+  margin: 16px 0 0;
+  padding: 28px 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+body.site-locked .content {
+  display: none;
+}
+
+body.site-locked .site-lock-screen {
+  display: block;
+}
+
+.site-lock-screen .lock-mark {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.site-lock-screen h2 {
+  margin-bottom: 8px;
+}
+
+.site-lock-screen .locked-hint {
+  margin-top: 8px;
+  color: var(--muted-soft);
+}
+
 .auth-state {
   display: inline-flex;
   align-items: center;

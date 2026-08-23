@@ -6,8 +6,19 @@
 - 앞으로 하이닉스 사이트 관련 사용자 원문/음성 오타/의도 원칙은 `USER_PRINCIPLES_RAW.md`에만 누적하고, 이 문서는 구현 판단용 요약과 체크 기준만 유지한다.
 - 단, 구현 대조가 필요한 최신 요청은 날짜별 캡처 목록으로 짧게 남길 수 있다.
 
+## 2026-08-23 접속 인증
+- 사용자 정정: 하이닉스 사이트는 비밀번호만으로 접속한다.
+- GPS, 매장 위치, CLI 단말 허용, 허용 IP는 접속 조건이 아니다.
+- `?readonly=1` / `?testAuth=1` 은 인증 후 수정만 막고, 비밀번호 없이 근무표를 열어주지 않는다.
+- 미인증이면 근무표/운영메뉴얼/공장 근무표 요청을 하지 않는다.
+- live 서버는 GitHub Pages `https://wk7007-wk.github.io/bbq-dashboard/hynix/` 이다. 개인폰 로컬 HTTP 서버는 쓰지 않는다.
+
+## 2026-08-22 근무표 주소
+- 신규 단일 DB 주소: `http://218.147.118.71:2421/workschedule.json`. 기존 `/workschedule_v2.json` 은 같은 live 빈 DB를 가리키는 별칭이다.
+- 기존 restore/firebase/gist 직원 데이터는 쓰지 않는다. 카카오봇과 하이닉스 사이트가 이 주소만 본다.
+
 ## 2026-08-01 현재 live/인증 gate
-- 현재 공개 원점은 `https://wk7007-ops-static-2026.web.app/hynix/`다. `poskds-attendance.web.app/hynix/`는 509인 역사 target이며 자동 점검 원점으로 쓰지 않는다.
+- 현재 공개 원점은 `https://wk7007-wk.github.io/bbq-dashboard/hynix/`다. `poskds-attendance.web.app`와 `wk7007-ops-static-2026.web.app`는 사용하지 않는다.
 - 공개 `index.html`, `app.js`, `styles.css`와 이 디렉터리 소스 해시를 대조한 뒤 자동화 registry도 현재 원점으로 갱신했다.
 - 미인증/readonly 사용자는 Google Calendar 설정·OAuth 화면으로 진입할 수 없다. owner 전용 대형 연결 배너는 숨겨 근무표를 밀어내지 않고, 인증된 owner에게만 기존 연결 CTA를 보여준다.
 - live version `fcb3da113add6f64`, release `1785564722543000`: 390x844에서 근무표 시작 `622→413px`, 툴바 `819→631px`이고 전체 툴바가 첫 화면 안에 들어온다. 1280x720 포함 이동·Firebase write·page error·request failure·가로 overflow 0, source/live `index.html`·`app.js` hash 일치다.

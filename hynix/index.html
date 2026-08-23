@@ -5,30 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>하이닉스 근무 포털</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="./styles.css?v=d398fecea05a">
+  <link rel="stylesheet" href="./styles.css?v=20260823-pw1">
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
-<body>
+<body class="site-locked">
   <div class="shell">
     <header class="topbar">
       <div class="brand">
         <p class="eyebrow">HynixOps</p>
         <h1>하이닉스 근무 포털</h1>
-        <p class="subtitle">근무표와 운영메뉴얼을 한 화면에서 빠르게 확인합니다.</p>
+        <p class="subtitle">비밀번호로 접속합니다. GPS·단말·IP 추가 조건은 없습니다.</p>
       </div>
-      <div class="topbar-actions auth-panel" aria-label="수정 권한">
-        <div class="auth-state" id="authState">권한 확인 중</div>
+      <div class="topbar-actions auth-panel" aria-label="접속">
+        <div class="auth-state" id="authState">접속 확인 중</div>
         <div class="auth-login-row" id="authLoginRow">
-          <label class="sr-only" for="authPasswordInput">수정 권한 비밀번호</label>
-          <input id="authPasswordInput" type="password" autocomplete="current-password" placeholder="수정 권한 비밀번호">
-          <button class="jump-button" id="authLoginButton" type="button">인증</button>
+          <label class="sr-only" for="authPasswordInput">접속 비밀번호</label>
+          <input id="authPasswordInput" type="password" autocomplete="current-password" placeholder="접속 비밀번호">
+          <button class="jump-button" id="authLoginButton" type="button">접속</button>
         </div>
         <button class="jump-button ghost" id="authSignOutButton" type="button" hidden>로그아웃</button>
       </div>
     </header>
 
-    <main class="content">
+    <div class="site-lock-screen" id="siteLockScreen">
+      <div class="lock-mark">잠김</div>
+      <h2>접속 비밀번호</h2>
+      <p>비밀번호만 맞으면 근무표와 운영메뉴얼을 볼 수 있습니다.</p>
+      <p class="locked-hint">GPS, 매장 위치, 단말 허용은 쓰지 않습니다.</p>
+    </div>
+
+    <main class="content" id="portalContent" hidden>
       <nav class="portal-strip" aria-label="주요 화면">
         <div class="portal-tabs" id="portalTabs" role="tablist">
           <button class="portal-tab is-active" id="portalScheduleTab" type="button" role="tab" aria-selected="true" aria-controls="scheduleSection" tabindex="0" data-portal-target="scheduleSection">근무표</button>
@@ -141,6 +148,7 @@
 
   <script src="../hynix_schedule_logic.js?v=20260727-2112"></script>
   <script src="./calendar_sync_logic.js?v=a76b4ff42d25"></script>
-  <script src="./app.js?v=023767dd6344"></script>
+  <script src="./factory_schedule.js?v=20260821-ws2"></script>
+  <script src="./app.js?v=20260823-pw1"></script>
 </body>
 </html>
