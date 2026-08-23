@@ -724,26 +724,12 @@
   }
 
   function recentManualShift(empId, dateKey) {
-    var dates = Object.keys(state.overrides || {}).concat(Object.keys(state.statuses || {}))
-      .filter(function (key, index, all) {
-        return key < dateKey && all.indexOf(key) === index;
-      })
-      .sort().reverse();
-    for (var i = 0; i < dates.length; i += 1) {
-      var key = dates[i];
-      var override = state.overrides[key] && state.overrides[key][empId];
-      var status = state.statuses[key] && state.statuses[key][empId];
-      var overrideState = rowState(override);
-      var statusState = rowState(status);
-      if (override && (override.off === true || override.dayoff === true || overrideState === 'off')) {
-        return { state: 'off' };
-      }
-      if (statusState === 'off' || statusState === 'dayoff') return { state: 'off' };
-      if (override && (override.shift || override.start || override.end)) {
-        var source = override.shift && typeof override.shift === 'object' ? override.shift : override;
-        var start = normalizeTime30(source.start || override.start || '');
-        var end = normalizeTime30(source.end || override.end || '');
-        if (start && end) return { state: 'shift', start: start, end: end };
+    for (var i = 1; i <= 21; i += 1) {
+      var key = shiftDateKey(dateKey, -i);
+      var shift = buildShift(empId, state.employees[empId] || {}, key);
+      if (shift && shift.state === 'off') return { state: 'off' };
+      if (shift && shift.state === 'shift' && shift.start && shift.end) {
+        return { state: 'shift', start: normalizeTime30(shift.start), end: normalizeTime30(shift.end) };
       }
     }
     return null;
@@ -1054,9 +1040,10 @@
     if (selected) marks += '<span class="cell-select-mark" aria-hidden="true"></span>';
     if (copied) marks += '<span class="cell-copy-mark" aria-hidden="true"></span>';
     var editorOpen = state.scheduleEditor.open && state.scheduleEditor.dateKey === dateKey && state.scheduleEditor.empId === empId;
-    var inlineValue = shift && shift.state === 'off' ? '휴무' : (shift && shift.start && shift.end ? shift.start + '-' + shift.end : '');
-    var inlineStart = shift && shift.start ? normalizeTime30(shift.start) : '08:00';
-    var inlineEnd = shift && shift.end ? normalizeTime30(shift.end) : '20:00';
+    var editShift = shift || recentManualShift(empId, dateKey);
+    var inlineValue = editShift && editShift.state === 'off' ? '휴무' : (editShift && editShift.start && editShift.end ? editShift.start + '-' + editShift.end : '');
+    var inlineStart = editShift && editShift.start ? normalizeTime30(editShift.start) : '17:00';
+    var inlineEnd = editShift && editShift.end ? normalizeTime30(editShift.end) : '03:00';
     return '<button class="matrix-cell-button' + (editorOpen ? ' is-editing' : '') + '" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
       (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '" autofocus><div class="inline-time-grid cell-time-grid"><label><span>시작</span><input data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(inlineStart) + '"></label><label><span>종료</span><input data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(inlineEnd) + '"></label></div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button><button type="button" data-schedule-editor-quick="clear">비우기</button><button type="button" data-schedule-editor-action="copy">복사</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
@@ -1531,8 +1518,8 @@
       dateKey: dateKey,
       empId: empId,
       preset: preset.preset,
-      start: preset.start || '08:00',
-      end: preset.end || '20:00',
+      start: preset.start || '17:00',
+      end: preset.end || '03:00',
       off: preset.off,
       clear: preset.clear,
       submitting: false,
@@ -1825,8 +1812,8 @@
       '</div>' +
       '<div class="inline-chip-row">' + INLINE_SHIFT_PRESETS.map(inlinePresetButtonHtml).join('') + '</div>' +
       '<div class="inline-time-grid">' +
-      '<label><span>시작</span><input data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(editor.start || '08:00') + '"' + (editor.off ? ' disabled' : '') + '></label>' +
-      '<label><span>종료</span><input data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(editor.end || '20:00') + '"' + (editor.off ? ' disabled' : '') + '></label>' +
+      '<label><span>시작</span><input data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(editor.start || '17:00') + '"' + (editor.off ? ' disabled' : '') + '></label>' +
+      '<label><span>종료</span><input data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(editor.end || '03:00') + '"' + (editor.off ? ' disabled' : '') + '></label>' +
       '<label class="toggle-field inline-toggle"><input data-schedule-editor-field="off" type="checkbox"' + (editor.off ? ' checked' : '') + '><span>휴무</span></label>' +
       '</div>' +
       '<div class="inline-editor-footer">' +
@@ -2905,8 +2892,8 @@
     state.scheduleEditor.dateKey = dateKey;
     state.scheduleEditor.empId = empId;
     if (!state.scheduleEditor.off && !state.scheduleEditor.clear) {
-      state.scheduleEditor.start = normalizeTime30(state.scheduleEditor.start || '08:00');
-      state.scheduleEditor.end = normalizeTime30(state.scheduleEditor.end || '20:00');
+      state.scheduleEditor.start = normalizeTime30(state.scheduleEditor.start || '17:00');
+      state.scheduleEditor.end = normalizeTime30(state.scheduleEditor.end || '03:00');
     }
     if (!state.scheduleEditor.off && !state.scheduleEditor.clear && (!state.scheduleEditor.start || !state.scheduleEditor.end)) {
       state.scheduleEditor.statusMessage = '시간을 먼저 넣어 주세요.';
