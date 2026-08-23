@@ -1731,6 +1731,46 @@ body.site-locked .site-lock-screen {
   margin: 0;
 }
 
+.roster-add-card {
+  width: min(520px, calc(100vw - 24px));
+}
+
+.roster-add-field {
+  display: grid;
+  gap: 6px;
+}
+
+.roster-add-input {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 10px 12px;
+  line-height: 1.45;
+}
+
+.roster-add-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 28px;
+}
+
+.roster-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .schedule-modal-card.is-off {
   border-color: #f0d2c4;
   background: #fff8f5;

@@ -18,6 +18,74 @@
     return labels.map(cleanLabel).filter(Boolean);
   }
 
+  function parseRosterNames(text) {
+    return String(text || '')
+      .split(/[\n\r\t,;|/]+/)
+      .map(function (part) {
+        return String(part || '').replace(/\s+/g, ' ').trim();
+      })
+      .filter(Boolean);
+  }
+
+  function rosterNameKey(name) {
+    return cleanLabel(name).toLowerCase();
+  }
+
+  function nextEmployeeId(name, used) {
+    var base = String(name || '')
+      .trim()
+      .replace(/[.#$\[\]\/\s]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 40) || 'emp';
+    var occupied = used && typeof used === 'object' && !Array.isArray(used)
+      ? used
+      : {};
+    var id = base;
+    var serial = 2;
+    while (Object.prototype.hasOwnProperty.call(occupied, id)) {
+      id = base + '_' + serial;
+      serial += 1;
+    }
+    return id;
+  }
+
+  function planRosterAdds(text, employees) {
+    var names = parseRosterNames(text);
+    var existing = employees && typeof employees === 'object' ? employees : {};
+    var usedKeys = {};
+    var plannedIds = {};
+    Object.keys(existing).forEach(function (empId) {
+      plannedIds[empId] = true;
+      employeeLabels(empId, existing[empId]).forEach(function (label) {
+        usedKeys[rosterNameKey(label)] = empId;
+      });
+    });
+    var adds = [];
+    var skipped = [];
+    names.forEach(function (name) {
+      var key = rosterNameKey(name);
+      if (!key) return;
+      if (usedKeys[key]) {
+        skipped.push(name);
+        return;
+      }
+      var id = nextEmployeeId(name, plannedIds);
+      adds.push({
+        id: id,
+        name: name,
+        payload: {
+          name: name,
+          short_name: name,
+          active: true,
+          role: ''
+        }
+      });
+      plannedIds[id] = true;
+      usedKeys[key] = id;
+    });
+    return { names: names, adds: adds, skipped: skipped };
+  }
+
   function canonicalFixedScheduleEntry(empId, emp, fixed) {
     if (!fixed || typeof fixed !== 'object') return null;
     var entry = Object.assign({}, fixed);
@@ -104,6 +172,10 @@
   return {
     canonicalFixedScheduleEntry: canonicalFixedScheduleEntry,
     employeeLabels: employeeLabels,
+    parseRosterNames: parseRosterNames,
+    rosterNameKey: rosterNameKey,
+    nextEmployeeId: nextEmployeeId,
+    planRosterAdds: planRosterAdds,
     weekdayIndexFromDateKey: weekdayIndexFromDateKey,
     mondayWeekStartKey: mondayWeekStartKey,
     buildScheduleRangeKeys: buildScheduleRangeKeys,

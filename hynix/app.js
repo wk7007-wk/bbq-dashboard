@@ -107,6 +107,12 @@
       submitting: false,
       statusMessage: ''
     },
+    rosterAdd: {
+      open: false,
+      draft: '',
+      submitting: false,
+      statusMessage: ''
+    },
     attendanceToday: null,
     attendanceOperational: null,
     edit: {
@@ -860,12 +866,158 @@
     renderSchedule();
   }
 
+  function rosterHelper() {
+    return window.HynixScheduleLogic || null;
+  }
+
+  function parseRosterDraft(text) {
+    var helper = rosterHelper();
+    if (helper && typeof helper.parseRosterNames === 'function') {
+      return helper.parseRosterNames(text);
+    }
+    return String(text || '').split(/[\n\r\t,;|/]+/).map(function (part) {
+      return String(part || '').replace(/\s+/g, ' ').trim();
+    }).filter(Boolean);
+  }
+
+  function rosterChipHtml(name) {
+    return '<span class="roster-chip">' + escapeHtml(name) + '</span>';
+  }
+
+  function syncRosterDraft(value) {
+    state.rosterAdd.draft = String(value || '');
+    var chips = $('rosterAddChips');
+    if (!chips) return;
+    var names = parseRosterDraft(state.rosterAdd.draft);
+    chips.innerHTML = names.map(rosterChipHtml).join('');
+  }
+
+  function restoreRosterAddFocus() {
+    var input = $('rosterAddInput');
+    if (!state.rosterAdd.open || !input) return;
+    input.focus();
+    var len = input.value.length;
+    try {
+      input.setSelectionRange(len, len);
+    } catch (error) {}
+  }
+
+  function rosterAddPanelHtml() {
+    if (!state.rosterAdd.open) return '';
+    var access = scheduleEditorAccessInfo();
+    var names = parseRosterDraft(state.rosterAdd.draft);
+    var countLabel = names.length ? String(names.length) + '명' : '대기 없음';
+    return '<div class="schedule-editor-overlay" data-roster-add-overlay>' +
+      '<div class="schedule-editor-backdrop" data-roster-add-close></div>' +
+      '<section class="schedule-modal-card schedule-edit-panel roster-add-card" role="dialog" aria-modal="true" aria-labelledby="rosterAddTitle">' +
+      '<div class="inline-editor-head">' +
+      '<div>' +
+      '<strong id="rosterAddTitle">명단 추가</strong>' +
+      '<span>이름 입력 후 Enter, 여러 이름은 붙여넣기</span>' +
+      '</div>' +
+      '<div class="inline-editor-badge-row"><span class="inline-mode-badge">' + escapeHtml(access.previewOnly ? '미리보기' : '바로 반영') + '</span><button class="icon-button" type="button" aria-label="명단 닫기" data-roster-add-close>x</button></div>' +
+      '</div>' +
+      '<label class="roster-add-field">' +
+      '<span class="sr-only">이름 목록</span>' +
+      '<textarea id="rosterAddInput" class="roster-add-input" rows="4" data-roster-add-field="draft" placeholder="김철수&#10;이영희" ' + (state.rosterAdd.submitting ? 'disabled' : '') + '>' + escapeHtml(state.rosterAdd.draft) + '</textarea>' +
+      '</label>' +
+      '<div class="roster-add-chips" id="rosterAddChips">' + names.map(rosterChipHtml).join('') + '</div>' +
+      '<div class="inline-editor-footer">' +
+      '<span class="request-status" id="rosterAddStatus">' + escapeHtml(state.rosterAdd.statusMessage || countLabel) + '</span>' +
+      '<button class="request-button inline-save-button" type="button" data-roster-add-save' + (state.rosterAdd.submitting || access.previewOnly ? ' disabled' : '') + '>' + (state.rosterAdd.submitting ? '추가 중' : '추가') + '</button>' +
+      '</div>' +
+      '</section>' +
+      '</div>';
+  }
+
+  function openRosterAdd() {
+    var access = scheduleEditorAccessInfo();
+    if (!access.canWrite) {
+      setText('scheduleStatus', access.canOpen ? '조회 권한으로는 명단을 추가할 수 없습니다.' : '인증 후 명단을 추가할 수 있습니다.');
+      return;
+    }
+    state.scheduleEditor = Object.assign({}, state.scheduleEditor, {
+      open: false,
+      dateKey: '',
+      empId: '',
+      submitting: false
+    });
+    state.rosterAdd.open = true;
+    state.rosterAdd.submitting = false;
+    if (!state.rosterAdd.statusMessage) {
+      state.rosterAdd.statusMessage = '이름 입력 후 Enter, 또는 여러 이름 붙여넣기.';
+    }
+    renderSchedule();
+  }
+
+  function closeRosterAdd() {
+    state.rosterAdd = Object.assign({}, state.rosterAdd, {
+      open: false,
+      draft: '',
+      submitting: false,
+      statusMessage: ''
+    });
+    renderSchedule();
+  }
+
+  async function submitRosterAdd() {
+    var access = scheduleEditorAccessInfo();
+    if (!access.canWrite || state.rosterAdd.submitting) return;
+    var helper = rosterHelper();
+    var plan = helper && typeof helper.planRosterAdds === 'function'
+      ? helper.planRosterAdds(state.rosterAdd.draft, state.employees)
+      : { names: parseRosterDraft(state.rosterAdd.draft), adds: [], skipped: [] };
+    if (!plan.adds.length) {
+      state.rosterAdd.statusMessage = plan.skipped.length ? '이미 있는 이름입니다.' : '이름을 입력하세요.';
+      renderSchedule();
+      return;
+    }
+    var now = Date.now();
+    var records = {};
+    plan.adds.forEach(function (item) {
+      records[item.id] = Object.assign({}, item.payload, {
+        source: 'hynix_portal',
+        updated_at_ms: now
+      });
+    });
+    state.rosterAdd.submitting = true;
+    state.rosterAdd.statusMessage = String(plan.adds.length) + '명 저장 중';
+    renderSchedule();
+    try {
+      await patchJson(WORKSCHEDULE_BASE + '/employees', records);
+      Object.keys(records).forEach(function (empId) {
+        state.employees[empId] = records[empId];
+      });
+      state.scheduleShowEmptyEmployees = true;
+      state.rosterAdd.draft = '';
+      state.rosterAdd.submitting = false;
+      var added = plan.adds.map(function (item) { return item.name; }).join(', ');
+      var extra = plan.skipped.length ? ' · 이미 있음 ' + String(plan.skipped.length) + '명' : '';
+      state.rosterAdd.statusMessage = added + ' 추가' + extra;
+      renderSchedule();
+    } catch (error) {
+      state.rosterAdd.submitting = false;
+      state.rosterAdd.statusMessage = '저장하지 못했습니다. 다시 시도하세요.';
+      renderSchedule();
+    }
+  }
+
+  function maybeCommitRosterPaste(raw) {
+    var names = parseRosterDraft(raw);
+    if (names.length >= 2 || /[\n\r\t,;|]/.test(String(raw || ''))) {
+      submitRosterAdd();
+      return true;
+    }
+    return false;
+  }
+
   function openScheduleEditor(dateKey, empId) {
     var access = scheduleEditorAccessInfo();
     if (!access.canOpen) {
       setText('scheduleStatus', '인증 후 열 수 있습니다.');
       return;
     }
+    state.rosterAdd.open = false;
     var currentShift = buildShift(empId, state.employees[empId] || {}, dateKey);
     var preset = inlinePresetForShift(currentShift);
     state.scheduleEditor = {
@@ -1428,11 +1580,13 @@
         '</tr>';
     }).join('');
 
-    tableHtml = state.scheduleView === 'timeline'
+    tableHtml = (state.scheduleView === 'timeline'
       ? renderTimestampGauge(keys, info) + scheduleEditorPanelHtml()
       : (employees.length
         ? '<div class="matrix-scroll"><table class="schedule-matrix"><thead><tr><th class="matrix-sticky head-sticky"><div class="matrix-sticky-head">직원</div></th>' + dateHeaders + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' + scheduleEditorPanelHtml()
-        : '<div class="empty-block"><div class="empty-title">표시할 근무자가 없습니다.</div><div class="empty-copy">근무 없는 직원 표시를 켜면 전체 직원을 볼 수 있습니다.</div></div>' + scheduleEditorPanelHtml());
+        : '<div class="empty-block"><div class="empty-title">표시할 근무자가 없습니다.</div><div class="empty-copy">근무 없는 직원 표시를 켜면 전체 직원을 볼 수 있습니다.</div>' +
+          (access.canWrite ? '<button class="range-button" type="button" data-roster-add-open>명단 추가</button>' : '') +
+          '</div>' + scheduleEditorPanelHtml())) + rosterAddPanelHtml();
 
     renderScheduleToolbar();
     $('scheduleGrid').innerHTML = tableHtml;
@@ -1445,6 +1599,7 @@
     setText('todayKeyLabel', '오늘 ' + info.calendarKey);
     setText('operationalKeyLabel', '기준 ' + info.operationalKey);
     setText('scheduleStatus', '');
+    if (state.rosterAdd.open) restoreRosterAddFocus();
   }
 
   function attendanceSummary(row) {
@@ -1764,6 +1919,9 @@
       '<button class="segmented-option' + (state.scheduleView === 'week' ? ' is-active' : '') + '" id="scheduleWeekTab" type="button" role="tab" aria-selected="' + (state.scheduleView === 'week' ? 'true' : 'false') + '" aria-controls="scheduleGrid" tabindex="' + (state.scheduleView === 'week' ? '0' : '-1') + '" data-schedule-view="week">근무표</button>' +
       '<button class="segmented-option' + (state.scheduleView === 'timeline' ? ' is-active' : '') + '" id="scheduleTimelineTab" type="button" role="tab" aria-selected="' + (state.scheduleView === 'timeline' ? 'true' : 'false') + '" aria-controls="scheduleGrid" tabindex="' + (state.scheduleView === 'timeline' ? '0' : '-1') + '" data-schedule-view="timeline">날짜별</button>' +
       '</div>' +
+      (access.canWrite
+        ? '<button class="range-button" type="button" data-roster-add-open>명단 추가</button>'
+        : '') +
       '<label class="schedule-filter toggle-filter empty-filter">' +
       '<input id="scheduleShowEmptyEmployeesToggle" type="checkbox" ' + (state.scheduleShowEmptyEmployees ? 'checked' : '') + '>' +
       '<span>근무 없는 직원 표시</span>' +
@@ -1776,7 +1934,7 @@
       '<div class="schedule-toolbar-note">' + (state.scheduleView === 'timeline'
         ? '00 · 06 · 12 · 17 · 24'
         : access.canWrite
-          ? '셀을 누르면 팝업 수정'
+          ? '셀 수정 · 명단은 이름 붙여넣기'
           : access.canOpen
             ? '셀을 누르면 미리보기'
             : '근무 있는 직원만 표시') + '</div>';
@@ -3289,6 +3447,18 @@
       });
     }
     document.addEventListener('click', function (event) {
+      if (event.target.closest('[data-roster-add-open]')) {
+        openRosterAdd();
+        return;
+      }
+      if (event.target.closest('[data-roster-add-close]')) {
+        closeRosterAdd();
+        return;
+      }
+      if (event.target.closest('[data-roster-add-save]')) {
+        submitRosterAdd();
+        return;
+      }
       var viewButton = event.target.closest('[data-schedule-view]');
       if (viewButton) {
         var nextView = viewButton.getAttribute('data-schedule-view') || 'week';
@@ -3361,6 +3531,20 @@
       if (!button) return;
       markRequestPrepared(button.getAttribute('data-request-action'));
     });
+    document.addEventListener('input', function (event) {
+      var target = event.target;
+      if (!target || target.getAttribute('data-roster-add-field') !== 'draft') return;
+      syncRosterDraft(target.value);
+    });
+    document.addEventListener('paste', function (event) {
+      var target = event.target;
+      if (!target || target.id !== 'rosterAddInput' || !state.rosterAdd.open) return;
+      setTimeout(function () {
+        var nextValue = target.value;
+        state.rosterAdd.draft = nextValue;
+        if (!maybeCommitRosterPaste(nextValue)) syncRosterDraft(nextValue);
+      }, 0);
+    });
     document.addEventListener('change', function (event) {
       var target = event.target;
       if (!target) return;
@@ -3392,11 +3576,23 @@
     });
     document.addEventListener('keydown', function (event) {
       if (handleTablistKeydown(event)) return;
+      if (state.rosterAdd.open && event.key === 'Escape') {
+        closeRosterAdd();
+        return;
+      }
+      if (state.rosterAdd.open && event.key === 'Enter' && event.target && event.target.id === 'rosterAddInput') {
+        if (event.shiftKey) return;
+        event.preventDefault();
+        state.rosterAdd.draft = event.target.value;
+        submitRosterAdd();
+        return;
+      }
       if (state.scheduleEditor.open && event.key === 'Escape') {
         closeScheduleEditor();
         return;
       }
       if (event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.target && event.target.id === 'rosterAddInput') return;
       var target = event.target && event.target.closest ? event.target.closest('[data-schedule-edit-open]') : null;
       if (!target) return;
       event.preventDefault();
