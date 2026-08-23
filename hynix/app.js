@@ -1,22 +1,7 @@
 (function () {
   'use strict';
 
-  var FIREBASE_BASE = 'https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app';
-  var FIREBASE_CONFIG = {
-    projectId: 'poskds-4ba60',
-    appId: '1:965064583329:web:8c06e85c3790107e34e8e0',
-    databaseURL: FIREBASE_BASE,
-    storageBucket: 'poskds-4ba60.firebasestorage.app',
-    apiKey: 'AIzaSyCWq5jMOwBQKXd7AgKWELR4ZKgRQRLN54Y',
-    authDomain: 'poskds-4ba60.firebaseapp.com',
-    messagingSenderId: '965064583329',
-    measurementId: 'G-48QB3R03JD'
-  };
-  var AUTH_EMAILS = [
-    { role: 'owner', email: 'owner@attendance.local' },
-    { role: 'operator', email: 'operator@attendance.local' },
-    { role: 'pos', email: 'pos@attendance.local' }
-  ];
+  var PORTAL_PIN_SHA256 = '5fac4c4102e357c594bbde07a5b34fd38cebb15b793543e695452afafdb1d605';
   var WORKSCHEDULE_BASE = '/workschedule_v2';
   var SCHEDULE_SOURCE = 'http://218.147.118.71:2421/workschedule.json';
   var OPS_MANUAL_PATH = '/packhelper/ops_manual';
@@ -67,7 +52,6 @@
     ops_manual: '운영 기준',
     '기타': '기타'
   });
-  var authClient = null;
   var state = {
     employees: {},
     fixedSchedules: {},
@@ -191,23 +175,19 @@
     }
   });
 
-  function firebaseUrl(path, authToken) {
-    var url = FIREBASE_BASE + path + '.json';
-    if (authToken) {
-      url += '?auth=' + encodeURIComponent(authToken);
-    }
-    return url;
+  function firebaseUrl() {
+    return '';
   }
 
   async function authToken() {
-    if (!state.auth.user || typeof state.auth.user.getIdToken !== 'function') {
-      return '';
-    }
-    try {
-      return await state.auth.user.getIdToken();
-    } catch (error) {
-      return '';
-    }
+    return '';
+  }
+
+  async function sha256hex(text) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(text || '')));
+    return Array.from(new Uint8Array(buf)).map(function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
   }
 
   function scheduleRest(path) {
@@ -216,12 +196,7 @@
   }
 
   async function readFirebaseJson(path) {
-    var token = await authToken();
-    var response = await fetch(firebaseUrl(path, token), { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error('데이터를 불러오지 못했습니다.');
-    }
-    return response.json();
+    return {};
   }
 
   async function fetchFirebaseScheduleTree() {
@@ -293,16 +268,7 @@
       if (!ok) throw new Error('요청을 보내지 못했습니다.');
       return payload;
     }
-    var token = await authToken();
-    var response = await fetch(firebaseUrl(path, token), {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-      throw new Error('요청을 보내지 못했습니다.');
-    }
-    return response.json();
+    throw new Error('공장 근무표만 저장합니다.');
   }
 
   async function patchJson(path, payload) {
@@ -316,27 +282,17 @@
       if (!ok) throw new Error('요청을 보내지 못했습니다.');
       return payload;
     }
-    var token = await authToken();
-    var response = await fetch(firebaseUrl(path, token), {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-      throw new Error('요청을 보내지 못했습니다.');
-    }
-    return response.json();
+    throw new Error('공장 근무표만 저장합니다.');
   }
 
   async function deleteJson(path) {
-    var token = await authToken();
-    var response = await fetch(firebaseUrl(path, token), {
-      method: 'DELETE'
-    });
-    if (!response.ok) {
-      throw new Error('요청을 보내지 못했습니다.');
-    }
-    return response.json();
+    var rest = scheduleRest(path);
+    if (rest === null) throw new Error('공장 근무표만 저장합니다.');
+    var tree = await window.FactorySchedule.load(true);
+    var next = window.FactorySchedule.setPath(tree || {}, rest, null);
+    var ok = await window.FactorySchedule.save(next);
+    if (!ok) throw new Error('요청을 보내지 못했습니다.');
+    return null;
   }
 
   function safeFirebaseKey(value) {
@@ -2316,11 +2272,7 @@
   }
 
   async function loadCalendarPublicConfig() {
-    try {
-      state.calendarPublicConfig = await readJson(CALENDAR_PUBLIC_CONFIG_PATH) || null;
-    } catch (error) {
-      state.calendarPublicConfig = null;
-    }
+    state.calendarPublicConfig = null;
     renderCalendarConnect();
   }
 
@@ -2354,68 +2306,28 @@
     if (state.auth.authenticated && state.auth.role === 'owner') loadCalendarPublicConfig();
   }
 
-  function initFirebaseAuth() {
-    if (!window.firebase || !window.firebase.initializeApp || !window.firebase.auth) {
+  function initPortalAuth() {
+    var unlocked = false;
+    try { unlocked = sessionStorage.getItem('hynix_unlocked') === '1'; } catch (e) {}
+    if (unlocked) {
       setAuthState({
         checking: false,
-        authenticated: false,
-        user: null,
-        role: 'blocked',
-        roleLabel: roleLabel('blocked'),
-        error: '인증 모듈을 불러오지 못했습니다.'
+        authenticated: true,
+        user: { local: true },
+        role: 'owner',
+        roleLabel: '관리 권한',
+        error: '',
+        unlockMethod: 'password'
       });
       return;
     }
-    if (!window.firebase.apps || !window.firebase.apps.length) {
-      window.firebase.initializeApp(FIREBASE_CONFIG);
-    }
-    authClient = window.firebase.auth();
-    authClient.onAuthStateChanged(function (user) {
-      if (!user) {
-        if (state.auth.unlockMethod === 'gps' && state.auth.authenticated) return;
-        setAuthState({
-          checking: false,
-          authenticated: false,
-          user: null,
-          role: 'blocked',
-          roleLabel: roleLabel('blocked'),
-          error: state.auth.error || '',
-          unlockMethod: ''
-        });
-        return;
-      }
-      setAuthState({
-        checking: true,
-        authenticated: true,
-        user: user,
-        role: 'authenticated',
-        roleLabel: '권한 확인 중',
-        error: ''
-      });
-      loadPortalRole(user).then(function (roleInfo) {
-        if (roleInfo && roleInfo.enabled === false) {
-          signOutPortal();
-          return;
-        }
-        var role = roleInfo && roleInfo.role ? roleInfo.role : 'authenticated';
-        setAuthState({
-          checking: false,
-          authenticated: true,
-          user: user,
-          role: role,
-          roleLabel: roleLabel(role),
-          error: ''
-        });
-      }).catch(function () {
-        setAuthState({
-          checking: false,
-          authenticated: true,
-          user: user,
-          role: 'authenticated',
-          roleLabel: roleLabel('authenticated'),
-          error: ''
-        });
-      });
+    setAuthState({
+      checking: false,
+      authenticated: false,
+      user: null,
+      role: 'blocked',
+      roleLabel: roleLabel('blocked'),
+      error: ''
     });
   }
 
@@ -2441,7 +2353,6 @@
   }
 
   async function signInPortal() {
-    if (!authClient) return;
     var input = $('authPasswordInput');
     var password = input ? input.value.trim() : '';
     if (!password) {
@@ -2449,39 +2360,41 @@
       return;
     }
     setAuthState({ checking: true, error: '' });
-    var lastError = null;
-    for (var i = 0; i < AUTH_EMAILS.length; i += 1) {
-      try {
-        await authClient.signInWithEmailAndPassword(AUTH_EMAILS[i].email, password);
-        try { sessionStorage.setItem('hynix_portal_password', password); } catch (e) {}
-        if (input) input.value = '';
-        return;
-      } catch (error) {
-        lastError = error;
-      }
+    var hex = await sha256hex('hynix-portal:' + password);
+    if (hex !== PORTAL_PIN_SHA256) {
+      setAuthState({
+        checking: false,
+        authenticated: false,
+        user: null,
+        role: 'blocked',
+        roleLabel: roleLabel('blocked'),
+        error: '비밀번호가 올바르지 않습니다.'
+      });
+      return;
     }
-    var code = lastError && lastError.code ? lastError.code : '';
+    try { sessionStorage.setItem('hynix_unlocked', '1'); } catch (e) {}
+    if (input) input.value = '';
     setAuthState({
       checking: false,
-      authenticated: false,
-      user: null,
-      role: 'blocked',
-      roleLabel: roleLabel('blocked'),
-      error: code === 'auth/operation-not-allowed' ? '인증 설정 확인이 필요합니다.' : '비밀번호가 올바르지 않습니다.'
+      authenticated: true,
+      user: { local: true },
+      role: 'owner',
+      roleLabel: '관리 권한',
+      error: '',
+      unlockMethod: 'password'
     });
   }
 
   async function signOutPortal() {
-    if (authClient) {
-      await authClient.signOut();
-    }
+    try { sessionStorage.removeItem('hynix_unlocked'); } catch (e) {}
     setAuthState({
       checking: false,
       authenticated: false,
       user: null,
       role: 'blocked',
       roleLabel: roleLabel('blocked'),
-      error: ''
+      error: '',
+      unlockMethod: ''
     });
   }
 
@@ -4335,6 +4248,6 @@
   bindEvents();
   renderPortalSections();
   applySiteLock();
-  initFirebaseAuth();
+  initPortalAuth();
   tryGpsUnlock();
 })();
