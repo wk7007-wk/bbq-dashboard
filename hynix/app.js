@@ -1026,9 +1026,10 @@
     var marks = '';
     if (selected) marks += '<span class="cell-select-mark" aria-hidden="true"></span>';
     if (copied) marks += '<span class="cell-copy-mark" aria-hidden="true"></span>';
+    var editorOpen = state.scheduleEditor.open && state.scheduleEditor.dateKey === dateKey && state.scheduleEditor.empId === empId;
+    var inlineValue = shift && shift.state === 'off' ? '휴무' : (shift && shift.start && shift.end ? shift.start + '-' + shift.end : '');
     return '<button class="matrix-cell-button" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
-      outputGaugeHtml(shift) +
-      (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty">수동</span>') +
+      (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '">' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
@@ -1116,14 +1117,8 @@
       setText('scheduleStatus', '인증 후 열 수 있습니다.');
       return;
     }
-    var now = Date.now();
-    var last = state.scheduleLastTap;
-    var isDouble = last.dateKey === dateKey && last.empId === empId && now - last.at < 350;
-    state.scheduleLastTap = { dateKey: dateKey, empId: empId, at: now };
     selectScheduleCell(dateKey, empId);
-    if (isDouble) {
-      openScheduleEditor(dateKey, empId, { fromDouble: true });
-    }
+    openScheduleEditor(dateKey, empId);
   }
 
   function moveScheduleSelection(dCol, dRow) {
@@ -1302,12 +1297,9 @@
   function renderScheduleSheetBar() {
     var bar = $('scheduleSheetBar');
     if (!bar) return;
-    if (state.scheduleView !== 'week') {
-      bar.hidden = true;
-      bar.innerHTML = '';
-      return;
-    }
-    bar.hidden = false;
+    bar.hidden = true;
+    bar.innerHTML = '';
+    return;
     var access = scheduleEditorAccessInfo();
     var sel = selectedCellKey();
     var hasSel = Boolean(sel.dateKey && sel.empId);
@@ -1522,14 +1514,40 @@
           : '직접 시간만 조정합니다.')
     };
     removeScheduleEditorOverlay();
-    var grid = $('scheduleGrid');
-    if (grid) {
-      var wrap = document.createElement('div');
-      wrap.innerHTML = scheduleEditorPanelHtml();
-      while (wrap.firstChild) grid.appendChild(wrap.firstChild);
-    }
     paintScheduleCell(dateKey, empId);
-    renderScheduleSheetBar();
+    restoreCellEditFocus();
+  }
+
+  function editorDraftValue() {
+    var input = document.querySelector('[data-cell-inline="1"]');
+    return input ? input.value : '';
+  }
+
+  function parseCellDraft(raw) {
+    var value = String(raw || '').trim();
+    if (!value) return { action: 'clear', clear: true, off: false };
+    if (/^(휴무|휴|off)$/i.test(value)) return { action: 'off', clear: false, off: true };
+    var match = value.match(/^(\d{1,2})(?::?(\d{2}))?\s*[-~]\s*(\d{1,2})(?::?(\d{2}))?$/);
+    if (!match) return null;
+    var startHour = Number(match[1]), startMinute = Number(match[2] || 0), endHour = Number(match[3]), endMinute = Number(match[4] || 0);
+    if (startHour > 23 || endHour > 23 || startMinute > 59 || endMinute > 59) return null;
+    return { action: 'upsert_shift', clear: false, off: false, start: String(startHour).padStart(2, '0') + ':' + String(startMinute).padStart(2, '0'), end: String(endHour).padStart(2, '0') + ':' + String(endMinute).padStart(2, '0') };
+  }
+
+  function restoreCellEditFocus() {
+    var input = document.querySelector('[data-cell-inline="1"]');
+    if (!input) return;
+    input.focus();
+    input.select();
+  }
+
+  async function commitOpenCellFromInput(moveCol, moveRow) {
+    var parsed = parseCellDraft(editorDraftValue());
+    if (!parsed) { setText('scheduleStatus', '시간 형식'); restoreCellEditFocus(); return false; }
+    Object.assign(state.scheduleEditor, parsed, { preset: parsed.action === 'off' ? 'off' : 'custom' });
+    var saved = await submitScheduleInlineEdit();
+    if (saved && (moveCol || moveRow)) { moveScheduleSelection(moveCol, moveRow); openScheduleEditor(state.scheduleSelection.dateKey, state.scheduleSelection.empId); }
+    return saved;
   }
 
   function closeScheduleEditor(options) {
@@ -1844,7 +1862,7 @@
   function renderScheduleTimeline(dateKeys, info) {
     var entries = timelineEntries(dateKeys);
     if (!entries.length) {
-      return '<div class="empty-block"><div class="empty-title">표시할 근무자가 없습니다.</div><div class="empty-copy">다음 주 더보기로 다른 날짜를 확인하세요.</div></div>' + scheduleEditorPanelHtml();
+      return '<div class="empty-block"><div class="empty-title">표시할 근무자가 없습니다.</div><div class="empty-copy">다음 주 더보기로 다른 날짜를 확인하세요.</div></div>';
     }
     var grouped = [];
     entries.forEach(function (entry) {
@@ -1874,7 +1892,7 @@
         '</div>' +
         rows +
         '</section>';
-    }).join('') + '</div>' + scheduleEditorPanelHtml();
+    }).join('') + '</div>';
   }
 
   function timestampClockMinute(value) {
@@ -1967,7 +1985,7 @@
   }
 
   function outputGaugeHtml(shift) {
-    if (!shift) return '<div class="out-track is-empty"><span>수동</span></div>';
+    if (!shift) return '<div class="out-track is-empty"></div>';
     if (shift.state === 'off') return '<div class="out-track is-off"><span>휴무</span></div>';
     var segs = timestampBarSegments(shift).map(function (style) {
       return '<span class="out-seg" style="' + style + '"></span>';
@@ -1991,7 +2009,7 @@
       var emp = row[1];
       var cells = keys.map(function (dateKey) {
         var shift = buildShift(empId, state.employees[empId], dateKey);
-        var label = compactShiftLabel(shift) || '수동';
+        var label = compactShiftLabel(shift) || '';
         return '<div class="out-name-cell">' + outputGaugeHtml(shift) + '<span class="out-cell-label' + (shift && shift.state === 'off' ? ' is-off' : '') + '">' + escapeHtml(label) + '</span></div>';
       }).join('');
       return '<div class="out-name-row"><strong class="out-name-who">' + escapeHtml(emp.shortName) + '</strong>' + cells + '</div>';
@@ -2007,7 +2025,7 @@
         var shift = buildShift(empId, state.employees[empId], dateKey);
         return '<div class="out-date-row"><span class="out-date-who">' + escapeHtml(row[1].shortName) + '</span>' +
           outputGaugeHtml(shift) +
-          '<span class="out-cell-label' + (shift && shift.state === 'off' ? ' is-off' : '') + '">' + escapeHtml(compactShiftLabel(shift) || '수동') + '</span></div>';
+          '<span class="out-cell-label' + (shift && shift.state === 'off' ? ' is-off' : '') + '">' + escapeHtml(compactShiftLabel(shift) || '') + '</span></div>';
       }).join('');
       return '<article class="out-date-card"><h3>' + escapeHtml(mmddLabel(dateKey) + ' ' + weekdayLabel(dateKey)) + '</h3>' +
         '<div class="out-track is-legend"><span class="out-track-bg"></span></div>' + outputAxisHtml() + rows + '</article>';
@@ -2183,12 +2201,12 @@
       tableHtml = renderCalendarOutputBoard(info) + rosterAddPanelHtml();
     } else {
       tableHtml = (state.scheduleView === 'timeline'
-        ? renderTimestampGauge(keys, info) + scheduleEditorPanelHtml()
+        ? renderTimestampGauge(keys, info)
         : (employees.length
-          ? '<div class="matrix-scroll"><table class="schedule-matrix"><thead><tr><th class="matrix-sticky head-sticky"><div class="matrix-sticky-head">직원</div></th>' + dateHeaders + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' + scheduleEditorPanelHtml()
+          ? '<div class="matrix-scroll"><table class="schedule-matrix"><thead><tr><th class="matrix-sticky head-sticky"><div class="matrix-sticky-head">직원</div></th>' + dateHeaders + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>'
           : '<div class="empty-block"><div class="empty-title">표시할 근무자가 없습니다.</div><div class="empty-copy">근무 없는 직원 표시를 켜면 전체 직원을 볼 수 있습니다.</div>' +
             (access.canWrite ? '<button class="range-button" type="button" data-roster-add-open>명단 추가</button>' : '') +
-            '</div>' + scheduleEditorPanelHtml())) + rosterAddPanelHtml();
+            '</div>')) + rosterAddPanelHtml();
     }
 
     renderScheduleToolbar();
@@ -4107,7 +4125,14 @@
         return;
       }
       var scheduleOpen = event.target.closest('[data-schedule-edit-open]');
+      if (event.target.closest('.cell-inline-input')) return;
       if (scheduleOpen && !event.target.closest('.schedule-edit-panel') && !event.target.closest('[data-schedule-editor-overlay]')) {
+        if (state.scheduleEditor.open) {
+          var nextDateKey = scheduleOpen.getAttribute('data-schedule-edit-open');
+          var nextEmpId = scheduleOpen.getAttribute('data-schedule-edit-emp');
+          commitOpenCellFromInput(0, 0).then(function () { openScheduleEditor(nextDateKey, nextEmpId); });
+          return;
+        }
         handleScheduleCellPointer(scheduleOpen.getAttribute('data-schedule-edit-open'), scheduleOpen.getAttribute('data-schedule-edit-emp'));
         return;
       }
@@ -4195,6 +4220,11 @@
         event.preventDefault();
         state.rosterAdd.draft = event.target.value;
         submitRosterAdd();
+        return;
+      }
+      if (event.target && event.target.matches && event.target.matches('.cell-inline-input')) {
+        if (event.key === 'Enter' || event.key === 'Tab') { event.preventDefault(); commitOpenCellFromInput(event.shiftKey ? -1 : 1, 0); return; }
+        if (event.key === 'Escape') { event.preventDefault(); closeScheduleEditor(); return; }
         return;
       }
       if (state.scheduleEditor.open && event.key === 'Escape') {
