@@ -1,5 +1,6 @@
 (function (global) {
-  const FB_BASE_URL = "https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app";
+  const FACTORY_WAN_JSON = "http://218.147.118.71:2421/chicken_timer.json";
+  const GIST_JSON = "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json";
   const SYNC_ROOT = "packhelper/chicken_timer/boards";
   const AUDIT_ROOT = "packhelper/chicken_timer/events";
   const CLOCK_ROOT = "packhelper/chicken_timer/clock";
@@ -199,13 +200,9 @@
     const actorId = options.actorId;
     const profile = options.profile;
     const syncKey = options.syncKey;
-    const stateUrls = [
-      "http://218.147.118.71:2421/chicken_timer.json",
-      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json",
-    ];
+    const stateUrls = buildStateUrls();
     const stateUrl = stateUrls[0];
-    const auditRootUrl = `${FB_BASE_URL}/${AUDIT_ROOT}/${syncKey}`;
-    const refreshUrl = `${FB_BASE_URL}/${UI_REFRESH_ROOT}/${syncKey}.json`;
+    const refreshUrl = null;
     let applyRemoteState = null;
     let getLocalState = null;
     let statusListener = null;
@@ -333,7 +330,7 @@
         lastRevision = envelope.meta.revision;
         writeCachedEnvelope(storage, syncKey, envelope);
         publishLanEnvelope(envelope);
-        return putJson(stateUrl, envelope)
+        return putFirstJson(stateUrls, envelope)
           .then(() => {
             markStateOk();
             markDirtyDelivered();
@@ -461,7 +458,7 @@
         notifyStatus();
         return Promise.resolve(false);
       }
-      return fetchJson(stateUrl)
+      return fetchFirstJson(stateUrls)
         .then((rawRemote) => {
           const remoteEnvelope = sanitizeEnvelope(rawRemote);
           if (remoteEnvelope && hasDirtySlotConflict(remoteEnvelope, dirty.envelope, dirty.audit, getNow())) {
@@ -474,7 +471,7 @@
             notifyStatus();
             return false;
           }
-          return putJson(stateUrl, dirty.envelope)
+          return putFirstJson(stateUrls, dirty.envelope)
             .then(() => {
               markStateOk();
               markDirtyDelivered();
@@ -819,7 +816,7 @@
       if (typeof global.fetch !== "function") return Promise.reject(new Error("fetch unavailable"));
       const sentAtMonoMs = getMonotonicNow();
       const sentAtLocalMs = Date.now();
-      const clockUrl = `${FB_BASE_URL}/${CLOCK_ROOT}/${syncKey}.json`;
+      const clockUrl = FACTORY_WAN_JSON;
       return global.fetch(appendCacheBust(clockUrl), {
         method: "PUT",
         cache: "no-store",
@@ -1501,6 +1498,23 @@
       chain = chain.catch(() => fetchJson(url));
     });
     return chain;
+  }
+
+  function buildStateUrls() {
+    const native = global.ChickenTimerNative;
+    const lan = native && Array.isArray(native.fastFactoryJsonUrls)
+      ? native.fastFactoryJsonUrls.filter(Boolean)
+      : [];
+    return lan.concat([FACTORY_WAN_JSON, GIST_JSON].filter((url) => lan.indexOf(url) < 0));
+  }
+
+  function putFirstJson(urls, value) {
+    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
+    if (!list.length) return Promise.reject(new Error("no urls"));
+    return putJson(list[0], value).then((response) => {
+      list.slice(1).forEach((url) => { putJson(url, value).catch(() => {}); });
+      return response;
+    });
   }
 
   function putJson(url, value) {
