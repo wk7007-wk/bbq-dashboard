@@ -1511,10 +1511,11 @@
   function putFirstJson(urls, value) {
     const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
     if (!list.length) return Promise.reject(new Error("no urls"));
-    return putJson(list[0], value).then((response) => {
-      list.slice(1).forEach((url) => { putJson(url, value).catch(() => {}); });
-      return response;
+    let chain = Promise.reject(new Error("empty"));
+    list.forEach((url) => {
+      chain = chain.catch(() => putJson(url, value));
     });
+    return chain;
   }
 
   function putJson(url, value) {
