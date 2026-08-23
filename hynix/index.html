@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;900&display=swap">
-  <link rel="stylesheet" href="./styles.css?v=20260824-need1">
+  <link rel="stylesheet" href="./styles.css?v=20260824-chrome2">
 </head>
 <body class="site-locked">
   <div class="shell">
@@ -53,43 +53,23 @@
       </section>
 
       <section class="section portal-view is-active" id="scheduleSection" role="tabpanel" aria-labelledby="portalScheduleTab">
-        <div class="section-header">
-          <div>
-            <h2 id="scheduleTitle">근무표</h2>
-            <p class="section-copy" id="scheduleRangeLabel">일정을 불러오는 중입니다.</p>
-          </div>
-        </div>
-
-        <div class="sheet-summary-grid" id="scheduleSummaryGrid">
-          <article class="summary-tile">
-            <span>근무</span>
-            <strong id="summaryTodayCount">-</strong>
-          </article>
-          <article class="summary-tile">
-            <span>야간</span>
-            <strong id="summaryNightCount">-</strong>
-          </article>
-          <article class="summary-tile">
-            <span>기준</span>
-            <strong id="summaryAttendance">확인 중</strong>
-          </article>
+        <h2 id="scheduleTitle" class="sr-only">근무표</h2>
+        <div class="schedule-chrome">
+          <p class="sheet-summary-line" id="scheduleSummaryGrid">근무 <strong id="summaryTodayCount">-</strong> · 야간 <strong id="summaryNightCount">-</strong> · <strong id="summaryAttendance">확인 중</strong></p>
+          <p class="section-copy is-compact sr-only" id="scheduleRangeLabel">일정을 불러오는 중입니다.</p>
+          <p class="surface-state" id="scheduleStatus">불러오는 중</p>
         </div>
         <div class="schedule-toolbar" id="scheduleToolbar"></div>
         <div class="briefing-context" id="briefingContext" hidden></div>
 
         <div class="surface schedule-surface">
-          <div class="surface-state" id="scheduleStatus">근무표 데이터를 불러오는 중입니다.</div>
           <div class="schedule-grid" id="scheduleGrid" role="tabpanel"></div>
         </div>
       </section>
 
       <section class="section portal-view" id="manualSection" role="tabpanel" aria-labelledby="portalManualTab" hidden>
-        <div class="section-header">
-          <div>
-            <p class="section-kicker">운영메뉴얼</p>
-            <h2 id="manualTitle">전체 원문</h2>
-            <p class="section-copy">가공된 운영메뉴얼 원문을 한 화면에 이어서 보여주고, 검색과 분류는 이동을 돕습니다.</p>
-          </div>
+        <div class="section-header is-compact">
+          <h2 id="manualTitle">전체 원문</h2>
         </div>
 
         <div class="surface manual-surface">
@@ -145,6 +125,6 @@
   <script src="../hynix_schedule_logic.js?v=20260823-dark1"></script>
   <script src="./calendar_sync_logic.js?v=a76b4ff42d25"></script>
   <script src="./factory_schedule.js?v=20260823-live1"></script>
-  <script src="./app.js?v=20260824-need1"></script>
+  <script src="./app.js?v=20260824-chrome2"></script>
 </body>
 </html>

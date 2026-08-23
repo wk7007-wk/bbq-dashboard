@@ -2934,6 +2934,102 @@ body.site-locked .site-lock-screen {
   }
 }
 
+/* Chrome2: keep the schedule grid as the first visual priority. */
+.shell {
+  padding: 10px;
+}
+
+.topbar {
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+h1 {
+  font-size: clamp(1.05rem, 1.8vw, 1.2rem);
+}
+
+.brand .subtitle {
+  display: none;
+}
+
+.site-lock-screen p {
+  display: block;
+}
+
+.content {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.section,
+.schedule-chrome {
+  gap: 6px;
+}
+
+.section-header {
+  min-height: 0;
+}
+
+.section-header h2 {
+  font-size: 1rem;
+}
+
+.sheet-summary-line,
+.section-copy,
+.surface-state {
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet-summary-line {
+  font-size: .82rem;
+}
+
+.sheet-summary-grid,
+.summary-tile {
+  min-height: 0;
+}
+
+.calendar-connect-banner {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .shell {
+    padding: 6px;
+  }
+
+  .topbar {
+    gap: 6px;
+    padding: 7px 8px;
+  }
+
+  .topbar-actions {
+    gap: 4px;
+  }
+
+  .content {
+    gap: 5px;
+    margin-top: 5px;
+  }
+
+  .portal-strip {
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .portal-tab {
+    min-height: 36px;
+  }
+
+  .sheet-summary-line {
+    font-size: .75rem;
+  }
+}
+
 /* Touch cell editing: keep the two native time controls as the primary
    inputs and keep every control inside the matrix cell. */
 @media (pointer: coarse), (max-width: 720px) {
