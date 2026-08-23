@@ -2818,6 +2818,30 @@ body.site-locked .site-lock-screen {
   }
 }
 
+.briefing-context {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.briefing-chip {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.briefing-chip b {
+  color: var(--brand);
+  font-size: 0.72rem;
+}
+
 .out-board {
   display: grid;
   gap: 10px;

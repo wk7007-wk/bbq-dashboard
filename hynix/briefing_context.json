@@ -1,0 +1,77 @@
+{
+  "schema": "briefing_context_v1",
+  "location": "이천",
+  "fetched_at_ms": 1787490406554,
+  "valid_until_ms": 1787494006554,
+  "updated_at": "2026-08-23T22:06:46+09:00",
+  "weather_days": [
+    {
+      "date": "2026-08-23",
+      "brief": "흐림 / 22~31도 / 강수확률 90%",
+      "weather": "흐림",
+      "temp_min": 22.0,
+      "temp_max": 31.8,
+      "rain_mm": 0.0,
+      "rain_probability": 90
+    },
+    {
+      "date": "2026-08-24",
+      "brief": "대체로 맑음 / 23~32도 / 강수확률 53%",
+      "weather": "대체로 맑음",
+      "temp_min": 23.4,
+      "temp_max": 32.5,
+      "rain_mm": 0.0,
+      "rain_probability": 53
+    },
+    {
+      "date": "2026-08-25",
+      "brief": "흐림 / 24~31도 / 강수확률 77%",
+      "weather": "흐림",
+      "temp_min": 24.1,
+      "temp_max": 31.5,
+      "rain_mm": 0.0,
+      "rain_probability": 77
+    },
+    {
+      "date": "2026-08-26",
+      "brief": "흐림 / 23~30도 / 강수확률 48%",
+      "weather": "흐림",
+      "temp_min": 23.3,
+      "temp_max": 30.1,
+      "rain_mm": 0.0,
+      "rain_probability": 48
+    },
+    {
+      "date": "2026-08-27",
+      "brief": "뇌우 / 23~29도 / 강수확률 45% / 강수 2.0mm",
+      "weather": "뇌우",
+      "temp_min": 23.8,
+      "temp_max": 29.8,
+      "rain_mm": 2.0,
+      "rain_probability": 45
+    },
+    {
+      "date": "2026-08-28",
+      "brief": "이슬비 / 23~28도 / 강수확률 45% / 강수 3.3mm",
+      "weather": "이슬비",
+      "temp_min": 23.6,
+      "temp_max": 28.6,
+      "rain_mm": 3.3,
+      "rain_probability": 45
+    },
+    {
+      "date": "2026-08-29",
+      "brief": "뇌우 / 22~27도 / 강수확률 94% / 강수 14.4mm",
+      "weather": "뇌우",
+      "temp_min": 22.4,
+      "temp_max": 27.7,
+      "rain_mm": 14.4,
+      "rain_probability": 94
+    }
+  ],
+  "news_lines": [
+    "반도체 호황에 SK하이닉스 소재 이천시 고용률 68.2%… 4년 만에 최고",
+    "역시 반도체 후광…SK하이닉스 경기 이천 고용률 1.9%p '껑충' 뛰어"
+  ],
+  "source": "factory_refresh"
+}

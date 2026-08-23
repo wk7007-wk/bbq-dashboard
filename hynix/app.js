@@ -148,6 +148,7 @@
       statusMessage: '',
       initialized: false
     },
+    briefingContext: null,
     auth: {
       checking: true,
       authenticated: false,
@@ -1320,6 +1321,28 @@
       '</button>';
   }
 
+  function renderBriefingContext() {
+    var box = $('briefingContext');
+    if (!box) return;
+    var ctx = state.briefingContext;
+    if (!ctx || typeof ctx !== 'object') {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    var todayKey = operationalInfo().calendarKey;
+    var weatherDays = Array.isArray(ctx.weather_days) ? ctx.weather_days : [];
+    var todayWeather = '';
+    weatherDays.forEach(function (row) {
+      if (row && row.date === todayKey) todayWeather = String(row.brief || '');
+    });
+    if (!todayWeather && weatherDays[0]) todayWeather = String(weatherDays[0].brief || '');
+    var news = (Array.isArray(ctx.news_lines) ? ctx.news_lines : []).slice(0, 2);
+    box.hidden = false;
+    box.innerHTML = '<div class="briefing-chip"><b>날씨</b><span>' + escapeHtml(todayWeather || '갱신 대기') + '</span></div>' +
+      '<div class="briefing-chip"><b>뉴스</b><span>' + escapeHtml(news.join(' · ') || '갱신 대기') + '</span></div>';
+  }
+
   function renderScheduleSheetBar() {
     var bar = $('scheduleSheetBar');
     if (!bar) return;
@@ -2213,6 +2236,7 @@
     }
 
     renderScheduleToolbar();
+    renderBriefingContext();
     renderScheduleSheetBar();
     $('scheduleGrid').innerHTML = tableHtml;
     var viewTitle = {
@@ -4042,6 +4066,12 @@
     state.manualEntries = normalizeManualEntries(scheduleResult[4]);
     state.attendanceToday = scheduleResult[5];
     state.attendanceOperational = scheduleResult[6];
+    try {
+      var briefingRes = await fetch('./briefing_context.json', { cache: 'no-store' });
+      state.briefingContext = briefingRes.ok ? await briefingRes.json() : null;
+    } catch (e) {
+      state.briefingContext = null;
+    }
 
     renderHeroPrimary();
     renderSchedule();
