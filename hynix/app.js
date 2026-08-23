@@ -1028,8 +1028,10 @@
     if (copied) marks += '<span class="cell-copy-mark" aria-hidden="true"></span>';
     var editorOpen = state.scheduleEditor.open && state.scheduleEditor.dateKey === dateKey && state.scheduleEditor.empId === empId;
     var inlineValue = shift && shift.state === 'off' ? '휴무' : (shift && shift.start && shift.end ? shift.start + '-' + shift.end : '');
+    var inlineStart = shift && shift.start ? normalizeTime30(shift.start) : '08:00';
+    var inlineEnd = shift && shift.end ? normalizeTime30(shift.end) : '20:00';
     return '<button class="matrix-cell-button' + (editorOpen ? ' is-editing' : '') + '" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
-      (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '" autofocus><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button><button type="button" data-schedule-editor-quick="clear">비우기</button><button type="button" data-schedule-editor-action="copy">복사</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
+      (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '" autofocus><div class="inline-time-grid cell-time-grid"><label><span>시작</span><input data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(inlineStart) + '"></label><label><span>종료</span><input data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(inlineEnd) + '"></label></div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button><button type="button" data-schedule-editor-quick="clear">비우기</button><button type="button" data-schedule-editor-action="copy">복사</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
@@ -1502,8 +1504,8 @@
       dateKey: dateKey,
       empId: empId,
       preset: preset.preset,
-      start: preset.start,
-      end: preset.end,
+      start: preset.start || '08:00',
+      end: preset.end || '20:00',
       off: preset.off,
       clear: preset.clear,
       submitting: false,
@@ -1531,7 +1533,18 @@
     if (!match) return null;
     var startHour = Number(match[1]), startMinute = Number(match[2] || 0), endHour = Number(match[3]), endMinute = Number(match[4] || 0);
     if (startHour > 23 || endHour > 23 || startMinute > 59 || endMinute > 59) return null;
-    return { action: 'upsert_shift', clear: false, off: false, start: String(startHour).padStart(2, '0') + ':' + String(startMinute).padStart(2, '0'), end: String(endHour).padStart(2, '0') + ':' + String(endMinute).padStart(2, '0') };
+    return { action: 'upsert_shift', clear: false, off: false, start: normalizeTime30(String(startHour).padStart(2, '0') + ':' + String(startMinute).padStart(2, '0')), end: normalizeTime30(String(endHour).padStart(2, '0') + ':' + String(endMinute).padStart(2, '0')) };
+  }
+
+  function normalizeTime30(value) {
+    var match = /^(\d{1,2}):(\d{2})$/.exec(String(value || '').trim());
+    if (!match) return '';
+    var hour = Number(match[1]);
+    var minute = Number(match[2]);
+    if (hour > 23 || minute > 59) return '';
+    if (minute >= 45) hour = (hour + 1) % 24;
+    else minute = minute < 15 ? 0 : 30;
+    return String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
   }
 
   function restoreCellEditFocus() {
@@ -1600,7 +1613,7 @@
       return;
     }
     if (field === 'start' || field === 'end') {
-      state.scheduleEditor[field] = String(value || '');
+      state.scheduleEditor[field] = normalizeTime30(value);
       state.scheduleEditor.preset = 'custom';
       state.scheduleEditor.off = false;
       state.scheduleEditor.clear = false;
@@ -1785,8 +1798,8 @@
       '</div>' +
       '<div class="inline-chip-row">' + INLINE_SHIFT_PRESETS.map(inlinePresetButtonHtml).join('') + '</div>' +
       '<div class="inline-time-grid">' +
-      '<label><span>시작</span><input data-schedule-editor-field="start" type="time" value="' + escapeHtml(editor.start) + '"' + (editor.off ? ' disabled' : '') + '></label>' +
-      '<label><span>종료</span><input data-schedule-editor-field="end" type="time" value="' + escapeHtml(editor.end) + '"' + (editor.off ? ' disabled' : '') + '></label>' +
+      '<label><span>시작</span><input data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(editor.start || '08:00') + '"' + (editor.off ? ' disabled' : '') + '></label>' +
+      '<label><span>종료</span><input data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(editor.end || '20:00') + '"' + (editor.off ? ' disabled' : '') + '></label>' +
       '<label class="toggle-field inline-toggle"><input data-schedule-editor-field="off" type="checkbox"' + (editor.off ? ' checked' : '') + '><span>휴무</span></label>' +
       '</div>' +
       '<div class="inline-editor-footer">' +
@@ -2864,6 +2877,10 @@
     }
     state.scheduleEditor.dateKey = dateKey;
     state.scheduleEditor.empId = empId;
+    if (!state.scheduleEditor.off && !state.scheduleEditor.clear) {
+      state.scheduleEditor.start = normalizeTime30(state.scheduleEditor.start || '08:00');
+      state.scheduleEditor.end = normalizeTime30(state.scheduleEditor.end || '20:00');
+    }
     if (!state.scheduleEditor.off && !state.scheduleEditor.clear && (!state.scheduleEditor.start || !state.scheduleEditor.end)) {
       state.scheduleEditor.statusMessage = '시간을 먼저 넣어 주세요.';
       setText('scheduleStatus', state.scheduleEditor.statusMessage);
