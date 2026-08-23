@@ -139,7 +139,8 @@
       user: null,
       role: 'blocked',
       roleLabel: '미인증',
-      error: ''
+      error: '',
+      unlockMethod: ''
     }
   };
 
@@ -810,8 +811,93 @@
     return formatClock(parsed + Number(deltaMinutes || 0));
   }
 
+  var STORE_GATE = {
+    lat: 37.2094,
+    lng: 127.4437,
+    address: '이천시 부발읍 경충대로 2100',
+    radiusM: 700
+  };
+
+  function distanceMeters(lat1, lng1, lat2, lng2) {
+    var toRad = Math.PI / 180;
+    var dLat = (lat2 - lat1) * toRad;
+    var dLng = (lng2 - lng1) * toRad;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
   function siteUnlocked() {
     return state.auth.authenticated && !state.auth.checking;
+  }
+
+  function downloadAccessTxt() {
+    var saved = '';
+    try { saved = sessionStorage.getItem('hynix_portal_password') || ''; } catch (e) { saved = ''; }
+    var lines = [
+      '하이닉스 근무 포털',
+      'https://wk7007-wk.github.io/bbq-dashboard/hynix/',
+      '가게: ' + STORE_GATE.address,
+      '가게 기준 ' + STORE_GATE.radiusM + 'm 이내이면 GPS 자동 접속',
+      saved ? ('접속 비밀번호: ' + saved) : '원격 접속 비밀번호는 점주가 알려준 값을 입력'
+    ];
+    var blob = new Blob([lines.join('\n') + '\n'], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'hynix-password.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+  }
+
+  function applyGpsFix(lat, lng, accuracy) {
+    var dist = distanceMeters(lat, lng, STORE_GATE.lat, STORE_GATE.lng);
+    var meters = Math.round(dist);
+    if (dist <= STORE_GATE.radiusM) {
+      if (state.auth.authenticated) return true;
+      setAuthState({
+        checking: false,
+        authenticated: true,
+        user: { gps: true },
+        role: 'operator',
+        roleLabel: '가게 GPS',
+        error: '',
+        unlockMethod: 'gps',
+        gpsDistance: meters
+      });
+      return true;
+    }
+    if (!state.auth.authenticated) {
+      var msg = '가게(' + STORE_GATE.address + ')에서 ' + meters + 'm · 비밀번호를 입력하거나 가게 ' + STORE_GATE.radiusM + 'm 안으로';
+      if (state.auth.checking || state.auth.error !== msg) {
+        setAuthState({
+          checking: false,
+          gpsDistance: meters,
+          error: msg
+        });
+      }
+    }
+    return false;
+  }
+
+  function tryGpsUnlock() {
+    if (!navigator.geolocation) return;
+    var opts = { enableHighAccuracy: true, timeout: 8000, maximumAge: 20000 };
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      applyGpsFix(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+    }, function () {
+      if (!state.auth.authenticated) {
+        setAuthState({ checking: false, error: state.auth.error || 'GPS 없음 · 비밀번호를 입력하세요' });
+      }
+    }, opts);
+    if (navigator.geolocation.watchPosition) {
+      navigator.geolocation.watchPosition(function (pos) {
+        applyGpsFix(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+      }, function () {}, opts);
+    }
   }
 
   function applySiteLock() {
@@ -1715,13 +1801,15 @@
     authClient = window.firebase.auth();
     authClient.onAuthStateChanged(function (user) {
       if (!user) {
+        if (state.auth.unlockMethod === 'gps' && state.auth.authenticated) return;
         setAuthState({
           checking: false,
           authenticated: false,
           user: null,
           role: 'blocked',
           roleLabel: roleLabel('blocked'),
-          error: ''
+          error: state.auth.error || '',
+          unlockMethod: ''
         });
         return;
       }
@@ -1794,6 +1882,7 @@
     for (var i = 0; i < AUTH_EMAILS.length; i += 1) {
       try {
         await authClient.signInWithEmailAndPassword(AUTH_EMAILS[i].email, password);
+        try { sessionStorage.setItem('hynix_portal_password', password); } catch (e) {}
         if (input) input.value = '';
         return;
       } catch (error) {
@@ -1879,7 +1968,7 @@
       '<div class="lock-mark">잠김</div>' +
       '<h3>' + escapeHtml(title) + '</h3>' +
       '<p>' + escapeHtml(reason) + '</p>' +
-      '<p class="locked-hint">상단에서 비밀번호만 맞으면 이 화면을 볼 수 있습니다. GPS·단말·IP는 쓰지 않습니다.</p>' +
+      '<p class="locked-hint">가게 경충대로 2100 기준 700m 안이면 GPS 자동, 밖에서는 비밀번호입니다. ?readonly=1 / ?testAuth=1 로는 잠금을 열지 않습니다.</p>' +
       '</div>';
   }
 
@@ -3439,6 +3528,9 @@
     if ($('authSignOutButton')) {
       $('authSignOutButton').addEventListener('click', signOutPortal);
     }
+    if ($('authPasswordTxtButton')) {
+      $('authPasswordTxtButton').addEventListener('click', downloadAccessTxt);
+    }
     if ($('portalTabs')) {
       $('portalTabs').addEventListener('click', function (event) {
         var button = event.target.closest('[data-portal-target]');
@@ -3604,4 +3696,5 @@
   renderPortalSections();
   applySiteLock();
   initFirebaseAuth();
+  tryGpsUnlock();
 })();
