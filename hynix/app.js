@@ -1996,7 +1996,7 @@
       }).join('');
       return '<div class="out-name-row"><strong class="out-name-who">' + escapeHtml(emp.shortName) + '</strong>' + cells + '</div>';
     }).join('');
-    return '<section class="out-board out-name" aria-label="이름 기준 근무표">' + head + (rows || '<div class="empty-block">명단이 없습니다.</div>') + '</section>';
+    return '<section class="out-board out-name" aria-label="이름 기준 근무표"><div class="out-scroll">' + head + (rows || '<div class="empty-block">명단이 없습니다.</div>') + '</div></section>';
   }
 
   function renderDateOutputBoard(keys) {

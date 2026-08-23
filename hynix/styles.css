@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   --bg: #eef2f6;
   --surface: #ffffff;
   --surface-soft: #f6f8fb;
@@ -17,8 +17,39 @@
   --amber-soft: #fff3e6;
   --red: #b42318;
   --red-soft: #fff0ee;
+  --on-brand: #ffffff;
+  --empty-track: #eef2f6;
+  --sheet-grad: linear-gradient(180deg, #f7fffc 0%, #eef8f4 100%);
+  --lock-grad: linear-gradient(135deg, #ffffff 0%, #f2fbf9 100%);
   --timestamp-day-gradient: linear-gradient(90deg, #17213d 0%, #243c63 20.833%, #f59e42 25%, #fff3a3 50%, #f59e42 70.833%, #293d63 87.5%, #17213d 100%);
   --shadow: 0 20px 36px rgba(15, 23, 42, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12171e;
+    --surface: #1b222c;
+    --surface-soft: #232c38;
+    --surface-strong: #2c3644;
+    --line: #3a4656;
+    --line-strong: #5b6b7c;
+    --text: #e8eef5;
+    --muted: #9aa6b2;
+    --muted-soft: #b7c2cc;
+    --brand: #2dd4bf;
+    --brand-soft: #14332f;
+    --blue: #93c5fd;
+    --blue-soft: #1e3a5f;
+    --amber: #fbbf24;
+    --amber-soft: #3a2a12;
+    --red: #f87171;
+    --red-soft: #3f1d1d;
+    --on-brand: #052e2b;
+    --empty-track: #232c38;
+    --sheet-grad: linear-gradient(180deg, #1c2a28 0%, #17232a 100%);
+    --lock-grad: linear-gradient(135deg, #1b222c 0%, #17232a 100%);
+    --shadow: 0 20px 36px rgba(0, 0, 0, 0.45);
+  }
 }
 
 * {
@@ -36,6 +67,7 @@ body {
 
 body {
   line-height: 1.5;
+  color-scheme: light dark;
 }
 
 button,
@@ -43,6 +75,9 @@ input,
 select,
 textarea {
   font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line);
 }
 
 [hidden] {
@@ -183,7 +218,7 @@ body.site-locked .site-lock-screen {
   min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 0 12px;
 }
@@ -198,7 +233,7 @@ body.site-locked .site-lock-screen {
   border-radius: 8px;
   border: 1px solid var(--brand);
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 14px;
   font-size: 0.86rem;
   font-weight: 800;
@@ -304,7 +339,7 @@ body.site-locked .site-lock-screen {
 }
 
 .focus-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f2fbf9 100%);
+  background: var(--lock-grad);
 }
 
 .focus-summary {
@@ -449,9 +484,9 @@ body.site-locked .site-lock-screen {
 }
 
 .schedule-sheet-bar {
-  position: sticky;
-  top: 0;
-  z-index: 7;
+  position: relative;
+  top: auto;
+  z-index: 1;
   box-sizing: border-box;
   height: 112px;
   overflow: hidden;
@@ -462,7 +497,7 @@ body.site-locked .site-lock-screen {
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: linear-gradient(180deg, #f7fffc 0%, #eef8f4 100%);
+  background: var(--sheet-grad);
   box-shadow: 0 1px 0 rgba(15, 118, 110, 0.08);
 }
 
@@ -508,7 +543,7 @@ body.site-locked .site-lock-screen {
   padding: 0 10px;
   border: 1px dashed #9bb7b0;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 800;
@@ -653,7 +688,7 @@ body.site-locked .site-lock-screen {
   min-height: 38px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 0 10px;
 }
@@ -688,7 +723,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--brand);
   border-radius: 8px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 12px;
   font-size: 0.8rem;
   font-weight: 900;
@@ -819,7 +854,7 @@ body.site-locked .site-lock-screen {
 
 .segmented-option.is-active {
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .timestamp-tab-option {
@@ -892,7 +927,7 @@ body.site-locked .site-lock-screen {
   min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 8px 10px;
 }
@@ -921,7 +956,7 @@ body.site-locked .site-lock-screen {
   min-height: 34px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 0 12px;
   font-size: 0.8rem;
@@ -1043,7 +1078,7 @@ body.site-locked .site-lock-screen {
   min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 8px 10px;
 }
@@ -1075,7 +1110,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--brand);
   border-radius: 8px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 14px;
   font-size: 0.84rem;
   font-weight: 900;
@@ -1134,7 +1169,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--brand);
   border-radius: 8px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 10px;
   font-size: 0.78rem;
   font-weight: 900;
@@ -1280,6 +1315,7 @@ body.site-locked .site-lock-screen {
 .matrix-scroll {
   overflow: auto;
   max-width: 100%;
+  max-height: min(70vh, 720px);
   min-width: 0;
 }
 
@@ -1302,7 +1338,8 @@ body.site-locked .site-lock-screen {
   position: sticky;
   top: 0;
   z-index: 5;
-  background: var(--surface);
+  background: var(--surface-soft);
+  box-shadow: 0 1px 0 var(--line);
 }
 
 .matrix-sticky,
@@ -1338,7 +1375,7 @@ body.site-locked .site-lock-screen {
 }
 
 .matrix-head.is-today {
-  background: #eefbf9;
+  background: var(--brand-soft);
 }
 
 .matrix-head-inner {
@@ -1364,7 +1401,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid #0f766e;
   border-radius: 999px;
   background: #0f766e;
-  color: #fff;
+  color: var(--on-brand);
   padding: 1px 6px;
   font-size: 0.65rem;
   font-weight: 900;
@@ -1376,13 +1413,13 @@ body.site-locked .site-lock-screen {
 }
 
 .matrix-row.is-focused .matrix-sticky {
-  background: #f4fbf8;
+  background: var(--brand-soft);
 }
 
 .matrix-cell {
   position: relative;
   min-width: 100px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .timeline-list {
@@ -1395,7 +1432,7 @@ body.site-locked .site-lock-screen {
   gap: 7px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   padding: 10px;
 }
 
@@ -1436,7 +1473,7 @@ body.site-locked .site-lock-screen {
 
 .timeline-row.is-open {
   border-color: #9edfd3;
-  background: #eefbf9;
+  background: var(--brand-soft);
 }
 
 .timeline-time,
@@ -1472,7 +1509,7 @@ body.site-locked .site-lock-screen {
 }
 
 .matrix-cell.is-open {
-  background: #f4fbf8;
+  background: var(--brand-soft);
   box-shadow: inset 0 0 0 1px #9edfd3;
 }
 
@@ -1579,7 +1616,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--brand);
   border-radius: 9px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 18px;
   font: inherit;
   font-size: 0.9rem;
@@ -1591,7 +1628,7 @@ body.site-locked .site-lock-screen {
 .calendar-connect-button:not(:disabled) {
   border-color: var(--brand);
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .calendar-connect-button:disabled {
@@ -1672,7 +1709,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--brand);
   border-radius: 9px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 14px;
   font-size: 0.84rem;
   font-weight: 900;
@@ -1725,7 +1762,7 @@ body.site-locked .site-lock-screen {
 .cell-chip.today {
   border: 1px solid #0f766e;
   background: #0f766e;
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .cell-chip.off {
@@ -1763,7 +1800,7 @@ body.site-locked .site-lock-screen {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .day-card.today {
@@ -1774,7 +1811,7 @@ body.site-locked .site-lock-screen {
 .day-card.is-today {
   border-color: #0f766e;
   border-width: 2px;
-  background: #eefbf9;
+  background: var(--brand-soft);
   box-shadow: 0 8px 24px rgba(15, 118, 110, 0.12);
 }
 
@@ -1813,7 +1850,7 @@ body.site-locked .site-lock-screen {
   border-radius: 999px;
   border: 1px solid #0f766e;
   background: #0f766e;
-  color: #fff;
+  color: var(--on-brand);
   padding: 2px 8px;
   font-size: 0.66rem;
   font-weight: 900;
@@ -1931,7 +1968,7 @@ body.site-locked .site-lock-screen {
   padding: 14px;
   border: 1px solid #bfe6dc;
   border-radius: 8px;
-  background: #f4fbf8;
+  background: var(--brand-soft);
   box-shadow: 0 22px 48px rgba(15, 23, 42, 0.22);
 }
 
@@ -1955,7 +1992,7 @@ body.site-locked .site-lock-screen {
   resize: vertical;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 10px 12px;
   line-height: 1.45;
@@ -2036,7 +2073,7 @@ body.site-locked .site-lock-screen {
   height: 28px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--muted);
   font-size: 1rem;
   font-weight: 900;
@@ -2053,7 +2090,7 @@ body.site-locked .site-lock-screen {
   min-height: 30px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 0 10px;
   font-size: 0.75rem;
@@ -2112,7 +2149,7 @@ body.site-locked .site-lock-screen {
   min-height: 38px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 0 10px;
 }
@@ -2207,7 +2244,7 @@ body.site-locked .site-lock-screen {
   min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 0 14px;
 }
@@ -2277,7 +2314,7 @@ body.site-locked .site-lock-screen {
   min-height: 26px;
   border: 1px solid #9edfd3;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
   padding: 0 9px;
   font-size: 0.72rem;
@@ -2301,7 +2338,7 @@ body.site-locked .site-lock-screen {
 .knowledge-preview-grid article {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   padding: 10px;
 }
 
@@ -2365,7 +2402,7 @@ body.site-locked .site-lock-screen {
   min-height: 24px;
   border: 1px solid #b6e7dd;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
   padding: 0 8px;
   font-size: 0.7rem;
@@ -2387,7 +2424,7 @@ body.site-locked .site-lock-screen {
   max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--muted);
   padding: 0 8px;
   font-size: 0.7rem;
@@ -2425,7 +2462,7 @@ body.site-locked .site-lock-screen {
   min-height: 38px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   padding: 8px 10px;
 }
@@ -2441,7 +2478,7 @@ body.site-locked .site-lock-screen {
   border: 1px solid var(--brand);
   border-radius: 8px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   padding: 0 10px;
   font-size: 0.76rem;
   font-weight: 900;
@@ -2450,7 +2487,7 @@ body.site-locked .site-lock-screen {
 
 .knowledge-delete-row button {
   border-color: var(--line-strong);
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
 }
 
@@ -2464,7 +2501,7 @@ body.site-locked .site-lock-screen {
   min-height: 28px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--muted);
   padding: 6px 8px;
   font-size: 0.78rem;
@@ -2524,7 +2561,7 @@ body.site-locked .site-lock-screen {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .manual-entry.is-search-current {
@@ -2754,17 +2791,17 @@ body.site-locked .site-lock-screen {
   }
 
   .schedule-toolbar {
-    position: sticky;
-    top: 10px;
-    z-index: 6;
+    position: relative;
+    top: auto;
+    z-index: 1;
     padding-top: 2px;
     background: var(--bg);
   }
 
   .schedule-sheet-bar {
-    position: sticky;
-    top: 58px;
-    z-index: 7;
+    position: relative;
+    top: auto;
+    z-index: 1;
     height: 120px;
   }
 
@@ -2832,7 +2869,7 @@ body.site-locked .site-lock-screen {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   font-size: 0.82rem;
   line-height: 1.4;
 }
@@ -2842,10 +2879,31 @@ body.site-locked .site-lock-screen {
   font-size: 0.72rem;
 }
 
-.out-board {
-  display: grid;
-  gap: 10px;
-  padding: 8px 4px 16px;
+.out-scroll {
+  overflow: auto;
+  max-height: min(70vh, 720px);
+  min-width: 0;
+}
+
+.out-name-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg);
+  padding-bottom: 6px;
+}
+
+.out-name-row .out-name-who,
+.out-name-head .out-name-who {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--surface);
+}
+
+.out-name-head .out-name-who {
+  z-index: 4;
+  background: var(--bg);
 }
 
 .out-name-head,
@@ -2859,7 +2917,7 @@ body.site-locked .site-lock-screen {
 .out-name-row,
 .out-date-card,
 .out-cal-cell {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 14px;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
@@ -2894,7 +2952,7 @@ body.site-locked .site-lock-screen {
   height: 28px;
   overflow: hidden;
   border-radius: 8px;
-  background: #eef2f6;
+  background: var(--empty-track);
 }
 
 .out-track-bg {
@@ -2914,7 +2972,7 @@ body.site-locked .site-lock-screen {
 .out-track.is-empty {
   display: grid;
   place-items: center;
-  background: #eef2f6;
+  background: var(--empty-track);
   color: var(--muted);
   font-size: 0.7rem;
   font-weight: 700;
