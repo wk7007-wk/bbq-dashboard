@@ -723,7 +723,34 @@
     return shift && shift.state === 'shift' && shift.end && shift.start && shift.end <= shift.start;
   }
 
-  function inlinePresetForShift(shift) {
+  function recentManualShift(empId, dateKey) {
+    var dates = Object.keys(state.overrides || {}).concat(Object.keys(state.statuses || {}))
+      .filter(function (key, index, all) {
+        return key < dateKey && all.indexOf(key) === index;
+      })
+      .sort().reverse();
+    for (var i = 0; i < dates.length; i += 1) {
+      var key = dates[i];
+      var override = state.overrides[key] && state.overrides[key][empId];
+      var status = state.statuses[key] && state.statuses[key][empId];
+      var overrideState = rowState(override);
+      var statusState = rowState(status);
+      if (override && (override.off === true || override.dayoff === true || overrideState === 'off')) {
+        return { state: 'off' };
+      }
+      if (statusState === 'off' || statusState === 'dayoff') return { state: 'off' };
+      if (override && (override.shift || override.start || override.end)) {
+        var source = override.shift && typeof override.shift === 'object' ? override.shift : override;
+        var start = normalizeTime30(source.start || override.start || '');
+        var end = normalizeTime30(source.end || override.end || '');
+        if (start && end) return { state: 'shift', start: start, end: end };
+      }
+    }
+    return null;
+  }
+
+  function inlinePresetForShift(shift, empId, dateKey) {
+    if (!shift && empId && dateKey) shift = recentManualShift(empId, dateKey);
     if (!shift) {
       return {
         preset: 'night',
@@ -1498,7 +1525,7 @@
     state.rosterAdd.open = false;
     selectScheduleCell(dateKey, empId);
     var currentShift = buildShift(empId, state.employees[empId] || {}, dateKey);
-    var preset = inlinePresetForShift(currentShift);
+    var preset = inlinePresetForShift(currentShift, empId, dateKey);
     state.scheduleEditor = {
       open: true,
       dateKey: dateKey,
