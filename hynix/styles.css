@@ -1592,6 +1592,10 @@ body.site-locked .site-lock-screen {
   user-select: none;
 }
 
+.matrix-cell-button.is-editing { gap: 4px; align-items: stretch; }
+.cell-inline-actions { display: flex; gap: 3px; flex-wrap: wrap; }
+.cell-inline-actions button { border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; background: var(--brand-soft); color: var(--text); font: inherit; font-size: .68rem; font-weight: 800; }
+
 .section-header-actions {
   display: flex;
   align-items: flex-end;

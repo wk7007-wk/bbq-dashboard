@@ -1028,8 +1028,8 @@
     if (copied) marks += '<span class="cell-copy-mark" aria-hidden="true"></span>';
     var editorOpen = state.scheduleEditor.open && state.scheduleEditor.dateKey === dateKey && state.scheduleEditor.empId === empId;
     var inlineValue = shift && shift.state === 'off' ? '휴무' : (shift && shift.start && shift.end ? shift.start + '-' + shift.end : '');
-    return '<button class="matrix-cell-button" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
-      (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '">' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
+    return '<button class="matrix-cell-button' + (editorOpen ? ' is-editing' : '') + '" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
+      (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '" autofocus><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button><button type="button" data-schedule-editor-quick="clear">비우기</button><button type="button" data-schedule-editor-action="copy">복사</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
@@ -1639,6 +1639,13 @@
         off: true,
         clear: false,
         statusMessage: access.previewOnly ? '미리보기로 휴무가 적용됩니다.' : '휴무로 바꿉니다.'
+      });
+    } else if (action === 'clear') {
+      setScheduleEditorQuickState({
+        preset: 'clear',
+        off: false,
+        clear: true,
+        statusMessage: access.previewOnly ? '미리보기로 비웁니다.' : '비웁니다.'
       });
     } else if (action === 'start-1' || action === 'start+1' || action === 'end-1' || action === 'end+1' || action === 'all-1' || action === 'all+1') {
       var delta = action.indexOf('-1') >= 0 ? -60 : 60;
@@ -4133,6 +4140,11 @@
       var scheduleQuick = event.target.closest('[data-schedule-editor-quick]');
       if (scheduleQuick) {
         runScheduleQuickAction(scheduleQuick.getAttribute('data-schedule-editor-quick'));
+        return;
+      }
+      var scheduleAction = event.target.closest('[data-schedule-editor-action]');
+      if (scheduleAction && scheduleAction.getAttribute('data-schedule-editor-action') === 'copy') {
+        copySelectedScheduleCell();
         return;
       }
       if (event.target.closest('[data-schedule-editor-close]')) {
