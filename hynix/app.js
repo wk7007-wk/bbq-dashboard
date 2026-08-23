@@ -2818,10 +2818,7 @@
         what: selectedWhatLabel(),
         count: plan.expectedCount
       };
-      var calendarResult = await queueCalendarTargets(plan.items.filter(function (item) { return item.calendar; }).map(function (item) { return item.calendar; }));
-      state.edit.statusMessage = calendarResult.failed
-        ? plan.statusMessage + ' 완료. 캘린더 대기열 반영은 재시도가 필요합니다.'
-        : plan.statusMessage + ' 완료. 캘린더 대기열에도 반영했습니다.';
+      state.edit.statusMessage = plan.statusMessage + ' 완료.';
     } catch (error) {
       state.edit.pending = null;
       state.edit.statusMessage = '즉시 반영에 실패했습니다. 잠시 후 다시 시도하세요.';
@@ -2976,52 +2973,35 @@
     ensureEditDefaults();
     var edit = state.edit;
     var summary = editSummary();
-    var fixedScope = edit.scope === 'fixed';
-    var targetLabel = fixedScope ? '기본표' : '날짜별';
-    var dateFields = fixedScope ? '' : (
+    var dateFields = (
       '<label><span>날짜 시작</span><input id="editStartDateInput" data-edit-field="startDate" type="date" value="' + escapeHtml(edit.startDate) + '"></label>' +
       '<label><span>날짜 끝</span><input id="editEndDateInput" data-edit-field="endDate" type="date" value="' + escapeHtml(edit.endDate) + '"></label>'
     );
-    var weekdayBlock = '<div class="choice-block"><span>' + (fixedScope ? '반영 요일' : '요일') + '</span><div class="choice-row">' + weekdayChipsHtml() + '</div></div>';
-    var timeBlock = fixedScope
-      ? '<div class="choice-block"><span>시간 선택</span><div class="choice-row">' + presetChipsHtml() + '</div><p class="scope-note">기본표는 선택한 요일만 바꿉니다.</p></div>'
-      : '<div class="choice-block"><span>시간 선택</span><div class="choice-row">' + presetChipsHtml() + '</div></div>';
-    var contentLabel = fixedScope ? '기본 근무' : '근무 내용';
-    var scopeText = fixedScope ? '기본표에 저장' : summary.applyMode.label;
+    var presetBlock = '<div class="choice-row">' +
+      '<button class="mini-button' + (edit.preset === 'off' ? ' is-active' : '') + '" type="button" data-edit-preset="off">휴무</button>' +
+      '<button class="mini-button' + (edit.preset === 'clear' ? ' is-active' : '') + '" type="button" data-edit-preset="clear">비우기</button>' +
+      '<button class="mini-button' + (edit.preset === 'custom' ? ' is-active' : '') + '" type="button" data-edit-preset="custom">시간</button></div>';
     $('editPortalBody').innerHTML =
       '<div class="edit-workbench">' +
-      '<div class="mode-segment" role="tablist" aria-label="근무 수정 범위">' +
-      '<button class="segmented-option' + (!fixedScope ? ' is-active' : '') + '" type="button" role="tab" aria-selected="' + (!fixedScope ? 'true' : 'false') + '" data-edit-scope="override">날짜별</button>' +
-      '<button class="segmented-option' + (fixedScope ? ' is-active' : '') + '" type="button" role="tab" aria-selected="' + (fixedScope ? 'true' : 'false') + '" data-edit-scope="fixed">기본표</button>' +
-      '</div>' +
       '<div class="edit-band">' +
-      '<div class="band-head"><h3>대상 선택</h3><span>' + escapeHtml(targetLabel) + '</span></div>' +
+      '<div class="band-head"><h3>대상 선택</h3></div>' +
       '<div class="field-grid target-grid">' +
       dateFields +
       '<label class="employee-select-field"><span>직원 선택</span><select id="editEmployeeSelect" multiple size="5">' + activeEmployeeOptions(edit.employeeIds) + '</select></label>' +
       '</div>' +
-      weekdayBlock +
       '<div class="choice-row compact"><button class="mini-button" type="button" data-edit-action="employees-all">전체</button><button class="mini-button" type="button" data-edit-action="employees-clear">해제</button></div>' +
       '</div>' +
       '<div class="edit-band">' +
-      '<div class="band-head"><h3>' + escapeHtml(contentLabel) + '</h3><span>' + escapeHtml(scopeText) + '</span></div>' +
-      timeBlock +
+      '<div class="band-head"><h3>내용</h3></div>' + presetBlock +
       '<div class="field-grid content-grid">' +
       '<label><span>시작</span><input id="editStartInput" data-edit-field="start" type="time" value="' + escapeHtml(edit.start) + '"' + (edit.off || edit.clear ? ' disabled' : '') + '></label>' +
       '<label><span>종료</span><input id="editEndInput" data-edit-field="end" type="time" value="' + escapeHtml(edit.end) + '"' + (edit.off || edit.clear ? ' disabled' : '') + '></label>' +
-      '<label class="toggle-field"><input id="editOffInput" data-edit-field="off" type="checkbox"' + (edit.off ? ' checked' : '') + '><span>휴무</span></label>' +
-      '<label class="toggle-field"><input id="editClearInput" data-edit-field="clear" type="checkbox"' + (edit.clear ? ' checked' : '') + '><span>비우기</span></label>' +
       '</div>' +
-      '<div class="choice-block"><span>역할</span><div class="choice-row">' + roleChipsHtml() + '</div></div>' +
-      (fixedScope ? '' : '<div class="choice-block"><span>적용 방식</span><div class="mode-segment small">' + applyModeHtml() + '</div></div>') +
       '</div>' +
       '<div class="edit-band confirm-band">' +
-      '<div class="band-head"><h3>확인</h3><span>저장 전 확인</span></div>' +
-      '<div class="summary-grid">' + summaryItemsHtml(summary) + '</div>' +
-      (fixedScope ? '<div class="scope-note">기본표만 바꾸고 날짜별 수정은 그대로 둡니다.</div>' : '') +
       '<div class="request-actions">' +
-      '<button class="request-button" type="button" data-request-action="edit"' + (edit.submitting ? ' disabled' : '') + '>' + (edit.submitting ? '반영 중' : '즉시 반영') + '</button>' +
-      '<span class="request-status" id="editRequestStatus">' + escapeHtml(edit.statusMessage || (fixedScope ? '인증 후 즉시 반영합니다.' : '인증 후 즉시 반영합니다.')) + '</span>' +
+      '<button class="request-button" type="button" data-request-action="edit"' + (edit.submitting ? ' disabled' : '') + '>' + (edit.submitting ? '반영 중' : '반영') + '</button>' +
+      '<span class="request-status" id="editRequestStatus">' + escapeHtml(edit.statusMessage || '') + '</span>' +
       '</div>' +
       editPendingHtml() +
       '</div>' +
@@ -3075,17 +3055,16 @@
       '<div class="request-panel">' +
       '<div class="portal-summary-line"><strong>' + escapeHtml(info.operationalKey) + '</strong><span>' + escapeHtml(String(rows.length) + '건 표시 중') + '</span></div>' +
       table +
-      '<div class="request-actions">' +
-      '<button class="request-button" type="button" data-request-action="attendance">확인 요청</button>' +
-      '<span class="request-status" id="attendanceRequestStatus">기록 수정은 아직 바로 실행하지 않습니다.</span>' +
-      '</div>' +
       '</div>';
   }
 
   function renderPortalSections() {
     renderAuthPanel();
     renderEditPortal();
-    renderAttendancePortal();
+    var attendanceSection = $('attendancePortalSection');
+    var hasAttendance = attendanceRows(state.attendanceOperational).length > 0;
+    if (attendanceSection) attendanceSection.hidden = !hasAttendance;
+    if (hasAttendance) renderAttendancePortal();
   }
 
   async function markRequestPrepared(kind) {
