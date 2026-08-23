@@ -1041,11 +1041,10 @@
     if (copied) marks += '<span class="cell-copy-mark" aria-hidden="true"></span>';
     var editorOpen = state.scheduleEditor.open && state.scheduleEditor.dateKey === dateKey && state.scheduleEditor.empId === empId;
     var editShift = shift || recentManualShift(empId, dateKey);
-    var inlineValue = editShift && editShift.state === 'off' ? '휴무' : (editShift && editShift.start && editShift.end ? editShift.start + '-' + editShift.end : '');
     var inlineStart = editShift && editShift.start ? normalizeTime30(editShift.start) : '17:00';
     var inlineEnd = editShift && editShift.end ? normalizeTime30(editShift.end) : '03:00';
     return '<button class="matrix-cell-button' + (editorOpen ? ' is-editing' : '') + '" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
-      (editorOpen ? '<input class="cell-inline-input" data-cell-inline="1" value="' + escapeHtml(inlineValue) + '" autofocus><div class="inline-time-grid cell-time-grid"><label><input aria-label="시작" data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(inlineStart) + '"></label><label><input aria-label="종료" data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(inlineEnd) + '"></label></div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button><button type="button" data-schedule-editor-quick="clear">비우기</button><button type="button" data-schedule-editor-action="copy">복사</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
+      (editorOpen ? '<div class="inline-time-grid cell-time-grid"><label><input aria-label="시간 시작" data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(inlineStart) + '"></label><label><input aria-label="시간 종료" data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(inlineEnd) + '"></label></div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
@@ -1535,7 +1534,9 @@
 
   function editorDraftValue() {
     var input = document.querySelector('[data-cell-inline="1"]');
-    return input ? input.value : '';
+    if (input) return input.value;
+    if (state.scheduleEditor.off) return '휴무';
+    return String(state.scheduleEditor.start || '17:00') + '-' + String(state.scheduleEditor.end || '03:00');
   }
 
   function parseCellDraft(raw) {
@@ -1564,9 +1565,7 @@
     var parsed = parseCellDraft(editorDraftValue());
     if (!parsed) { setText('scheduleStatus', '시간 형식'); return false; }
     Object.assign(state.scheduleEditor, parsed, { preset: parsed.action === 'off' ? 'off' : 'custom' });
-    var saved = await submitScheduleInlineEdit();
-    if (saved && (moveCol || moveRow)) { moveScheduleSelection(moveCol, moveRow); openScheduleEditor(state.scheduleSelection.dateKey, state.scheduleSelection.empId); }
-    return saved;
+    return submitScheduleInlineEdit();
   }
 
   function closeScheduleEditor(options) {
@@ -4250,8 +4249,8 @@
         submitRosterAdd();
         return;
       }
-      if (event.target && event.target.matches && event.target.matches('.cell-inline-input')) {
-        if (event.key === 'Enter' || event.key === 'Tab') { event.preventDefault(); commitOpenCellFromInput(event.shiftKey ? -1 : 1, 0); return; }
+      if (event.target && event.target.matches && event.target.matches('[data-schedule-editor-field="start"], [data-schedule-editor-field="end"]')) {
+        if (event.key === 'Enter' || event.key === 'Tab') { event.preventDefault(); commitOpenCellFromInput(0, 0); return; }
         if (event.key === 'Escape') { event.preventDefault(); closeScheduleEditor(); return; }
         return;
       }
