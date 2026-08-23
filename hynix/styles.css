@@ -2933,6 +2933,70 @@ body.site-locked .site-lock-screen {
   }
 }
 
+/* Touch cell editing: keep the two native time controls as the primary
+   inputs and keep every control inside the matrix cell. */
+@media (pointer: coarse), (max-width: 720px) {
+  .matrix-cell.is-open {
+    overflow: hidden;
+  }
+
+  .matrix-cell-button.is-editing {
+    flex-wrap: nowrap;
+    min-width: 0;
+    gap: 3px;
+    padding: 5px 4px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .cell-inline-input {
+    display: none;
+  }
+
+  .cell-time-grid.inline-time-grid {
+    min-width: 0;
+    gap: 3px;
+  }
+
+  .cell-time-grid label {
+    min-width: 0;
+  }
+
+  .cell-time-grid input {
+    box-sizing: border-box;
+    width: 5.6em;
+    min-width: 5.6em;
+    max-width: 5.6em;
+    min-height: 44px;
+    font-size: .82rem;
+  }
+
+  .cell-inline-actions {
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .cell-inline-actions button[data-schedule-editor-quick="clear"],
+  .cell-inline-actions button[data-schedule-editor-action="copy"] {
+    display: none;
+  }
+
+  .cell-inline-actions button[data-schedule-editor-quick="off"] {
+    flex: 0 0 auto;
+    min-height: 30px;
+    padding: 3px 5px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface-strong);
+    font-size: .66rem;
+  }
+
+  .matrix-head,
+  .matrix-cell {
+    min-width: 104px;
+  }
+}
+
 .briefing-context {
   display: grid;
   gap: 8px;
