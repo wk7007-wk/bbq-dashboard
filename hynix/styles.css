@@ -2939,6 +2939,16 @@ body.site-locked .site-lock-screen {
   padding: 10px;
 }
 
+.topbar { align-items: center; padding: 8px 10px; gap: 8px; }
+h1, .brand h1 { font-size: 1.1rem; line-height: 1.2; margin: 0; }
+body:not(.site-locked) .brand .subtitle { display: none; }
+.schedule-sheet-bar { height: auto; min-height: 0; }
+.shell { padding: 8px; }
+@media (max-width: 760px) {
+  .shell { padding: 6px; }
+  .topbar { padding: 6px 8px; }
+}
+
 .topbar {
   align-items: center;
   gap: 10px;
