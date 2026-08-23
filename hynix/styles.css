@@ -2185,6 +2185,68 @@ body.site-locked .site-lock-screen {
   min-height: 18px;
 }
 
+/* Spreadsheet-like inline cell editor */
+.matrix-cell-button.is-editing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 7px;
+  min-height: 40px;
+  padding: 5px 7px;
+}
+.cell-inline-input {
+  flex: 1 1 96px;
+  width: auto;
+  min-width: 72px;
+  min-height: 26px;
+  padding: 1px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: inherit;
+}
+.cell-time-grid.inline-time-grid {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+.cell-time-grid label { display: inline-flex; align-items: center; gap: 5px; }
+.cell-time-grid label + label::before { content: "–"; color: var(--muted); }
+.cell-time-grid input {
+  width: 66px;
+  min-height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: inherit;
+}
+.cell-inline-actions { display: inline-flex; flex: 0 0 auto; gap: 2px; flex-wrap: nowrap; }
+.cell-inline-actions button {
+  border: 0;
+  border-radius: 4px;
+  padding: 2px 4px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: .68rem;
+  font-weight: 600;
+}
+.cell-inline-actions button:hover,
+.cell-inline-actions button:focus-visible { background: var(--surface-strong); color: var(--text); }
+
 .inline-editor-footer {
   display: flex;
   align-items: center;
