@@ -8,7 +8,7 @@
     {"id":"posdelay","label":"PosDelay","apkName":"PosDelay_latest.bin","packages":["com.posdelay.app"],"enabled":true},
     {"id":"poskds","label":"PosKDS","apkName":"PosKDS_latest.bin","packages":["com.poskds.app"],"enabled":true},
     {"id":"banktotal","label":"BankTotal","apkName":"BankTotal_latest.bin","packages":["com.banktotal.app"],"enabled":true},
-    {"id":"deliveryhelper","label":"DeliveryHelper","apkName":"DeliveryHelper_latest.bin","packages":["com.deliveryhelper.app"],"enabled":true},
+    {"id":"deliveryhelper","label":"DeliveryHelper","apkName":"DeliveryHelper_latest.bin","packages":["com.deliveryhelper.app"],"enabled":true,"versionName":"0825.0048","versionCode":29793108,"metadataUrl":"https://218.147.118.71/updates/deliveryhelper/version.json"},
     {"id":"storebot-termux","label":"StoreBotTermux","apkName":"StoreBotTermux_latest.bin","packages":["com.sbotux"],"enabled":true},
     {"id":"chicken-timer","label":"치킨타이머","apkName":"ChickenTimer_latest.bin","packages":["com.chickentimer.board.v2"],"enabled":true}
   ]

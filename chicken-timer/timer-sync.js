@@ -813,38 +813,7 @@
     }
 
     function requestFirebaseClockSample() {
-      if (typeof global.fetch !== "function") return Promise.reject(new Error("fetch unavailable"));
-      const sentAtMonoMs = getMonotonicNow();
-      const sentAtLocalMs = Date.now();
-      const clockUrl = FACTORY_WAN_JSON;
-      return global.fetch(appendCacheBust(clockUrl), {
-        method: "PUT",
-        cache: "no-store",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ".sv": "timestamp" }),
-      }).then((response) => {
-        if (!response || !response.ok) {
-          throw new Error(`http ${response ? response.status : 0}`);
-        }
-        return response.json();
-      }).then((value) => {
-        const receivedAtMonoMs = getMonotonicNow();
-        const receivedAtLocalMs = Date.now();
-        const serverMs = Number(value);
-        if (!Number.isFinite(serverMs) || serverMs <= 0) {
-          throw new Error("invalid firebase server timestamp");
-        }
-        return createClockSample({
-          source: "firebase-timestamp",
-          serverMs,
-          sentAtMonoMs,
-          receivedAtMonoMs,
-          sentAtLocalMs,
-          receivedAtLocalMs,
-        });
-      });
+      return Promise.reject(new Error("factory json clock put forbidden"));
     }
 
     function requestHostingClockSample() {
