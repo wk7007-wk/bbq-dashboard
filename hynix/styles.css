@@ -500,7 +500,6 @@ body.site-locked .site-lock-screen {
   background: var(--sheet-grad);
   box-shadow: 0 1px 0 rgba(15, 118, 110, 0.08);
 }
-.schedule-sheet-bar { display:none !important; height:0; margin:0; padding:0; border:0; overflow:hidden; }
 .cell-inline-input { box-sizing:border-box; width:100%; min-height:36px; border:0; background:var(--surface); color:var(--text); font-weight:900; font-size:0.9rem; padding:8px 6px; outline:none; }
 .matrix-cell-button { min-height:40px; }
 

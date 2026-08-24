@@ -1327,9 +1327,8 @@
   function renderScheduleSheetBar() {
     var bar = $('scheduleSheetBar');
     if (!bar) return;
-    bar.hidden = true;
+    bar.hidden = false;
     bar.innerHTML = '';
-    return;
     var access = scheduleEditorAccessInfo();
     var sel = selectedCellKey();
     var hasSel = Boolean(sel.dateKey && sel.empId);
@@ -4242,7 +4241,11 @@
             scheduleValue = String(hourPart).padStart(2, '0') + ':' + String(minutePart).padStart(2, '0');
           }
           updateScheduleEditorField(scheduleField, scheduleValue);
-          if (!target.getAttribute('data-schedule-editor-part')) renderSchedule();
+          if (target.getAttribute('data-schedule-editor-part')) {
+            submitScheduleInlineEdit();
+          } else {
+            renderSchedule();
+          }
           return;
         }
       }
