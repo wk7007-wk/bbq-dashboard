@@ -1505,7 +1505,7 @@
     const lan = native && Array.isArray(native.fastFactoryJsonUrls)
       ? native.fastFactoryJsonUrls.filter(Boolean)
       : [];
-    return lan.concat([FACTORY_WAN_JSON, GIST_JSON].filter((url) => lan.indexOf(url) < 0));
+    return lan.concat([FACTORY_WAN_JSON].filter((url) => lan.indexOf(url) < 0));
   }
 
   function putFirstJson(urls, value) {

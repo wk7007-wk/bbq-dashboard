@@ -1,7 +1,7 @@
 (function (root) {
   'use strict';
   var URL = 'https://218.147.118.71/workschedule.json';
-  var GIST = '';
+  var GIST = 'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json';
   var AUTH = 'token grok-ops';
   var cache = null;
   var cacheAt = 0;
@@ -53,6 +53,7 @@
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
     var sources = [
       { name: 'factory', url: URL, timeout: 1500 },
+      { name: 'gist', url: GIST, timeout: 2500 },
       { name: 'pages', url: './workschedule.json', timeout: 2500 }
     ];
     var empty = {};
@@ -86,8 +87,10 @@
         body: JSON.stringify(cache)
       });
       if (res.ok) lastSource = 'factory';
-      return res.ok;
+      if (!res.ok) throw new Error('factory save failed');
+      return true;
     } catch (e) {
+      try { localStorage.setItem('factory_schedule_pending', JSON.stringify(cache)); } catch (_) {}
       return false;
     }
   }
