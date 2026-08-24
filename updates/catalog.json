@@ -1,15 +1,103 @@
 {
   "schemaVersion": 1,
   "apps": [
-    {"id":"solnote","label":"SolNote 개인노트 (정식)","apkName":"SolNote_latest.bin","packages":["com.wonmux.solnote.personal","com.wonmux.solnote"],"enabled":true},
-    {"id":"wonmux-browser","label":"Wonmux Browser","apkName":"WonmuxBrowser_latest.bin","packages":["com.wonmux.browser"],"enabled":true},
-    {"id":"update-center","label":"업데이트 센터","apkName":"AppUpdateCenter_latest.bin","packages":["com.appupdatecenter.app"],"enabled":true},
-    {"id":"wonmux","label":"Wonmux","apkName":"Wonmux_latest.bin","packages":["com.wonmux"],"enabled":true},
-    {"id":"posdelay","label":"PosDelay","apkName":"PosDelay_latest.bin","packages":["com.posdelay.app"],"enabled":true},
-    {"id":"poskds","label":"PosKDS","apkName":"PosKDS_latest.bin","packages":["com.poskds.app"],"enabled":true},
-    {"id":"banktotal","label":"BankTotal","apkName":"BankTotal_latest.bin","packages":["com.banktotal.app"],"enabled":true},
-    {"id":"deliveryhelper","label":"DeliveryHelper","apkName":"DeliveryHelper_latest.bin","packages":["com.deliveryhelper.app"],"enabled":true,"versionName":"0825.0048","versionCode":29793108,"metadataUrl":"https://218.147.118.71/updates/deliveryhelper/version.json"},
-    {"id":"storebot-termux","label":"StoreBotTermux","apkName":"StoreBotTermux_latest.bin","packages":["com.sbotux"],"enabled":true},
-    {"id":"chicken-timer","label":"치킨타이머","apkName":"ChickenTimer_latest.bin","packages":["com.chickentimer.board.v2"],"enabled":true}
-  ]
+    {
+      "id": "solnote",
+      "label": "SolNote 개인노트 (정식)",
+      "apkName": "SolNote_latest.bin",
+      "packages": [
+        "com.wonmux.solnote.personal",
+        "com.wonmux.solnote"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "wonmux-browser",
+      "label": "Wonmux Browser",
+      "apkName": "WonmuxBrowser_latest.bin",
+      "packages": [
+        "com.wonmux.browser"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "update-center",
+      "label": "업데이트 센터",
+      "apkName": "AppUpdateCenter_latest.bin",
+      "packages": [
+        "com.appupdatecenter.app"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "wonmux",
+      "label": "Wonmux",
+      "apkName": "Wonmux_latest.bin",
+      "packages": [
+        "com.wonmux"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "posdelay",
+      "label": "PosDelay",
+      "apkName": "PosDelay_latest.bin",
+      "packages": [
+        "com.posdelay.app"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "poskds",
+      "label": "PosKDS",
+      "apkName": "PosKDS_latest.bin",
+      "packages": [
+        "com.poskds.app"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "banktotal",
+      "label": "BankTotal",
+      "apkName": "BankTotal_latest.bin",
+      "packages": [
+        "com.banktotal.app"
+      ],
+      "enabled": true
+    },
+    {
+      "id": "deliveryhelper",
+      "label": "DeliveryHelper",
+      "apkName": "DeliveryHelper_latest.bin",
+      "packages": [
+        "com.deliveryhelper.app"
+      ],
+      "enabled": true,
+      "versionName": "0825.0048",
+      "versionCode": 29793108,
+      "metadataUrl": "https://218.147.118.71/updates/deliveryhelper/version.json"
+    },
+    {
+      "id": "storebot-termux",
+      "label": "StoreBotTermux",
+      "apkName": "StoreBotTermux_latest.bin",
+      "packages": [
+        "com.sbotux"
+      ],
+      "enabled": true,
+      "versionName": "0.118.7-storebot-kst0825.t0810",
+      "versionCode": 1085,
+      "metadataUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/storebot-termux/version.json"
+    },
+    {
+      "id": "chicken-timer",
+      "label": "치킨타이머",
+      "apkName": "ChickenTimer_latest.bin",
+      "packages": [
+        "com.chickentimer.board.v2"
+      ],
+      "enabled": true
+    }
+  ],
+  "updatedAt": "2026-08-25T08:39:41+09:00"
 }

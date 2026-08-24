@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 1085,
+      "appVersionName": "0.118.7-storebot-kst0825.t0810",
+      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/StoreBotTermux_latest.bin?v=1085",
+      "sha256": "1a7740add36badc671f7f2e096f4d9635f1f0c40de8e9fcafc73cc1b64d1298d",
+      "sizeBytes": 38757968,
+      "packageName": "com.sbotux",
+      "updatedAt": "2026-08-25T08:39:41+09:00"
+    },
+    {
       "appVersionCode": 1074,
       "appVersionName": "0.118.3-storebot-kst0727.t0832",
       "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/StoreBotTermux_latest.bin?v=1074",
