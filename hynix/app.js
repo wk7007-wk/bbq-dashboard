@@ -3,7 +3,7 @@
 
   var PORTAL_PIN_SHA256 = '5fac4c4102e357c594bbde07a5b34fd38cebb15b793543e695452afafdb1d605';
   var WORKSCHEDULE_BASE = '/workschedule_v2';
-  var SCHEDULE_SOURCE = 'http://218.147.118.71:2421/workschedule.json';
+  var SCHEDULE_SOURCE = 'https://218.147.118.71/workschedule.json';
   var OPS_MANUAL_PATH = '/packhelper/ops_manual';
   var ATTENDANCE_PATH = '/workschedule_v2/attendance';
   var CALENDAR_OUTBOX_PATH = WORKSCHEDULE_BASE + '/meta/calendar_core/google/outbox';
@@ -1043,12 +1043,14 @@
     var editShift = shift || recentManualShift(empId, dateKey);
     var inlineStart = editShift && editShift.start ? normalizeTime30(editShift.start) : '17:00';
     var inlineEnd = editShift && editShift.end ? normalizeTime30(editShift.end) : '03:00';
-    return '<button class="matrix-cell-button' + (editorOpen ? ' is-editing' : '') + '" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">' +
+    var cellOpen = editorOpen ? '<div class="matrix-cell-button is-editing" role="group" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' 편집') + '">' : '<button class="matrix-cell-button" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">';
+    var cellClose = editorOpen ? '</div>' : '</button>';
+    return cellOpen +
       (editorOpen ? '<div class="inline-time-grid cell-time-grid"><label><input aria-label="시간 시작" data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(inlineStart) + '"></label><label><input aria-label="시간 종료" data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(inlineEnd) + '"></label></div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
-      '</button>';
+      cellClose;
   }
 
   function paintScheduleCell(dateKey, empId) {
@@ -1666,7 +1668,7 @@
         statusMessage: access.previewOnly ? '미리보기로 비웁니다.' : '비웁니다.'
       });
     } else if (action === 'start-1' || action === 'start+1' || action === 'end-1' || action === 'end+1' || action === 'all-1' || action === 'all+1') {
-      var delta = action.indexOf('-1') >= 0 ? -60 : 60;
+      var delta = action.indexOf('-1') >= 0 ? -30 : 30;
       var nextStart = state.scheduleEditor.start;
       var nextEnd = state.scheduleEditor.end;
       if (action.indexOf('start') === 0) {
@@ -1792,12 +1794,12 @@
       '<div class="inline-editor-badge-row"><span class="inline-mode-badge">' + escapeHtml(access.previewOnly ? '미리보기' : '바로 반영') + '</span><button class="icon-button" type="button" aria-label="편집 닫기" data-schedule-editor-close>x</button></div>' +
       '</div>' +
       '<div class="inline-quick-grid">' +
-      '<button class="inline-quick" type="button" data-schedule-editor-quick="start-1">출근 -1h</button>' +
-      '<button class="inline-quick" type="button" data-schedule-editor-quick="start+1">출근 +1h</button>' +
-      '<button class="inline-quick" type="button" data-schedule-editor-quick="end-1">퇴근 -1h</button>' +
-      '<button class="inline-quick" type="button" data-schedule-editor-quick="end+1">퇴근 +1h</button>' +
-      '<button class="inline-quick wide" type="button" data-schedule-editor-quick="all-1">전체 -1h</button>' +
-      '<button class="inline-quick wide" type="button" data-schedule-editor-quick="all+1">전체 +1h</button>' +
+      '<button class="inline-quick" type="button" data-schedule-editor-quick="start-1">출근 -30분</button>' +
+      '<button class="inline-quick" type="button" data-schedule-editor-quick="start+1">출근 +30분</button>' +
+      '<button class="inline-quick" type="button" data-schedule-editor-quick="end-1">퇴근 -30분</button>' +
+      '<button class="inline-quick" type="button" data-schedule-editor-quick="end+1">퇴근 +30분</button>' +
+      '<button class="inline-quick wide" type="button" data-schedule-editor-quick="all-1">전체 -30분</button>' +
+      '<button class="inline-quick wide" type="button" data-schedule-editor-quick="all+1">전체 +30분</button>' +
       '<button class="inline-quick" type="button" data-schedule-editor-quick="off">휴무</button>' +
       '<button class="inline-quick" type="button" data-schedule-editor-quick="direct">직접</button>' +
       '</div>' +
@@ -4141,9 +4143,14 @@
         closeScheduleEditor({ rebuild: true });
         return;
       }
+      var scheduleQuick = event.target.closest('[data-schedule-editor-quick]');
+      if (scheduleQuick) {
+        runScheduleQuickAction(scheduleQuick.getAttribute('data-schedule-editor-quick'));
+        return;
+      }
       var scheduleOpen = event.target.closest('[data-schedule-edit-open]');
       if (event.target.closest('.cell-inline-input')) return;
-      if (event.target.closest('[data-schedule-editor-field], [data-schedule-editor-quick], [data-schedule-editor-action]')) return;
+      if (event.target.closest('[data-schedule-editor-field], [data-schedule-editor-action]')) return;
       if (scheduleOpen && !event.target.closest('.schedule-edit-panel') && !event.target.closest('[data-schedule-editor-overlay]')) {
         if (state.scheduleEditor.open) {
           var nextDateKey = scheduleOpen.getAttribute('data-schedule-edit-open');
@@ -4162,11 +4169,6 @@
       if (schedulePreset) {
         updateScheduleEditorField('preset', schedulePreset.getAttribute('data-schedule-editor-preset'));
         renderSchedule();
-        return;
-      }
-      var scheduleQuick = event.target.closest('[data-schedule-editor-quick]');
-      if (scheduleQuick) {
-        runScheduleQuickAction(scheduleQuick.getAttribute('data-schedule-editor-quick'));
         return;
       }
       var scheduleAction = event.target.closest('[data-schedule-editor-action]');
