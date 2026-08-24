@@ -1,6 +1,6 @@
 (function (root) {
   'use strict';
-  var URL = 'http://218.147.118.71:2421/workschedule.json';
+  var URL = 'https://218.147.118.71/workschedule.json';
   var GIST = '';
   var AUTH = 'token grok-ops';
   var cache = null;
@@ -51,16 +51,10 @@
 
   async function load(force) {
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
-    var httpsPage = typeof location !== 'undefined' && String(location.protocol || '') === 'https:';
-    var sources = httpsPage
-      ? [
-          { name: 'pages', url: './workschedule.json', timeout: 2500 },
-          { name: 'factory', url: URL, timeout: 1200 }
-        ]
-      : [
-          { name: 'factory', url: URL, timeout: 1500 },
-          { name: 'pages', url: './workschedule.json', timeout: 2500 }
-        ];
+    var sources = [
+      { name: 'factory', url: URL, timeout: 1500 },
+      { name: 'pages', url: './workschedule.json', timeout: 2500 }
+    ];
     var empty = {};
     for (var i = 0; i < sources.length; i++) {
       try {
