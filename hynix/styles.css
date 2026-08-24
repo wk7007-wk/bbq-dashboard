@@ -2219,19 +2219,21 @@ body.site-locked .site-lock-screen {
   align-items: center;
   gap: 5px;
 }
-.cell-time-grid label { display: inline-flex; align-items: center; gap: 5px; }
+.cell-time-grid label { display: inline-flex; align-items: center; gap: 2px; }
 .cell-time-grid label + label::before { content: "–"; color: var(--muted); }
-.cell-time-grid input {
-  width: 66px;
+.cell-time-grid select {
+  width: 2.7em;
+  min-width: 2.5em;
   min-height: 26px;
-  padding: 0;
+  padding: 0 1px;
   border: 0;
+  border-bottom: 1px solid var(--line-strong);
   border-radius: 0;
   background: transparent;
+  color: var(--text);
+  font: inherit;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
-  appearance: none;
-  -webkit-appearance: none;
   color-scheme: inherit;
 }
 .cell-inline-actions { display: inline-flex; flex: 0 0 auto; gap: 2px; flex-wrap: nowrap; }
@@ -3040,11 +3042,11 @@ h1 {
   }
 }
 
-/* Touch cell editing: keep the two native time controls as the primary
-   inputs and keep every control inside the matrix cell. */
+/* Touch cell editing: hour + 00/30 minute selects stay inside the cell. */
 @media (pointer: coarse), (max-width: 720px) {
   .matrix-cell.is-open {
-    overflow: hidden;
+    overflow: visible;
+    min-width: 168px;
   }
 
   .matrix-cell-button.is-editing {
@@ -3053,7 +3055,6 @@ h1 {
     gap: 3px;
     padding: 5px 4px;
     white-space: nowrap;
-    overflow: hidden;
   }
 
   .cell-inline-input {
@@ -3069,11 +3070,11 @@ h1 {
     min-width: 0;
   }
 
-  .cell-time-grid input {
+  .cell-time-grid select {
     box-sizing: border-box;
-    width: 5.6em;
-    min-width: 5.6em;
-    max-width: 5.6em;
+    width: 2.8em;
+    min-width: 2.6em;
+    max-width: 3.1em;
     min-height: 44px;
     font-size: .82rem;
   }

@@ -1043,10 +1043,23 @@
     var editShift = shift || recentManualShift(empId, dateKey);
     var inlineStart = editShift && editShift.start ? normalizeTime30(editShift.start) : '17:00';
     var inlineEnd = editShift && editShift.end ? normalizeTime30(editShift.end) : '03:00';
+    function timeSelect(field, value, label) {
+      var parts = String(value || '00:00').split(':');
+      var hourOptions = '';
+      var minuteOptions = '';
+      for (var hour = 0; hour < 24; hour += 1) {
+        var hourValue = String(hour).padStart(2, '0');
+        hourOptions += '<option value="' + hourValue + '"' + (parts[0] === hourValue ? ' selected' : '') + '>' + hourValue + '</option>';
+      }
+      ['00', '30'].forEach(function (minuteValue) {
+        minuteOptions += '<option value="' + minuteValue + '"' + (parts[1] === minuteValue ? ' selected' : '') + '>' + minuteValue + '</option>';
+      });
+      return '<label>' + '<span class="sr-only">' + label + ' 시</span><select aria-label="' + label + ' 시" data-schedule-editor-field="' + field + '" data-schedule-editor-part="hour">' + hourOptions + '</select>' + '<span aria-hidden="true">:</span><span class="sr-only">' + label + ' 분</span><select aria-label="' + label + ' 분" data-schedule-editor-field="' + field + '" data-schedule-editor-part="minute">' + minuteOptions + '</select></label>';
+    }
     var cellOpen = editorOpen ? '<div class="matrix-cell-button is-editing" role="group" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' 편집') + '">' : '<button class="matrix-cell-button" type="button" aria-label="' + escapeHtml(emp.shortName + ' ' + dateKey + ' ' + (shiftLabel || '빈칸')) + '" aria-selected="' + (selected ? 'true' : 'false') + '">';
     var cellClose = editorOpen ? '</div>' : '</button>';
     return cellOpen +
-      (editorOpen ? '<div class="inline-time-grid cell-time-grid"><label><input aria-label="시간 시작" data-schedule-editor-field="start" type="time" step="1800" value="' + escapeHtml(inlineStart) + '"></label><label><input aria-label="시간 종료" data-schedule-editor-field="end" type="time" step="1800" value="' + escapeHtml(inlineEnd) + '"></label></div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
+      (editorOpen ? '<div class="inline-time-grid cell-time-grid">' + timeSelect('start', inlineStart, '시간 시작') + timeSelect('end', inlineEnd, '시간 종료') + '</div><span class="cell-inline-actions"><button type="button" data-schedule-editor-quick="off">휴무</button></span>' : (shiftLabel ? '<span class="matrix-time">' + escapeHtml(shiftLabel) + '</span>' : '<span class="matrix-time is-empty"></span>')) +
       (roleLabelText ? '<span class="matrix-role">' + escapeHtml(roleLabelText) + '</span>' : '') +
       (chip ? '<span class="matrix-chip-row">' + chip + '</span>' : '') +
       marks +
@@ -4220,8 +4233,16 @@
       if (target && $('scheduleGrid') && $('scheduleGrid').contains(target)) {
         var scheduleField = target.getAttribute('data-schedule-editor-field');
         if (scheduleField) {
-          updateScheduleEditorField(scheduleField, target.type === 'checkbox' ? target.checked : target.value);
-          if (target.type !== 'time') renderSchedule();
+          var scheduleValue = target.type === 'checkbox' ? target.checked : target.value;
+          if (target.getAttribute('data-schedule-editor-part')) {
+            var part = target.getAttribute('data-schedule-editor-part');
+            var current = String(state.scheduleEditor[scheduleField] || '00:00').split(':');
+            var hourPart = part === 'hour' ? scheduleValue : (current[0] || '00');
+            var minutePart = part === 'minute' ? scheduleValue : (current[1] || '00');
+            scheduleValue = String(hourPart).padStart(2, '0') + ':' + String(minutePart).padStart(2, '0');
+          }
+          updateScheduleEditorField(scheduleField, scheduleValue);
+          if (!target.getAttribute('data-schedule-editor-part')) renderSchedule();
           return;
         }
       }
