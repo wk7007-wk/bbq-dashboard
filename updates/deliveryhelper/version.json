@@ -1,13 +1,13 @@
 {
-  "appVersionCode": 29794313,
-  "appVersionName": "0825.2053",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29794313",
-  "sha256": "b64795884c09d452d54402f73848a4e5f298fc6bab2805bbed5cb75c0b1bfd0f",
+  "appVersionCode": 29794340,
+  "appVersionName": "0825.2120",
+  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/DeliveryHelper_latest.bin?v=29794340",
+  "sha256": "d342353ec5770c1400c532c113a9629975544ebbaaa9a52f1311418b8846ed87",
   "sizeBytes": 32908517,
   "packageName": "com.deliveryhelper.app",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "공장 폴링 전표수신. 파이어 SSE 402 제거",
-  "updatedAt": "2026-08-25T21:10:28+09:00",
+  "releaseNotes": "네이버 지도 키 포함. 지도 로드 검증",
+  "updatedAt": "2026-08-25T21:24:58+09:00",
   "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/history.json"
 }
