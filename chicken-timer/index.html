@@ -1,8 +1,33 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-web-v="0826-fresh">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <script>
+(function(){
+  var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";
+  if (!v) {
+    var m = document.querySelector('meta[name="web-v"]');
+    v = m ? m.getAttribute("content") : "";
+  }
+  if (!v) return;
+  try {
+    var u = new URL(location.href);
+    if (u.searchParams.get("v") !== v) {
+      u.searchParams.set("v", v);
+      location.replace(u.toString());
+      return;
+    }
+  } catch (e) {}
+  window.addEventListener("pageshow", function (ev) { if (ev.persisted) location.reload(); });
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); });
+  }
+})();
+  </script>
   <title>Chicken Timer</title>
   <link rel="stylesheet" href="./style.css?v=aca18d342df0">
   <link rel="stylesheet" href="./auth.css?v=2b74d591629c">
@@ -18,7 +43,7 @@
   <script src="./timer-core.js?v=934992dc8aa5"></script>
   <script src="./timer-bridge.js?v=2e312ed9c073"></script>
   <script src="./timer-split-assist.js?v=0731299f4936"></script>
-  <script src="./timer-sync.js?v=74aecc7b8ecc"></script>
+  <script src="./timer-sync.js?v=20260824-origin1"></script>
   <script src="./timer-auth.js?v=63236fff3407"></script>
   <script src="./app.js?v=319dd90116dc"></script>
   <script src="./physical-evidence.js?v=b053bac7aff0"></script>

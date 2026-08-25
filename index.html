@@ -1,6 +1,31 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-web-v="0826-fresh">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <script>
+(function(){
+  var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";
+  if (!v) {
+    var m = document.querySelector('meta[name="web-v"]');
+    v = m ? m.getAttribute("content") : "";
+  }
+  if (!v) return;
+  try {
+    var u = new URL(location.href);
+    if (u.searchParams.get("v") !== v) {
+      u.searchParams.set("v", v);
+      location.replace(u.toString());
+      return;
+    }
+  } catch (e) {}
+  window.addEventListener("pageshow", function (ev) { if (ev.persisted) location.reload(); });
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); });
+  }
+})();
+  </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#16213e">
