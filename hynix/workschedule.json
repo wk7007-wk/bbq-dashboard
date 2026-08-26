@@ -55,6 +55,14 @@
       "sort_order": 6,
       "input_mode": "manual",
       "source": "hynix_initial"
+    },
+    "사아야": {
+      "name": "사아야",
+      "short_name": "사아야",
+      "active": true,
+      "role": "",
+      "source": "hynix_portal",
+      "updated_at_ms": 1787567261535
     }
   },
   "fixed_schedules": {
@@ -107,8 +115,1262 @@
       "note": "매일 17-04 규와같음"
     }
   },
-  "overrides": {},
-  "status": {},
+  "overrides": {
+    "2026-08-24": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "emp_hio": {
+        "employee_id": "emp_hio",
+        "employee": "히오",
+        "action": "upsert_shift",
+        "role": "히오",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal_inline",
+        "updated_at_ms": 1787567128161,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "04:00",
+          "role": "히오"
+        },
+        "start": "17:00",
+        "end": "04:00",
+        "time_range": "17:00-04:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-08-25": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "연옥",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal_inline",
+        "updated_at_ms": 1787662631185,
+        "state": "shift",
+        "shift": {
+          "start": "07:00",
+          "end": "22:00",
+          "role": "연옥"
+        },
+        "start": "07:00",
+        "end": "22:00",
+        "time_range": "07:00-22:00"
+      },
+      "emp_li": {
+        "employee_id": "emp_li",
+        "employee": "리",
+        "action": "off",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567010983,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      },
+      "emp_hio": {
+        "employee_id": "emp_hio",
+        "employee": "히오",
+        "action": "upsert_shift",
+        "role": "히오",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal_inline",
+        "updated_at_ms": 1787566968436,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "04:00",
+          "role": "히오"
+        },
+        "start": "17:00",
+        "end": "04:00",
+        "time_range": "17:00-04:00"
+      },
+      "emp_yongbyung": {
+        "employee_id": "emp_yongbyung",
+        "employee": "용병",
+        "action": "off",
+        "role": "용병",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal_inline",
+        "updated_at_ms": 1787570635437,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-08-31": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "연옥",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal_inline",
+        "updated_at_ms": 1787662633007,
+        "state": "shift",
+        "shift": {
+          "start": "07:00",
+          "end": "22:00",
+          "role": "연옥"
+        },
+        "start": "07:00",
+        "end": "22:00",
+        "time_range": "07:00-22:00"
+      },
+      "emp_li": {
+        "employee_id": "emp_li",
+        "employee": "리",
+        "action": "off",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567072393,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-01": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "off",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567089147,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "off",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567375079,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      }
+    },
+    "2026-09-07": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-08": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-14": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-15": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-21": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-22": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-28": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-29": {
+      "emp_yeonok": {
+        "employee_id": "emp_yeonok",
+        "employee": "연옥",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787566917011,
+        "state": "shift",
+        "shift": {
+          "start": "17:00",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:00",
+        "end": "22:00",
+        "time_range": "17:00-22:00"
+      },
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-08-26": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      },
+      "emp_li": {
+        "employee_id": "emp_li",
+        "employee": "리",
+        "action": "off",
+        "role": "리",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal_inline",
+        "updated_at_ms": 1787662037136,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      }
+    },
+    "2026-08-27": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-08-28": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-02": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      },
+      "emp_hio": {
+        "employee_id": "emp_hio",
+        "employee": "히오",
+        "action": "off",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567518977,
+        "state": "off",
+        "off": true,
+        "dayoff": true,
+        "work": false
+      }
+    },
+    "2026-09-03": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308048,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-04": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-09": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-10": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-11": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-16": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-17": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-18": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-23": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-24": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-25": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    },
+    "2026-09-30": {
+      "사아야": {
+        "employee_id": "사아야",
+        "employee": "사아야",
+        "action": "upsert_shift",
+        "role": "주방",
+        "apply_policy": "overwrite",
+        "source": "hynix_portal",
+        "updated_at_ms": 1787567308049,
+        "state": "shift",
+        "shift": {
+          "start": "17:30",
+          "end": "22:00",
+          "role": "주방"
+        },
+        "start": "17:30",
+        "end": "22:00",
+        "time_range": "17:30-22:00"
+      }
+    }
+  },
+  "status": {
+    "2026-08-24": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "emp_hio": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567128161,
+        "source": "hynix_portal_inline"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-08-25": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787662631185,
+        "source": "hynix_portal_inline"
+      },
+      "emp_li": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787567010983,
+        "source": "hynix_portal"
+      },
+      "emp_hio": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566968436,
+        "source": "hynix_portal_inline"
+      },
+      "emp_yongbyung": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787570635437,
+        "source": "hynix_portal_inline"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-08-31": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787662633007,
+        "source": "hynix_portal_inline"
+      },
+      "emp_li": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787567072393,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-01": {
+      "emp_yeonok": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787567089147,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787567375079,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-07": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-08": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-14": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-15": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-21": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-22": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-28": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-29": {
+      "emp_yeonok": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787566917011,
+        "source": "hynix_portal"
+      },
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-08-26": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      },
+      "emp_li": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787662037136,
+        "source": "hynix_portal_inline"
+      }
+    },
+    "2026-08-27": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-08-28": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-02": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      },
+      "emp_hio": {
+        "status": "off",
+        "state": "off",
+        "confirmed": true,
+        "updated_at_ms": 1787567518977,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-03": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308048,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-04": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-09": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-10": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-11": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-16": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-17": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-18": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-23": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-24": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-25": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    },
+    "2026-09-30": {
+      "사아야": {
+        "status": "confirmed",
+        "state": "confirmed",
+        "confirmed": true,
+        "updated_at_ms": 1787567308049,
+        "source": "hynix_portal"
+      }
+    }
+  },
   "aliases": {
     "리": "emp_li",
     "규": "emp_gyu",
@@ -124,6 +1386,312 @@
     "write_ready": true,
     "source": "hynix_initial_2026-08-23",
     "updated_at": "2026-08-23T21:44:03+09:00",
-    "note": "최초입력. 리 08-20 매일, 규/히오 17-04 매일, 연옥/재훈/원희/용병 수동"
+    "note": "최초입력. 리 08-20 매일, 규/히오 17-04 매일, 연옥/재훈/원희/용병 수동",
+    "calendar_core": {
+      "google": {
+        "outbox": {
+          "daily_2026-08-25_emp_yeonok_shift_1787566932339": {
+            "id": "daily_2026-08-25_emp_yeonok_shift_1787566932339",
+            "idempotency_key": "daily_2026-08-25_emp_yeonok_shift_1787566932339",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_yeonok",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_yeonok",
+            "action": "shift",
+            "canonical_revision": "1787566932339",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_yeonok",
+            "created_at_ms": 1787566932510,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787566932510
+          },
+          "daily_2026-08-25_emp_li_shift_1787566967283": {
+            "id": "daily_2026-08-25_emp_li_shift_1787566967283",
+            "idempotency_key": "daily_2026-08-25_emp_li_shift_1787566967283",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_li",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_li",
+            "action": "shift",
+            "canonical_revision": "1787566967283",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_li",
+            "created_at_ms": 1787566967448,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787566967448
+          },
+          "daily_2026-08-25_emp_li_shift_1787566967959": {
+            "id": "daily_2026-08-25_emp_li_shift_1787566967959",
+            "idempotency_key": "daily_2026-08-25_emp_li_shift_1787566967959",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_li",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_li",
+            "action": "shift",
+            "canonical_revision": "1787566967959",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_li",
+            "created_at_ms": 1787566968125,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787566968125
+          },
+          "daily_2026-08-25_emp_hio_shift_1787566968436": {
+            "id": "daily_2026-08-25_emp_hio_shift_1787566968436",
+            "idempotency_key": "daily_2026-08-25_emp_hio_shift_1787566968436",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_hio",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_hio",
+            "action": "shift",
+            "canonical_revision": "1787566968436",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_hio",
+            "created_at_ms": 1787566968578,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787566968578
+          },
+          "daily_2026-08-25_emp_yongbyung_shift_1787566970002": {
+            "id": "daily_2026-08-25_emp_yongbyung_shift_1787566970002",
+            "idempotency_key": "daily_2026-08-25_emp_yongbyung_shift_1787566970002",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_yongbyung",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_yongbyung",
+            "action": "shift",
+            "canonical_revision": "1787566970002",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_yongbyung",
+            "created_at_ms": 1787566970171,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787566970171
+          },
+          "daily_2026-08-25_emp_li_shift_1787566995255": {
+            "id": "daily_2026-08-25_emp_li_shift_1787566995255",
+            "idempotency_key": "daily_2026-08-25_emp_li_shift_1787566995255",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_li",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_li",
+            "action": "shift",
+            "canonical_revision": "1787566995255",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_li",
+            "created_at_ms": 1787566995450,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787566995450
+          },
+          "daily_2026-08-25_emp_li_shift_1787566999960": {
+            "id": "daily_2026-08-25_emp_li_shift_1787566999960",
+            "idempotency_key": "daily_2026-08-25_emp_li_shift_1787566999960",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_li",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_li",
+            "action": "shift",
+            "canonical_revision": "1787566999960",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_li",
+            "created_at_ms": 1787567000140,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787567000140
+          },
+          "daily_2026-08-24_emp_hio_shift_1787567128161": {
+            "id": "daily_2026-08-24_emp_hio_shift_1787567128161",
+            "idempotency_key": "daily_2026-08-24_emp_hio_shift_1787567128161",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-24|emp_hio",
+            "entity": "daily_override",
+            "date": "2026-08-24",
+            "employee_id": "emp_hio",
+            "action": "shift",
+            "canonical_revision": "1787567128161",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-24/emp_hio",
+            "created_at_ms": 1787567128326,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787567128326
+          },
+          "daily_2026-08-24_사아야_shift_1787567275428": {
+            "id": "daily_2026-08-24_사아야_shift_1787567275428",
+            "idempotency_key": "daily_2026-08-24_사아야_shift_1787567275428",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-24|사아야",
+            "entity": "daily_override",
+            "date": "2026-08-24",
+            "employee_id": "사아야",
+            "action": "shift",
+            "canonical_revision": "1787567275428",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-24/사아야",
+            "created_at_ms": 1787567275579,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787567275579
+          },
+          "daily_2026-08-25_emp_yongbyung_shift_1787567352418": {
+            "id": "daily_2026-08-25_emp_yongbyung_shift_1787567352418",
+            "idempotency_key": "daily_2026-08-25_emp_yongbyung_shift_1787567352418",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_yongbyung",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_yongbyung",
+            "action": "shift",
+            "canonical_revision": "1787567352418",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_yongbyung",
+            "created_at_ms": 1787567352506,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787567352506
+          },
+          "daily_2026-08-25_emp_yongbyung_shift_1787567804052": {
+            "id": "daily_2026-08-25_emp_yongbyung_shift_1787567804052",
+            "idempotency_key": "daily_2026-08-25_emp_yongbyung_shift_1787567804052",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_yongbyung",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_yongbyung",
+            "action": "shift",
+            "canonical_revision": "1787567804052",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_yongbyung",
+            "created_at_ms": 1787567804276,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787567804276
+          },
+          "daily_2026-08-25_emp_yongbyung_off_1787570635437": {
+            "id": "daily_2026-08-25_emp_yongbyung_off_1787570635437",
+            "idempotency_key": "daily_2026-08-25_emp_yongbyung_off_1787570635437",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_yongbyung",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_yongbyung",
+            "action": "off",
+            "canonical_revision": "1787570635437",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_yongbyung",
+            "created_at_ms": 1787570635689,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787570635689
+          },
+          "daily_2026-08-26_emp_li_off_1787662037136": {
+            "id": "daily_2026-08-26_emp_li_off_1787662037136",
+            "idempotency_key": "daily_2026-08-26_emp_li_off_1787662037136",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-26|emp_li",
+            "entity": "daily_override",
+            "date": "2026-08-26",
+            "employee_id": "emp_li",
+            "action": "off",
+            "canonical_revision": "1787662037136",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-26/emp_li",
+            "created_at_ms": 1787662037325,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787662037325
+          },
+          "daily_2026-08-25_emp_yeonok_shift_1787662631185": {
+            "id": "daily_2026-08-25_emp_yeonok_shift_1787662631185",
+            "idempotency_key": "daily_2026-08-25_emp_yeonok_shift_1787662631185",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-25|emp_yeonok",
+            "entity": "daily_override",
+            "date": "2026-08-25",
+            "employee_id": "emp_yeonok",
+            "action": "shift",
+            "canonical_revision": "1787662631185",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-25/emp_yeonok",
+            "created_at_ms": 1787662631313,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787662631313
+          },
+          "daily_2026-08-31_emp_yeonok_shift_1787662633007": {
+            "id": "daily_2026-08-31_emp_yeonok_shift_1787662633007",
+            "idempotency_key": "daily_2026-08-31_emp_yeonok_shift_1787662633007",
+            "schema_version": "workschedule.calendar_core.outbox.v1",
+            "source": "hynix_portal",
+            "sync_profile": "shared_schedule_intersection_v1",
+            "canonical_root": "/workschedule_v2",
+            "metadata_root": "/workschedule_v2/meta/calendar_core/google",
+            "canonical_key": "daily|2026-08-31|emp_yeonok",
+            "entity": "daily_override",
+            "date": "2026-08-31",
+            "employee_id": "emp_yeonok",
+            "action": "shift",
+            "canonical_revision": "1787662633007",
+            "canonical_path": "/workschedule_v2/overrides/2026-08-31/emp_yeonok",
+            "created_at_ms": 1787662633127,
+            "status": "pending",
+            "attempt_count": 0,
+            "next_attempt_at_ms": 1787662633127
+          }
+        }
+      }
+    }
   }
 }

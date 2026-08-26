@@ -52,7 +52,7 @@
   async function load(force) {
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
     var sources = [
-      { name: 'factory', url: URL, timeout: 1500 },
+      { name: 'factory', url: URL, timeout: 4000 },
       { name: 'gist', url: GIST, timeout: 2500 },
       { name: 'pages', url: './workschedule.json', timeout: 2500 }
     ];
@@ -87,10 +87,8 @@
         body: JSON.stringify(cache)
       });
       if (res.ok) lastSource = 'factory';
-      if (!res.ok) throw new Error('factory save failed');
-      return true;
+      return res.ok;
     } catch (e) {
-      try { localStorage.setItem('factory_schedule_pending', JSON.stringify(cache)); } catch (_) {}
       return false;
     }
   }
