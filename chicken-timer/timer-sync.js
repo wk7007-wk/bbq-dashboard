@@ -1591,8 +1591,31 @@
     return raceFirst(urls, fetchJson);
   }
 
+  function putAllJson(urls, value) {
+    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
+    if (!list.length) return Promise.reject(new Error("no urls"));
+    if (list.length === 1) return putJson(list[0], value);
+    return new Promise((resolve, reject) => {
+      let pending = list.length;
+      let resolved = false;
+      let lastErr = null;
+      list.forEach((url) => {
+        putJson(url, value).then((res) => {
+          if (!resolved) {
+            resolved = true;
+            resolve(res);
+          }
+        }).catch((err) => {
+          lastErr = err;
+          pending -= 1;
+          if (!resolved && pending <= 0) reject(lastErr || new Error("all failed"));
+        });
+      });
+    });
+  }
+
   function putFirstJson(urls, value) {
-    return raceFirst(urls, (url) => putJson(url, value));
+    return putAllJson(urls, value);
   }
 
   function putJson(url, value) {
