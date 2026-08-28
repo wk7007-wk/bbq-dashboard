@@ -929,12 +929,12 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 <script>
 const TRACK={
   kds:[
-    'http://218.147.118.71:2421/kds_status.json',
+    'https://218.147.118.71/kds_status.json',
     'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/kds_status.json',
     'https://rentry.co/bbqkdsstatus/raw'
   ],
   bus:[
-    'http://218.147.118.71:2421/posdelay_bus.json',
+    'https://218.147.118.71/posdelay_bus.json',
     'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay_bus.json',
     'https://rentry.co/bbqposdelaybus/raw'
   ]
@@ -2787,16 +2787,27 @@ function togGate() {
 
 function togStop() {
   if(!requireAppControl())return false;
+  if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
+    toast('앱 전용','warn');
+    return false;
+  }
   var prev = policySettings.enabled;
   policySettings.enabled = !policySettings.enabled;
   syncPolicySummary();
-  if(!savePolicySettings(true)){
+  try {
+    var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify({enabled: !!policySettings.enabled}));
+    if(!ok){
+      policySettings.enabled = prev;
+      syncPolicySummary();
+      toast('저장 실패','warn');
+      return;
+    }
+    toast(policySettings.enabled?'자동중지 ON':'자동중지 OFF','ok');
+  } catch(e) {
     policySettings.enabled = prev;
     syncPolicySummary();
     toast('저장 실패','warn');
-    return;
   }
-  toast(policySettings.enabled?'자동중지 ON':'자동중지 OFF','ok');
 }
 
 function togAutoAccept() {
