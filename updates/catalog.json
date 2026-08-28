@@ -45,7 +45,10 @@
       "packages": [
         "com.posdelay.app"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0829.0240",
+      "versionCode": 29802350,
+      "metadataUrl": "https://218.147.118.71/updates/posdelay/version.json"
     },
     {
       "id": "poskds",
