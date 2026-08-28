@@ -2,6 +2,18 @@
   "schemaVersion": 1,
   "apps": [
     {
+      "id": "posdelay",
+      "label": "PosDelay",
+      "apkName": "PosDelay_latest.bin",
+      "packages": [
+        "com.posdelay.app"
+      ],
+      "enabled": true,
+      "versionName": "0829.0330",
+      "versionCode": 29802360,
+      "metadataUrl": "https://218.147.118.71/updates/posdelay/version.json"
+    },
+    {
       "id": "solnote",
       "label": "SolNote 개인노트 (정식)",
       "apkName": "SolNote_latest.bin",
@@ -37,18 +49,6 @@
         "com.wonmux"
       ],
       "enabled": true
-    },
-    {
-      "id": "posdelay",
-      "label": "PosDelay",
-      "apkName": "PosDelay_latest.bin",
-      "packages": [
-        "com.posdelay.app"
-      ],
-      "enabled": true,
-      "versionName": "0829.0240",
-      "versionCode": 29802350,
-      "metadataUrl": "https://218.147.118.71/updates/posdelay/version.json"
     },
     {
       "id": "poskds",

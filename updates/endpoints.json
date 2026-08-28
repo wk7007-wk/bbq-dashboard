@@ -17,7 +17,9 @@
       "grok_ops": "http://218.147.118.71:2421/grok_ops.json",
       "delivery_bus": "http://218.147.118.71:2421/delivery_bus.json",
       "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/",
-      "chicken_timer": "http://218.147.118.71:2421/chicken_timer.json"
+      "chicken_timer": "http://218.147.118.71:2421/chicken_timer.json",
+      "update.posdelay": "https://218.147.118.71/updates/posdelay/version.json",
+      "update.catalog": "https://218.147.118.71/updates/catalog.json"
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
