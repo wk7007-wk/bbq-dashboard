@@ -1,7 +1,6 @@
 (function (root) {
   'use strict';
   var URL = 'https://218.147.118.71/workschedule.json';
-  var GIST = 'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json';
   var AUTH = 'token grok-ops';
   var cache = null;
   var cacheAt = 0;
@@ -51,30 +50,19 @@
 
   async function load(force) {
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
-    var sources = [
-      { name: 'factory', url: URL, timeout: 4000 },
-      { name: 'gist', url: GIST, timeout: 2500 },
-      { name: 'pages', url: './workschedule.json', timeout: 2500 }
-    ];
-    var empty = {};
-    for (var i = 0; i < sources.length; i++) {
-      try {
-        var tree = await fetchJson(sources[i].url, sources[i].timeout);
-        lastSource = sources[i].name;
-        if (planning(tree)) {
-          cache = tree;
-          cacheAt = Date.now();
-          return cache;
-        }
-        if (!planning(empty)) empty = tree || {};
-      } catch (e) {
-        lastSource = sources[i].name + '_down';
-      }
+    try {
+      var tree = await fetchJson(URL, 4000);
+      lastSource = 'factory';
+      cache = tree || {};
+      cacheAt = Date.now();
+      if (!planning(cache)) lastSource = 'empty';
+      return cache;
+    } catch (e) {
+      lastSource = 'factory_down';
+      cacheAt = Date.now();
+      if (!(cache && planning(cache))) cache = {};
+      return cache;
     }
-    cache = empty;
-    cacheAt = Date.now();
-    if (!planning(cache) && lastSource.indexOf('_down') < 0) lastSource = 'empty';
-    return cache;
   }
 
   async function save(tree) {
@@ -105,7 +93,6 @@
 
   root.FactorySchedule = {
     URL: URL,
-    GIST: GIST,
     load: load,
     save: save,
     dig: dig,
