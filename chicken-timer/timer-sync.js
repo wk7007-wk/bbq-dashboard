@@ -1495,7 +1495,6 @@
   }
 
   const FACTORY_WAN_JSON = "https://218.147.118.71/chicken_timer.json";
-  const GIST_JSON = "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json";
 
   function isStoreLanHost(host) {
     const match = String(host || "").match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);

@@ -5,8 +5,7 @@
   if (!document || !document.body) return;
 
   const RECIPE_URLS = [
-    "http://218.147.118.71:2421/recipes.json",
-    "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/recipes.json",
+    "https://218.147.118.71/recipes.json",
   ];
   const REFRESH_MS = 5 * 60 * 1000;
 
