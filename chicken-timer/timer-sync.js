@@ -1684,7 +1684,14 @@
     if (protocol !== "http:" && protocol !== "https:") return "";
     if (!hostname) return "";
     const host = location && location.host ? String(location.host) : hostname;
-    return `${protocol}//${host}/chicken-timer/index.html`;
+    let path = location && location.pathname ? String(location.pathname) : "/";
+    if (!path || path.charAt(0) !== "/") path = "/" + path;
+    const lastSeg = path.split("/").pop();
+    const looksLikeFile = lastSeg.indexOf(".") >= 0;
+    const dir = looksLikeFile
+      ? path.slice(0, path.lastIndexOf("/") + 1)
+      : (path.charAt(path.length - 1) === "/" ? path : path + "/");
+    return `${protocol}//${host}${dir}index.html`;
   }
 
   function isConstrainedAndroidClient() {
