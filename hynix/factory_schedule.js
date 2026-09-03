@@ -1,10 +1,93 @@
 (function (root) {
   'use strict';
-  var URL = 'https://218.147.118.71/workschedule.json';
+  var GIST_WS_URL = 'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json';
+  var EP_CANDIDATES = [
+    '/endpoints.json',
+    'https://wsl-ubuntu.tail785e65.ts.net/endpoints.json',
+    'https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json',
+    'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json'
+  ];
   var AUTH = 'token grok-ops';
   var cache = null;
   var cacheAt = 0;
   var lastSource = '';
+  var URL = GIST_WS_URL;
+  var rw = false;
+  var recoverStarted = false;
+
+  function isGithubPagesHost() {
+    try { return String(location.hostname || '').indexOf('github.io') >= 0; } catch (e) { return false; }
+  }
+  function probe(url) {
+    if (!url) return Promise.resolve(false);
+    return fetch(url, { cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) return false;
+      return r.json().then(function (j) {
+        return !!(j && (j.ok === true || j.status === 'ok'));
+      });
+    }).catch(function () { return false; });
+  }
+  function loadEp() {
+    var cands = isGithubPagesHost()
+      ? EP_CANDIDATES.filter(function (u) { return u.indexOf('https://') === 0; })
+      : EP_CANDIDATES;
+    var i = 0;
+    function next() {
+      if (i >= cands.length) return Promise.resolve(null);
+      var u = cands[i++];
+      return fetch(u, { cache: 'no-cache' }).then(function (r) {
+        if (!r.ok) return next();
+        return r.json().then(function (ep) {
+          return ep && typeof ep === 'object' ? ep : next();
+        });
+      }).catch(function () { return next(); });
+    }
+    return next();
+  }
+  function setRw(base) {
+    if (!base) return;
+    rw = true;
+    URL = String(base).replace(/\/$/, '') + '/workschedule.json';
+    if (root && typeof window !== 'undefined') window.__factoryRw = true;
+  }
+  function setGist(desk) {
+    rw = false;
+    URL = desk || GIST_WS_URL;
+    if (root && typeof window !== 'undefined') window.__factoryRw = false;
+  }
+  function pick(ep) {
+    var f = ep && ep.sets && ep.sets.factory;
+    var h = ep && ep.health;
+    var fb = ep && ep.sets && ep.sets.fallback;
+    var magicHealth = (h && h.factory_magic) || 'https://wsl-ubuntu.tail785e65.ts.net/health';
+    var tsHealth = (h && h.factory) || 'http://wsl-ubuntu.tail785e65.ts.net:2421/health';
+    var magicBase = (f && f.magic_base) || 'https://wsl-ubuntu.tail785e65.ts.net';
+    var tsBase = (f && (f.pages_base_http || f.pages_base || f.ts_base)) || 'http://wsl-ubuntu.tail785e65.ts.net:2421';
+    var gistWs = (fb && (fb.workschedule || fb.order_desk)) || GIST_WS_URL;
+    return probe(magicHealth).then(function (ok) {
+      if (ok) { setRw(magicBase); return 'magic'; }
+      if (isGithubPagesHost()) { setGist(gistWs); return 'gist'; }
+      return probe(tsHealth).then(function (ok2) {
+        if (ok2) { setRw(tsBase); return 'ts2421'; }
+        setGist(gistWs);
+        return 'gist';
+      });
+    });
+  }
+  function startRecover() {
+    if (recoverStarted) return;
+    recoverStarted = true;
+    setInterval(function () {
+      if (rw) return;
+      loadEp().then(pick);
+    }, 30000);
+  }
+  function boot() {
+    loadEp().then(pick).then(function (mode) {
+      lastSource = mode === 'gist' ? 'gist' : 'factory';
+      if (mode === 'gist') startRecover();
+    });
+  }
 
   function dig(tree, path) {
     if (!path) return tree;
@@ -52,13 +135,13 @@
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
     try {
       var tree = await fetchJson(URL, 4000);
-      lastSource = 'factory';
+      lastSource = rw ? 'factory' : 'gist';
       cache = tree || {};
       cacheAt = Date.now();
       if (!planning(cache)) lastSource = 'empty';
       return cache;
     } catch (e) {
-      lastSource = 'factory_down';
+      lastSource = rw ? 'factory_down' : 'gist_down';
       cacheAt = Date.now();
       if (!(cache && planning(cache))) cache = {};
       return cache;
@@ -68,6 +151,10 @@
   async function save(tree) {
     cache = tree && typeof tree === 'object' ? tree : {};
     cacheAt = Date.now();
+    if (!rw) {
+      lastSource = 'gist_readonly';
+      return false;
+    }
     try {
       var res = await fetch(URL, {
         method: 'PUT',
@@ -92,13 +179,15 @@
   }
 
   root.FactorySchedule = {
-    URL: URL,
+    get URL() { return URL; },
     load: load,
     save: save,
     dig: dig,
     setPath: setPath,
     planning: planning,
     restFrom: restFrom,
-    lastSource: function () { return lastSource; }
+    lastSource: function () { return lastSource; },
+    isRw: function () { return rw; }
   };
+  boot();
 })(typeof window !== 'undefined' ? window : this);

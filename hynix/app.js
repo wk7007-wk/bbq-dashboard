@@ -3,7 +3,7 @@
 
   var PORTAL_PIN_SHA256 = '5fac4c4102e357c594bbde07a5b34fd38cebb15b793543e695452afafdb1d605';
   var WORKSCHEDULE_BASE = '/workschedule_v2';
-  var SCHEDULE_SOURCE = 'https://218.147.118.71/workschedule.json';
+  var SCHEDULE_SOURCE = (window.FactorySchedule && window.FactorySchedule.URL) || 'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json';
   var OPS_MANUAL_PATH = '/packhelper/ops_manual';
   var ATTENDANCE_PATH = '/workschedule_v2/attendance';
   var CALENDAR_OUTBOX_PATH = WORKSCHEDULE_BASE + '/meta/calendar_core/google/outbox';
