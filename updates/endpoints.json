@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-04T16:54:43+09:00",
+  "updated_at": "2026-09-04T23:14:33+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "chain": [
@@ -11,7 +11,7 @@
     ]
   },
   "health": {
-    "factory": "http://125.176.112.214:2421/health",
+    "factory": "https://wsl-ubuntu.tail785e65.ts.net/health",
     "factory_lan": "http://127.0.0.1:2421/health",
     "factory_magic": "https://wsl-ubuntu.tail785e65.ts.net/health",
     "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
@@ -19,7 +19,7 @@
   },
   "sets": {
     "factory": {
-      "pages_base": "https://125.176.112.214",
+      "pages_base": "https://wsl-ubuntu.tail785e65.ts.net",
       "lan_base": "http://127.0.0.1:2421",
       "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
       "wan_base": "http://125.176.112.214:2421",
@@ -47,7 +47,7 @@
       "update.solnote": "http://125.176.112.214:2421/updates/solnote/version.json",
       "update.banktotal": "http://125.176.112.214:2421/updates/banktotal/version.json",
       "update.update-center": "http://125.176.112.214:2421/updates/update-center/version.json",
-      "update.catalog": "http://125.176.112.214:2421/updates/catalog.json"
+      "update.catalog": "https://wsl-ubuntu.tail785e65.ts.net/updates/catalog.json"
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
