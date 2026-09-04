@@ -1,7 +1,7 @@
 {
   "appVersionCode": 29780005,
   "appVersionName": "0.118.3-wonmux.20260812.2",
-  "apkUrl": "https://125.176.112.214/updates/wonmux/Wonmux_latest.apk",
+  "apkUrl": "http://125.176.112.214:2421/updates/wonmux/Wonmux_latest.apk",
   "sha256": "668208315bdc251858e7585e13c70f9f187458c5a5bb78409528a42316086733",
   "sizeBytes": 118233755,
   "packageName": "com.wonmux",
@@ -9,6 +9,6 @@
   "enabled": true,
   "releaseNotes": "Codex context rollover and bounded handoff automation",
   "updatedAt": "2026-08-12T23:04:43+09:00",
-  "historyUrl": "https://125.176.112.214/updates/wonmux/history.json",
-  "artifactUrl": "https://125.176.112.214/updates/wonmux/Wonmux_latest.bin"
+  "historyUrl": "http://125.176.112.214:2421/updates/wonmux/history.json",
+  "artifactUrl": "http://125.176.112.214:2421/updates/wonmux/Wonmux_latest.apk"
 }

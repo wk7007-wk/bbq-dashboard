@@ -1,14 +1,14 @@
 {
-  "apkUrl": "https://125.176.112.214/updates/solnote/SolNote_latest.apk",
+  "apkUrl": "http://125.176.112.214:2421/updates/solnote/SolNote_latest.apk",
   "appVersionCode": 262131113,
   "appVersionName": "0801.1113",
   "certificateSha256": "67599082e102541ac86386c181dfd3f5f6349448e113d5deb34fc5ee39ae7599",
   "enabled": true,
-  "historyUrl": "https://125.176.112.214/updates/solnote/history.json",
+  "historyUrl": "http://125.176.112.214:2421/updates/solnote/history.json",
   "packageName": "com.wonmux.solnote.personal",
   "releaseNotes": "source provenance와 격리 업데이트 채널 보강",
   "sha256": "a78b1a3afae4ca8bcf1167c3a0285e98098dc81ebcacc353172aacab7c65b953",
   "sizeBytes": 12235418,
   "updatedAt": "2026-08-01T11:13:00+09:00",
-  "artifactUrl": "https://125.176.112.214/updates/solnote/SolNote_latest.bin"
+  "artifactUrl": "http://125.176.112.214:2421/updates/solnote/SolNote_latest.apk"
 }

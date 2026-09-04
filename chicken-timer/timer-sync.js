@@ -585,7 +585,7 @@
     }
 
     function startStream() {
-      // 파이어 SSE 안 씀. 공장/gist 폴링만.
+      // 파이어 SSE 안 씀. 공장 JSON 폴링만.
       scheduleFallbackPoll(visibleFallbackBaseMs());
       return;
       if (closed || eventSource) return;
@@ -1470,7 +1470,7 @@
     }
     const host = httpUrlHost(url);
     const lan = isStoreLanHost(host);
-    const factory = host === "218.147.118.71";
+    const factory = !!(FACTORY_WAN_HOST && host === FACTORY_WAN_HOST);
     const ctrl = typeof global.AbortController === "function" ? new global.AbortController() : null;
     const timeoutMs = lan ? 800 : factory ? 2500 : 5000;
     const timer = ctrl && typeof global.setTimeout === "function"
@@ -1494,7 +1494,54 @@
     });
   }
 
-  const FACTORY_WAN_JSON = "https://218.147.118.71/chicken_timer.json";
+  let FACTORY_WAN_HOST = "";
+  let FACTORY_WAN_JSON = "";
+  let sotReady = null;
+
+  function factorySotCandidates() {
+    const cands = [];
+    try {
+      const loc = global.location || {};
+      const host = String(loc.hostname || "");
+      const origin = String(loc.origin || "");
+      if (origin && host.indexOf("github.io") < 0) {
+        cands.push(origin + "/endpoints.json");
+        cands.push(origin + "/factory_bridge.json");
+      }
+    } catch (_) {}
+    cands.push("https://wsl-ubuntu.tail785e65.ts.net/endpoints.json");
+    cands.push("https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json");
+    cands.push("https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json");
+    return cands;
+  }
+
+  function applyFactorySot(ep) {
+    if (!ep || typeof ep !== "object") return false;
+    const ip = String(ep.public_ip || "").trim();
+    if (!ip) return false;
+    FACTORY_WAN_HOST = ip;
+    FACTORY_WAN_JSON = "https://" + ip + "/chicken_timer.json";
+    return true;
+  }
+
+  function loadFactorySot() {
+    if (sotReady) return sotReady;
+    sotReady = (async function () {
+      const cands = factorySotCandidates();
+      for (let i = 0; i < cands.length; i++) {
+        const u = cands[i];
+        try {
+          const r = await global.fetch(u, { cache: "no-cache" });
+          if (!r || !r.ok) continue;
+          const ep = await r.json();
+          if (applyFactorySot(ep)) return ep;
+        } catch (_) {}
+      }
+      return null;
+    })();
+    return sotReady;
+  }
+  loadFactorySot();
 
   function isStoreLanHost(host) {
     const match = String(host || "").match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
@@ -1587,11 +1634,15 @@
   }
 
   function fetchFirstJson(urls) {
-    return raceFirst(urls, fetchJson);
+    return loadFactorySot().then(function () {
+      const list = (Array.isArray(urls) && urls.length) ? urls : buildStateUrls(global);
+      return raceFirst(list, fetchJson);
+    });
   }
 
   function putAllJson(urls, value) {
-    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
+    return loadFactorySot().then(function () {
+    const list = Array.isArray(urls) && urls.length ? urls.filter(Boolean) : buildStateUrls(global).filter(Boolean);
     if (!list.length) return Promise.reject(new Error("no urls"));
     if (list.length === 1) return putJson(list[0], value);
     return new Promise((resolve, reject) => {
@@ -1610,6 +1661,7 @@
           if (!resolved && pending <= 0) reject(lastErr || new Error("all failed"));
         });
       });
+    });
     });
   }
 

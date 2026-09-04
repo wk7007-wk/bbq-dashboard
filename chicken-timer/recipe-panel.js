@@ -4,31 +4,73 @@
   const document = global.document;
   if (!document || !document.body) return;
 
-  const RECIPE_URLS = [
-    "https://218.147.118.71/recipes.json",
-  ];
+  let RECIPE_URLS = [];
+  let sotReady = null;
   const REFRESH_MS = 5 * 60 * 1000;
 
+  function factorySotCandidates() {
+    const cands = [];
+    try {
+      const loc = global.location || {};
+      const host = String(loc.hostname || "");
+      const origin = String(loc.origin || "");
+      if (origin && host.indexOf("github.io") < 0) {
+        cands.push(origin + "/endpoints.json");
+        cands.push(origin + "/factory_bridge.json");
+      }
+    } catch (_) {}
+    cands.push("https://wsl-ubuntu.tail785e65.ts.net/endpoints.json");
+    cands.push("https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json");
+    cands.push("https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json");
+    return cands;
+  }
+
+  function loadFactorySot() {
+    if (sotReady) return sotReady;
+    sotReady = (async function () {
+      const cands = factorySotCandidates();
+      for (let i = 0; i < cands.length; i++) {
+        try {
+          const r = await global.fetch(cands[i], { cache: "no-cache" });
+          if (!r || !r.ok) continue;
+          const ep = await r.json();
+          const ip = ep && typeof ep === "object" ? String(ep.public_ip || "").trim() : "";
+          if (!ip) continue;
+          RECIPE_URLS = ["https://" + ip + "/recipes.json"];
+          return ep;
+        } catch (_) {}
+      }
+      RECIPE_URLS = [];
+      return null;
+    })();
+    return sotReady;
+  }
+
   function fetchFirstRecipeJson() {
-    let chain = Promise.reject(new Error("empty"));
-    RECIPE_URLS.forEach((url) => {
-      chain = chain.catch(() => global.fetch(url, { cache: "no-store" }).then((response) => {
-        if (!response || !response.ok) throw new Error("HTTP " + (response ? response.status : ""));
-        return response.json();
-      }));
+    return loadFactorySot().then(function () {
+      let chain = Promise.reject(new Error("empty"));
+      RECIPE_URLS.forEach((url) => {
+        chain = chain.catch(() => global.fetch(url, { cache: "no-store" }).then((response) => {
+          if (!response || !response.ok) throw new Error("HTTP " + (response ? response.status : ""));
+          return response.json();
+        }));
+      });
+      return chain;
     });
-    return chain;
   }
 
   function putRecipes(nextRecipes) {
-    return global.fetch(RECIPE_URLS[0], {
-      method: "PUT",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "token chicken-timer",
-      },
-      body: JSON.stringify(nextRecipes || {}),
+    return loadFactorySot().then(function () {
+      if (!RECIPE_URLS[0]) return Promise.reject(new Error("no recipe url"));
+      return global.fetch(RECIPE_URLS[0], {
+        method: "PUT",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "token chicken-timer",
+        },
+        body: JSON.stringify(nextRecipes || {}),
+      });
     });
   }
 

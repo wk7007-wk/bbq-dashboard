@@ -3,8 +3,8 @@
   "appVersionName": "0902.1105",
   "versionCode": 29805245,
   "versionName": "0902.1105",
-  "apkUrl": "https://125.176.112.214/updates/deliveryhelper/DeliveryHelper_latest.apk",
-  "artifactUrl": "https://125.176.112.214/updates/deliveryhelper/DeliveryHelper_latest.apk",
+  "apkUrl": "http://125.176.112.214:2421/updates/deliveryhelper/DeliveryHelper_latest.apk",
+  "artifactUrl": "http://125.176.112.214:2421/updates/deliveryhelper/DeliveryHelper_latest.apk",
   "sha256": "1a803b4c51b71229e22419341c0d602187af619ee5b1fa5cf8403ef077d1c0fd",
   "sizeBytes": 32925901,
   "packageName": "com.deliveryhelper.app",
@@ -13,5 +13,5 @@
   "enabled": true,
   "releaseNotes": "claim feeText=receipt charge_amount. card/cash show, prepaid hide. OrderParser deliveryFee=0.",
   "updatedAt": "2026-09-02T11:05:44+09:00",
-  "historyUrl": "https://125.176.112.214/updates/deliveryhelper/history.json"
+  "historyUrl": "http://125.176.112.214:2421/updates/deliveryhelper/history.json"
 }

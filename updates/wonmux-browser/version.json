@@ -1,7 +1,7 @@
 {
   "appVersionCode": 26072612,
   "appVersionName": "0726.1257",
-  "apkUrl": "https://125.176.112.214/updates/wonmux-browser/WonmuxBrowser_latest.apk",
+  "apkUrl": "http://125.176.112.214:2421/updates/wonmux-browser/WonmuxBrowser_latest.apk",
   "sha256": "5fdd4250b7213c1cd42a76ff124f8cd5f18934ffc5c501ea7c63bd32bdf95093",
   "sizeBytes": 1295062,
   "packageName": "com.wonmux.browser",
@@ -9,6 +9,6 @@
   "enabled": true,
   "releaseNotes": "격리된 Google Calendar 읽기에서 BankTotal 고정입금 항목만 제한 검증",
   "updatedAt": "2026-07-30T01:10:00+09:00",
-  "historyUrl": "https://125.176.112.214/updates/wonmux-browser/history.json",
-  "artifactUrl": "https://125.176.112.214/updates/wonmux-browser/WonmuxBrowser_latest.bin"
+  "historyUrl": "http://125.176.112.214:2421/updates/wonmux-browser/history.json",
+  "artifactUrl": "http://125.176.112.214:2421/updates/wonmux-browser/WonmuxBrowser_latest.apk"
 }

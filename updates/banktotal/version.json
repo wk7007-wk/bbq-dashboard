@@ -1,7 +1,7 @@
 {
   "appVersionCode": 29760630,
   "appVersionName": "0802.1130",
-  "apkUrl": "https://125.176.112.214/updates/banktotal/BankTotal_latest.apk",
+  "apkUrl": "http://125.176.112.214:2421/updates/banktotal/BankTotal_latest.apk",
   "sha256": "9b95ece9d54ce808b80fedf7f11be848e5ab8cda7a983ee71812e06aa82b6b94",
   "sizeBytes": 7315167,
   "packageName": "com.banktotal.app",
@@ -9,6 +9,6 @@
   "enabled": true,
   "releaseNotes": "가계부 그룹 입금·출금 합계를 함께 표시",
   "updatedAt": "2026-08-02T11:39:41+09:00",
-  "historyUrl": "https://125.176.112.214/updates/banktotal/history.json",
-  "artifactUrl": "https://125.176.112.214/updates/banktotal/BankTotal_latest.bin"
+  "historyUrl": "http://125.176.112.214:2421/updates/banktotal/history.json",
+  "artifactUrl": "http://125.176.112.214:2421/updates/banktotal/BankTotal_latest.apk"
 }

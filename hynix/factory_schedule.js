@@ -1,17 +1,17 @@
 (function (root) {
   'use strict';
-  var GIST_WS_URL = 'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json';
   var EP_CANDIDATES = [
     '/endpoints.json',
+    '/factory_bridge.json',
     'https://wsl-ubuntu.tail785e65.ts.net/endpoints.json',
-    'https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json',
-    'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json'
+    'https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json',
+    'https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json'
   ];
   var AUTH = 'token grok-ops';
   var cache = null;
   var cacheAt = 0;
   var lastSource = '';
-  var URL = GIST_WS_URL;
+  var URL = '';
   var rw = false;
   var recoverStarted = false;
 
@@ -46,31 +46,43 @@
   }
   function setRw(base) {
     if (!base) return;
+    var b = String(base).replace(/\/$/, '');
+    if (isGithubPagesHost() && b.indexOf('https://') !== 0) return;
     rw = true;
-    URL = String(base).replace(/\/$/, '') + '/workschedule.json';
+    URL = b + '/workschedule.json';
     if (root && typeof window !== 'undefined') window.__factoryRw = true;
   }
-  function setGist(desk) {
+  function setBlocked() {
     rw = false;
-    URL = desk || GIST_WS_URL;
+    URL = '';
     if (root && typeof window !== 'undefined') window.__factoryRw = false;
   }
   function pick(ep) {
     var f = ep && ep.sets && ep.sets.factory;
     var h = ep && ep.health;
-    var fb = ep && ep.sets && ep.sets.fallback;
-    var magicHealth = (h && h.factory_magic) || 'https://wsl-ubuntu.tail785e65.ts.net/health';
-    var tsHealth = (h && h.factory) || 'http://wsl-ubuntu.tail785e65.ts.net:2421/health';
-    var magicBase = (f && f.magic_base) || 'https://wsl-ubuntu.tail785e65.ts.net';
-    var tsBase = (f && (f.pages_base_http || f.pages_base || f.ts_base)) || 'http://wsl-ubuntu.tail785e65.ts.net:2421';
-    var gistWs = (fb && (fb.workschedule || fb.order_desk)) || GIST_WS_URL;
+    var ip = String((ep && ep.public_ip) || '').trim();
+    var magicHealth = h && h.factory_magic;
+    var tsHealth = h && h.factory;
+    var magicBase = f && f.magic_base;
+    var tsBase = f && f.ts_base;
+    var wanHttps = ip ? ('https://' + ip) : '';
+    var wanHealth = wanHttps ? (wanHttps + '/health') : '';
     return probe(magicHealth).then(function (ok) {
       if (ok) { setRw(magicBase); return 'magic'; }
-      if (isGithubPagesHost()) { setGist(gistWs); return 'gist'; }
+      if (isGithubPagesHost()) {
+        return probe(wanHealth).then(function (okw) {
+          if (okw) { setRw(wanHttps); return 'wan_https'; }
+          setBlocked();
+          return 'blocked';
+        });
+      }
       return probe(tsHealth).then(function (ok2) {
         if (ok2) { setRw(tsBase); return 'ts2421'; }
-        setGist(gistWs);
-        return 'gist';
+        return probe(wanHealth).then(function (okw) {
+          if (okw) { setRw(wanHttps); return 'wan_https'; }
+          setBlocked();
+          return 'blocked';
+        });
       });
     });
   }
@@ -84,8 +96,7 @@
   }
   function boot() {
     loadEp().then(pick).then(function (mode) {
-      lastSource = mode === 'gist' ? 'gist' : 'factory';
-      if (mode === 'gist') startRecover();
+      lastSource = mode === 'blocked' ? 'blocked' : 'factory';
     });
   }
 
@@ -135,13 +146,13 @@
     if (!force && cache && planning(cache) && (Date.now() - cacheAt) < 2000) return cache;
     try {
       var tree = await fetchJson(URL, 4000);
-      lastSource = rw ? 'factory' : 'gist';
+      lastSource = rw ? 'factory' : 'blocked';
       cache = tree || {};
       cacheAt = Date.now();
       if (!planning(cache)) lastSource = 'empty';
       return cache;
     } catch (e) {
-      lastSource = rw ? 'factory_down' : 'gist_down';
+      lastSource = rw ? 'factory_down' : 'blocked_down';
       cacheAt = Date.now();
       if (!(cache && planning(cache))) cache = {};
       return cache;
@@ -152,7 +163,7 @@
     cache = tree && typeof tree === 'object' ? tree : {};
     cacheAt = Date.now();
     if (!rw) {
-      lastSource = 'gist_readonly';
+      lastSource = 'blocked_readonly';
       return false;
     }
     try {

@@ -1,7 +1,7 @@
 {
   "appVersionCode": 29788812,
   "appVersionName": "0822.0112",
-  "apkUrl": "https://125.176.112.214/updates/chicken-timer/ChickenTimer_latest.apk",
+  "apkUrl": "http://125.176.112.214:2421/updates/chicken-timer/ChickenTimer_latest.apk",
   "sha256": "d297b517027efc90f19838622c65d5d637f15c70607b759c513a8cd31005daa3",
   "sizeBytes": 1580032,
   "packageName": "com.chickentimer.board.v2",
@@ -9,6 +9,6 @@
   "enabled": true,
   "releaseNotes": "가로 26px 레일이 56px를 이김",
   "updatedAt": "2026-08-22T01:12:48+09:00",
-  "historyUrl": "https://125.176.112.214/updates/chicken-timer/history.json",
-  "artifactUrl": "https://125.176.112.214/updates/chicken-timer/ChickenTimer_latest.bin"
+  "historyUrl": "http://125.176.112.214:2421/updates/chicken-timer/history.json",
+  "artifactUrl": "http://125.176.112.214:2421/updates/chicken-timer/ChickenTimer_latest.apk"
 }
