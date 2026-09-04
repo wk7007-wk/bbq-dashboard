@@ -1,64 +1,69 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
+  "updated_at": "2026-09-04T16:50:09+09:00",
+  "policy": {
+    "no_ip_literals_in_code": true,
+    "chain": [
+      "factory",
+      "primary",
+      "fallback"
+    ]
+  },
   "health": {
-    "factory": "http://218.147.118.71:2421/health",
+    "factory": "http://125.176.112.214:2421/health",
+    "factory_lan": "http://127.0.0.1:2421/health",
+    "factory_magic": "https://wsl-ubuntu.tail785e65.ts.net/health",
     "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
     "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
   },
   "sets": {
     "factory": {
-      "pages_base": "https://218.147.118.71",
-      "kds_ocr": "http://218.147.118.71:2421/kds_status.json",
-      "kds_ocr_write": "http://218.147.118.71:2421/kds_status.json",
-      "posdelay_bus": "http://218.147.118.71:2421/posdelay_bus.json",
-      "posdelay_bus_write": "http://218.147.118.71:2421/posdelay_bus.json",
-      "printer_capture": "http://218.147.118.71:2421/printer_capture.json",
-      "grok_ops": "http://218.147.118.71:2421/grok_ops.json",
-      "delivery_bus": "http://218.147.118.71:2421/delivery_bus.json",
+      "pages_base": "https://125.176.112.214",
+      "lan_base": "http://127.0.0.1:2421",
+      "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
+      "wan_base": "http://125.176.112.214:2421",
+      "baeksu_reports": "https://wsl-ubuntu.tail785e65.ts.net/baeksu_reports.json",
+      "factory_put_paths": "https://wsl-ubuntu.tail785e65.ts.net/factory_put_paths.json",
       "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/",
-      "chicken_timer": "http://218.147.118.71:2421/chicken_timer.json",
-      "update.posdelay": "https://218.147.118.71/updates/posdelay/version.json",
-      "update.catalog": "https://218.147.118.71/updates/catalog.json"
+      "ts_base": "http://100.65.156.49:2421",
+      "pages_base_http": "http://125.176.112.214:2421",
+      "orderhelper": "https://wsl-ubuntu.tail785e65.ts.net/OrderHelper/",
+      "hynix": "http://wsl-ubuntu.tail785e65.ts.net:2421/hynix/",
+      "workschedule": "https://wsl-ubuntu.tail785e65.ts.net/workschedule.json",
+      "updates_base": "http://125.176.112.214:2421/updates",
+      "factory_internal": {
+        "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
+        "magic_updates_base": "https://wsl-ubuntu.tail785e65.ts.net/updates",
+        "ts_base": "http://100.65.156.49:2421",
+        "lan_base": "http://127.0.0.1:2421"
+      },
+      "update.posdelay": "http://125.176.112.214:2421/updates/posdelay/version.json",
+      "update.deliveryhelper": "http://125.176.112.214:2421/updates/deliveryhelper/version.json",
+      "update.chicken-timer": "http://125.176.112.214:2421/updates/chicken-timer/version.json",
+      "update.storebot-termux": "http://125.176.112.214:2421/updates/storebot-termux/version.json",
+      "update.wonmux": "http://125.176.112.214:2421/updates/wonmux/version.json",
+      "update.wonmux-browser": "http://125.176.112.214:2421/updates/wonmux-browser/version.json",
+      "update.solnote": "http://125.176.112.214:2421/updates/solnote/version.json",
+      "update.banktotal": "http://125.176.112.214:2421/updates/banktotal/version.json",
+      "update.update-center": "http://125.176.112.214:2421/updates/update-center/version.json",
+      "update.catalog": "http://125.176.112.214:2421/updates/catalog.json"
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
-      "kds_ocr": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/kds_status.json",
-      "kds_ocr_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb",
-      "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/",
-      "posdelay_dashboard": "https://wk7007-wk.github.io/bbq-dashboard/posdelay.html",
-      "storebot_bundle": "https://wk7007-wk.github.io/bbq-dashboard/storebot-codex/bundle.json",
-      "storebot_zip": "https://wk7007-wk.github.io/bbq-dashboard/storebot-codex/StoreBotCodexWorker_latest.zip",
-      "update.poskds": "https://wk7007-wk.github.io/bbq-dashboard/updates/poskds/version.json",
-      "update.posdelay": "https://wk7007-wk.github.io/bbq-dashboard/updates/posdelay/version.json",
-      "update.deliveryhelper": "https://wk7007-wk.github.io/bbq-dashboard/updates/deliveryhelper/version.json",
-      "update.chicken-timer": "https://wk7007-wk.github.io/bbq-dashboard/updates/chicken-timer/version.json",
-      "update.storebot-termux": "https://wk7007-wk.github.io/bbq-dashboard/updates/storebot-termux/version.json",
-      "update.catalog": "https://wk7007-wk.github.io/bbq-dashboard/updates/catalog.json",
-      "posdelay_bus": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay_bus.json",
-      "posdelay_bus_write": "https://api.github.com/gists/a67e5de3271d6d0716b276dc6a8391cb",
-      "printer_capture": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/printer_capture.json",
-      "grok_ops": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/grok_ops.json",
-      "chicken_timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json",
-      "delivery_bus": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/delivery_bus.json"
+      "updates_base": "https://wk7007-wk.github.io/bbq-dashboard/updates",
+      "endpoints": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "hynix": "https://wk7007-wk.github.io/bbq-dashboard/hynix/",
+      "orderhelper": "https://wk7007-wk.github.io/OrderHelper/"
     },
     "fallback": {
-      "pages_base": "https://rentry.co/bbqkdsstatus",
-      "kds_ocr": "https://rentry.co/bbqkdsstatus",
-      "kds_ocr_write": "https://rentry.co/api/edit/bbqkdsstatus",
-      "chicken_timer_board": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken-timer/",
-      "posdelay_dashboard": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay.html",
-      "storebot_bundle": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/bundle.json",
-      "storebot_zip": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/StoreBotCodexWorker_latest.zip",
-      "update.poskds": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/poskds-version.json",
-      "update.posdelay": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay-version.json",
-      "update.deliveryhelper": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/deliveryhelper-version.json",
-      "update.chicken-timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken-timer-version.json",
-      "update.storebot-termux": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/storebot-termux-version.json",
-      "update.catalog": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/catalog.json",
-      "posdelay_bus": "https://rentry.co/bbqposdelaybus",
-      "posdelay_bus_write": "https://rentry.co/api/edit/bbqposdelaybus",
-      "chicken_timer": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json"
+      "endpoints": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
+      "factory_put_paths": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_put_paths.json",
+      "note": "gist fallback only; factory health->SoT R/W; Pages UI stays github.io",
+      "order_desk": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/order_desk.json",
+      "workschedule": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json"
     }
-  }
+  },
+  "public_ip": "125.176.112.214",
+  "host": "125.176.112.214"
 }

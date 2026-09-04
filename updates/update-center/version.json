@@ -1,13 +1,19 @@
 {
-  "appVersionCode": 29791273,
-  "appVersionName": "0823.1813",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/AppUpdateCenter_latest.bin?v=29791273",
-  "sha256": "c738fa3649e0279b5d89f3eaf92d2ed7939dee514dd313d815ddbe1be2db523f",
-  "sizeBytes": 1559373,
+  "appVersionCode": 29807900,
+  "appVersionName": "0904.0720",
+  "versionCode": 29807900,
+  "versionName": "0904.0720",
+  "apkUrl": "https://125.176.112.214/updates/update-center/AppUpdateCenter_latest.apk",
+  "artifactUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/update-center/AppUpdateCenter_latest.bin",
+  "sha256": "23eedc7d1873e9defc758d231f54a68576c0f1a66aff8b6da620ce2a93e31e83",
+  "sizeBytes": 1555724,
   "packageName": "com.appupdatecenter.app",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+  "signerSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "접속할 때마다 공장 목록을 새로 받는다",
-  "updatedAt": "2026-08-23T18:14:27+09:00",
-  "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/update-center/history.json"
+  "releaseNotes": "factory MagicHTTPS origin; 218 reject SoT",
+  "updatedAt": "2026-09-04T07:22:09+09:00",
+  "historyUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/update-center/history.json",
+  "channel": "update-center",
+  "label": "업데이트 센터"
 }

@@ -4,51 +4,76 @@
     {
       "id": "posdelay",
       "label": "PosDelay",
-      "apkName": "PosDelay_latest.bin",
+      "apkName": "PosDelay_latest.apk",
       "packages": [
         "com.posdelay.app"
       ],
       "enabled": true,
-      "versionName": "0829.0330",
-      "versionCode": 29802360,
-      "metadataUrl": "https://218.147.118.71/updates/posdelay/version.json"
+      "versionName": "0904.0720",
+      "versionCode": 29807900,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/posdelay/version.json",
+      "packageName": "com.posdelay.app",
+      "sha256": "e423b7e931a107d92e186ef89b9a241e11bc8aefe837ffee2bdcf161dae5e3e8",
+      "sizeBytes": 7755578,
+      "apkUrl": "https://125.176.112.214/updates/posdelay/PosDelay_latest.apk"
     },
     {
       "id": "solnote",
       "label": "SolNote 개인노트 (정식)",
-      "apkName": "SolNote_latest.bin",
+      "apkName": "SolNote_latest.apk",
       "packages": [
-        "com.wonmux.solnote.personal",
-        "com.wonmux.solnote"
+        "com.wonmux.solnote.personal"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0801.1113",
+      "versionCode": 262131113,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/solnote/version.json",
+      "packageName": "com.wonmux.solnote.personal",
+      "apkUrl": "https://125.176.112.214/updates/solnote/SolNote_latest.apk"
     },
     {
       "id": "wonmux-browser",
       "label": "Wonmux Browser",
-      "apkName": "WonmuxBrowser_latest.bin",
+      "apkName": "WonmuxBrowser_latest.apk",
       "packages": [
         "com.wonmux.browser"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0726.1257",
+      "versionCode": 26072612,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/wonmux-browser/version.json",
+      "packageName": "com.wonmux.browser",
+      "apkUrl": "https://125.176.112.214/updates/wonmux-browser/WonmuxBrowser_latest.apk"
     },
     {
       "id": "update-center",
       "label": "업데이트 센터",
-      "apkName": "AppUpdateCenter_latest.bin",
+      "apkName": "AppUpdateCenter_latest.apk",
       "packages": [
         "com.appupdatecenter.app"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0904.0720",
+      "versionCode": 29807900,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/update-center/version.json",
+      "packageName": "com.appupdatecenter.app",
+      "sha256": "23eedc7d1873e9defc758d231f54a68576c0f1a66aff8b6da620ce2a93e31e83",
+      "sizeBytes": 1555724,
+      "apkUrl": "https://125.176.112.214/updates/update-center/AppUpdateCenter_latest.apk"
     },
     {
       "id": "wonmux",
       "label": "Wonmux",
-      "apkName": "Wonmux_latest.bin",
+      "apkName": "Wonmux_latest.apk",
       "packages": [
         "com.wonmux"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0.118.3-wonmux.20260812.2",
+      "versionCode": 29780005,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/wonmux/version.json",
+      "packageName": "com.wonmux",
+      "apkUrl": "https://125.176.112.214/updates/wonmux/Wonmux_latest.apk"
     },
     {
       "id": "poskds",
@@ -57,50 +82,67 @@
       "packages": [
         "com.poskds.app"
       ],
-      "enabled": true
+      "enabled": true,
+      "apkUrl": "https://125.176.112.214/updates/poskds/PosKDS_latest.bin"
     },
     {
       "id": "banktotal",
       "label": "BankTotal",
-      "apkName": "BankTotal_latest.bin",
+      "apkName": "BankTotal_latest.apk",
       "packages": [
         "com.banktotal.app"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0802.1130",
+      "versionCode": 29760630,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/banktotal/version.json",
+      "packageName": "com.banktotal.app",
+      "apkUrl": "https://125.176.112.214/updates/banktotal/BankTotal_latest.apk"
     },
     {
       "id": "deliveryhelper",
       "label": "DeliveryHelper",
-      "apkName": "DeliveryHelper_latest.bin",
+      "apkName": "DeliveryHelper_latest.apk",
       "packages": [
         "com.deliveryhelper.app"
       ],
       "enabled": true,
-      "versionName": "0825.0048",
-      "versionCode": 29793108,
-      "metadataUrl": "https://218.147.118.71/updates/deliveryhelper/version.json"
+      "versionName": "0831.0040",
+      "versionCode": 29801740,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/deliveryhelper/version.json",
+      "packageName": "com.deliveryhelper.app",
+      "sha256": "371bfd5f1e19275f79f53431ba89bea7ed19f089acddc6c3ecab48c45b08809b",
+      "sizeBytes": 32921809,
+      "apkUrl": "https://125.176.112.214/updates/deliveryhelper/DeliveryHelper_latest.apk"
     },
     {
       "id": "storebot-termux",
       "label": "StoreBotTermux",
-      "apkName": "StoreBotTermux_latest.bin",
+      "apkName": "StoreBotTermux_latest.apk",
       "packages": [
         "com.sbotux"
       ],
       "enabled": true,
       "versionName": "0.118.7-storebot-kst0825.t0810",
       "versionCode": 1085,
-      "metadataUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/storebot-termux/version.json"
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/storebot-termux/version.json",
+      "packageName": "com.sbotux",
+      "apkUrl": "https://125.176.112.214/updates/storebot-termux/StoreBotTermux_latest.apk"
     },
     {
       "id": "chicken-timer",
       "label": "치킨타이머",
-      "apkName": "ChickenTimer_latest.bin",
+      "apkName": "ChickenTimer_latest.apk",
       "packages": [
         "com.chickentimer.board.v2"
       ],
-      "enabled": true
+      "enabled": true,
+      "versionName": "0822.0112",
+      "versionCode": 29788812,
+      "metadataUrl": "https://wsl-ubuntu.tail785e65.ts.net/updates/chicken-timer/version.json",
+      "packageName": "com.chickentimer.board.v2",
+      "apkUrl": "https://125.176.112.214/updates/chicken-timer/ChickenTimer_latest.apk"
     }
   ],
-  "updatedAt": "2026-08-25T08:39:41+09:00"
+  "updatedAt": "2026-09-04T16:50:09+09:00"
 }
