@@ -3,9 +3,10 @@
   var EP_CANDIDATES = [
     '/endpoints.json',
     '/factory_bridge.json',
+    'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_bridge.json',
+    'https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json',
     'https://wsl-ubuntu.tail785e65.ts.net/endpoints.json',
-    'https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json',
-    'https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json'
+    'https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json'
   ];
   var AUTH = 'token grok-ops';
   var cache = null;
@@ -57,29 +58,35 @@
     URL = '';
     if (root && typeof window !== 'undefined') window.__factoryRw = false;
   }
-  function pick(ep) {
-    var f = ep && ep.sets && ep.sets.factory;
-    var h = ep && ep.health;
+  function tableBases(ep) {
+    var f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
+    var h = (ep && ep.health) || {};
     var ip = String((ep && ep.public_ip) || '').trim();
-    var magicHealth = h && h.factory_magic;
-    var tsHealth = h && h.factory;
-    var magicBase = f && f.magic_base;
-    var tsBase = f && f.ts_base;
-    var wanHttps = ip ? ('https://' + ip) : '';
-    var wanHealth = wanHttps ? (wanHttps + '/health') : '';
-    return probe(magicHealth).then(function (ok) {
-      if (ok) { setRw(magicBase); return 'magic'; }
+    var magicBase = String((f && f.magic_base) || (ep && ep.magic_base) || '').replace(/\/$/, '');
+    var tsBase = String((f && f.ts_base) || (ep && ep.ts_base) || '').replace(/\/$/, '');
+    var wan = String((f && f.wan_base) || (ep && ep.wan_base) || '').replace(/\/$/, '');
+    var wanHost = '';
+    var match = wan.match(/^https?:\/\/([^/:]+)/i);
+    if (match) wanHost = match[1];
+    if (ip && (!wan || wanHost !== ip || wan.indexOf('https://') === 0)) {
+      wan = 'http://' + ip + ':2421';
+    }
+    var magicHealth = (h && h.factory_magic) || (magicBase ? magicBase + '/health' : '');
+    var tsHealth = (h && h.factory) || (tsBase ? tsBase + '/health' : '');
+    return { ip: ip, magicBase: magicBase, tsBase: tsBase, wan: wan, magicHealth: magicHealth, tsHealth: tsHealth };
+  }
+  function pick(ep) {
+    var t = tableBases(ep);
+    return probe(t.magicHealth).then(function (ok) {
+      if (ok) { setRw(t.magicBase); return 'magic'; }
       if (isGithubPagesHost()) {
-        return probe(wanHealth).then(function (okw) {
-          if (okw) { setRw(wanHttps); return 'wan_https'; }
-          setBlocked();
-          return 'blocked';
-        });
+        setBlocked();
+        return 'blocked';
       }
-      return probe(tsHealth).then(function (ok2) {
-        if (ok2) { setRw(tsBase); return 'ts2421'; }
-        return probe(wanHealth).then(function (okw) {
-          if (okw) { setRw(wanHttps); return 'wan_https'; }
+      return probe(t.tsHealth).then(function (ok2) {
+        if (ok2) { setRw(t.tsBase); return 'ts2421'; }
+        return probe(t.wan ? t.wan + '/health' : '').then(function (okw) {
+          if (okw) { setRw(t.wan); return 'wan_http'; }
           setBlocked();
           return 'blocked';
         });

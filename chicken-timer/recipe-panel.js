@@ -9,7 +9,10 @@
   const REFRESH_MS = 5 * 60 * 1000;
 
   function factorySotCandidates() {
-    const cands = [];
+    const cands = [
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_bridge.json",
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+    ];
     try {
       const loc = global.location || {};
       const host = String(loc.hostname || "");
@@ -21,8 +24,21 @@
     } catch (_) {}
     cands.push("https://wsl-ubuntu.tail785e65.ts.net/endpoints.json");
     cands.push("https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json");
-    cands.push("https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json");
     return cands;
+  }
+
+  function tableBases(ep) {
+    const f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
+    const ip = String((ep && ep.public_ip) || "").trim();
+    const magic = String((f && f.magic_base) || (ep && ep.magic_base) || "").replace(/\/$/, "");
+    let wan = String((f && f.wan_base) || (ep && ep.wan_base) || "").replace(/\/$/, "");
+    let wanHost = "";
+    const match = wan.match(/^https?:\/\/([^/:]+)/i);
+    if (match) wanHost = match[1];
+    if (ip && (!wan || wanHost !== ip || wan.indexOf("https://") === 0)) {
+      wan = "http://" + ip + ":2421";
+    }
+    return { ip: ip, magic: magic, wan: wan };
   }
 
   function loadFactorySot() {
@@ -34,9 +50,17 @@
           const r = await global.fetch(cands[i], { cache: "no-cache" });
           if (!r || !r.ok) continue;
           const ep = await r.json();
-          const ip = ep && typeof ep === "object" ? String(ep.public_ip || "").trim() : "";
-          if (!ip) continue;
-          RECIPE_URLS = ["https://" + ip + "/recipes.json"];
+          if (!ep || typeof ep !== "object") continue;
+          const t = tableBases(ep);
+          if (!t.ip && !t.wan && !t.magic) continue;
+          let host = "";
+          try { host = String((global.location || {}).hostname || ""); } catch (_) {}
+          let live = t.wan;
+          if (host.indexOf(".ts.net") >= 0 && t.magic) live = t.magic;
+          else if ((host === "127.0.0.1" || host === "localhost") && t.magic) live = t.magic;
+          if (!live) live = t.magic || t.wan;
+          RECIPE_URLS = live ? [live.replace(/\/$/, "") + "/recipes.json"] : [];
+          if (!RECIPE_URLS.length) continue;
           return ep;
         } catch (_) {}
       }

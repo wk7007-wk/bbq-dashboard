@@ -1,6 +1,5 @@
 (function (global) {
-  const FACTORY_WAN_JSON = "https://218.147.118.71/chicken_timer.json";
-  const GIST_JSON = "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json";
+  const FB_BASE_URL = "https://poskds-4ba60-default-rtdb.asia-southeast1.firebasedatabase.app";
   const SYNC_ROOT = "packhelper/chicken_timer/boards";
   const AUDIT_ROOT = "packhelper/chicken_timer/events";
   const CLOCK_ROOT = "packhelper/chicken_timer/clock";
@@ -200,9 +199,11 @@
     const actorId = options.actorId;
     const profile = options.profile;
     const syncKey = options.syncKey;
-    const stateUrls = buildStateUrls();
-    const stateUrl = stateUrls[0];
-    const refreshUrl = null;
+    const stateUrls = buildStateUrls(global);
+    const writeUrls = stateUrls.filter((url) => String(url).indexOf("githubusercontent.com") < 0);
+    const stateUrl = writeUrls[0] || stateUrls[0];
+    const auditRootUrl = `${FB_BASE_URL}/${AUDIT_ROOT}/${syncKey}`;
+    const refreshUrl = `${FB_BASE_URL}/${UI_REFRESH_ROOT}/${syncKey}.json`;
     let applyRemoteState = null;
     let getLocalState = null;
     let statusListener = null;
@@ -330,7 +331,7 @@
         lastRevision = envelope.meta.revision;
         writeCachedEnvelope(storage, syncKey, envelope);
         publishLanEnvelope(envelope);
-        return putFirstJson(stateUrls, envelope)
+        return putFirstJson(writeUrls, envelope)
           .then(() => {
             markStateOk();
             markDirtyDelivered();
@@ -359,7 +360,7 @@
       };
 
       if (shouldGuardAutomaticPublish(reason)) {
-        return fetchJson(stateUrl)
+        return fetchFirstJson(stateUrls)
           .then((rawRemote) => {
             const remoteEnvelope = sanitizeEnvelope(rawRemote);
             if (remoteEnvelope && hasUnsafeAutomaticBoardRemoval(remoteEnvelope.board, envelope.board, auditDetails, getNow())) {
@@ -471,7 +472,7 @@
             notifyStatus();
             return false;
           }
-          return putFirstJson(stateUrls, dirty.envelope)
+          return putFirstJson(writeUrls, dirty.envelope)
             .then(() => {
               markStateOk();
               markDirtyDelivered();
@@ -584,7 +585,7 @@
     }
 
     function startStream() {
-      // 파이어 SSE 안 씀. 공장/gist 폴링만.
+      // 파이어 SSE 안 씀. 공장 JSON 폴링만.
       scheduleFallbackPoll(visibleFallbackBaseMs());
       return;
       if (closed || eventSource) return;
@@ -816,7 +817,7 @@
       if (typeof global.fetch !== "function") return Promise.reject(new Error("fetch unavailable"));
       const sentAtMonoMs = getMonotonicNow();
       const sentAtLocalMs = Date.now();
-      const clockUrl = FACTORY_WAN_JSON;
+      const clockUrl = `${FB_BASE_URL}/${CLOCK_ROOT}/${syncKey}.json`;
       return global.fetch(appendCacheBust(clockUrl), {
         method: "PUT",
         cache: "no-store",
@@ -1467,10 +1468,13 @@
     if (typeof global.fetch !== "function") {
       return Promise.reject(new Error("fetch unavailable"));
     }
-    const factory = url.indexOf("218.147.118.71") >= 0;
+    const host = httpUrlHost(url);
+    const lan = isStoreLanHost(host);
+    const factory = !!(FACTORY_WAN_HOST && host === FACTORY_WAN_HOST);
     const ctrl = typeof global.AbortController === "function" ? new global.AbortController() : null;
+    const timeoutMs = lan ? 800 : factory ? 2500 : 5000;
     const timer = ctrl && typeof global.setTimeout === "function"
-      ? global.setTimeout(() => { try { ctrl.abort(); } catch (_) {} }, factory ? 1500 : 5000)
+      ? global.setTimeout(() => { try { ctrl.abort(); } catch (_) {} }, timeoutMs)
       : 0;
     return global.fetch(appendCacheBust(url), {
       cache: "no-store",
@@ -1490,32 +1494,202 @@
     });
   }
 
-  function fetchFirstJson(urls) {
-    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
-    if (!list.length) return Promise.reject(new Error("no urls"));
-    let chain = Promise.reject(new Error("empty"));
-    list.forEach((url) => {
-      chain = chain.catch(() => fetchJson(url));
-    });
-    return chain;
+  let FACTORY_WAN_HOST = "";
+  let FACTORY_WAN_JSON = "";
+  let sotReady = null;
+
+  function factorySotCandidates() {
+    const cands = [
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_bridge.json",
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+    ];
+    try {
+      const loc = global.location || {};
+      const host = String(loc.hostname || "");
+      const origin = String(loc.origin || "");
+      if (origin && host.indexOf("github.io") < 0) {
+        cands.push(origin + "/endpoints.json");
+        cands.push(origin + "/factory_bridge.json");
+      }
+    } catch (_) {}
+    cands.push("https://wsl-ubuntu.tail785e65.ts.net/endpoints.json");
+    cands.push("https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json");
+    return cands;
   }
 
-  function buildStateUrls() {
-    const native = global.ChickenTimerNative;
-    const lan = native && Array.isArray(native.fastFactoryJsonUrls)
-      ? native.fastFactoryJsonUrls.filter(Boolean)
-      : [];
-    return lan.concat([FACTORY_WAN_JSON, GIST_JSON].filter((url) => lan.indexOf(url) < 0));
+  function tableBases(ep) {
+    const f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
+    const ip = String((ep && ep.public_ip) || "").trim();
+    const magic = String((f && f.magic_base) || (ep && ep.magic_base) || "").replace(/\/$/, "");
+    let wan = String((f && f.wan_base) || (ep && ep.wan_base) || "").replace(/\/$/, "");
+    let wanHost = "";
+    const match = wan.match(/^https?:\/\/([^/:]+)/i);
+    if (match) wanHost = match[1];
+    if (ip && (!wan || wanHost !== ip || wan.indexOf("https://") === 0)) {
+      wan = "http://" + ip + ":2421";
+    }
+    return { ip: ip, magic: magic, wan: wan };
+  }
+
+  function applyFactorySot(ep) {
+    if (!ep || typeof ep !== "object") return false;
+    const t = tableBases(ep);
+    if (!t.ip && !t.wan && !t.magic) return false;
+    FACTORY_WAN_HOST = t.ip;
+    let host = "";
+    try { host = String((global.location || {}).hostname || ""); } catch (_) {}
+    let live = t.wan;
+    if (host.indexOf(".ts.net") >= 0 && t.magic) live = t.magic;
+    else if ((host === "127.0.0.1" || host === "localhost") && t.magic) live = t.magic;
+    if (!live) live = t.magic || t.wan;
+    if (!live) return false;
+    FACTORY_WAN_JSON = live.replace(/\/$/, "") + "/chicken_timer.json";
+    return true;
+  }
+
+  function loadFactorySot() {
+    if (sotReady) return sotReady;
+    sotReady = (async function () {
+      const cands = factorySotCandidates();
+      for (let i = 0; i < cands.length; i++) {
+        const u = cands[i];
+        try {
+          const r = await global.fetch(u, { cache: "no-cache" });
+          if (!r || !r.ok) continue;
+          const ep = await r.json();
+          if (applyFactorySot(ep)) return ep;
+        } catch (_) {}
+      }
+      return null;
+    })();
+    return sotReady;
+  }
+  loadFactorySot();
+
+  function isStoreLanHost(host) {
+    const match = String(host || "").match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (!match) return false;
+    const a = Number(match[1]);
+    const b = Number(match[2]);
+    if (a === 192 && b === 168) return true;
+    return a === 10;
+  }
+
+  function httpUrlHost(url) {
+    const match = String(url || "").match(/^https?:\/\/([^/:]+)/i);
+    return match ? match[1] : "";
+  }
+
+  function parseNativeUrlList(raw) {
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw !== "string") return [];
+    const text = raw.trim();
+    if (!text) return [];
+    if (text.charAt(0) === "[") {
+      try {
+        const parsed = JSON.parse(text);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        return [];
+      }
+    }
+    return text.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+
+  function lanFactoryJsonUrls(globalObj) {
+    const root = globalObj || global;
+    const native = root.ChickenTimerNative;
+    if (!native || typeof native.fastFactoryJsonUrls !== "function") return [];
+    let raw;
+    try {
+      raw = native.fastFactoryJsonUrls();
+    } catch (_) {
+      return [];
+    }
+    const out = [];
+    parseNativeUrlList(raw).forEach((item) => {
+      const url = String(item || "").trim();
+      const host = httpUrlHost(url);
+      if (!isStoreLanHost(host)) return;
+      if (url.indexOf(":2421/") < 0) return;
+      if (url.indexOf("chicken_timer.json") < 0) return;
+      const normalized = "http://" + host + ":2421/chicken_timer.json";
+      if (out.indexOf(normalized) < 0) out.push(normalized);
+    });
+    return out;
+  }
+
+  function androidNative(globalObj) {
+    const native = (globalObj || global).ChickenTimerNative;
+    return !!(native && typeof native.fastFactoryJsonUrls === "function");
+  }
+
+  function buildStateUrls(globalObj) {
+    if (!androidNative(globalObj)) {
+      return [FACTORY_WAN_JSON];
+    }
+    const urls = [];
+    lanFactoryJsonUrls(globalObj).forEach((url) => {
+      if (urls.indexOf(url) < 0) urls.push(url);
+    });
+    if (urls.indexOf(FACTORY_WAN_JSON) < 0) urls.push(FACTORY_WAN_JSON);
+    return urls;
+  }
+
+  function raceFirst(urls, runner) {
+    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
+    if (!list.length) return Promise.reject(new Error("no urls"));
+    if (list.length === 1) return runner(list[0]);
+    return new Promise((resolve, reject) => {
+      let pending = list.length;
+      let settled = false;
+      list.forEach((url) => {
+        runner(url).then((value) => {
+          if (settled) return;
+          settled = true;
+          resolve(value);
+        }).catch(() => {
+          pending -= 1;
+          if (!settled && pending <= 0) reject(new Error("all failed"));
+        });
+      });
+    });
+  }
+
+  function fetchFirstJson(urls) {
+    return loadFactorySot().then(function () {
+      const list = (Array.isArray(urls) && urls.length) ? urls : buildStateUrls(global);
+      return raceFirst(list, fetchJson);
+    });
+  }
+
+  function putAllJson(urls, value) {
+    return loadFactorySot().then(function () {
+    const list = Array.isArray(urls) && urls.length ? urls.filter(Boolean) : buildStateUrls(global).filter(Boolean);
+    if (!list.length) return Promise.reject(new Error("no urls"));
+    if (list.length === 1) return putJson(list[0], value);
+    return new Promise((resolve, reject) => {
+      let pending = list.length;
+      let resolved = false;
+      let lastErr = null;
+      list.forEach((url) => {
+        putJson(url, value).then((res) => {
+          if (!resolved) {
+            resolved = true;
+            resolve(res);
+          }
+        }).catch((err) => {
+          lastErr = err;
+          pending -= 1;
+          if (!resolved && pending <= 0) reject(lastErr || new Error("all failed"));
+        });
+      });
+    });
+    });
   }
 
   function putFirstJson(urls, value) {
-    const list = Array.isArray(urls) ? urls.filter(Boolean) : [];
-    if (!list.length) return Promise.reject(new Error("no urls"));
-    let chain = Promise.reject(new Error("empty"));
-    list.forEach((url) => {
-      chain = chain.catch(() => putJson(url, value));
-    });
-    return chain;
+    return putAllJson(urls, value);
   }
 
   function putJson(url, value) {
@@ -1585,7 +1759,14 @@
     if (protocol !== "http:" && protocol !== "https:") return "";
     if (!hostname) return "";
     const host = location && location.host ? String(location.host) : hostname;
-    return `${protocol}//${host}/chicken-timer/index.html`;
+    let path = location && location.pathname ? String(location.pathname) : "/";
+    if (!path || path.charAt(0) !== "/") path = "/" + path;
+    const lastSeg = path.split("/").pop();
+    const looksLikeFile = lastSeg.indexOf(".") >= 0;
+    const dir = looksLikeFile
+      ? path.slice(0, path.lastIndexOf("/") + 1)
+      : (path.charAt(path.length - 1) === "/" ? path : path + "/");
+    return `${protocol}//${host}${dir}index.html`;
   }
 
   function isConstrainedAndroidClient() {
@@ -1622,5 +1803,7 @@
 
   global.ChickenTimerSync = {
     createChannel,
+    buildStateUrls,
+    isStoreLanHost,
   };
 })(window);

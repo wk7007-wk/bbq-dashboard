@@ -1499,7 +1499,10 @@
   let sotReady = null;
 
   function factorySotCandidates() {
-    const cands = [];
+    const cands = [
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_bridge.json",
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+    ];
     try {
       const loc = global.location || {};
       const host = String(loc.hostname || "");
@@ -1511,16 +1514,36 @@
     } catch (_) {}
     cands.push("https://wsl-ubuntu.tail785e65.ts.net/endpoints.json");
     cands.push("https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json");
-    cands.push("https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json");
     return cands;
+  }
+
+  function tableBases(ep) {
+    const f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
+    const ip = String((ep && ep.public_ip) || "").trim();
+    const magic = String((f && f.magic_base) || (ep && ep.magic_base) || "").replace(/\/$/, "");
+    let wan = String((f && f.wan_base) || (ep && ep.wan_base) || "").replace(/\/$/, "");
+    let wanHost = "";
+    const match = wan.match(/^https?:\/\/([^/:]+)/i);
+    if (match) wanHost = match[1];
+    if (ip && (!wan || wanHost !== ip || wan.indexOf("https://") === 0)) {
+      wan = "http://" + ip + ":2421";
+    }
+    return { ip: ip, magic: magic, wan: wan };
   }
 
   function applyFactorySot(ep) {
     if (!ep || typeof ep !== "object") return false;
-    const ip = String(ep.public_ip || "").trim();
-    if (!ip) return false;
-    FACTORY_WAN_HOST = ip;
-    FACTORY_WAN_JSON = "https://" + ip + "/chicken_timer.json";
+    const t = tableBases(ep);
+    if (!t.ip && !t.wan && !t.magic) return false;
+    FACTORY_WAN_HOST = t.ip;
+    let host = "";
+    try { host = String((global.location || {}).hostname || ""); } catch (_) {}
+    let live = t.wan;
+    if (host.indexOf(".ts.net") >= 0 && t.magic) live = t.magic;
+    else if ((host === "127.0.0.1" || host === "localhost") && t.magic) live = t.magic;
+    if (!live) live = t.magic || t.wan;
+    if (!live) return false;
+    FACTORY_WAN_JSON = live.replace(/\/$/, "") + "/chicken_timer.json";
     return true;
   }
 
