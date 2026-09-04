@@ -1,13 +1,14 @@
 {
   "appVersionCode": 29760630,
   "appVersionName": "0802.1130",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/BankTotal_latest.bin?v=29760630",
-  "sha256": "206f3fce141c25ae03dc7f811d872b20908986d2451eec6da32f070ba299083e",
-  "sizeBytes": 7272827,
+  "apkUrl": "https://125.176.112.214/updates/banktotal/BankTotal_latest.apk",
+  "sha256": "9b95ece9d54ce808b80fedf7f11be848e5ab8cda7a983ee71812e06aa82b6b94",
+  "sizeBytes": 7315167,
   "packageName": "com.banktotal.app",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
   "releaseNotes": "가계부 그룹 입금·출금 합계를 함께 표시",
   "updatedAt": "2026-08-02T11:39:41+09:00",
-  "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/banktotal/history.json"
+  "historyUrl": "https://125.176.112.214/updates/banktotal/history.json",
+  "artifactUrl": "https://125.176.112.214/updates/banktotal/BankTotal_latest.bin"
 }

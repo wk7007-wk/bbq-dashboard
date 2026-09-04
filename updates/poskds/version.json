@@ -1,7 +1,7 @@
 {
   "appVersionCode": 29677568,
   "appVersionName": "0605.1008",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/PosKDS_latest.bin?v=29677568",
+  "apkUrl": "https://125.176.112.214/updates/poskds/PosKDS_latest.bin",
   "sha256": "bd907ee2ff45103c63f70395267e0c0bde0f444120ef5626b9221e13322f2580",
   "sizeBytes": 6218139,
   "packageName": "com.poskds.app",
@@ -9,5 +9,5 @@
   "enabled": true,
   "releaseNotes": "PosKDS 업데이트 센터 배포",
   "updatedAt": "2026-07-30T01:10:00+09:00",
-  "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/poskds/history.json"
+  "historyUrl": "https://125.176.112.214/updates/poskds/history.json"
 }

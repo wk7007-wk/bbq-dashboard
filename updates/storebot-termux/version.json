@@ -1,7 +1,7 @@
 {
   "appVersionCode": 1085,
   "appVersionName": "0.118.7-storebot-kst0825.t0810",
-  "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/StoreBotTermux_latest.bin?v=1085",
+  "apkUrl": "https://125.176.112.214/updates/storebot-termux/StoreBotTermux_latest.apk",
   "sha256": "1a7740add36badc671f7f2e096f4d9635f1f0c40de8e9fcafc73cc1b64d1298d",
   "sizeBytes": 38757968,
   "packageName": "com.sbotux",
@@ -9,5 +9,6 @@
   "enabled": true,
   "releaseNotes": "근무표 PNG 날짜별 할인 칸. 서버폰 설치 1085.",
   "updatedAt": "2026-08-25T08:39:41+09:00",
-  "historyUrl": "https://wk7007-wk.github.io/bbq-dashboard/updates/storebot-termux/history.json"
+  "historyUrl": "https://125.176.112.214/updates/storebot-termux/history.json",
+  "artifactUrl": "https://125.176.112.214/updates/storebot-termux/StoreBotTermux_latest.bin"
 }
