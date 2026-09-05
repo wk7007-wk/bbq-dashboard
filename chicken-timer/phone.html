@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>치킨 타이머</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+</head>
+<body style="font-family:sans-serif;background:#111;color:#eee;padding:24px">
+  <p>타이머 주소를 찾는 중…</p>
+  <p style="color:#888;font-size:14px">안드로이드는 Tailscale 없이 공장 공인 주소로 붙습니다. APK·웹은 같은 타이머 파일을 봅니다.</p>
+  <script>
+  (function () {
+    var books = [
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    ];
+    function go(ep) {
+      var f = (ep && ep.sets && ep.sets.factory) || {};
+      var wan = String(f.wan_base || "").replace(/\/$/, "");
+      if (!wan) throw new Error("no wan");
+      location.replace(wan + "/chicken-timer/");
+    }
+    function next(i) {
+      if (i >= books.length) {
+        document.body.innerHTML = "<p>공장 주소를 못 읽었습니다. 잠시 후 다시 열어 주세요.</p>";
+        return;
+      }
+      fetch(books[i], { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("http");
+        return r.json();
+      }).then(go).catch(function () { next(i + 1); });
+    }
+    next(0);
+  })();
+  </script>
+</body>
+</html>

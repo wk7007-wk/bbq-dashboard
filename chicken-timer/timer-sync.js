@@ -1528,17 +1528,30 @@
     const local = sameOriginJson("chicken_timer.json");
     if (local) {
       FACTORY_WAN_JSON = local;
+      FACTORY_WAN_HOST = httpUrlHost(local) || FACTORY_WAN_HOST;
       return true;
     }
     if (!ep || typeof ep !== "object") return false;
     const t = tableBases(ep);
     let host = "";
-    try { host = String((global.location || {}).hostname || ""); } catch (_) {}
+    let httpsPage = false;
+    try {
+      host = String((global.location || {}).hostname || "");
+      httpsPage = String((global.location || {}).protocol || "") === "https:";
+    } catch (_) {}
     let live = "";
-    if (host.indexOf(".ts.net") >= 0 && t.magic) live = t.magic;
-    else live = t.wanHttps || t.wan || t.siteLan || t.magic || t.ts;
+    if (androidNative(global)) {
+      live = t.wan || t.siteLan || t.wanHttps || t.magic;
+    } else if (host.indexOf(".ts.net") >= 0 && t.magic) {
+      live = t.magic;
+    } else if (httpsPage && host.indexOf("github.io") >= 0) {
+      live = t.wanHttps || t.magic;
+    } else {
+      live = t.wan || t.siteLan || t.magic || t.ts;
+    }
     if (!live) return false;
     FACTORY_WAN_JSON = live.replace(/\/$/, "") + "/chicken_timer.json";
+    FACTORY_WAN_HOST = httpUrlHost(FACTORY_WAN_JSON) || String((ep && ep.public_ip) || "") || FACTORY_WAN_HOST;
     return true;
   }
 
