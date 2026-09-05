@@ -66,13 +66,31 @@
     return out;
   }
 
+  function fallbackJsonUrls(name) {
+    name = String(name || "").replace(/^\//, "");
+    var out = [];
+    var ep = addressBook;
+    if (!ep || !ep.sets) return out;
+    ["primary", "fallback"].forEach(function (setname) {
+      var s = ep.sets[setname] || {};
+      ["live_base", "pages_base"].forEach(function (k) {
+        var live = String(s[k] || "").replace(/\/$/, "");
+        if (!live || !canUseUrl(live)) return;
+        var u = live + "/" + name;
+        if (out.indexOf(u) < 0) out.push(u);
+      });
+      var direct = String(s[name] || "").trim();
+      if (direct.indexOf("http") === 0 && canUseUrl(direct) && out.indexOf(direct) < 0) out.push(direct);
+    });
+    return out;
+  }
+
   function loadAddressBook() {
     if (typeof fetch !== "function") return Promise.reject(new Error("no fetch"));
-    var cands = [
-      "updates/endpoints.json",
-      GITHUB_ENDPOINTS,
-      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
-    ];
+    var cands = [];
+    if (onGithubPages()) cands.push("updates/endpoints.json");
+    cands.push(GITHUB_ENDPOINTS);
+    cands.push("https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json");
     var chain = Promise.reject(new Error("none"));
     cands.forEach(function (url) {
       chain = chain.catch(function () {
@@ -117,11 +135,11 @@
     var bar = doc.getElementById("factoryDownBanner");
     var msg = factoryLive
       ? ("공장 " + (factoryOrigin || ""))
-      : ("공장 먹통 · 주소판 깃허브" + (factoryOriginList[0] ? " · " + factoryOriginList[0] : ""));
+      : ("공장 먹통 · 주소판 깃허브 · 읽기 2차");
     if (pin) pin.textContent = msg;
     if (bar) {
       bar.style.display = factoryLive ? "none" : "block";
-      bar.textContent = "공장이 응답하지 않습니다. 주소는 깃허브 주소판입니다. 실시간 건수/쓰기는 공장이 살아날 때까지 멈춥니다.";
+      bar.textContent = "공장이 응답하지 않습니다. 주소판은 깃허브입니다. 읽기는 2차, 쓰기는 공장 복구 후.";
     }
     var ct = doc.getElementById("cT");
     var cd = doc.getElementById("cD");
@@ -319,6 +337,14 @@
             if (!r.ok) throw new Error(String(r.status));
             factoryOrigin = base || factoryOrigin;
             factoryLive = true;
+            return r.text();
+          });
+        });
+      });
+      fallbackJsonUrls(name).forEach(function (url) {
+        p = p.catch(function () {
+          return fetch(url + (url.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+            if (!r.ok) throw new Error(String(r.status));
             return r.text();
           });
         });

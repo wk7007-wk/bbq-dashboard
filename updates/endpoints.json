@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-05T08:01:40+09:00",
+  "updated_at": "2026-09-06T04:30:00+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -18,7 +18,7 @@
       "primary",
       "fallback"
     ],
-    "note": "주소판은 깃허브(공장 없어도 읽힘). 실데이터 1차=factory, 먹통이면 2차=primary/fallback. 2차 주소는 이 JSON에서 바꾼다."
+    "note": "부트스트랩은 깃허브 이 파일(공장 없어도 읽힘). 실데이터 1차=sets.factory, 먹통이면 2차=sets.primary.live_base 그다음 fallback.live_base. 공장/2차 주소는 이 JSON만 고친다."
   },
   "health": {
     "factory": "http://100.65.156.49:2421/health",
@@ -64,15 +64,17 @@
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
+      "live_base": "https://wk7007-wk.github.io/bbq-dashboard",
       "updates_base": "https://wk7007-wk.github.io/bbq-dashboard/updates",
       "endpoints": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
       "hynix": "https://wk7007-wk.github.io/bbq-dashboard/hynix/",
       "orderhelper": "https://wk7007-wk.github.io/OrderHelper/"
     },
     "fallback": {
+      "live_base": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw",
       "endpoints": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
       "factory_put_paths": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_put_paths.json",
-      "note": "gist fallback only; factory health->SoT R/W; Pages UI stays github.io",
+      "note": "2차 live_base는 이 칸에서 바꾼다. 공장 먹통이어도 깃허브 주소판만 고치면 됨.",
       "order_desk": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/order_desk.json",
       "workschedule": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json"
     }

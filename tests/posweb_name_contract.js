@@ -28,6 +28,8 @@ assert(admin.includes('wsl-ubuntu.tail785e65.ts.net'), 'factory magic HTTPS requ
 assert(admin.includes('github.io/bbq-dashboard/updates/endpoints.json'), 'github endpoints are the address book');
 assert(admin.includes('gist.githubusercontent.com'), 'gist is 2nd address book if github pages fails');
 assert(admin.includes('basesFromEndpoints') || admin.includes('sets.factory'), 'factory bases come from github endpoints');
+assert(admin.includes('fallbackJsonUrls'), 'factory down must read 2nd live_base from github address book');
+assert(!admin.includes('"updates/endpoints.json",\n      GITHUB_ENDPOINTS'), 'address book must not prefer factory relative json');
 assert(live.includes('poswebFactory'), 'posweb.html must use factory origin helper');
 assert(live.includes('window.S=S'), 'page S must be visible to posweb_admin');
 assert(admin.includes('settingsReady'), 'empty web save must not wipe kitchen settings');

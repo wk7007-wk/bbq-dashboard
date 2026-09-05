@@ -1499,49 +1499,41 @@
   let sotReady = null;
 
   function factorySotCandidates() {
-    const cands = [
-      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_bridge.json",
+    return [
       "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
     ];
-    try {
-      const loc = global.location || {};
-      const host = String(loc.hostname || "");
-      const origin = String(loc.origin || "");
-      if (origin && host.indexOf("github.io") < 0) {
-        cands.push(origin + "/endpoints.json");
-        cands.push(origin + "/factory_bridge.json");
-      }
-    } catch (_) {}
-    cands.push("https://wsl-ubuntu.tail785e65.ts.net/endpoints.json");
-    cands.push("https://wsl-ubuntu.tail785e65.ts.net/factory_bridge.json");
-    return cands;
   }
 
   function tableBases(ep) {
     const f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
-    const ip = String((ep && ep.public_ip) || "").trim();
     const magic = String((f && f.magic_base) || (ep && ep.magic_base) || "").replace(/\/$/, "");
-    let wan = String((f && f.wan_base) || (ep && ep.wan_base) || "").replace(/\/$/, "");
-    let wanHost = "";
-    const match = wan.match(/^https?:\/\/([^/:]+)/i);
-    if (match) wanHost = match[1];
-    if (ip && (!wan || wanHost !== ip || wan.indexOf("https://") === 0)) {
-      wan = "http://" + ip + ":2421";
-    }
-    return { ip: ip, magic: magic, wan: wan };
+    const ts = String((f && f.ts_base) || (ep && ep.ts_base) || "").replace(/\/$/, "");
+    return { magic: magic, ts: ts };
+  }
+
+  function sameOriginJson(name) {
+    try {
+      const host = String((global.location || {}).hostname || "");
+      if (host && host.indexOf("github.io") < 0) return "/" + String(name || "").replace(/^\//, "");
+    } catch (_) {}
+    return "";
   }
 
   function applyFactorySot(ep) {
+    const local = sameOriginJson("chicken_timer.json");
+    if (local) {
+      FACTORY_WAN_JSON = local;
+      return true;
+    }
     if (!ep || typeof ep !== "object") return false;
     const t = tableBases(ep);
-    if (!t.ip && !t.wan && !t.magic) return false;
-    FACTORY_WAN_HOST = t.ip;
     let host = "";
     try { host = String((global.location || {}).hostname || ""); } catch (_) {}
-    let live = t.wan;
+    let live = "";
     if (host.indexOf(".ts.net") >= 0 && t.magic) live = t.magic;
-    else if ((host === "127.0.0.1" || host === "localhost") && t.magic) live = t.magic;
-    if (!live) live = t.magic || t.wan;
+    else if (t.magic) live = t.magic;
+    else if (t.ts) live = t.ts;
     if (!live) return false;
     FACTORY_WAN_JSON = live.replace(/\/$/, "") + "/chicken_timer.json";
     return true;
@@ -1564,6 +1556,7 @@
     })();
     return sotReady;
   }
+  FACTORY_WAN_JSON = sameOriginJson("chicken_timer.json") || FACTORY_WAN_JSON;
   loadFactorySot();
 
   function isStoreLanHost(host) {

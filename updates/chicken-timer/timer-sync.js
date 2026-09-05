@@ -1500,8 +1500,8 @@
 
   function factorySotCandidates() {
     const cands = [
-      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_bridge.json",
       "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
     ];
     try {
       const loc = global.location || {};
