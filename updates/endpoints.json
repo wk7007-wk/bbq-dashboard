@@ -18,7 +18,13 @@
       "primary",
       "fallback"
     ],
-    "note": "부트스트랩은 깃허브 이 파일(공장 없어도 읽힘). 실데이터 1차=sets.factory, 먹통이면 2차=sets.primary.live_base 그다음 fallback.live_base. 공장/2차 주소는 이 JSON만 고친다."
+    "note": "사람은 공장 이름만 북마크. IP와 깃허브는 기계용. 프로그램 주소판=이 JSON. 실데이터 1차=factory, 먹통이면 2차=primary/fallback.",
+    "bookmarks": {
+      "posweb": "https://wsl-ubuntu.tail785e65.ts.net/posweb.html",
+      "orderhelper": "https://wsl-ubuntu.tail785e65.ts.net/OrderHelper/",
+      "hynix": "https://wsl-ubuntu.tail785e65.ts.net/hynix/",
+      "updates": "https://wsl-ubuntu.tail785e65.ts.net/updates/"
+    }
   },
   "health": {
     "factory": "http://100.65.156.49:2421/health",
