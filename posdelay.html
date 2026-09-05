@@ -2,15 +2,22 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>posweb</title>
 <script>
 (function () {
-  var next = "posweb.html" + location.search + location.hash;
-  location.replace(next);
+  var v = "0906-nocache3";
+  var u = new URL("posweb.html", location.href);
+  u.search = location.search;
+  u.searchParams.set("v", v);
+  u.hash = location.hash;
+  location.replace(u.pathname.replace(/[^/]+$/, "posweb.html") + u.search + u.hash);
 })();
 </script>
-<meta http-equiv="refresh" content="0; url=posweb.html">
+<meta http-equiv="refresh" content="0; url=posweb.html?v=0906-nocache3">
 </head>
 <body>posweb으로 이동합니다.</body>
 </html>

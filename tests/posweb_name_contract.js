@@ -13,7 +13,9 @@ assert(!hub.includes('app-title">PosDelay'), 'hub must not keep PosDelay as the 
 assert(!hub.includes('href="posdelay.html"'), 'hub must not send people to the leftover filename');
 
 assert(live.includes('<title>posweb</title>'), 'live page title must be posweb');
-assert(live.includes('posweb_admin.js'), 'live page must load posweb_admin.js');
+assert(live.includes('data-web-v='), 'html must carry a cache-bust version');
+assert(live.includes('posweb_admin.js?v='), 'admin script must be cache-busted');
+assert(live.includes('no-store'), 'html must forbid store cache');
 assert(!live.includes('PosDelay Dashboard'), 'live page must not keep old dashboard title');
 
 assert(legacy.includes('posweb.html'), 'old posdelay.html must redirect to posweb');
