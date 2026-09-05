@@ -19,6 +19,7 @@
       "fallback"
     ],
     "note": "사람은 공장 이름만 북마크. IP와 깃허브는 기계용. 프로그램 주소판=이 JSON. 실데이터 1차=factory, 먹통이면 2차=primary/fallback.",
+    "note_viewers": "메인PC Tailscale 북마크=policy.bookmarks. 노트북(Tailscale 없음)=policy.bookmarks_public github.io 점프 → 매장 LAN 공장. 타이머 노트북은 사이트가 아니라 PackHelper Edge --app 335x900.",
     "bookmarks": {
       "posweb": "https://wsl-ubuntu.tail785e65.ts.net/posweb.html",
       "orderhelper": "https://wsl-ubuntu.tail785e65.ts.net/OrderHelper/",
@@ -26,6 +27,15 @@
       "chicken_timer": "https://wsl-ubuntu.tail785e65.ts.net/chicken-timer/",
       "chicken_timer_phone": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/phone.html",
       "updates": "https://wsl-ubuntu.tail785e65.ts.net/updates/"
+    },
+    "bookmarks_public": {
+      "posweb": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=posweb",
+      "orderhelper": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=orderhelper",
+      "hynix": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=hynix",
+      "chicken_timer": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer",
+      "chicken_timer_subnote": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer&profile=subnote&sync=main",
+      "chicken_timer_phone": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/phone.html",
+      "updates": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=updates"
     }
   },
   "health": {

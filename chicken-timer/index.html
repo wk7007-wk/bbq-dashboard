@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0902-clockpath">
+<html lang="ko" data-web-v="0905-sites">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -8,6 +8,13 @@
   <meta http-equiv="Expires" content="0">
   <script>
 (function(){
+  var host = location.hostname || "";
+  if (host === "wk7007-wk.github.io") {
+    var jump = new URLSearchParams(location.search);
+    jump.set("to", "chicken-timer");
+    location.replace("/bbq-dashboard/go.html?" + jump.toString());
+    return;
+  }
   var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";
   if (!v) {
     var m = document.querySelector('meta[name="web-v"]');
@@ -43,10 +50,10 @@
   <script src="./timer-core.js?v=934992dc8aa5"></script>
   <script src="./timer-bridge.js?v=2e312ed9c073"></script>
   <script src="./timer-split-assist.js?v=0731299f4936"></script>
-  <script src="./timer-sync.js?v=0902-clockpath"></script>
+  <script src="./timer-sync.js?v=0905-sites"></script>
   <script src="./timer-auth.js?v=63236fff3407"></script>
   <script src="./app.js?v=319dd90116dc"></script>
   <script src="./physical-evidence.js?v=b053bac7aff0"></script>
-  <script src="./recipe-panel.js?v=0830-https"></script>
+  <script src="./recipe-panel.js?v=0905-sites"></script>
 </body>
 </html>

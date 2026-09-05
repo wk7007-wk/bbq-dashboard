@@ -17,9 +17,12 @@
     ];
     function go(ep) {
       var f = (ep && ep.sets && ep.sets.factory) || {};
+      var lan = String(f.site_lan_base || "").replace(/\/$/, "");
       var wan = String(f.wan_base || "").replace(/\/$/, "");
-      if (!wan) throw new Error("no wan");
-      location.replace(wan + "/chicken-timer/");
+      var via = String((location.search || "").match(/[?&]via=([^&]*)/) || [])[1] || "lan";
+      var base = via === "wan" ? wan : (lan || wan);
+      if (!base) throw new Error("no base");
+      location.replace(base.replace(/\/$/, "") + "/chicken-timer/");
     }
     function next(i) {
       if (i >= books.length) {

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>공장 연결</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body style="font-family:sans-serif;background:#111;color:#eee;padding:24px;max-width:40rem">
+  <p>공장 주소를 찾는 중…</p>
+  <p style="color:#888;font-size:14px">노트북은 Tailscale 없이 매장 LAN을 먼저 붙습니다. 메인 PC Tailscale 주소는 쓰지 않습니다.</p>
+  <p id="alt" style="display:none;margin-top:16px"></p>
+  <script>
+  (function () {
+    var books = [
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    ];
+    var PATHS = {
+      posweb: "/posweb.html",
+      orderhelper: "/OrderHelper/",
+      hynix: "/hynix/",
+      "chicken-timer": "/chicken-timer/",
+      updates: "/updates/"
+    };
+    var params = new URLSearchParams(location.search);
+    var to = params.get("to") || "posweb";
+    var via = (params.get("via") || "lan").toLowerCase();
+    params.delete("to");
+    params.delete("via");
+    var extra = params.toString();
+    var path = PATHS[to] || PATHS.posweb;
+    if (extra) path += (path.indexOf("?") >= 0 ? "&" : "?") + extra;
+
+    function join(base, suffix) {
+      return String(base || "").replace(/\/$/, "") + suffix;
+    }
+
+    function go(ep) {
+      var f = (ep && ep.sets && ep.sets.factory) || {};
+      var lan = String(f.site_lan_base || "").replace(/\/$/, "");
+      var wan = String(f.wan_base || "").replace(/\/$/, "");
+      var primary = via === "wan" ? wan : lan;
+      var other = via === "wan" ? lan : wan;
+      if (!primary && other) primary = other;
+      if (!primary) throw new Error("no base");
+      var alt = document.getElementById("alt");
+      if (alt && other && other !== primary) {
+        alt.style.display = "block";
+        var otherVia = primary === lan ? "wan" : "lan";
+        var otherLabel = otherVia === "wan" ? "외부(공인) 주소" : "매장 LAN 주소";
+        alt.innerHTML = '안 열리면 <a href="?to=' + encodeURIComponent(to) + '&via=' + otherVia + (extra ? '&' + extra : '') + '" style="color:#8cf">' + otherLabel + '</a>로 다시 붙기';
+      }
+      location.replace(join(primary, path));
+    }
+
+    function next(i) {
+      if (i >= books.length) {
+        document.body.innerHTML = "<p>공장 주소를 못 읽었습니다. 잠시 후 다시 열어 주세요.</p>";
+        return;
+      }
+      fetch(books[i], { cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw new Error("http");
+        return r.json();
+      }).then(go).catch(function () { next(i + 1); });
+    }
+    next(0);
+  })();
+  </script>
+</body>
+</html>
