@@ -68,8 +68,11 @@
 
   function loadAddressBook() {
     if (typeof fetch !== "function") return Promise.reject(new Error("no fetch"));
-    var cands = ["updates/endpoints.json", GITHUB_ENDPOINTS];
-    if (canUseUrl(MAGIC + "/endpoints.json")) cands.push(MAGIC + "/endpoints.json");
+    var cands = [
+      "updates/endpoints.json",
+      GITHUB_ENDPOINTS,
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    ];
     var chain = Promise.reject(new Error("none"));
     cands.forEach(function (url) {
       chain = chain.catch(function () {

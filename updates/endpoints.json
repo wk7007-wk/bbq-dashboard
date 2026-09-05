@@ -1,17 +1,27 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-04T23:14:33+09:00",
+  "updated_at": "2026-09-05T08:01:40+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
+    "address_book": [
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    ],
+    "live_chain": [
+      "factory",
+      "primary",
+      "fallback"
+    ],
     "chain": [
       "factory",
       "primary",
       "fallback"
-    ]
+    ],
+    "note": "주소판은 깃허브(공장 없어도 읽힘). 실데이터 1차=factory, 먹통이면 2차=primary/fallback. 2차 주소는 이 JSON에서 바꾼다."
   },
   "health": {
-    "factory": "https://wsl-ubuntu.tail785e65.ts.net/health",
+    "factory": "http://100.65.156.49:2421/health",
     "factory_lan": "http://127.0.0.1:2421/health",
     "factory_magic": "https://wsl-ubuntu.tail785e65.ts.net/health",
     "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
@@ -25,29 +35,32 @@
       "wan_base": "http://125.176.112.214:2421",
       "baeksu_reports": "https://wsl-ubuntu.tail785e65.ts.net/baeksu_reports.json",
       "factory_put_paths": "https://wsl-ubuntu.tail785e65.ts.net/factory_put_paths.json",
-      "chicken_timer_board": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/",
+      "chicken_timer_board": "https://wsl-ubuntu.tail785e65.ts.net/chicken-timer/",
       "ts_base": "http://100.65.156.49:2421",
-      "pages_base_http": "http://125.176.112.214:2421",
+      "pages_base_http": "http://100.65.156.49:2421",
       "orderhelper": "https://wsl-ubuntu.tail785e65.ts.net/OrderHelper/",
-      "hynix": "http://wsl-ubuntu.tail785e65.ts.net:2421/hynix/",
+      "hynix": "https://wsl-ubuntu.tail785e65.ts.net/hynix/",
       "workschedule": "https://wsl-ubuntu.tail785e65.ts.net/workschedule.json",
-      "updates_base": "http://125.176.112.214:2421/updates",
+      "updates_base": "https://wsl-ubuntu.tail785e65.ts.net/updates",
       "factory_internal": {
         "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
         "magic_updates_base": "https://wsl-ubuntu.tail785e65.ts.net/updates",
         "ts_base": "http://100.65.156.49:2421",
         "lan_base": "http://127.0.0.1:2421"
       },
-      "update.posdelay": "http://125.176.112.214:2421/updates/posdelay/version.json",
-      "update.deliveryhelper": "http://125.176.112.214:2421/updates/deliveryhelper/version.json",
-      "update.chicken-timer": "http://125.176.112.214:2421/updates/chicken-timer/version.json",
-      "update.storebot-termux": "http://125.176.112.214:2421/updates/storebot-termux/version.json",
-      "update.wonmux": "http://125.176.112.214:2421/updates/wonmux/version.json",
-      "update.wonmux-browser": "http://125.176.112.214:2421/updates/wonmux-browser/version.json",
-      "update.solnote": "http://125.176.112.214:2421/updates/solnote/version.json",
-      "update.banktotal": "http://125.176.112.214:2421/updates/banktotal/version.json",
-      "update.update-center": "http://125.176.112.214:2421/updates/update-center/version.json",
-      "update.catalog": "https://wsl-ubuntu.tail785e65.ts.net/updates/catalog.json"
+      "update.posdelay": "https://wsl-ubuntu.tail785e65.ts.net/updates/posdelay/version.json",
+      "update.deliveryhelper": "https://wsl-ubuntu.tail785e65.ts.net/updates/deliveryhelper/version.json",
+      "update.chicken-timer": "https://wsl-ubuntu.tail785e65.ts.net/updates/chicken-timer/version.json",
+      "update.storebot-termux": "https://wsl-ubuntu.tail785e65.ts.net/updates/storebot-termux/version.json",
+      "update.wonmux": "https://wsl-ubuntu.tail785e65.ts.net/updates/wonmux/version.json",
+      "update.wonmux-browser": "https://wsl-ubuntu.tail785e65.ts.net/updates/wonmux-browser/version.json",
+      "update.solnote": "https://wsl-ubuntu.tail785e65.ts.net/updates/solnote/version.json",
+      "update.banktotal": "https://wsl-ubuntu.tail785e65.ts.net/updates/banktotal/version.json",
+      "update.update-center": "https://wsl-ubuntu.tail785e65.ts.net/updates/update-center/version.json",
+      "update.catalog": "https://wsl-ubuntu.tail785e65.ts.net/updates/catalog.json",
+      "center_mode": "site",
+      "wan_base_lock": true,
+      "wan_base_lock_value": "http://125.176.112.214:2421"
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
@@ -65,5 +78,6 @@
     }
   },
   "public_ip": "125.176.112.214",
-  "host": "125.176.112.214"
+  "host": "125.176.112.214",
+  "center_mode": "site"
 }
