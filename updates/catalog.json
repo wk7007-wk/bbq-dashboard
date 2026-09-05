@@ -1,6 +1,33 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-09-06T06:14:08+09:00",
+  "sites": [
+    {
+      "id": "posweb",
+      "label": "포스웹",
+      "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=posweb"
+    },
+    {
+      "id": "orderhelper",
+      "label": "발주",
+      "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=orderhelper"
+    },
+    {
+      "id": "hynix",
+      "label": "하이닉스·근무표",
+      "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=hynix"
+    },
+    {
+      "id": "chicken_timer",
+      "label": "타이머 웹",
+      "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer"
+    },
+    {
+      "id": "updates",
+      "label": "업데이트 센터",
+      "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=updates"
+    }
+  ],
   "apps": [
     {
       "id": "chicken-timer",

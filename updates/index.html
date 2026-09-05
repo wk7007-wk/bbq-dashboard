@@ -95,6 +95,8 @@
     .acts button.save { background: #3d5a80; }
     .note { color: var(--muted); font-size: .8rem; margin-top: 6px; }
     .err { color: #ff8b82; }
+    h2 { font-size: 1.12rem; margin: 18px 0 6px; }
+    .site-url { font-size: .82rem; color: #cfe4ff; word-break: break-all; }
     .retired { opacity: .92; }
     body.auth-locked > *:not(#pinOverlay) { display: none !important; }
     #pinOverlay { position: fixed; inset: 0; background: #0e141c; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
@@ -115,11 +117,14 @@
     <div id="pinErr"></div>
   </div>
   <h1>업데이트 센터 · 9조</h1>
+  <p class="lead">브라우저에 아래 사이트 주소를 북마크하세요. 깃허브 점프가 주소판의 공장을 찾습니다. Tailscale은 필요 없습니다.</p>
+  <div id="sites">사이트 주소 불러오는 중…</div>
+  <h2>앱 업데이트</h2>
   <p class="lead">지금 이 폰에 깔린 버전과 공장 최신을 한 줄씩 비교합니다. 받기는 잘라서 받습니다. 브라우저가 설치본을 못 읽으면 이 폰 칸에 한 번 적고 저장하세요.</p>
   <p class="meta" id="meta">catalog 불러오는 중… · <a href="catalog.json">catalog.json</a></p>
   <div class="counts" id="counts"></div>
   <div id="list">불러오는 중…</div>
-  <p class="meta">PosKDS는 잠금이라 제외. 근무표는 웹이라 제외. 업데이트센터 앱은 폐기 — 센터는 이 화면.</p>
+  <p class="meta">PosKDS는 잠금이라 제외. 근무표는 하이닉스 사이트. 업데이트센터 앱은 폐기 — 센터는 이 화면. 노트북 타이머 본체는 PackHelper 고정창입니다.</p>
   <script>
     const PIN_HASH = "38083c7ee9121e17401883566a148aa5c2e2d55dc53bc4a94a026517dbff3c6b";
     const PIN_KEY = "uc9_pin_ok";
@@ -165,6 +170,21 @@
     const list = document.getElementById("list");
     const meta = document.getElementById("meta");
     const counts = document.getElementById("counts");
+    const sitesBox = document.getElementById("sites");
+    const SITE_ROWS = [
+      { key: "posweb", label: "포스웹" },
+      { key: "orderhelper", label: "발주" },
+      { key: "hynix", label: "하이닉스·근무표" },
+      { key: "chicken_timer", label: "타이머 웹" },
+      { key: "updates", label: "업데이트 센터" }
+    ];
+    const SITE_FALLBACK = {
+      posweb: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=posweb",
+      orderhelper: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=orderhelper",
+      hynix: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=hynix",
+      chicken_timer: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer",
+      updates: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=updates"
+    };
 
     function esc(s) {
       return String(s || "").replace(/[&<>"']/g, c => ({
@@ -276,20 +296,64 @@
       out.push("catalog.json");
       return out;
     }
-    async function loadCatalog() {
+    async function loadCatalogAndBook() {
       const ep = await loadAddressBook();
       const urls = catalogUrls(ep);
+      let cat = null;
       for (const u of urls) {
-        try { return await getJson(u); } catch (e) {}
+        try { cat = await getJson(u); break; } catch (e) {}
       }
-      throw new Error("catalog");
+      if (!cat) throw new Error("catalog");
+      return { cat: cat, ep: ep };
+    }
+
+    function renderSites(ep, cat) {
+      const book = (ep && ep.policy && (ep.policy.bookmarks_public || ep.policy.bookmarks)) || {};
+      const extra = (cat && cat.sites) || [];
+      const byKey = {};
+      extra.forEach(function (s) { if (s && s.id) byKey[s.id] = s; });
+      sitesBox.innerHTML = "";
+      SITE_ROWS.forEach(function (row) {
+        const fromCat = byKey[row.key] || {};
+        const url = String(book[row.key] || fromCat.bookmark || SITE_FALLBACK[row.key] || "").trim();
+        if (!url) return;
+        const div = document.createElement("div");
+        div.className = "row latest";
+        div.innerHTML =
+          '<div class="head"><div class="name">' + esc(fromCat.label || row.label) + "</div></div>" +
+          '<div class="site-url">' + esc(url) + "</div>" +
+          '<div class="acts">' +
+          '<a href="' + esc(url) + '">열기</a>' +
+          '<button type="button" data-copy="' + esc(url) + '">주소 복사</button>' +
+          "</div>";
+        sitesBox.appendChild(div);
+      });
+      if (!sitesBox.innerHTML) {
+        sitesBox.innerHTML = '<p class="err">사이트 주소를 못 읽었습니다. 주소판을 다시 불러 주세요.</p>';
+      }
+      sitesBox.onclick = function (ev) {
+        const btn = ev.target.closest("button[data-copy]");
+        if (!btn) return;
+        const url = btn.getAttribute("data-copy") || "";
+        if (!url) return;
+        const done = function () { btn.textContent = "복사됨"; setTimeout(function () { btn.textContent = "주소 복사"; }, 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(done).catch(function () {
+            window.prompt("북마크 주소", url);
+          });
+        } else {
+          window.prompt("북마크 주소", url);
+        }
+      };
     }
 
     function bootCenter() {
     Promise.all([
-      loadCatalog(),
+      loadCatalogAndBook(),
       getJson("/phone_installed.json").catch(() => ({}))
-    ]).then(async ([cat, installedFile]) => {
+    ]).then(async ([pack, installedFile]) => {
+      const cat = pack.cat;
+      renderSites(pack.ep, cat);
       const byId = {};
       (cat.apps || []).forEach(a => { if (a && a.id) byId[a.id] = a; });
       const local = loadLocal();
