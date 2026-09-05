@@ -24,5 +24,9 @@ const admin = fs.readFileSync(path.join(root, 'posweb_admin.js'), 'utf8');
 assert(admin.includes('onGithubPages'), 'github pages must talk to factory, not same-origin JSON');
 assert(admin.includes('wsl-ubuntu.tail785e65.ts.net'), 'factory magic HTTPS required from github.io');
 assert(live.includes('poswebFactory'), 'posweb.html must use factory origin helper');
+assert(live.includes('id="pinOverlay"'), 'site must require a password overlay');
+assert(live.includes('class="auth-locked"'), 'site must start locked');
+assert(admin.includes('checkPoswebPin'), 'password is checked against factory');
+assert(!/TRACK3_WRITE_TOKEN\s*=/.test(admin), 'password must not be in github js');
 
 console.log('PASS posweb_name');

@@ -93,43 +93,129 @@
     } catch (e) {}
   }
 
+  var pinAttempts = 0;
+  var pinLockUntil = 0;
+  var PIN_MAX_ATTEMPTS = 5;
+  var PIN_LOCK_MS = 30000;
+
+  function setPinMessage(text, ok) {
+    var el = document.getElementById("pinError");
+    if (!el) return;
+    el.style.color = ok ? "#2ECC71" : "#E74C3C";
+    el.textContent = text || "";
+  }
+
+  function showSite(unlocked) {
+    var overlay = document.getElementById("pinOverlay");
+    if (unlocked) {
+      document.body.classList.remove("auth-locked");
+      if (overlay) overlay.classList.add("authed");
+    } else {
+      document.body.classList.add("auth-locked");
+      if (overlay) overlay.classList.remove("authed");
+    }
+  }
+
   function applyWebAdminUi() {
-    var unlocked = isWebAdmin();
+    var unlocked = isWebAdmin() || !!root.isApp;
+    showSite(unlocked);
     var notice = document.getElementById("standaloneReadOnlyNotice");
     if (notice) {
-      notice.style.display = root.isApp ? "none" : "block";
-      notice.textContent = unlocked
-        ? "관리자 웹 — 임계는 공장에 저장됩니다. 광고/배달료 실행은 공장, 수락·중지는 PC입니다."
-        : "공개 웹은 읽기 전용입니다. 임계 변경은 관리자, 실행은 공장/PC입니다.";
+      notice.style.display = root.isApp ? "none" : (unlocked ? "block" : "none");
+      notice.textContent = "관리자 웹 — 임계는 공장에 저장됩니다. 광고/배달료 실행은 공장, 수락·중지는 PC입니다.";
     }
     var btn = document.getElementById("webAdminBtn");
-    if (btn) btn.textContent = unlocked ? "관리자ON" : "관리자";
-    if (typeof root.updMonitor === "function") {
+    if (btn) btn.textContent = unlocked ? "잠금" : "잠금";
+    if (unlocked && typeof root.updMonitor === "function") {
       try { root.updMonitor(); } catch (e) {}
     }
   }
 
-  function toggleWebAdmin() {
-    if (isWebAdmin()) {
-      setWriteToken("");
-      applyWebAdminUi();
-      if (typeof root.toast === "function") root.toast("관리자 종료", "ok");
+  function afterUnlock() {
+    applyWebAdminUi();
+    loadWebSettings();
+    if (typeof root.startPoswebLive === "function") root.startPoswebLive();
+  }
+
+  function verifyPassword(pw) {
+    setWriteToken(String(pw || "").trim());
+    return factoryPutJson("posdelay_web_admin_ack.json", {
+      ok: true,
+      ts: Date.now(),
+      source: "posweb_login"
+    }).then(function (ok) {
+      if (!ok) setWriteToken("");
+      return ok;
+    });
+  }
+
+  function checkPoswebPin() {
+    var inp = document.getElementById("pinInput");
+    var pw = inp ? String(inp.value || "").trim() : "";
+    if (Date.now() < pinLockUntil) {
+      var sec = Math.ceil((pinLockUntil - Date.now()) / 1000);
+      setPinMessage("잠시 후 다시 시도 (" + sec + "초)");
+      if (inp) inp.value = "";
       return;
     }
-    var token = root.prompt("공장 쓰기 토큰", "");
-    if (!token) return;
-    setWriteToken(String(token).trim());
-    factoryPutJson("posdelay_web_admin_ack.json", { ok: true, ts: Date.now(), source: "web_admin" }).then(function (ok) {
-      if (!ok) {
-        setWriteToken("");
-        if (typeof root.toast === "function") root.toast("토큰 확인 실패", "warn");
-        applyWebAdminUi();
+    if (!pw) {
+      setPinMessage("비밀번호를 입력하세요");
+      return;
+    }
+    setPinMessage("확인 중...");
+    verifyPassword(pw).then(function (ok) {
+      if (ok) {
+        pinAttempts = 0;
+        setPinMessage("접속되었습니다.", true);
+        if (inp) inp.value = "";
+        afterUnlock();
         return;
       }
-      applyWebAdminUi();
-      loadWebSettings();
-      if (typeof root.toast === "function") root.toast("관리자 웹 열림", "ok");
+      pinAttempts += 1;
+      if (pinAttempts >= PIN_MAX_ATTEMPTS) {
+        pinLockUntil = Date.now() + PIN_LOCK_MS;
+        pinAttempts = 0;
+        setPinMessage(PIN_MAX_ATTEMPTS + "회 틀림 — " + PIN_LOCK_MS / 1000 + "초 후 다시");
+      } else {
+        setPinMessage("비밀번호가 틀립니다 (" + pinAttempts + "/" + PIN_MAX_ATTEMPTS + ")");
+      }
+      if (inp) inp.value = "";
     });
+  }
+
+  function restorePoswebAuth() {
+    if (root.isApp) {
+      afterUnlock();
+      return;
+    }
+    if (!isWebAdmin()) {
+      applyWebAdminUi();
+      var inp = document.getElementById("pinInput");
+      if (inp) {
+        inp.addEventListener("keydown", function (ev) {
+          if (ev.key === "Enter") checkPoswebPin();
+        });
+      }
+      return;
+    }
+    verifyPassword(writeToken()).then(function (ok) {
+      if (ok) afterUnlock();
+      else {
+        applyWebAdminUi();
+        var inp = document.getElementById("pinInput");
+        if (inp) {
+          inp.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter") checkPoswebPin();
+          });
+        }
+      }
+    });
+  }
+
+  function toggleWebAdmin() {
+    setWriteToken("");
+    applyWebAdminUi();
+    if (typeof root.toast === "function") root.toast("잠금", "ok");
   }
 
   function factoryGetJson(name) {
@@ -382,6 +468,8 @@
   root.isWebAdmin = isWebAdmin;
   root.doToggleWebAdmin = toggleWebAdmin;
   root.toggleWebAdmin = toggleWebAdmin;
+  root.checkPoswebPin = checkPoswebPin;
+  root.restorePoswebAuth = restorePoswebAuth;
   root.applyWebAdminUi = applyWebAdminUi;
   root.saveWebAdSettings = saveWebAdSettings;
   root.saveWebPolicy = saveWebPolicy;

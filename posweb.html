@@ -16,6 +16,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 radial-gradient(circle at top right,rgba(42,193,188,.14),transparent 28%),
 radial-gradient(circle at top left,rgba(255,215,0,.10),transparent 22%),
 linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-height:100vh;padding:10px;padding-bottom:16px;font-size:13px;}
+body.auth-locked>*:not(#pinOverlay){display:none!important;}
+.pin-overlay{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0F1221;padding:24px;}
+.pin-overlay.authed{display:none;}
+.pin-overlay h2{margin:0;font-size:20px;font-weight:800;color:var(--text-bright);}
+.pin-note{font-size:13px;color:var(--text-secondary);}
+.pin-overlay input{min-height:54px;width:min(100%,280px);padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-bright);font-size:18px;text-align:center;}
+.pin-overlay button{min-width:128px;min-height:48px;border:0;border-radius:10px;background:#2AC1BC;color:#081018;font-size:16px;font-weight:800;cursor:pointer;}
+.pin-error{min-height:20px;font-size:13px;color:#E74C3C;}
 .page-sticky{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg-deep),var(--bg-deep));padding:4px 10px 2px;margin:-10px -10px 0;}
 .icon-row{display:flex;gap:6px;align-items:center;}
 .icon-btn,.icon-btn-text{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg-input);color:var(--text-secondary);cursor:pointer;touch-action:manipulation;}
@@ -288,14 +296,22 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 }
 </style>
 </head>
-<body>
+<body class="auth-locked">
+
+<div class="pin-overlay" id="pinOverlay">
+  <h2>posweb</h2>
+  <div class="pin-note">비밀번호를 입력하세요.</div>
+  <input type="password" id="pinInput" placeholder="비밀번호" autocomplete="current-password">
+  <button type="button" id="pinSubmit" onclick="checkPoswebPin()">확인</button>
+  <div class="pin-error" id="pinError" role="status" aria-live="polite"></div>
+</div>
 
 <div class="page-sticky">
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div class="conn" style="margin:0"><span class="dot dd" id="cD"></span> <span id="cT" class="text-secondary">...</span><span id="appVer" style="font-size:9px;color:#888;margin-left:6px"></span></div>
     <div class="icon-row">
       <button type="button" class="icon-btn" onclick="doCapture()" aria-label="캡처">&#128247;</button>
-      <button type="button" class="icon-btn-text" id="webAdminBtn" onclick="toggleWebAdmin()">관리자</button>
+      <button type="button" class="icon-btn-text" id="webAdminBtn" onclick="toggleWebAdmin()">잠금</button>
       <button type="button" class="icon-btn-text" onclick="location.reload()">갱신</button>
     </div>
   </div>
@@ -2306,6 +2322,7 @@ sse('/posdelay/alert.json',m=>{
 // 5초 폴링 — 공장/gist/rentry. 파이어 없음.
 let _sseOk=false;
 function pollAll(force){
+  if(!isApp && typeof isWebAdmin==='function' && !isWebAdmin()) return;
   Promise.allSettled([
     fetchFirst(TRACK.kds),
     fetchFirst(TRACK.bus),
@@ -2342,11 +2359,25 @@ function pollAll(force){
     }
   }).catch(function(){updC(false);});
 }
-setInterval(pollAll,5000);
-if(typeof poswebFactory==='object'&&poswebFactory.resolveOrigin){
-  poswebFactory.resolveOrigin().then(function(){pollAll();}).catch(function(){pollAll();});
+function startPoswebLive(){
+  if(window.__poswebLive) return;
+  window.__poswebLive=true;
+  if(typeof poswebFactory==='object'&&poswebFactory.resolveOrigin){
+    poswebFactory.resolveOrigin().then(function(){pollAll();}).catch(function(){pollAll();});
+  }else{
+    setTimeout(pollAll,400);
+  }
+  setInterval(pollAll,5000);
+}
+if(isApp){
+  document.body.classList.remove('auth-locked');
+  var ov=document.getElementById('pinOverlay');
+  if(ov)ov.classList.add('authed');
+  startPoswebLive();
+}else if(typeof restorePoswebAuth==='function'){
+  restorePoswebAuth();
 }else{
-  setTimeout(pollAll,400);
+  startPoswebLive();
 }
 setInterval(()=>{
   const ls=stS.kds_sync??0;
