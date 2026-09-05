@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-06T04:30:00+09:00",
+  "updated_at": "2026-09-06T04:51:37+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -60,7 +60,9 @@
       "update.catalog": "https://wsl-ubuntu.tail785e65.ts.net/updates/catalog.json",
       "center_mode": "site",
       "wan_base_lock": true,
-      "wan_base_lock_value": "http://125.176.112.214:2421"
+      "wan_base_lock_value": "http://125.176.112.214:2421",
+      "wan_https": "https://125.176.112.214",
+      "site_lan_base": "http://192.168.219.42:2421"
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
