@@ -96,9 +96,24 @@
     .note { color: var(--muted); font-size: .8rem; margin-top: 6px; }
     .err { color: #ff8b82; }
     .retired { opacity: .92; }
+    body.auth-locked > *:not(#pinOverlay) { display: none !important; }
+    #pinOverlay { position: fixed; inset: 0; background: #0e141c; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+    #pinOverlay.authed { display: none; }
+    #pinOverlay h2 { margin: 0; font-size: 1.2rem; }
+    #pinOverlay p { margin: 0; color: var(--muted); font-size: .9rem; }
+    #pinOverlay input { font-size: 1.6rem; letter-spacing: .4em; width: 160px; text-align: center; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #0f1a26; color: var(--text); }
+    #pinOverlay button { min-height: 44px; min-width: 120px; border: 0; border-radius: 10px; font-weight: 800; background: var(--tap); color: #03140b; }
+    #pinErr { min-height: 1.2em; color: #ff8b82; font-size: .9rem; }
   </style>
 </head>
-<body class="uc9-compare">
+<body class="uc9-compare auth-locked">
+  <div id="pinOverlay">
+    <h2>업데이트 센터</h2>
+    <p>비밀번호를 입력하세요.</p>
+    <input type="password" inputmode="numeric" maxlength="4" id="pinInput" autocomplete="off">
+    <button type="button" id="pinBtn">확인</button>
+    <div id="pinErr"></div>
+  </div>
   <h1>업데이트 센터 · 9조</h1>
   <p class="lead">지금 이 폰에 깔린 버전과 공장 최신을 한 줄씩 비교합니다. 받기는 잘라서 받습니다. 브라우저가 설치본을 못 읽으면 이 폰 칸에 한 번 적고 저장하세요.</p>
   <p class="meta" id="meta">catalog 불러오는 중… · <a href="catalog.json">catalog.json</a></p>
@@ -106,6 +121,35 @@
   <div id="list">불러오는 중…</div>
   <p class="meta">PosKDS는 잠금이라 제외. 근무표는 웹이라 제외. 업데이트센터 앱은 폐기 — 센터는 이 화면.</p>
   <script>
+    const PIN_HASH = "38083c7ee9121e17401883566a148aa5c2e2d55dc53bc4a94a026517dbff3c6b";
+    const PIN_KEY = "uc9_pin_ok";
+    async function hashPin(pin) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pin));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+    function unlockSite() {
+      document.body.classList.remove("auth-locked");
+      const ov = document.getElementById("pinOverlay");
+      if (ov) ov.classList.add("authed");
+    }
+    async function checkPin() {
+      const inp = document.getElementById("pinInput");
+      const err = document.getElementById("pinErr");
+      const pw = inp ? String(inp.value || "").trim() : "";
+      if (!pw) { if (err) err.textContent = "비밀번호를 입력하세요"; return; }
+      const h = await hashPin(pw);
+      if (h !== PIN_HASH) { if (err) err.textContent = "비밀번호가 틀립니다"; if (inp) inp.value = ""; return; }
+      try { sessionStorage.setItem(PIN_KEY, "1"); } catch (e) {}
+      if (inp) inp.value = "";
+      unlockSite();
+    }
+    (function bindPin() {
+      try { if (sessionStorage.getItem(PIN_KEY) === "1") unlockSite(); } catch (e) {}
+      const btn = document.getElementById("pinBtn");
+      const inp = document.getElementById("pinInput");
+      if (btn) btn.addEventListener("click", checkPin);
+      if (inp) inp.addEventListener("keydown", function (ev) { if (ev.key === "Enter") checkPin(); });
+    })();
     const NINE = [
       { id: "posdelay", label: "PosDelay" },
       { id: "storebot-termux", label: "스토어봇" },
