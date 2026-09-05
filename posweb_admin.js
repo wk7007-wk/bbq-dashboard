@@ -33,7 +33,7 @@
 
   function basesFromEndpoints(ep) {
     var f = (ep && ep.sets && ep.sets.factory) || {};
-    var keys = ["magic_base", "pages_base", "wan_base", "lan_base", "ts_base", "pages_base_http"];
+    var keys = ["wan_https", "magic_base", "pages_base", "wan_base", "site_lan_base", "lan_base", "ts_base", "pages_base_http"];
     var out = [];
     keys.forEach(function (k) {
       var u = String(f[k] || "").replace(/\/$/, "");
@@ -113,7 +113,7 @@
     var chain = Promise.reject(new Error("none"));
     list.forEach(function (base) {
       chain = chain.catch(function () {
-        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined }).then(function (r) {
           if (!r.ok) throw new Error(String(r.status));
           factoryOrigin = base;
           factoryLive = true;
