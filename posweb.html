@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0906-nocache7">
+<html lang="ko" data-web-v="0906-nocache8">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -982,8 +982,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0906-nocache7"></script>
-<script src="posweb_admin.js?v=0906-nocache7"></script>
+<script src="posdelay_ad_receipt.js?v=0906-nocache8"></script>
+<script src="posweb_admin.js?v=0906-nocache8"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1133,7 +1133,10 @@ function sse(path,cb){
 function dispatchBus(){
   _sseConns.forEach(function(s){
     var path=String(s.path||'').replace(/^\//,'').replace(/\.json$/,'');
-    var data=path==='kds_status'?_kds:busPath(_bus,path);
+    var data;
+    if(path==='kds_status') data=_kds;
+    else if(path==='posdelay/signal_snapshot'||path==='signal_snapshot') data=_snap;
+    else data=busPath(_bus,path);
     if(data==null||data==='null')return;
     try{s.cb({path:'/',data:data});}catch(e){}
   });

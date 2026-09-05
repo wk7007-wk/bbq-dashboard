@@ -520,6 +520,7 @@
   }
 
   var settingsReady = false;
+  var policyReady = false;
 
   function saveWebAdSettings(S, gateSettings) {
     if (!isWebAdmin()) return Promise.resolve(false);
@@ -531,6 +532,7 @@
 
   function saveWebPolicy(next) {
     if (!isWebAdmin()) return Promise.resolve(false);
+    if (!policyReady) return Promise.resolve(false);
     return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next));
   }
 
@@ -562,6 +564,7 @@
       }
       if (v2 && v2.version === 2 && root.policySettings) {
         applyRuntimeV2ToPolicy(v2, root.policySettings);
+        policyReady = true;
         if (typeof root.normalizePolicySettings === "function") root.normalizePolicySettings();
         if (typeof root.applyPolicySettingsToUI === "function") root.applyPolicySettingsToUI();
         if (typeof root.initButtonValueControls === "function") root.initButtonValueControls();
