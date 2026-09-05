@@ -1,25 +1,351 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>앱 업데이트</title>
-<style>
-body{font-family:sans-serif;background:#10140f;color:#f8fff6;margin:0;padding:24px}
-a.card{display:block;max-width:480px;margin:0 auto 16px;padding:20px;border:1px solid #2f4e2e;border-radius:16px;background:#172414;color:#f8fff6;text-decoration:none}
-h1{text-align:center}
-.btn{display:block;margin-top:12px;padding:14px;border-radius:12px;background:#85df54;color:#071606;text-align:center;font-weight:700}
-small{color:#8fa38b}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>업데이트 센터 · 9조 비교</title>
+  <style>
+    :root {
+      --bg: #0e141c;
+      --card: #172433;
+      --line: #2a3d54;
+      --text: #f4f8fd;
+      --muted: #9eb0c3;
+      --latest: #3dd68c;
+      --update: #ffb020;
+      --newer: #7ebfff;
+      --unknown: #8b9aab;
+      --tap: #48d597;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: sans-serif;
+      padding: 16px 14px 32px;
+    }
+    h1 { font-size: 1.35rem; margin: 0 0 6px; }
+    .lead, .meta { color: var(--muted); margin: 0 0 10px; font-size: .92rem; line-height: 1.45; }
+    .meta a { color: #7ebfff; }
+    .counts { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+    .counts span {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: .82rem;
+      font-weight: 700;
+      background: #1d2c3d;
+    }
+    .row {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 0 0 10px;
+      border-left: 8px solid var(--unknown);
+    }
+    .row.latest { border-left-color: var(--latest); }
+    .row.update { border-left-color: var(--update); }
+    .row.newer { border-left-color: var(--newer); }
+    .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .name { font-size: 1.08rem; font-weight: 800; }
+    .chip {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: .8rem;
+      font-weight: 800;
+      color: #081018;
+    }
+    .chip.latest { background: var(--latest); }
+    .chip.update { background: var(--update); }
+    .chip.newer { background: var(--newer); }
+    .chip.unknown { background: var(--unknown); color: #0e141c; }
+    .grid { display: grid; grid-template-columns: 72px 1fr; gap: 6px 8px; align-items: center; }
+    .k { color: var(--muted); font-size: .82rem; font-weight: 700; }
+    .v { font-size: .98rem; word-break: break-all; }
+    input[type=text] {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #0f1a26;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+    }
+    .acts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .acts a, .acts button {
+      flex: 1 1 30%;
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      font-size: .95rem;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #04140c;
+      background: #2c3f55;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .acts a.apk, .acts button.apk { background: var(--tap); color: #03140b; }
+    .acts button.save { background: #3d5a80; }
+    .note { color: var(--muted); font-size: .8rem; margin-top: 6px; }
+    .err { color: #ff8b82; }
+    .retired { opacity: .92; }
+  </style>
 </head>
-<body>
-<h1>앱 업데이트</h1>
-<a class="card" href="posdelay/PosDelay_latest.bin">
-  <div>PosDelay</div>
-  <div>버전 0829.0330 (29802360)</div>
-  <div class="btn">PosDelay 받기</div>
-  <small>공장 파일 · 업데이트 센터 앱에서도 동일</small>
-</a>
-<p style="text-align:center;color:#8fa38b">업데이트 센터 앱을 닫았다가 다시 열면 목록이 갱신됩니다.</p>
+<body class="uc9-compare">
+  <h1>업데이트 센터 · 9조</h1>
+  <p class="lead">지금 이 폰에 깔린 버전과 공장 최신을 한 줄씩 비교합니다. 받기는 잘라서 받습니다. 브라우저가 설치본을 못 읽으면 이 폰 칸에 한 번 적고 저장하세요.</p>
+  <p class="meta" id="meta">catalog 불러오는 중… · <a href="catalog.json">catalog.json</a></p>
+  <div class="counts" id="counts"></div>
+  <div id="list">불러오는 중…</div>
+  <p class="meta">PosKDS는 잠금이라 제외. 근무표는 웹이라 제외. 업데이트센터 앱은 폐기 — 센터는 이 화면.</p>
+  <script>
+    const NINE = [
+      { id: "posdelay", label: "PosDelay" },
+      { id: "storebot-termux", label: "스토어봇" },
+      { id: "deliveryhelper", label: "배달도우미" },
+      { id: "chicken-timer", label: "치킨타이머" },
+      { id: "wonmux", label: "원멕스" },
+      { id: "wonmux-browser", label: "원멕스 브라우저" },
+      { id: "solnote", label: "솔노트" },
+      { id: "banktotal", label: "통장모음" },
+      { id: "update-center", label: "업데이트센터 앱", retired: true }
+    ];
+    const STORE = "uc9_installed_v1";
+    const list = document.getElementById("list");
+    const meta = document.getElementById("meta");
+    const counts = document.getElementById("counts");
+
+    function esc(s) {
+      return String(s || "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+    function apkName(name) {
+      if (!name) return "";
+      return name.endsWith(".bin") ? name.slice(0, -4) + ".apk" : name;
+    }
+    function num(v) {
+      const n = Number(v);
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    }
+    async function downloadApk(id, file, btn) {
+      const url = id + "/" + file;
+      const old = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "받는 중";
+      try {
+        const probe = await fetch(url, { headers: { Range: "bytes=0-0" }, cache: "no-store" });
+        const cr = probe.headers.get("Content-Range") || "";
+        const total = Number((/\/(\d+)\s*$/.exec(cr) || [])[1] || 0);
+        if (!total) throw new Error("size");
+        const chunk = 262144;
+        const parts = [];
+        let got = 0;
+        while (got < total) {
+          const end = Math.min(got + chunk - 1, total - 1);
+          const r = await fetch(url, { headers: { Range: "bytes=" + got + "-" + end }, cache: "no-store" });
+          if (r.status !== 206 && r.status !== 200) throw new Error("http");
+          const buf = await r.arrayBuffer();
+          if (!buf.byteLength) throw new Error("empty");
+          parts.push(buf);
+          got += buf.byteLength;
+          btn.textContent = "받는 중 " + Math.min(100, Math.round(got * 100 / total)) + "%";
+        }
+        const blob = new Blob(parts, { type: "application/vnd.android.package-archive" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = file;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+        btn.textContent = "받음";
+      } catch (e) {
+        btn.textContent = "실패, 다시";
+      }
+      btn.disabled = false;
+      setTimeout(function () { if (btn.textContent !== "받는 중") btn.textContent = old; }, 2500);
+    }
+    function loadLocal() {
+      try { return JSON.parse(localStorage.getItem(STORE) || "{}"); }
+      catch (e) { return {}; }
+    }
+    function saveLocal(obj) {
+      localStorage.setItem(STORE, JSON.stringify(obj));
+    }
+    function statusOf(inst, fac) {
+      const ic = num(inst.versionCode), fc = num(fac.versionCode);
+      const iname = String(inst.versionName || "").trim();
+      const fname = String(fac.versionName || "").trim();
+      if (ic && fc) {
+        if (ic < fc) return "update";
+        if (ic > fc) return "newer";
+        if (iname && fname && iname !== fname) return "update";
+        return "latest";
+      }
+      if (!iname) return "unknown";
+      if (iname === fname) return "latest";
+      return "update";
+    }
+    const LABEL = {
+      latest: "최신",
+      update: "업데이트",
+      newer: "이 폰이 더 새것",
+      unknown: "미확인"
+    };
+
+    async function getJson(url) {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error(url);
+      return r.json();
+    }
+    const ADDRESS_BOOK = [
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    ];
+    async function loadAddressBook() {
+      for (const u of ADDRESS_BOOK) {
+        try {
+          const ep = await getJson(u);
+          if (ep && ep.sets && ep.sets.factory) return ep;
+        } catch (e) {}
+      }
+      return null;
+    }
+    function catalogUrls(ep) {
+      const f = (ep && ep.sets && ep.sets.factory) || {};
+      const out = [];
+      ["wan_https", "magic_base", "pages_base", "wan_base", "site_lan_base"].forEach(function (k) {
+        const b = String(f[k] || "").replace(/\/$/, "");
+        if (!b) return;
+        if (location.protocol === "https:" && b.indexOf("http://") === 0) return;
+        const u = b + "/updates/catalog.json";
+        if (out.indexOf(u) < 0) out.push(u);
+      });
+      out.push("catalog.json");
+      return out;
+    }
+    async function loadCatalog() {
+      const ep = await loadAddressBook();
+      const urls = catalogUrls(ep);
+      for (const u of urls) {
+        try { return await getJson(u); } catch (e) {}
+      }
+      throw new Error("catalog");
+    }
+
+    function bootCenter() {
+    Promise.all([
+      loadCatalog(),
+      getJson("/phone_installed.json").catch(() => ({}))
+    ]).then(async ([cat, installedFile]) => {
+      const byId = {};
+      (cat.apps || []).forEach(a => { if (a && a.id) byId[a.id] = a; });
+      const local = loadLocal();
+      const fileApps = (installedFile && installedFile.apps) || {};
+      const rows = [];
+      for (const spec of NINE) {
+        const app = byId[spec.id] || { id: spec.id };
+        let ver = {};
+        try { ver = await getJson(spec.id + "/version.json"); } catch (e) { ver = {}; }
+        const factory = {
+          versionName: ver.versionName || app.versionName || "",
+          versionCode: ver.versionCode || app.versionCode || "",
+          packageName: ver.packageName || app.packageName || "",
+          apkName: apkName(ver.apkName || app.apkName || "")
+        };
+        const fromFile = fileApps[spec.id] || {};
+        const inst = local[spec.id] || {
+          versionName: fromFile.versionName || "",
+          versionCode: fromFile.versionCode || ""
+        };
+        rows.push({ spec, app, factory, inst });
+      }
+      meta.innerHTML = "공장 목록 " + esc(cat.updatedAt || "") +
+        " · 9조 비교 · <a href=\"catalog.json\">catalog.json</a>";
+      render(rows, local);
+    }).catch(() => {
+      list.innerHTML = '<p class="err">공장 목록을 못 읽었습니다. 같은 사이트에서 다시 여세요.</p>';
+    });
+    }
+    bootCenter();
+    setInterval(bootCenter, 5 * 60 * 1000);
+
+    function render(rows, local) {
+      const tally = { update: 0, unknown: 0, latest: 0, newer: 0 };
+      list.innerHTML = "";
+      rows.forEach(row => {
+        const st = statusOf(row.inst, row.factory);
+        tally[st] = (tally[st] || 0) + 1;
+        const file = row.factory.apkName || (row.spec.id + "_latest.apk");
+        const href = row.spec.id + "/" + file;
+        const div = document.createElement("div");
+        div.className = "row " + st + (row.spec.retired ? " retired" : "");
+        div.innerHTML =
+          '<div class="head"><div class="name">' + esc(row.spec.label) +
+          '</div><span class="chip ' + st + '">' + LABEL[st] + "</span></div>" +
+          '<div class="grid">' +
+          '<div class="k">이 폰</div><div class="v">' +
+          '<input type="text" data-id="' + esc(row.spec.id) + '" value="' +
+          esc(row.inst.versionName || "") + '" placeholder="설치 버전 예: 0904.0720" inputmode="text">' +
+          "</div>" +
+          '<div class="k">공장</div><div class="v">' +
+          esc(row.factory.versionName || "없음") +
+          (row.factory.versionCode ? " · " + esc(row.factory.versionCode) : "") +
+          "</div></div>" +
+          '<div class="acts">' +
+          '<button class="apk" type="button" data-act="dl" data-id="' + esc(row.spec.id) +
+          '" data-file="' + esc(file) + '">받기</button>' +
+          '<button class="save" type="button" data-act="save" data-id="' + esc(row.spec.id) + '">이 폰 저장</button>' +
+          '<button type="button" data-act="same" data-id="' + esc(row.spec.id) + '">공장과 같음</button>' +
+          "</div>" +
+          (row.spec.retired ? '<div class="note">앱은 폐기. 센터는 이 화면. 설치본만 비교합니다.</div>' : "") +
+          '<div class="note">' + esc(row.factory.packageName || "") + "</div>";
+        list.appendChild(div);
+        const input = div.querySelector("input");
+        input.dataset.factoryName = row.factory.versionName || "";
+        input.dataset.factoryCode = String(row.factory.versionCode || "");
+        input.dataset.instCode = String(row.inst.versionCode || "");
+      });
+      counts.innerHTML =
+        '<span>업데이트 ' + tally.update + "</span>" +
+        '<span>미확인 ' + tally.unknown + "</span>" +
+        '<span>최신 ' + tally.latest + "</span>" +
+        (tally.newer ? "<span>이 폰이 더 새것 " + tally.newer + "</span>" : "");
+      list.onclick = ev => {
+        const btn = ev.target.closest("button");
+        if (!btn) return;
+        const id = btn.getAttribute("data-id");
+        const act = btn.getAttribute("data-act");
+        if (act === "dl") {
+          ev.preventDefault();
+          downloadApk(id, btn.getAttribute("data-file") || "", btn);
+          return;
+        }
+        const input = list.querySelector('input[data-id="' + id + '"]');
+        if (!input) return;
+        if (act === "same") {
+          input.value = input.dataset.factoryName || "";
+          input.dataset.instCode = input.dataset.factoryCode || "";
+        }
+        const store = loadLocal();
+        store[id] = {
+          versionName: input.value.trim(),
+          versionCode: num(input.dataset.instCode) || undefined,
+          savedAt: new Date().toISOString()
+        };
+        if (!store[id].versionCode) delete store[id].versionCode;
+        saveLocal(store);
+        location.reload();
+      };
+    }
+  </script>
 </body>
 </html>
