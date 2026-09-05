@@ -407,6 +407,7 @@
     dest.baemin1_resume_at = b1.resume_at;
     dest.baemin1_one_pause_at = b1.one_person_pause_at;
     dest.baemin1_one_resume_at = b1.one_person_resume_at;
+    if (b1.pause_duration) dest.baemin1_pause_duration = b1.pause_duration;
     dest.coupang_pause_at = cp.pause_at;
     dest.coupang_resume_at = cp.resume_at;
     dest.coupang_one_pause_at = cp.one_person_pause_at;

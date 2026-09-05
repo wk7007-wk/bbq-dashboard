@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0906-nocache4">
+<html lang="ko" data-web-v="0906-nocache5">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -372,6 +372,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
           </span>
         </div>
         <div id="kdsUnitHint" class="unit-hint">시각 --</div>
+        <div id="factorySot" class="unit-hint" style="white-space:pre-line;line-height:1.45;padding-top:8px;color:var(--text-secondary)"></div>
       </div>
       <div class="hero-panel">
         <span class="hero-label">프린터</span>
@@ -979,8 +980,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0906-nocache4"></script>
-<script src="posweb_admin.js?v=0906-nocache4"></script>
+<script src="posdelay_ad_receipt.js?v=0906-nocache5"></script>
+<script src="posweb_admin.js?v=0906-nocache5"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1606,6 +1607,18 @@ function updDelayPred(){
 }
 
 // === 설정 UI ===
+function renderFactorySot(){
+  var el=document.getElementById('factorySot');
+  if(!el)return;
+  el.textContent=[
+    '광고 배민 '+g(S,'baemin_amount',0)+'/'+g(S,'baemin_mid_amount',0)+'/'+g(S,'baemin_reduced_amount',0)+'원 · 0건최대 2건중간 4건최소',
+    '광고 쿠팡 0건ON 2건OFF',
+    '배달료 임계'+(gateSettings.threshold)+'건 · '+gateSettings.fee+'원 · 기본'+gateSettings.base+'원 · 정지'+gateSettings.threshold_stop+'건 · '+(gateSettings.enabled?'게이트ON':'게이트OFF'),
+    '자동수락 배민 프린터 '+policySettings.baemin_auto_min_1+'/'+policySettings.baemin_auto_min_2+'/'+policySettings.baemin_auto_min_3+'분  1인 '+policySettings.baemin_auto_one_min_1+'/'+policySettings.baemin_auto_one_min_2+'/'+policySettings.baemin_auto_one_min_3+'분',
+    '자동수락 배민배달 KDS '+policySettings.store_auto_min_1+'/'+policySettings.store_auto_min_2+'/'+policySettings.store_auto_min_3+'분',
+    '영업정지 '+(policySettings.enabled?'ON':'OFF')+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' 1인 '+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+' 1인 '+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
+  ].join('\n');
+}
 function updSetUI(){
   const fields=['baemin_amount','baemin_mid_amount','baemin_reduced_amount','baemin_target_time','baemin_fixed_cook_time','baemin_delay_threshold','baemin_delay_minutes','coupang_target_time','coupang_fixed_cook_time','coupang_delay_threshold','coupang_delay_minutes'];
   fields.forEach(f=>{const e=document.getElementById('set_'+f);if(e&&S[f]!=null)e.value=S[f];});
@@ -1620,6 +1633,7 @@ function updSetUI(){
   const sd3=document.getElementById('schDot3');if(sd3)sd3.className='dot '+(S.schedule_enabled?'dg':'dr');
   const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
   updGauges(getKdsWeightedCount());
+  renderFactorySot();
   loadDiscDt();
   // 배민 광고 접힌 헤더 요약
   var adSum=document.getElementById('adSummary');
@@ -2463,13 +2477,13 @@ let policySettings = {
   store_auto_one_count_3:4,
   baemin1_pause_at:10,
   baemin1_resume_at:2,
-  baemin1_one_pause_at:10,
-  baemin1_one_resume_at:2,
+  baemin1_one_pause_at:6,
+  baemin1_one_resume_at:1,
   baemin1_pause_duration:'30분',
-  coupang_pause_at:12,
+  coupang_pause_at:7,
   coupang_resume_at:3,
-  coupang_one_pause_at:12,
-  coupang_one_resume_at:3
+  coupang_one_pause_at:5,
+  coupang_one_resume_at:2
 };
 window.policySettings=policySettings;
 
@@ -2494,6 +2508,7 @@ function syncPolicySummary() {
     : 'OFF';
   var stopTog=document.getElementById('tog_stop');
   if(stopTog)stopTog.classList.toggle('on',!!policySettings.enabled);
+  renderFactorySot();
 }
 
 function applyPolicySettingsToUI() {
