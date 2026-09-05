@@ -2,6 +2,25 @@
   "schemaVersion": 1,
   "releases": [
     {
+      "appVersionCode": 29810708,
+      "appVersionName": "0906.0608",
+      "versionCode": 29810708,
+      "versionName": "0906.0608",
+      "apkUrl": "/updates/poskds/PosKDS_latest.apk",
+      "artifactUrl": "/updates/poskds/PosKDS_latest.bin",
+      "sha256": "19aa65207b3687a7eb5540fe1a3b01d8509803f898a2f2b74287e9df7476c5fe",
+      "sizeBytes": 6222815,
+      "packageName": "com.poskds.app",
+      "enabled": true,
+      "releaseNotes": "factory from GitHub endpoints.json sets.factory first; Gist kds_status second",
+      "updatedAt": "2026-09-06T06:09:24+09:00",
+      "historyUrl": "/updates/poskds/history.json",
+      "channel": "poskds",
+      "label": "PosKDS",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "signerSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb"
+    },
+    {
       "appVersionCode": 29677568,
       "appVersionName": "0605.1008",
       "apkUrl": "http://125.176.112.214:2421/updates/poskds/PosKDS_latest.bin",
@@ -24,14 +43,14 @@
     "sha256": "19aa65207b3687a7eb5540fe1a3b01d8509803f898a2f2b74287e9df7476c5fe",
     "sizeBytes": 6222815,
     "packageName": "com.poskds.app",
-    "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-    "signerSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
     "enabled": true,
-    "releaseNotes": "GitHub endpoints.json address book; factory kds_status PUT 1st; gist 2nd",
-    "updatedAt": "2026-09-06T06:09:01+09:00",
+    "releaseNotes": "factory from GitHub endpoints.json sets.factory first; Gist kds_status second",
+    "updatedAt": "2026-09-06T06:09:24+09:00",
     "historyUrl": "/updates/poskds/history.json",
     "channel": "poskds",
-    "label": "PosKDS"
+    "label": "PosKDS",
+    "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+    "signerSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb"
   },
   "entries": [
     {
@@ -44,14 +63,15 @@
       "sha256": "19aa65207b3687a7eb5540fe1a3b01d8509803f898a2f2b74287e9df7476c5fe",
       "sizeBytes": 6222815,
       "packageName": "com.poskds.app",
-      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-      "signerSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
       "enabled": true,
-      "releaseNotes": "GitHub endpoints.json address book; factory kds_status PUT 1st; gist 2nd",
-      "updatedAt": "2026-09-06T06:09:01+09:00",
+      "releaseNotes": "factory from GitHub endpoints.json sets.factory first; Gist kds_status second",
+      "updatedAt": "2026-09-06T06:09:24+09:00",
       "historyUrl": "/updates/poskds/history.json",
       "channel": "poskds",
-      "label": "PosKDS"
+      "label": "PosKDS",
+      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
+      "signerSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb"
     }
-  ]
+  ],
+  "channel": "poskds"
 }
