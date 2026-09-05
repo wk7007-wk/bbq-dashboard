@@ -1,7 +1,11 @@
 (function (root) {
   var TOKEN_KEY = "posweb_admin_token";
   var MAGIC = "https://wsl-ubuntu.tail785e65.ts.net";
+  var GITHUB_ENDPOINTS = "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json";
   var factoryOrigin = "";
+  var factoryOriginList = [];
+  var factoryLive = false;
+  var addressBook = null;
   var originReady = null;
 
   function onGithubPages() {
@@ -12,10 +16,38 @@
     }
   }
 
+  function pageIsHttps() {
+    try {
+      return String((root.location && root.location.protocol) || "") === "https:";
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function canUseUrl(u) {
+    u = String(u || "").replace(/\/$/, "");
+    if (!u) return false;
+    if (pageIsHttps() && u.indexOf("http://") === 0) return false;
+    return true;
+  }
+
+  function basesFromEndpoints(ep) {
+    var f = (ep && ep.sets && ep.sets.factory) || {};
+    var keys = ["magic_base", "pages_base", "wan_base", "lan_base", "ts_base", "pages_base_http"];
+    var out = [];
+    keys.forEach(function (k) {
+      var u = String(f[k] || "").replace(/\/$/, "");
+      if (!canUseUrl(u) || u.indexOf("github.io") >= 0) return;
+      if (out.indexOf(u) < 0) out.push(u);
+    });
+    if (!out.length && canUseUrl(MAGIC)) out.push(MAGIC);
+    return out;
+  }
+
   function factoryJsonUrl(name) {
     name = String(name || "").replace(/^\//, "");
     if (!onGithubPages() && !factoryOrigin) return "/" + name;
-    return (factoryOrigin || MAGIC).replace(/\/$/, "") + "/" + name;
+    return (factoryOrigin || factoryOriginList[0] || MAGIC).replace(/\/$/, "") + "/" + name;
   }
 
   function factoryOrigins() {
@@ -23,52 +55,108 @@
     var seen = {};
     function add(u) {
       u = String(u || "").replace(/\/$/, "");
-      if (seen[u]) return;
+      if (seen[u] || (u && !canUseUrl(u))) return;
       seen[u] = 1;
       out.push(u);
     }
-    if (!onGithubPages()) add("");
     if (factoryOrigin) add(factoryOrigin);
-    add(MAGIC);
+    factoryOriginList.forEach(add);
+    if (!onGithubPages()) add("");
+    if (canUseUrl(MAGIC)) add(MAGIC);
     return out;
+  }
+
+  function loadAddressBook() {
+    if (typeof fetch !== "function") return Promise.reject(new Error("no fetch"));
+    var cands = ["updates/endpoints.json", GITHUB_ENDPOINTS];
+    if (canUseUrl(MAGIC + "/endpoints.json")) cands.push(MAGIC + "/endpoints.json");
+    var chain = Promise.reject(new Error("none"));
+    cands.forEach(function (url) {
+      chain = chain.catch(function () {
+        return fetch(url, { cache: "no-store" }).then(function (r) {
+          if (!r.ok) throw new Error(String(r.status));
+          return r.json();
+        }).then(function (ep) {
+          if (!ep || !ep.sets || !ep.sets.factory) throw new Error("no factory set");
+          addressBook = ep;
+          factoryOriginList = basesFromEndpoints(ep);
+          return ep;
+        });
+      });
+    });
+    return chain;
+  }
+
+  function probeFactoryHealth(bases) {
+    var list = (bases && bases.length) ? bases : factoryOriginList;
+    var chain = Promise.reject(new Error("none"));
+    list.forEach(function (base) {
+      chain = chain.catch(function () {
+        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+          if (!r.ok) throw new Error(String(r.status));
+          factoryOrigin = base;
+          factoryLive = true;
+          return base;
+        });
+      });
+    });
+    return chain.catch(function () {
+      factoryLive = false;
+      factoryOrigin = factoryOriginList[0] || (canUseUrl(MAGIC) ? MAGIC : "");
+      return factoryOrigin;
+    });
+  }
+
+  function paintFactoryBanner() {
+    var doc = root.document;
+    if (!doc || typeof doc.getElementById !== "function") return;
+    var pin = doc.getElementById("pinFactoryHint");
+    var bar = doc.getElementById("factoryDownBanner");
+    var msg = factoryLive
+      ? ("공장 " + (factoryOrigin || ""))
+      : ("공장 먹통 · 주소판 깃허브" + (factoryOriginList[0] ? " · " + factoryOriginList[0] : ""));
+    if (pin) pin.textContent = msg;
+    if (bar) {
+      bar.style.display = factoryLive ? "none" : "block";
+      bar.textContent = "공장이 응답하지 않습니다. 주소는 깃허브 주소판입니다. 실시간 건수/쓰기는 공장이 살아날 때까지 멈춥니다.";
+    }
+    var ct = doc.getElementById("cT");
+    var cd = doc.getElementById("cD");
+    if (!factoryLive && ct) {
+      ct.textContent = "공장 먹통";
+      ct.style.color = "#E74C3C";
+      if (cd) cd.className = "dot dr";
+    }
   }
 
   function resolveFactoryOrigin() {
     if (originReady) return originReady;
-    originReady = Promise.resolve().then(function () {
-      if (!onGithubPages()) {
-        factoryOrigin = "";
-        return factoryOrigin;
-      }
-      var cands = [
-        "updates/endpoints.json",
-        "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
-        MAGIC + "/endpoints.json"
-      ];
-      var chain = Promise.reject(new Error("none"));
-      cands.forEach(function (url) {
-        chain = chain.catch(function () {
-          return fetch(url, { cache: "no-store" }).then(function (r) {
-            if (!r.ok) throw new Error(String(r.status));
-            return r.json();
-          }).then(function (ep) {
-            var f = (ep && ep.sets && ep.sets.factory) || {};
-            var live = String(f.magic_base || f.pages_base || "").replace(/\/$/, "");
-            if (!live || live.indexOf("github.io") >= 0) live = MAGIC;
-            factoryOrigin = live;
-            return factoryOrigin;
-          });
-        });
-      });
-      return chain.catch(function () {
-        factoryOrigin = MAGIC;
-        return factoryOrigin;
-      });
+    originReady = loadAddressBook().then(function () {
+      return probeFactoryHealth(factoryOriginList);
+    }).catch(function () {
+      factoryLive = false;
+      factoryOriginList = canUseUrl(MAGIC) ? [MAGIC] : [];
+      factoryOrigin = factoryOriginList[0] || "";
+      return factoryOrigin;
+    }).then(function () {
+      paintFactoryBanner();
+      return factoryOrigin;
     });
     return originReady;
   }
 
+  function refreshAddressBook() {
+    originReady = null;
+    return resolveFactoryOrigin();
+  }
+
   resolveFactoryOrigin();
+  if (root.setInterval) {
+    root.setInterval(function () {
+      originReady = null;
+      resolveFactoryOrigin();
+    }, 300000);
+  }
 
   function isWebAdmin() {
     try {
@@ -199,7 +287,7 @@
       return;
     }
     verifyPassword(writeToken()).then(function (ok) {
-      if (ok) afterUnlock();
+      if (ok || (!factoryLive && writeToken())) afterUnlock();
       else {
         applyWebAdminUi();
         var inp = document.getElementById("pinInput");
@@ -220,10 +308,19 @@
 
   function factoryGetJson(name) {
     return resolveFactoryOrigin().then(function () {
-      return fetch(factoryJsonUrl(name) + "?t=" + Date.now(), { cache: "no-store" });
-    }).then(function (r) {
-      if (!r.ok) throw new Error(String(r.status));
-      return r.text();
+      var p = Promise.reject(new Error("none"));
+      factoryOrigins().forEach(function (base) {
+        var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + String(name || "").replace(/^\//, "");
+        p = p.catch(function () {
+          return fetch(url + "?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
+            if (!r.ok) throw new Error(String(r.status));
+            factoryOrigin = base || factoryOrigin;
+            factoryLive = true;
+            return r.text();
+          });
+        });
+      });
+      return p;
     }).then(function (text) {
       var t = (text || "").trim();
       if (!t || t === "null") return {};
@@ -237,15 +334,22 @@
       "X-Write-Token": writeToken()
     };
     return resolveFactoryOrigin().then(function () {
-      var url = factoryJsonUrl(name);
-      if (obj == null) {
-        return fetch(url, { method: "GET", cache: "no-store", headers: headers }).then(function (r) {
-          return r.ok;
+      var p = Promise.reject(new Error("none"));
+      factoryOrigins().forEach(function (base) {
+        var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + String(name || "").replace(/^\//, "");
+        p = p.catch(function () {
+          var req = obj == null
+            ? fetch(url, { method: "GET", cache: "no-store", headers: headers })
+            : fetch(url, { method: "PUT", headers: headers, body: JSON.stringify(obj) });
+          return req.then(function (r) {
+            if (!r.ok) throw new Error(String(r.status));
+            factoryOrigin = base || factoryOrigin;
+            factoryLive = true;
+            return true;
+          });
         });
-      }
-      return fetch(url, { method: "PUT", headers: headers, body: JSON.stringify(obj) }).then(function (r) {
-        return r.ok;
       });
+      return p;
     }).catch(function () { return false; });
   }
 
@@ -483,7 +587,10 @@
   root.poswebFactory = {
     jsonUrl: factoryJsonUrl,
     resolveOrigin: resolveFactoryOrigin,
+    refreshAddressBook: refreshAddressBook,
     onGithubPages: onGithubPages,
-    origins: factoryOrigins
+    origins: factoryOrigins,
+    isLive: function () { return factoryLive; },
+    githubEndpoints: GITHUB_ENDPOINTS
   };
 })(typeof window !== "undefined" ? window : globalThis);

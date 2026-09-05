@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0906-nocache6">
+<html lang="ko" data-web-v="0906-nocache7">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -322,6 +322,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 <div class="pin-overlay" id="pinOverlay">
   <h2>posweb</h2>
   <div class="pin-note">비밀번호를 입력하세요.</div>
+  <div class="pin-note" id="pinFactoryHint" style="color:var(--text-muted);font-size:11px;margin-top:6px">주소판 깃허브에서 받는 중…</div>
   <input type="password" id="pinInput" placeholder="비밀번호" autocomplete="current-password">
   <button type="button" id="pinSubmit" onclick="checkPoswebPin()">확인</button>
   <div class="pin-error" id="pinError" role="status" aria-live="polite"></div>
@@ -343,6 +344,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     <button type="button" onclick="jumpToCard('gatePanel')">운영</button>
     <button type="button" onclick="jumpToCard('baeminDelayCard')">지연</button>
   </div>
+  <div class="alert" id="factoryDownBanner" style="display:none;background:#E74C3C18;color:#E74C3C;border:1px solid #E74C3C55"></div>
   <div class="alert" id="alertB"></div>
   <div class="alert" id="anomalyB"></div>
 </div>
@@ -980,8 +982,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0906-nocache6"></script>
-<script src="posweb_admin.js?v=0906-nocache6"></script>
+<script src="posdelay_ad_receipt.js?v=0906-nocache7"></script>
+<script src="posweb_admin.js?v=0906-nocache7"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1137,9 +1139,12 @@ function dispatchBus(){
   });
 }
 function updC(ok){
-  document.getElementById('cD').className='dot '+(ok?'dg':'dr');
-  const t=document.getElementById('cT');t.textContent=ok?'실시간':'폴링';t.style.color=ok?'#2ECC71':'#E67E22';
-  if(!ok)_sseOk=false; // 에러 시만 해제, true는 데이터 도착 시 설정
+  var live=typeof poswebFactory==='object'&&typeof poswebFactory.isLive==='function'?poswebFactory.isLive():ok;
+  document.getElementById('cD').className='dot '+(ok&&live?'dg':'dr');
+  const t=document.getElementById('cT');
+  if(!live){t.textContent='공장 먹통';t.style.color='#E74C3C';}
+  else{t.textContent=ok?'실시간':'폴링';t.style.color=ok?'#2ECC71':'#E67E22';}
+  if(!ok)_sseOk=false;
 }
 
 // === Data Handlers ===

@@ -25,6 +25,8 @@ assert(fs.existsSync(path.join(root, 'posweb_admin.js')), 'posweb_admin.js missi
 const admin = fs.readFileSync(path.join(root, 'posweb_admin.js'), 'utf8');
 assert(admin.includes('onGithubPages'), 'github pages must talk to factory, not same-origin JSON');
 assert(admin.includes('wsl-ubuntu.tail785e65.ts.net'), 'factory magic HTTPS required from github.io');
+assert(admin.includes('github.io/bbq-dashboard/updates/endpoints.json'), 'github endpoints are the address book');
+assert(admin.includes('basesFromEndpoints') || admin.includes('sets.factory'), 'factory bases come from github endpoints');
 assert(live.includes('poswebFactory'), 'posweb.html must use factory origin helper');
 assert(live.includes('window.S=S'), 'page S must be visible to posweb_admin');
 assert(admin.includes('settingsReady'), 'empty web save must not wipe kitchen settings');
