@@ -977,7 +977,17 @@ async function ensureFactoryHttpsPutReady() {
       else await forceMagicHttpsFactory();
     };
     setInterval(reloadBook, 5 * 60 * 1000);
-    if (mode === 'blocked') setInterval(reloadBook, 15000);
+    if (mode === 'blocked') {
+      let failN = 0;
+      const retryBlocked = async () => {
+        if (window.__factoryRw) { failN = 0; return; }
+        failN += 1;
+        await reloadBook();
+        const wait = Math.min(5 * 60 * 1000, 15000 * Math.pow(2, Math.min(failN - 1, 4)));
+        setTimeout(retryBlocked, wait);
+      };
+      setTimeout(retryBlocked, 15000);
+    }
   };
   window.__factoryRepick = async () => {
     if (await forceMagicHttpsFactory()) return 'magic';
