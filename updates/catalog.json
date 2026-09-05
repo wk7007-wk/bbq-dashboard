@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-05T07:03:56+09:00",
+  "updatedAt": "2026-09-06T06:09:01+09:00",
   "apps": [
     {
       "id": "chicken-timer",
@@ -10,30 +10,34 @@
       "versionCode": 29788812,
       "packageName": "com.chickentimer.board.v2",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/chicken-timer/ChickenTimer_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/chicken-timer/version.json"
+      "apkUrl": "/updates/chicken-timer/ChickenTimer_latest.apk",
+      "metadataUrl": "/updates/chicken-timer/version.json"
     },
     {
       "id": "deliveryhelper",
       "label": "배달도우미",
-      "apkName": "DeliveryHelper_latest.bin",
-      "versionName": "0902.1105",
-      "versionCode": 29805245,
+      "apkName": "DeliveryHelper_latest.apk",
+      "versionName": "0906.0605",
+      "versionCode": 29810705,
       "packageName": "com.deliveryhelper.app",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/deliveryhelper/DeliveryHelper_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/deliveryhelper/version.json"
+      "apkUrl": "/updates/deliveryhelper/DeliveryHelper_latest.apk",
+      "metadataUrl": "/updates/deliveryhelper/version.json",
+      "sha256": "0e7669bc60edd3deddb5f43e943d6986e5bf94185413f4df7d2d872fba586310",
+      "sizeBytes": 32925901
     },
     {
       "id": "posdelay",
       "label": "PosDelay",
-      "apkName": "PosDelay_latest.bin",
-      "versionName": "0904.0720",
-      "versionCode": 29807900,
+      "apkName": "PosDelay_latest.apk",
+      "versionName": "0905.2308",
+      "versionCode": 29810288,
+      "sha256": "70dfd9e9b554e1591a2277dda69e87a90632dbc4afab3f7ae2a3727159fac25a",
+      "sizeBytes": 7757418,
       "packageName": "com.posdelay.app",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/posdelay/PosDelay_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/posdelay/version.json"
+      "apkUrl": "/updates/posdelay/PosDelay_latest.apk",
+      "metadataUrl": "/updates/posdelay/version.json"
     },
     {
       "id": "storebot-termux",
@@ -43,8 +47,8 @@
       "versionCode": 1085,
       "packageName": "com.sbotux",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/storebot-termux/StoreBotTermux_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/storebot-termux/version.json"
+      "apkUrl": "/updates/storebot-termux/StoreBotTermux_latest.apk",
+      "metadataUrl": "/updates/storebot-termux/version.json"
     },
     {
       "id": "wonmux",
@@ -54,8 +58,8 @@
       "versionCode": 29780005,
       "packageName": "com.wonmux",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/wonmux/Wonmux_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/wonmux/version.json"
+      "apkUrl": "/updates/wonmux/Wonmux_latest.apk",
+      "metadataUrl": "/updates/wonmux/version.json"
     },
     {
       "id": "wonmux-browser",
@@ -65,8 +69,8 @@
       "versionCode": 26072612,
       "packageName": "com.wonmux.browser",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/wonmux-browser/WonmuxBrowser_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/wonmux-browser/version.json"
+      "apkUrl": "/updates/wonmux-browser/WonmuxBrowser_latest.apk",
+      "metadataUrl": "/updates/wonmux-browser/version.json"
     },
     {
       "id": "solnote",
@@ -76,8 +80,8 @@
       "versionCode": 262131113,
       "packageName": "com.wonmux.solnote.personal",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/solnote/SolNote_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/solnote/version.json"
+      "apkUrl": "/updates/solnote/SolNote_latest.apk",
+      "metadataUrl": "/updates/solnote/version.json"
     },
     {
       "id": "banktotal",
@@ -87,8 +91,8 @@
       "versionCode": 29760630,
       "packageName": "com.banktotal.app",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/banktotal/BankTotal_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/banktotal/version.json"
+      "apkUrl": "/updates/banktotal/BankTotal_latest.apk",
+      "metadataUrl": "/updates/banktotal/version.json"
     },
     {
       "id": "update-center",
@@ -97,9 +101,33 @@
       "versionName": "0905.0026",
       "versionCode": 29808926,
       "packageName": "com.appupdatecenter.app",
+      "enabled": false,
+      "apkUrl": "/updates/update-center/AppUpdateCenter_latest.apk",
+      "metadataUrl": "/updates/update-center/version.json"
+    },
+    {
+      "id": "poskds",
+      "label": "PosKDS",
+      "apkName": "PosKDS_latest.apk",
+      "versionName": "0906.0608",
+      "versionCode": 29810708,
+      "packageName": "com.poskds.app",
       "enabled": true,
-      "apkUrl": "http://125.176.112.214:2421/updates/update-center/AppUpdateCenter_latest.apk",
-      "metadataUrl": "http://125.176.112.214:2421/updates/update-center/version.json"
+      "apkUrl": "/updates/poskds/PosKDS_latest.apk",
+      "metadataUrl": "/updates/poskds/version.json",
+      "sha256": "19aa65207b3687a7eb5540fe1a3b01d8509803f898a2f2b74287e9df7476c5fe",
+      "sizeBytes": 6222815
+    },
+    {
+      "id": "workschedule",
+      "label": "WorkSchedule",
+      "apkName": "WorkSchedule_latest.bin",
+      "versionName": "0702.1839",
+      "versionCode": 1782985171,
+      "packageName": "com.workschedule.app",
+      "enabled": true,
+      "apkUrl": "/updates/workschedule/WorkSchedule_latest.bin",
+      "metadataUrl": "/updates/workschedule/version.json"
     }
   ]
 }
