@@ -979,6 +979,7 @@ const TRACK={
 };
 let _bus={},_kds=null,_snap=null;
 let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
+window.S=S;window.aS=aS;window.kS=kS;window.stS=stS;
 let aTS=0;let sseLoaded=false;
 const KDS_NO_CHANGE_ZERO_MS=7*60*1000;
 let _kdsLastChange=Date.now(),_kdsLastCount=-1;
@@ -2394,6 +2395,7 @@ document.addEventListener('visibilitychange',()=>{
 
 // ═══ 게이트(배달료) ═══
 let gateSettings = {threshold:1, threshold_stop:7, valid:30, fee:2000, base:0, clubAuto:false, enabled:false, _stopSource:'PRINTER', _defenseMode:'B'};
+window.gateSettings=gateSettings;
 let policySettings = {
   enabled:false,
   auto_accept_enabled:true,
@@ -2434,6 +2436,7 @@ let policySettings = {
   coupang_one_pause_at:12,
   coupang_one_resume_at:3
 };
+window.policySettings=policySettings;
 
 function syncPolicySummary() {
   var peakLabel = policySettings.time_mode_enabled ? '피크설정' : '항상일반';

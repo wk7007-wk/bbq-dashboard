@@ -420,9 +420,14 @@
     return dest;
   }
 
+  var settingsReady = false;
+
   function saveWebAdSettings(S, gateSettings) {
     if (!isWebAdmin()) return Promise.resolve(false);
-    return factoryPutJson("posdelay_ad_settings.json", buildAdSettingsPayload(S, gateSettings));
+    if (!settingsReady) return Promise.resolve(false);
+    S = S || root.S;
+    if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) return Promise.resolve(false);
+    return factoryPutJson("posdelay_ad_settings.json", buildAdSettingsPayload(S, gateSettings || root.gateSettings));
   }
 
   function saveWebPolicy(next) {
@@ -434,11 +439,13 @@
     return Promise.all([factoryGetJson("posdelay_ad_settings.json"), factoryGetJson("runtime_config_v2.json")]).then(function (pair) {
       var ad = pair[0] || {};
       var v2 = pair[1] || {};
-      if (ad && (ad.ad_enabled != null || ad.baemin_amount != null) && root.S) {
+      var S = root.S;
+      if (ad && (ad.ad_enabled != null || ad.baemin_amount != null) && S) {
         Object.keys(ad).forEach(function (k) {
           if (k === "defense" || k.charAt(0) === "_" || k === "schema") return;
-          root.S[k] = ad[k];
+          S[k] = ad[k];
         });
+        settingsReady = Number(S.baemin_amount) > 0;
         if (ad.defense && root.gateSettings) {
           root.gateSettings.enabled = !!ad.defense.gate_enabled;
           if (ad.defense.fee_threshold != null) root.gateSettings.threshold = ad.defense.fee_threshold;
