@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-06T06:25:00+09:00",
+  "updatedAt": "2026-09-06T06:37:22+09:00",
   "notices": [
     {
       "date": "2026-09-06",
@@ -10,7 +10,8 @@
         "PosKDS 0906.0608 — 주소판 factory에 kds_status PUT. Gist는 2차",
         "배달도우미 0906.0610 — KDS는 공장 파일 폴링. 파이어 SSE 제거",
         "발주 사이트 — github.io 점프 후 공장에 저장. MagicDNS만으로는 PUT 안 함",
-        "사이트 북마크 — 이 화면 위에 go.html 주소. Tailscale 없이 북마크"
+        "사이트 북마크 — 이 화면 위에 go.html 주소. Tailscale 없이 북마크",
+        "스토어봇 0.118.8 — 주소판 factory 1차 PUT. 서버폰 재설치 필요(USB 미연결이면 센터에서 받기)"
       ]
     }
   ],
@@ -83,12 +84,14 @@
       "id": "storebot-termux",
       "label": "StoreBotTermux",
       "apkName": "StoreBotTermux_latest.bin",
-      "versionName": "0.118.7-storebot-kst0825.t0810",
-      "versionCode": 1085,
+      "versionName": "0.118.8-storebot-kst0905.t1620",
+      "versionCode": 1086,
       "packageName": "com.sbotux",
       "enabled": true,
       "apkUrl": "/updates/storebot-termux/StoreBotTermux_latest.apk",
-      "metadataUrl": "/updates/storebot-termux/version.json"
+      "metadataUrl": "/updates/storebot-termux/version.json",
+      "sha256": "ef83bd7be36ccb84b13a972add9965dbb1f95dba13079ba981ff136841ec9aa0",
+      "sizeBytes": 38822086
     },
     {
       "id": "wonmux",
