@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0906-nocache5">
+<html lang="ko" data-web-v="0906-nocache6">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -980,8 +980,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0906-nocache5"></script>
-<script src="posweb_admin.js?v=0906-nocache5"></script>
+<script src="posdelay_ad_receipt.js?v=0906-nocache6"></script>
+<script src="posweb_admin.js?v=0906-nocache6"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1244,6 +1244,33 @@ function kdsAgeText(ms){
   var age=ago<60?ago+'초 전':ago<3600?Math.floor(ago/60)+'분 전':Math.floor(ago/3600)+'시간 전';
   return clock+' · '+age;
 }
+function applyPrinterHero(){
+  var p=_snap&&_snap.printer;
+  if(!p||typeof p!=='object')return;
+  var count=toCount(p.agency_valid_count);
+  var age=p.age_s;
+  var connected=!!p.connected;
+  var status='';
+  if(!connected){
+    if(typeof age==='number'){
+      status=age>=3600?Math.floor(age/3600)+'시간 전':age>=60?Math.floor(age/60)+'분 전':age+'초 전';
+    }else{
+      status='끊김';
+    }
+  }
+  var srcMs=0;
+  if(typeof p.updated_at==='number'&&p.updated_at>1e9){
+    srcMs=p.updated_at>1e12?p.updated_at:p.updated_at*1000;
+  }else if(typeof age==='number'){
+    srcMs=Date.now()-age*1000;
+  }
+  renderCaptureSnapshot({
+    agencyValidCount:count,
+    printerConnected:connected,
+    status:status,
+    lastCaptureAt:srcMs?kdsAgeText(srcMs):'--'
+  });
+}
 function applyKdsHero(ops, raw, sourceMs){
   if(sourceMs!=null&&sourceMs>0)lastKdsTime=sourceMs;
   var opsN=toCount(ops);
@@ -1295,6 +1322,7 @@ function gateBaseLabel(){
 
 // === 모니터링 ===
 function updMonitor(){
+  applyPrinterHero();
   const c=applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
   const st=document.getElementById('mStatus');
   if(c!=null){
@@ -3282,7 +3310,10 @@ function renderCaptureSnapshot(patch){
   var orders=(lastCaptureSnapshot.orders||[]).filter(function(order){return order&&!order.expired;}).sort(function(a,b){return (b.elapsed||0)-(a.elapsed||0);});
   var connected=!!lastCaptureSnapshot.printerConnected;
   var threshold=gateSettings.threshold||lastCaptureSnapshot.thresholdFee||8;
-  gateSettings._validCount=orders.length;
+  var validCount=lastCaptureSnapshot.agencyValidCount;
+  if(validCount==null||validCount==='')validCount=orders.length;
+  validCount=toCount(validCount);
+  gateSettings._validCount=validCount;
   gateSettings._printerConnected=connected;
   gateSettings._captureStatus=lastCaptureSnapshot.status||'';
   var printerLabel=(connected?'ON':'OFF')+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
@@ -3304,12 +3335,12 @@ function renderCaptureSnapshot(patch){
   if(printerDot2)printerDot2.className=printerDotClass;
   if(printerText){printerText.textContent=printerLabel;printerText.style.color=labelColor;}
   if(captureTime)captureTime.textContent=lastCaptureSnapshot.lastCaptureAt||'--';
-  if(heroPrinterState)heroPrinterState.textContent=(connected?'ON':'OFF')+' · '+orders.length+'건'+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
+  if(heroPrinterState)heroPrinterState.textContent=(connected?'ON':'OFF')+' · '+validCount+'건'+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
   if(heroCaptureTime)heroCaptureTime.textContent='수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
   if(feeLiveClock)feeLiveClock.textContent='수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
-  if(feeValue)feeValue.textContent=orders.length;
-  if(feeCount)feeCount.textContent=orders.length+'건';
-  if(printerCount)printerCount.textContent=orders.length;
+  if(feeValue)feeValue.textContent=validCount;
+  if(feeCount)feeCount.textContent=validCount+'건';
+  if(printerCount)printerCount.textContent=validCount;
   updateOutputTimer();
   if(feeGauge){feeGauge.style.width=feeGaugeRatio+'%';feeGauge.style.background=feeGaugeRatio>=100?'#E74C3C':feeGaugeRatio>70?'#E67E22':'#4FC3F7';}
   renderFeeOrderList(orders);
