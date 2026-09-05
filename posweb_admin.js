@@ -220,7 +220,10 @@
         fee_threshold: Number(gateSettings && gateSettings.threshold) || 8,
         fee_configured_high: Number(gateSettings && gateSettings.fee) || 0,
         fee_configured_base: Number(gateSettings && gateSettings.base) || 0,
-        valid_minutes: Number(gateSettings && gateSettings.valid) || 30
+        valid_minutes: Number(gateSettings && gateSettings.valid) || 30,
+        stop_threshold: Number(gateSettings && gateSettings.threshold_stop) || 7,
+        stop_source: (gateSettings && gateSettings._stopSource) || "PRINTER",
+        mode: (gateSettings && (gateSettings._defenseMode || gateSettings.mode)) || "B"
       }
     };
   }
@@ -356,6 +359,9 @@
           if (ad.defense.fee_configured_high != null) root.gateSettings.fee = ad.defense.fee_configured_high;
           if (ad.defense.fee_configured_base != null) root.gateSettings.base = ad.defense.fee_configured_base;
           if (ad.defense.valid_minutes != null) root.gateSettings.valid = ad.defense.valid_minutes;
+          if (ad.defense.stop_threshold != null) root.gateSettings.threshold_stop = ad.defense.stop_threshold;
+          if (ad.defense.stop_source) root.gateSettings._stopSource = ad.defense.stop_source;
+          if (ad.defense.mode) root.gateSettings._defenseMode = ad.defense.mode;
         }
         if (typeof root.updSetUI === "function") root.updSetUI();
         if (typeof root.syncGatePriceDisplay === "function") {
