@@ -1,6 +1,19 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-06T06:14:08+09:00",
+  "updatedAt": "2026-09-06T06:25:00+09:00",
+  "notices": [
+    {
+      "date": "2026-09-06",
+      "title": "오늘 올린 것",
+      "items": [
+        "PosDelay 0906.0613 — 깃허브 주소판의 factory JSON을 봄. KDS/버스/임계값 파이어 아님",
+        "PosKDS 0906.0608 — 주소판 factory에 kds_status PUT. Gist는 2차",
+        "배달도우미 0906.0610 — KDS는 공장 파일 폴링. 파이어 SSE 제거",
+        "발주 사이트 — github.io 점프 후 공장에 저장. MagicDNS만으로는 PUT 안 함",
+        "사이트 북마크 — 이 화면 위에 go.html 주소. Tailscale 없이 북마크"
+      ]
+    }
+  ],
   "sites": [
     {
       "id": "posweb",

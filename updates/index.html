@@ -97,6 +97,10 @@
     .err { color: #ff8b82; }
     h2 { font-size: 1.12rem; margin: 18px 0 6px; }
     .site-url { font-size: .82rem; color: #cfe4ff; word-break: break-all; }
+    .notice { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin: 0 0 10px; border-left: 8px solid #7ebfff; }
+    .notice h3 { margin: 0 0 6px; font-size: 1rem; }
+    .notice ul { margin: 0; padding-left: 1.15rem; color: #d7e6f7; font-size: .92rem; line-height: 1.45; }
+    .notice li { margin: 0 0 4px; }
     .retired { opacity: .92; }
     body.auth-locked > *:not(#pinOverlay) { display: none !important; }
     #pinOverlay { position: fixed; inset: 0; background: #0e141c; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
@@ -119,6 +123,8 @@
   <h1>업데이트 센터 · 9조</h1>
   <p class="lead">브라우저에 아래 사이트 주소를 북마크하세요. 깃허브 점프가 주소판의 공장을 찾습니다. Tailscale은 필요 없습니다.</p>
   <div id="sites">사이트 주소 불러오는 중…</div>
+  <h2>최근 공지</h2>
+  <div id="notices">공지 불러오는 중…</div>
   <h2>앱 업데이트</h2>
   <p class="lead">지금 이 폰에 깔린 버전과 공장 최신을 한 줄씩 비교합니다. 받기는 잘라서 받습니다. 브라우저가 설치본을 못 읽으면 이 폰 칸에 한 번 적고 저장하세요.</p>
   <p class="meta" id="meta">catalog 불러오는 중… · <a href="catalog.json">catalog.json</a></p>
@@ -171,6 +177,7 @@
     const meta = document.getElementById("meta");
     const counts = document.getElementById("counts");
     const sitesBox = document.getElementById("sites");
+    const noticesBox = document.getElementById("notices");
     const SITE_ROWS = [
       { key: "posweb", label: "포스웹" },
       { key: "orderhelper", label: "발주" },
@@ -307,6 +314,23 @@
       return { cat: cat, ep: ep };
     }
 
+    function renderNotices(cat) {
+      const notes = (cat && cat.notices) || [];
+      noticesBox.innerHTML = "";
+      if (!notes.length) {
+        noticesBox.innerHTML = '<p class="meta">등록된 공지가 없습니다.</p>';
+        return;
+      }
+      notes.slice(0, 5).forEach(function (n) {
+        const div = document.createElement("div");
+        div.className = "notice";
+        const items = Array.isArray(n.items) ? n.items : [];
+        div.innerHTML =
+          "<h3>" + esc(n.date || "") + " · " + esc(n.title || "공지") + "</h3>" +
+          "<ul>" + items.map(function (it) { return "<li>" + esc(it) + "</li>"; }).join("") + "</ul>";
+        noticesBox.appendChild(div);
+      });
+    }
     function renderSites(ep, cat) {
       const book = (ep && ep.policy && (ep.policy.bookmarks_public || ep.policy.bookmarks)) || {};
       const extra = (cat && cat.sites) || [];
@@ -354,6 +378,7 @@
     ]).then(async ([pack, installedFile]) => {
       const cat = pack.cat;
       renderSites(pack.ep, cat);
+      renderNotices(cat);
       const byId = {};
       (cat.apps || []).forEach(a => { if (a && a.id) byId[a.id] = a; });
       const local = loadLocal();
