@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-06T06:09:24+09:00",
+  "updatedAt": "2026-09-06T06:11:06+09:00",
   "apps": [
     {
       "id": "chicken-timer",
@@ -17,14 +17,14 @@
       "id": "deliveryhelper",
       "label": "배달도우미",
       "apkName": "DeliveryHelper_latest.apk",
-      "versionName": "0906.0606",
-      "versionCode": 29810706,
+      "versionName": "0906.0610",
+      "versionCode": 29810710,
       "packageName": "com.deliveryhelper.app",
       "enabled": true,
       "apkUrl": "/updates/deliveryhelper/DeliveryHelper_latest.apk",
       "metadataUrl": "/updates/deliveryhelper/version.json",
-      "sha256": "05d2f93988660924a051854e0fd4a9afcb80482ff9b36a326573b8bca5aeb9ed",
-      "sizeBytes": 32925897
+      "sha256": "f8e4cd58387626a7c4ea91187f1a8b8f7185b82992ac1d57e9e760fc325f9454",
+      "sizeBytes": 32925901
     },
     {
       "id": "posdelay",
