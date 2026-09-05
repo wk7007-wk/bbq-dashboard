@@ -1669,22 +1669,29 @@
   }
 
   function fetchFirstJson(urls) {
+    if (Array.isArray(urls) && urls.length) return raceFirst(urls, fetchJson);
+    const lan = lanFactoryJsonUrls(global);
+    if (lan.length) {
+      return raceFirst(lan, fetchJson).catch(function () {
+        return loadFactorySot().then(function () {
+          return raceFirst(buildStateUrls(global), fetchJson);
+        });
+      });
+    }
     return loadFactorySot().then(function () {
-      const list = (Array.isArray(urls) && urls.length) ? urls : buildStateUrls(global);
-      return raceFirst(list, fetchJson);
+      return raceFirst(buildStateUrls(global), fetchJson);
     });
   }
 
-  function putAllJson(urls, value) {
-    return loadFactorySot().then(function () {
-    const list = Array.isArray(urls) && urls.length ? urls.filter(Boolean) : buildStateUrls(global).filter(Boolean);
-    if (!list.length) return Promise.reject(new Error("no urls"));
-    if (list.length === 1) return putJson(list[0], value);
+  function putToUrlList(list, value) {
+    const urls = (list || []).filter(Boolean);
+    if (!urls.length) return Promise.reject(new Error("no urls"));
+    if (urls.length === 1) return putJson(urls[0], value);
     return new Promise((resolve, reject) => {
-      let pending = list.length;
+      let pending = urls.length;
       let resolved = false;
       let lastErr = null;
-      list.forEach((url) => {
+      urls.forEach((url) => {
         putJson(url, value).then((res) => {
           if (!resolved) {
             resolved = true;
@@ -1697,6 +1704,22 @@
         });
       });
     });
+  }
+
+  function putAllJson(urls, value) {
+    if (Array.isArray(urls) && urls.length) return putToUrlList(urls, value);
+    const lan = lanFactoryJsonUrls(global);
+    if (lan.length) {
+      return putToUrlList(lan, value).catch(function (err) {
+        return loadFactorySot().then(function () {
+          const list = buildStateUrls(global).filter(Boolean);
+          if (!list.length) return Promise.reject(err);
+          return putToUrlList(list, value);
+        });
+      });
+    }
+    return loadFactorySot().then(function () {
+      return putToUrlList(buildStateUrls(global).filter(Boolean), value);
     });
   }
 
