@@ -38,12 +38,15 @@
   }
   function httpsBase(ep) {
     var f = (ep && ep.factory) || (ep && ep.sets && ep.sets.factory) || {};
+    var wanHttps = String(f.wan_https || '').replace(/\/$/, '');
+    if (wanHttps.indexOf('https://') === 0) return wanHttps;
     var magic = String(f.magic_base || (ep && ep.magic_base) || '').replace(/\/$/, '');
     if (magic.indexOf('https://') === 0) return magic;
     return '';
   }
-  function boot() {
-    if (ready) return ready;
+  function boot(force) {
+    if (ready && !force) return ready;
+    if (force) ready = null;
     if (!isGithubPagesHost()) {
       URL = originJson();
       rw = true;
@@ -68,6 +71,9 @@
       });
     });
     return ready;
+  }
+  if (root.setInterval) {
+    root.setInterval(function () { boot(true); }, 5 * 60 * 1000);
   }
   function dig(tree, path) {
     if (!path) return tree;

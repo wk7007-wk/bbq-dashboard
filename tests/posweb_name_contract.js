@@ -29,6 +29,7 @@ assert(admin.includes('github.io/bbq-dashboard/updates/endpoints.json'), 'github
 assert(admin.includes('gist.githubusercontent.com'), 'gist is 2nd address book if github pages fails');
 assert(admin.includes('basesFromEndpoints') || admin.includes('sets.factory'), 'factory bases come from github endpoints');
 assert(admin.includes('fallbackJsonUrls'), 'factory down must read 2nd live_base from github address book');
+assert(admin.includes('refreshAddressBook'), 'blocked factory get must reload github address book');
 assert(!admin.includes('"updates/endpoints.json",\n      GITHUB_ENDPOINTS'), 'address book must not prefer factory relative json');
 assert(live.includes('poswebFactory'), 'posweb.html must use factory origin helper');
 assert(live.includes('window.S=S'), 'page S must be visible to posweb_admin');

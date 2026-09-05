@@ -327,7 +327,7 @@
     if (typeof root.toast === "function") root.toast("잠금", "ok");
   }
 
-  function factoryGetJson(name) {
+  function getFactoryText(name) {
     return resolveFactoryOrigin().then(function () {
       var p = Promise.reject(new Error("none"));
       factoryOrigins().forEach(function (base) {
@@ -350,11 +350,23 @@
         });
       });
       return p;
-    }).then(function (text) {
+    });
+  }
+
+  function factoryGetJson(name) {
+    return getFactoryText(name).then(function (text) {
       var t = (text || "").trim();
       if (!t || t === "null") return {};
       return JSON.parse(t);
-    }).catch(function () { return {}; });
+    }).catch(function () {
+      return refreshAddressBook().then(function () {
+        return getFactoryText(name);
+      }).then(function (text) {
+        var t = (text || "").trim();
+        if (!t || t === "null") return {};
+        return JSON.parse(t);
+      }).catch(function () { return {}; });
+    });
   }
 
   function factoryPutJson(name, obj) {

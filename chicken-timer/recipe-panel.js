@@ -17,9 +17,13 @@
 
   function tableBases(ep) {
     const f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
-    const magic = String((f && f.magic_base) || (ep && ep.magic_base) || "").replace(/\/$/, "");
-    const ts = String((f && f.ts_base) || (ep && ep.ts_base) || "").replace(/\/$/, "");
-    return { magic: magic, ts: ts };
+    return {
+      wanHttps: String(f.wan_https || "").replace(/\/$/, ""),
+      wan: String(f.wan_base || "").replace(/\/$/, ""),
+      siteLan: String(f.site_lan_base || "").replace(/\/$/, ""),
+      magic: String((f.magic_base) || "").replace(/\/$/, ""),
+      ts: String((f.ts_base) || "").replace(/\/$/, "")
+    };
   }
 
   function sameOriginJson(name) {
@@ -30,8 +34,19 @@
     return "";
   }
 
-  function loadFactorySot() {
-    if (sotReady) return sotReady;
+  function recipeUrlsFromEp(ep) {
+    const t = tableBases(ep);
+    const out = [];
+    [t.wanHttps, t.wan, t.siteLan, t.magic, t.ts].forEach(function (base) {
+      if (!base) return;
+      const u = base.replace(/\/$/, "") + "/recipes.json";
+      if (out.indexOf(u) < 0) out.push(u);
+    });
+    return out;
+  }
+
+  function loadFactorySot(force) {
+    if (sotReady && !force) return sotReady;
     sotReady = (async function () {
       const local = sameOriginJson("recipes.json");
       if (local) {
@@ -45,9 +60,7 @@
           if (!r || !r.ok) continue;
           const ep = await r.json();
           if (!ep || typeof ep !== "object") continue;
-          const t = tableBases(ep);
-          let live = t.magic || t.ts;
-          RECIPE_URLS = live ? [live.replace(/\/$/, "") + "/recipes.json"] : [];
+          RECIPE_URLS = recipeUrlsFromEp(ep);
           if (!RECIPE_URLS.length) continue;
           return ep;
         } catch (_) {}
@@ -56,6 +69,9 @@
       return null;
     })();
     return sotReady;
+  }
+  if (global.setInterval) {
+    global.setInterval(function () { loadFactorySot(true); }, REFRESH_MS);
   }
 
   function fetchFirstRecipeJson() {
@@ -67,7 +83,18 @@
           return response.json();
         }));
       });
-      return chain;
+      return chain.catch(function () {
+        return loadFactorySot(true).then(function () {
+          let retry = Promise.reject(new Error("empty"));
+          RECIPE_URLS.forEach((url) => {
+            retry = retry.catch(() => global.fetch(url, { cache: "no-store" }).then((response) => {
+              if (!response || !response.ok) throw new Error("HTTP " + (response ? response.status : ""));
+              return response.json();
+            }));
+          });
+          return retry;
+        });
+      });
     });
   }
 

@@ -1507,9 +1507,13 @@
 
   function tableBases(ep) {
     const f = (ep && ep.sets && ep.sets.factory) || (ep && ep.factory) || {};
-    const magic = String((f && f.magic_base) || (ep && ep.magic_base) || "").replace(/\/$/, "");
-    const ts = String((f && f.ts_base) || (ep && ep.ts_base) || "").replace(/\/$/, "");
-    return { magic: magic, ts: ts };
+    return {
+      wanHttps: String(f.wan_https || "").replace(/\/$/, ""),
+      wan: String(f.wan_base || "").replace(/\/$/, ""),
+      siteLan: String(f.site_lan_base || "").replace(/\/$/, ""),
+      magic: String((f.magic_base) || "").replace(/\/$/, ""),
+      ts: String((f.ts_base) || "").replace(/\/$/, "")
+    };
   }
 
   function sameOriginJson(name) {
@@ -1532,15 +1536,14 @@
     try { host = String((global.location || {}).hostname || ""); } catch (_) {}
     let live = "";
     if (host.indexOf(".ts.net") >= 0 && t.magic) live = t.magic;
-    else if (t.magic) live = t.magic;
-    else if (t.ts) live = t.ts;
+    else live = t.wanHttps || t.wan || t.siteLan || t.magic || t.ts;
     if (!live) return false;
     FACTORY_WAN_JSON = live.replace(/\/$/, "") + "/chicken_timer.json";
     return true;
   }
 
-  function loadFactorySot() {
-    if (sotReady) return sotReady;
+  function loadFactorySot(force) {
+    if (sotReady && !force) return sotReady;
     sotReady = (async function () {
       const cands = factorySotCandidates();
       for (let i = 0; i < cands.length; i++) {
@@ -1558,6 +1561,9 @@
   }
   FACTORY_WAN_JSON = sameOriginJson("chicken_timer.json") || FACTORY_WAN_JSON;
   loadFactorySot();
+  if (global.setInterval) {
+    global.setInterval(function () { loadFactorySot(true); }, 5 * 60 * 1000);
+  }
 
   function isStoreLanHost(host) {
     const match = String(host || "").match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
