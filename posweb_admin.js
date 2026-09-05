@@ -399,14 +399,8 @@
     dest.store_auto_source = store.source === "PRINTER" || store.source === "프린터" ? "PRINTER" : "KDS";
     rangesToCounts(baemin.printer_to_minutes || baemin.kds_to_minutes, "baemin_auto", dest);
     rangesToCounts(baemin.one_person_printer_to_minutes || baemin.one_person_kds_to_minutes, "baemin_auto_one", dest);
-    dest.baemin_auto_one_min_1 = dest.baemin_auto_min_1;
-    dest.baemin_auto_one_min_2 = dest.baemin_auto_min_2;
-    dest.baemin_auto_one_min_3 = dest.baemin_auto_min_3;
     rangesToCounts(store.kds_to_minutes || store.printer_to_minutes, "store_auto", dest);
     rangesToCounts(store.one_person_kds_to_minutes || store.one_person_printer_to_minutes, "store_auto_one", dest);
-    dest.store_auto_one_min_1 = dest.store_auto_min_1;
-    dest.store_auto_one_min_2 = dest.store_auto_min_2;
-    dest.store_auto_one_min_3 = dest.store_auto_min_3;
     var b1 = (sp.per_channel || {}).baemin_one || {};
     var cp = (sp.per_channel || {}).coupang_eats || {};
     dest.baemin1_pause_at = b1.pause_at;

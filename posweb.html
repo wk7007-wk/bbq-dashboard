@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0906-nocache3">
+<html lang="ko" data-web-v="0906-nocache4">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -804,6 +804,10 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
           <div class="compact-cell"><input type="number" id="policy_baemin_auto_min_1" min="5" max="70" step="5"><b>분</b></div>
           <div class="compact-cell"><input type="number" id="policy_baemin_auto_min_2" min="5" max="70" step="5"><b>분</b></div>
           <div class="compact-cell"><input type="number" id="policy_baemin_auto_min_3" min="5" max="70" step="5"><b>분</b></div>
+          <span class="compact-row-label">1인분</span>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_one_min_1" min="5" max="70" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_one_min_2" min="5" max="70" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_one_min_3" min="5" max="70" step="5"><b>분</b></div>
           <span class="compact-row-label">일반</span>
           <div class="compact-cell"><input type="number" id="policy_baemin_auto_count_1" min="0" max="999"><b>건</b></div>
           <div class="compact-cell"><input type="number" id="policy_baemin_auto_count_2" min="0" max="999"><b>건</b></div>
@@ -825,6 +829,10 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
           <div class="compact-cell"><input type="number" id="policy_store_auto_min_1" min="5" max="30" step="5"><b>분</b></div>
           <div class="compact-cell"><input type="number" id="policy_store_auto_min_2" min="5" max="30" step="5"><b>분</b></div>
           <div class="compact-cell"><input type="number" id="policy_store_auto_min_3" min="5" max="30" step="5"><b>분</b></div>
+          <span class="compact-row-label">1인분</span>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_one_min_1" min="5" max="30" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_one_min_2" min="5" max="30" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_one_min_3" min="5" max="30" step="5"><b>분</b></div>
           <span class="compact-row-label">일반</span>
           <div class="compact-cell"><input type="number" id="policy_store_auto_count_1" min="0" max="999"><b>건</b></div>
           <div class="compact-cell"><input type="number" id="policy_store_auto_count_2" min="0" max="999"><b>건</b></div>
@@ -971,8 +979,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0906-nocache3"></script>
-<script src="posweb_admin.js?v=0906-nocache3"></script>
+<script src="posdelay_ad_receipt.js?v=0906-nocache4"></script>
+<script src="posweb_admin.js?v=0906-nocache4"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -2426,27 +2434,33 @@ let policySettings = {
   peak2_start:'',
   peak2_end:'',
   baemin_auto_enabled:true,
-  baemin_auto_source:'KDS',
-  baemin_auto_min_1:20,
-  baemin_auto_min_2:25,
-  baemin_auto_min_3:30,
+  baemin_auto_source:'PRINTER',
+  baemin_auto_min_1:30,
+  baemin_auto_min_2:50,
+  baemin_auto_min_3:70,
   baemin_auto_count_1:0,
   baemin_auto_count_2:2,
   baemin_auto_count_3:4,
+  baemin_auto_one_min_1:40,
+  baemin_auto_one_min_2:60,
+  baemin_auto_one_min_3:70,
   baemin_auto_one_count_1:0,
   baemin_auto_one_count_2:1,
-  baemin_auto_one_count_3:2,
+  baemin_auto_one_count_3:3,
   store_auto_enabled:true,
   store_auto_source:'KDS',
   store_auto_min_1:20,
   store_auto_min_2:25,
   store_auto_min_3:30,
+  store_auto_one_min_1:25,
+  store_auto_one_min_2:30,
+  store_auto_one_min_3:30,
   store_auto_count_1:0,
   store_auto_count_2:2,
   store_auto_count_3:4,
   store_auto_one_count_1:0,
   store_auto_one_count_2:1,
-  store_auto_one_count_3:2,
+  store_auto_one_count_3:4,
   baemin1_pause_at:10,
   baemin1_resume_at:2,
   baemin1_one_pause_at:10,
@@ -2492,6 +2506,9 @@ function applyPolicySettingsToUI() {
     ['policy_baemin_auto_min_1',policySettings.baemin_auto_min_1],
     ['policy_baemin_auto_min_2',policySettings.baemin_auto_min_2],
     ['policy_baemin_auto_min_3',policySettings.baemin_auto_min_3],
+    ['policy_baemin_auto_one_min_1',policySettings.baemin_auto_one_min_1],
+    ['policy_baemin_auto_one_min_2',policySettings.baemin_auto_one_min_2],
+    ['policy_baemin_auto_one_min_3',policySettings.baemin_auto_one_min_3],
     ['policy_baemin_auto_count_1',policySettings.baemin_auto_count_1],
     ['policy_baemin_auto_count_2',policySettings.baemin_auto_count_2],
     ['policy_baemin_auto_count_3',policySettings.baemin_auto_count_3],
@@ -2502,6 +2519,9 @@ function applyPolicySettingsToUI() {
     ['policy_store_auto_min_1',policySettings.store_auto_min_1],
     ['policy_store_auto_min_2',policySettings.store_auto_min_2],
     ['policy_store_auto_min_3',policySettings.store_auto_min_3],
+    ['policy_store_auto_one_min_1',policySettings.store_auto_one_min_1],
+    ['policy_store_auto_one_min_2',policySettings.store_auto_one_min_2],
+    ['policy_store_auto_one_min_3',policySettings.store_auto_one_min_3],
     ['policy_store_auto_count_1',policySettings.store_auto_count_1],
     ['policy_store_auto_count_2',policySettings.store_auto_count_2],
     ['policy_store_auto_count_3',policySettings.store_auto_count_3],
@@ -2540,7 +2560,7 @@ function readPolicyInt(id,label,min,max,silent){
 function srcLabel(src){return src==='PRINTER'?'프린터':'KDS';}
 
 function buttonValueSpec(id){
-  if(/^policy_(baemin|store)_auto_min_[123]$/.test(id)){
+  if(/^policy_(baemin|store)_auto_(one_)?min_[123]$/.test(id)){
     const max=id.includes('baemin_auto')?70:30;
     return {min:5,max,step:5,unit:'분',kind:'minute'};
   }
@@ -2645,17 +2665,18 @@ function readAutoPolicy(prefix,label,maxMinute,silent){
   var mins=[], counts=[], oneCounts=[];
   for(var i=1;i<=3;i++){
     var mn=readPolicyInt('policy_'+prefix+'_min_'+i,label+' '+i+'단계 시간',5,maxMinute,silent);
+    var om=readPolicyInt('policy_'+prefix+'_one_min_'+i,label+' '+i+'단계 1인시간',5,maxMinute,silent);
     var ct=readPolicyInt('policy_'+prefix+'_count_'+i,label+' '+i+'단계 일반',0,999,silent);
     var oc=readPolicyInt('policy_'+prefix+'_one_count_'+i,label+' '+i+'단계 1인',0,999,silent);
-    if(mn===null||ct===null||oc===null)return null;
-    if(mn%5!==0){
+    if(mn===null||om===null||ct===null||oc===null)return null;
+    if(mn%5!==0||om%5!==0){
       if(!silent)toast(label+' 시간은 5분 단위만 가능합니다','warn');
       return null;
     }
     mins.push(mn);counts.push(ct);oneCounts.push(oc);
     out[prefix+'_min_'+i]=mn;
     out[prefix+'_count_'+i]=ct;
-    out[prefix+'_one_min_'+i]=mn;
+    out[prefix+'_one_min_'+i]=om;
     out[prefix+'_one_count_'+i]=oc;
   }
   if(new Set(mins).size!==3 || new Set(counts).size!==3 || new Set(oneCounts).size!==3){
@@ -2737,10 +2758,12 @@ function bindPolicyAutoSave(){
     'policy_peak1_start','policy_peak1_end','policy_peak2_start','policy_peak2_end',
     'policy_baemin_auto_source',
     'policy_baemin_auto_min_1','policy_baemin_auto_min_2','policy_baemin_auto_min_3',
+    'policy_baemin_auto_one_min_1','policy_baemin_auto_one_min_2','policy_baemin_auto_one_min_3',
     'policy_baemin_auto_count_1','policy_baemin_auto_count_2','policy_baemin_auto_count_3',
     'policy_baemin_auto_one_count_1','policy_baemin_auto_one_count_2','policy_baemin_auto_one_count_3',
     'policy_store_auto_source',
     'policy_store_auto_min_1','policy_store_auto_min_2','policy_store_auto_min_3',
+    'policy_store_auto_one_min_1','policy_store_auto_one_min_2','policy_store_auto_one_min_3',
     'policy_store_auto_count_1','policy_store_auto_count_2','policy_store_auto_count_3',
     'policy_store_auto_one_count_1','policy_store_auto_one_count_2','policy_store_auto_one_count_3',
     'policy_baemin1_pause','policy_baemin1_resume',
