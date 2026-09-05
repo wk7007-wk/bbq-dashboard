@@ -2,7 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const source = fs.readFileSync(path.join(__dirname, '..', 'posdelay.html'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', 'posweb.html'), 'utf8');
 const scripts = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 assert(scripts.length > 0, 'dashboard script block missing');
 for (const script of scripts) {
@@ -83,5 +83,18 @@ const adStateHandlerStart = source.indexOf('function hASt(');
 const adStateHandlerEnd = source.indexOf('function hStatus(', adStateHandlerStart);
 assert(adStateHandlerStart >= 0 && adStateHandlerEnd > adStateHandlerStart, 'ad state callback block missing');
 assert(source.slice(adStateHandlerStart, adStateHandlerEnd).includes('syncGateClubToggle();'), 'ad state callback must refresh club readback status immediately');
+
+const activeStart = source.indexOf('function getActiveCount(');
+const activeEnd = source.indexOf('\nfunction ', activeStart + 1);
+assert(activeStart >= 0 && activeEnd > activeStart, 'getActiveCount missing');
+assert(!source.slice(activeStart, activeEnd).includes('kS.count'), 'getActiveCount must not put kds.count on hero');
+const weightedStart = source.indexOf('function getKdsWeightedCount(');
+const weightedEnd = source.indexOf('\nfunction ', weightedStart + 1);
+assert(weightedStart >= 0 && weightedEnd > weightedStart, 'getKdsWeightedCount missing');
+const weightedBody = source.slice(weightedStart, weightedEnd);
+assert(weightedBody.includes('snapshotWeighted()'), 'hero count must use snapshot.weighted');
+assert(weightedBody.includes('order_count_weighted'), 'hero count must use status.order_count_weighted');
+assert(!weightedBody.includes('kS.count'), 'getKdsWeightedCount must not fall back to kds.count');
+assert(!weightedBody.includes('kds.count'), 'getKdsWeightedCount must not fall back to kds.count');
 
 console.log('PASS posdelay UI cleanup/navigation/native-callback contract');

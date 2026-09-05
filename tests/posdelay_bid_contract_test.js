@@ -2,7 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const source = fs.readFileSync(path.join(__dirname, '..', 'posdelay.html'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', 'posweb.html'), 'utf8');
 
 for (const key of ['baemin_amount', 'baemin_mid_amount', 'baemin_reduced_amount']) {
   assert(source.includes(`adjS('${key}',-50)`), `${key} minus button must use 50 won`);

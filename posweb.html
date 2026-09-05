@@ -1,0 +1,3651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>posweb</title>
+<style>
+:root{
+  --bg-deep:#121225;--bg-card:#242444;--bg-input:#2A2A45;
+  --border:#2E2E52;--text-bright:#E0E0EC;--text-secondary:#9090A8;--text-muted:#707088;
+  --c-baemin:#2AC1BC;--c-coupang:#FFD700;--c-on:#2ECC71;--c-off:#E74C3C;--c-mid:#E67E22;--c-info:#4FC3F7;
+  --radius:12px;--radius-sm:6px;
+}
+*{margin:0;padding:0;box-sizing:border-box;letter-spacing:0!important;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:
+radial-gradient(circle at top right,rgba(42,193,188,.14),transparent 28%),
+radial-gradient(circle at top left,rgba(255,215,0,.10),transparent 22%),
+linear-gradient(180deg,#151829,#0F1221 52%,#0A0D18 100%);color:#E0E0EC;min-height:100vh;padding:10px;padding-bottom:16px;font-size:13px;}
+.page-sticky{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg-deep),var(--bg-deep));padding:4px 10px 2px;margin:-10px -10px 0;}
+.icon-row{display:flex;gap:6px;align-items:center;}
+.icon-btn,.icon-btn-text{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg-input);color:var(--text-secondary);cursor:pointer;touch-action:manipulation;}
+.icon-btn{font-size:18px;padding:0;}
+.icon-btn-text{font-size:12px;font-weight:600;padding:0 12px;}
+.app-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:6px 0 8px;}
+.app-nav button{min-height:36px;border:1px solid var(--border);border-radius:8px;background:rgba(42,42,69,.82);color:var(--text-secondary);font-size:11px;font-weight:700;}
+.app-nav button:active{background:rgba(79,195,247,.16);color:var(--text-bright);}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 2px 2px;}
+.section-title:first-of-type{padding-top:6px;}
+.section-title-block{display:flex;flex-direction:column;gap:0;}
+.section-eyebrow{display:none;}
+.section-heading{font-size:12px;font-weight:800;color:var(--text-muted);}
+.section-note{display:none;}
+.section-chip{display:none;}
+.stack-tight{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.stat-label{font-size:12px;color:var(--text-secondary);}
+.stat-label-sm{font-size:10px;color:var(--text-muted);}
+.stat-value{font-size:30px;font-weight:700;color:var(--text-bright);}
+.stat-value-sm{font-size:14px;font-weight:700;color:var(--c-info);}
+.border-top{border-top:1px solid var(--bg-input);}
+.text-muted{color:var(--text-muted);}
+.text-secondary{color:var(--text-secondary);}
+.text-xs{font-size:10px;}
+.note{font-size:10px;color:var(--text-muted);padding:4px 0;}
+.unit-hint{font-size:10px;line-height:1.35;color:var(--text-muted);font-weight:600;}
+.time-pill{display:inline-flex;align-items:center;justify-content:center;min-width:72px;min-height:44px;padding:0 12px;border-radius:10px;background:var(--bg-deep);border:1px solid var(--border);color:var(--text-bright);font-size:16px;font-weight:700;cursor:pointer;}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:5px;padding-top:6px;}
+.summary-card{appearance:none;display:flex;flex-direction:column;gap:4px;width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:rgba(18,18,37,.56);color:inherit;text-align:left;font:inherit;cursor:pointer;touch-action:manipulation;}
+.summary-card:active{transform:translateY(1px);border-color:rgba(255,255,255,.18);}
+.summary-card.off{opacity:.56;}
+.summary-head{display:flex;align-items:center;gap:6px;}
+.summary-name{flex:1;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.summary-count{font-size:10px;font-weight:700;flex-shrink:0;}
+.summary-meter{height:5px;border-radius:999px;background:var(--border);overflow:hidden;}
+.summary-meter>span{display:block;height:100%;border-radius:999px;transition:width .3s;}
+.summary-detail{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.summary-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px;color:var(--text-muted);}
+.summary-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;font-size:10px;color:var(--text-muted);border-top:1px solid var(--bg-input);}
+.monitor-shell{display:flex;flex-direction:column;gap:8px;}
+.monitor-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.fresh-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.mini-gauges{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mini-gauge{padding:6px 8px;border-radius:8px;background:rgba(12,16,30,.55);border:1px solid rgba(255,255,255,.06);}
+.mini-gauge-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;font-size:11px;font-weight:800;}
+.kicker{display:none;}
+.monitor-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.monitor-title{font-size:18px;font-weight:800;letter-spacing:-.03em;}
+.hero-status{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:700;}
+.role-row{display:none;}
+.role-pill{display:inline-flex;align-items:center;min-height:26px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:10px;font-weight:600;color:var(--text-secondary);}
+.role-pill.primary{background:rgba(42,193,188,.14);border-color:rgba(42,193,188,.28);color:#B5F2EF;}
+.monitor-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:160px;}
+.sync-cluster{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;}
+.sync-badge{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr);gap:8px;}
+.hero-panel{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:8px;background:rgba(12,16,30,.66);border:1px solid rgba(255,255,255,.06);min-height:72px;}
+.hero-panel.primary{background:linear-gradient(135deg,rgba(79,195,247,.18),rgba(42,193,188,.12) 55%,rgba(12,16,30,.78));min-height:104px;}
+.hero-panel.primary .hero-number{font-size:44px;line-height:0.92;}
+.hero-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
+.hero-number-row{display:flex;align-items:flex-end;gap:6px;line-height:1;flex-wrap:wrap;}
+.hero-number{font-size:28px;font-weight:800;letter-spacing:-.06em;}
+.hero-number-sm{font-size:20px;font-weight:800;letter-spacing:-.04em;}
+.hero-unit{font-size:13px;color:var(--text-secondary);padding-bottom:4px;}
+.src-lights{display:inline-flex;gap:4px;align-items:center;padding-bottom:3px;}
+.src-light{font-size:10px;line-height:1;padding:4px 7px;border-radius:999px;border:1px solid rgba(255,255,255,.12);color:var(--text-muted);opacity:.38;font-weight:800;}
+.src-light.raw.on{opacity:1;border-color:#2ECC71;color:#2ECC71;background:rgba(46,204,113,.16);}
+.src-light.adj.on{opacity:1;border-color:#E67E22;color:#E67E22;background:rgba(230,126,34,.16);}
+.hero-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-secondary);line-height:1.35;}
+.hero-meta.strong{align-items:flex-start;font-weight:600;color:var(--text-bright);}
+.hero-meta.accent{color:var(--c-mid);}
+.prediction-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.prediction-card{display:flex;flex-direction:column;gap:2px;padding:6px;border-radius:8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
+.prediction-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
+.prediction-value{font-size:16px;font-weight:800;letter-spacing:-.04em;}
+.prediction-note{display:none;}
+.board-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.board-refresh{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid rgba(79,195,247,.24);background:rgba(79,195,247,.10);color:#C6EBFF;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;}
+.board-last{font-size:10px;color:var(--text-secondary);}
+.ops-log-panel{border-top:1px solid var(--bg-input);padding-top:6px;}
+.ops-log-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.ops-log-title{font-size:11px;font-weight:800;color:var(--text-bright);}
+.ops-log-time{font-size:10px;color:var(--text-muted);}
+.ops-log-list{display:flex;flex-direction:column;gap:4px;max-height:190px;overflow-y:auto;}
+.ops-log-row{display:grid;grid-template-columns:58px minmax(0,1fr);gap:6px;align-items:start;padding:5px 6px;border:1px solid rgba(69,76,122,.38);border-radius:6px;background:rgba(18,18,37,.45);}
+.ops-log-row.live{border-color:rgba(79,195,247,.30);background:rgba(79,195,247,.07);}
+.ops-log-stamp{font-size:10px;font-weight:700;color:var(--text-muted);white-space:nowrap;}
+.ops-log-main{min-width:0;}
+.ops-log-name{font-size:11px;font-weight:800;color:var(--text-bright);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ops-log-meta{font-size:10px;color:var(--text-secondary);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ops-log-empty{padding:8px 0;text-align:center;font-size:11px;color:var(--text-muted);}
+.panel-shell{padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.order-shell{border-bottom:1px solid var(--border);margin-bottom:4px;}
+.order-header{display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer;min-height:44px;}
+.order-empty{text-align:center;padding:10px 0;font-size:11px;color:var(--text-muted);}
+.order-note{display:none;}
+.order-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-input);font-size:11px;}
+.order-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
+.order-channel-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.order-channel{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;font-weight:700;flex-shrink:0;}
+.order-status-mini{font-size:10px;font-weight:700;}
+.order-address{color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.order-elapsed{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;min-width:58px;}
+.elapsed-main{font-size:18px;font-weight:800;letter-spacing:-.04em;line-height:1;}
+.elapsed-sub{font-size:10px;color:var(--text-secondary);}
+.badge-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding-bottom:2px;}
+.badge-chip{padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;}
+.compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:6px 0 8px;}
+.compare-box{display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
+.compare-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
+.compare-value{font-size:20px;font-weight:800;letter-spacing:-.04em;}
+.compare-sub{font-size:10px;color:var(--text-secondary);line-height:1.35;}
+.acc-header{cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:2px 0;}
+.acc-summary{font-size:11px;color:var(--text-secondary);margin-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:right;padding-right:8px;}
+.acc-arrow{color:var(--text-muted);font-size:14px;transition:transform .2s;flex-shrink:0;}
+.acc-arrow.open{transform:rotate(90deg);}
+.card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(36,36,68,.92),rgba(18,18,37,.94));border:1px solid rgba(69,76,122,.54);border-radius:8px;padding:9px;margin-bottom:6px;box-shadow:0 16px 40px rgba(0,0,0,.22);scroll-margin-top:86px;}
+.card::before{content:'';position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.22),rgba(255,255,255,.06));}
+.card-monitor::before{background:linear-gradient(90deg,rgba(79,195,247,.2),rgba(42,193,188,.92),rgba(255,215,0,.4));}
+.card-control::before{background:linear-gradient(90deg,rgba(79,195,247,.14),rgba(79,195,247,.78),rgba(255,255,255,.08));}
+.card-ad::before,.card-delay::before{background:linear-gradient(90deg,rgba(42,193,188,.18),rgba(42,193,188,.92),rgba(255,255,255,.08));}
+.card-coupang::before{background:linear-gradient(90deg,rgba(255,215,0,.16),rgba(255,215,0,.92),rgba(255,255,255,.08));}
+.card-fee::before{background:linear-gradient(90deg,rgba(79,195,247,.2),rgba(79,195,247,.9),rgba(255,255,255,.08));}
+.card-stop::before{background:linear-gradient(90deg,rgba(231,76,60,.18),rgba(231,76,60,.92),rgba(255,255,255,.08));}
+.card-diag::before{background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.22),rgba(255,255,255,.08));}
+.card-power::before{background:linear-gradient(90deg,rgba(124,111,224,.18),rgba(124,111,224,.88),rgba(79,195,247,.18));}
+@keyframes pcPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+.pc-pulse{animation:pcPulse 2s ease-in-out infinite;}
+.pc-overlay{position:fixed;inset:0;background:rgba(8,10,20,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px;}
+.pc-overlay.show{display:flex;}
+.pc-dialog{width:100%;max-width:340px;background:linear-gradient(180deg,rgba(36,36,68,.98),rgba(18,18,37,.98));border:1px solid rgba(124,111,224,.45);border-radius:16px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.pc-dialog .pc-dialog-title{font-size:14px;font-weight:800;color:var(--text-bright);margin-bottom:6px;letter-spacing:-.02em;}
+.pc-dialog .pc-dialog-msg{font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.45;}
+.pc-dialog .pc-dialog-count{font-size:28px;font-weight:800;color:#E67E22;text-align:center;margin:6px 0 14px;letter-spacing:-.04em;}
+.pc-dialog .pc-dialog-row{display:flex;gap:8px;}
+.pc-dialog .pc-dialog-row > .btn{flex:1;min-height:48px;font-size:14px;font-weight:700;}
+.row{display:flex;align-items:center;gap:6px;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.dg{background:#2ECC71;}.do{background:#E67E22;}.dr{background:#E74C3C;}.dd{background:#707088;}
+.gauge{display:flex;gap:1px;height:36px;margin-bottom:2px;}
+.gc{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#FFF;border-radius:2px;opacity:.85;cursor:pointer;}
+.gc.act{opacity:1;box-shadow:inset 0 0 0 2px #FFF;}
+.btn{padding:3px 10px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;color:#FFF;touch-action:manipulation;min-height:44px;}
+.bs{padding:9px 12px;font-size:11px;}
+.bg{background:#2ECC71;}.bred{background:#E74C3C;}.bor{background:#E67E22;}.bn{background:#2A2A45;color:#E0E0EC;}.bb{background:#2AC1BC;}.bcp{background:#FFD700;color:#1A1A30;}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:6px 0;border-bottom:1px solid #2A2A45;}
+.sr:last-child{border-bottom:none;}
+.sl{font-size:12px;color:#C8C8DC;font-weight:600;}
+.sv{display:flex;align-items:center;gap:4px;}
+input[type=number]{width:48px;background:#1A1A30;border:1px solid #2E2E52;border-radius:6px;color:#FFF;padding:6px 4px;text-align:center;font-size:14px;font-weight:bold;-moz-appearance:textfield;}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=time],input[type=text]{background:#1A1A30;border:1px solid #2E2E52;color:#FFF;padding:6px 8px;border-radius:6px;font-size:13px;font-weight:700;}
+select{background:#1A1A30;border:1px solid #2E2E52;color:#FFF;padding:7px 8px;border-radius:6px;font-size:12px;font-weight:800;}
+.tog{width:44px;height:28px;border-radius:14px;background:#E74C3C;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.tog.on{background:#2ECC71;}.tog::after{content:'';width:22px;height:22px;border-radius:50%;background:#FFF;position:absolute;top:3px;left:3px;transition:left .2s;}.tog.on::after{left:19px;}
+.ch{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:40px;}
+.ch>.row>span:first-child,.ch>span:first-child{font-size:13px!important;font-weight:800!important;}
+.cb{display:none;}.cb.open{display:block;}
+.logbox{background:#1A1A30;border:1px solid #2A2A45;border-radius:6px;padding:6px;max-height:180px;overflow-y:auto;font-family:monospace;font-size:10px;color:#9898B0;white-space:pre-wrap;word-break:break-all;}
+canvas{width:100%;height:100px;display:block;margin-top:6px;}
+.tabs{display:flex;gap:3px;margin-bottom:6px;}
+.tab{padding:8px 12px;border-radius:5px;font-size:11px;cursor:pointer;background:#2A2A45;color:#A0A0BC;}.tab.active{background:#2AC1BC;color:#FFF;}
+.sec{font-size:12px;font-weight:700;padding:7px 0 5px;border-bottom:1px solid #2A2A45;margin-top:6px;color:var(--text-bright);}
+.settings-panel{padding-top:8px;}
+.setting-hint{font-size:11px;color:var(--text-secondary);line-height:1.4;padding:2px 0 8px;}
+.auto-save-note{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 10px;border:1px solid rgba(69,76,122,.48);border-radius:8px;background:rgba(18,18,37,.42);color:var(--text-secondary);font-size:11px;font-weight:700;}
+.auto-save-note.ok{color:var(--c-on);border-color:rgba(46,204,113,.35);}
+.auto-save-note.warn{color:var(--c-mid);border-color:rgba(230,126,34,.4);}
+.auto-save-note.error{color:var(--c-off);border-color:rgba(231,76,60,.4);}
+.settings-block{border:1px solid rgba(69,76,122,.48);border-radius:8px;background:rgba(18,18,37,.42);padding:8px;margin-bottom:8px;}
+.settings-block:last-child{margin-bottom:0;}
+.settings-title{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid rgba(69,76,122,.44);font-size:12px;font-weight:800;color:var(--text-bright);}
+.settings-title small{font-size:10px;font-weight:700;color:var(--text-muted);}
+.threshold-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.threshold-card{border:1px solid rgba(69,76,122,.42);border-radius:8px;background:rgba(12,16,30,.44);padding:7px;}
+.threshold-title{font-size:11px;font-weight:800;color:var(--text-bright);padding-bottom:5px;border-bottom:1px solid rgba(69,76,122,.35);}
+.policy-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:38px;border-bottom:1px solid rgba(42,42,69,.78);}
+.policy-row:last-child{border-bottom:none;}
+.policy-label{font-size:12px;color:#C8C8DC;font-weight:700;white-space:nowrap;}
+.policy-control{display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:10px;white-space:nowrap;}
+.policy-num{width:58px!important;text-align:center!important;}
+.policy-time{width:88px!important;text-align:center!important;}
+.readonly-pill{width:62px!important;text-align:center!important;color:var(--c-mid)!important;}
+.preset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:4px;}
+.preset-grid .btn{min-height:38px;padding:6px 4px;}
+.compact-thresholds{display:grid;gap:8px;}
+.compact-block{border:1px solid rgba(69,76,122,.42);border-radius:8px;background:rgba(12,16,30,.44);padding:8px;}
+.compact-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid rgba(69,76,122,.35);}
+.compact-title{font-size:12px;font-weight:900;color:var(--text-bright);}
+.compact-table{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr));gap:5px;align-items:center;padding-top:6px;}
+.compact-table span{font-size:10px;color:var(--text-secondary);font-weight:800;text-align:center;}
+.compact-cell{display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;}
+.compact-cell input{width:42px!important;font-size:12px!important;padding:5px 3px!important;}
+.compact-cell b{font-size:9px;color:var(--text-muted);font-weight:700;}
+.compact-row-label{text-align:left!important;color:#C8C8DC!important;}
+.button-value-source{display:none!important;}
+.button-value-control{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:26px;}
+.button-value-btn{min-width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-primary);font-size:14px;font-weight:800;line-height:1;}
+.button-value-btn:active{transform:translateY(1px);background:var(--surface-muted);}
+.button-value-btn:disabled{opacity:.35;transform:none;}
+.native-control:disabled{opacity:.42;cursor:not-allowed;filter:saturate(.35);}
+.standalone-readonly{display:none;margin:0 0 8px;padding:8px 10px;border:1px solid rgba(230,126,34,.45);border-radius:8px;background:rgba(230,126,34,.10);color:#F4C27A;font-size:11px;font-weight:700;}
+.button-value-text{min-width:44px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--surface-muted);font-size:12px;font-weight:800;color:var(--text-primary);padding:0 6px;white-space:nowrap;}
+.button-value-control.is-minute .button-value-text{min-width:48px;}
+.compact-cell .button-value-control{width:100%;}
+.compact-cell .button-value-text{flex:1;min-width:0;}
+.policy-control .button-value-control{margin-left:auto;}
+.card-fee .panel-shell{padding:8px;}
+.card-fee .compare-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+.card-fee .compare-box{min-height:0;padding:6px 8px;}
+.card-fee .compare-label{font-size:10px;}
+.card-fee .compare-value{font-size:20px;line-height:1.05;}
+.card-fee .hero-unit{font-size:11px;}
+.card-fee .compare-sub{font-size:10px;line-height:1.25;}
+.card-fee #feeChannelRow{margin-top:4px;gap:4px;}
+.card-fee .order-shell{margin-top:6px;}
+.card-fee .order-header{padding:6px 8px;}
+.card-fee #feeOrderListWrap{max-height:96px;overflow:auto;}
+.card-fee #feeOrderList{gap:4px;}
+.nbtn{width:100%;padding:8px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;color:#FFF;margin-top:6px;touch-action:manipulation;}
+.alert{padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;display:none;}
+.alert.warn{background:#E74C3C33;border:1px solid #E74C3C;color:#E74C3C;display:block;}
+.alert.ok{background:#2ECC7133;border:1px solid #2ECC71;color:#2ECC71;display:block;}
+.conn{font-size:10px;text-align:right;margin-bottom:4px;}
+.sync-row{display:flex;gap:4px;font-size:10px;flex-wrap:wrap;}
+.sync-item{display:flex;align-items:center;gap:2px;}
+.ck-row{transition:opacity 0.3s;}
+.ck-dying{opacity:0.3 !important;text-decoration:line-through;}
+.cd-wrap{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+.cd-wrap .cd-label{font-size:8px;font-weight:700;color:#9898B0;writing-mode:vertical-rl;letter-spacing:-1px;}
+.cd-wrap.active .cd-label{color:#E0E0EC;}
+.cd-ring{position:relative;width:44px;height:44px;flex-shrink:0;}
+.cd-ring svg{transform:rotate(-90deg);}
+.cd-ring .cd-txt{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#9898B0;}
+.cd-wrap.active .cd-txt{color:#FFF;}
+/* 주문 리스트 스크롤 */
+#feeOrderListWrap{overflow-y:auto;transition:max-height .3s ease;}
+#feeOrderListWrap::-webkit-scrollbar{width:3px;}
+#feeOrderListWrap::-webkit-scrollbar-thumb{background:#2E2E52;border-radius:4px;}
+#feeOrderList>div:active{background:rgba(255,255,255,0.05)}
+/* 배달료 설정 헤더 화살표 회전 */
+#gate_body_arrow{transition:transform .25s;}
+.cb.open ~ * #gate_body_arrow{transform:rotate(180deg);}
+@media (max-width:380px){
+  .summary-grid{grid-template-columns:1fr;}
+  .time-pill{min-width:64px;font-size:15px;}
+  .stat-value{font-size:28px;}
+  .threshold-grid{grid-template-columns:1fr;}
+}
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);}
+  .prediction-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media (max-width:640px){
+  .section-title{align-items:flex-start;flex-direction:column;padding-top:6px;}
+  .app-nav{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .monitor-side{align-items:flex-start;min-width:0;}
+  .compare-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .compare-grid .compare-box:last-child{grid-column:span 2;}
+  .hero-grid{grid-template-columns:1fr 1fr;}
+  .hero-panel.primary{grid-column:1 / -1;}
+  .hero-panel.primary .hero-number{font-size:40px;}
+  .hero-number{font-size:24px;}
+  .hero-number-sm{font-size:18px;}
+  .hero-unit{font-size:11px;}
+  .hero-meta{font-size:9px;}
+  .mini-gauges{grid-template-columns:1fr;}
+  .prediction-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+  .prediction-title{font-size:9px;}
+  .prediction-value{font-size:17px;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-sticky">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div class="conn" style="margin:0"><span class="dot dd" id="cD"></span> <span id="cT" class="text-secondary">...</span><span id="appVer" style="font-size:9px;color:#888;margin-left:6px"></span></div>
+    <div class="icon-row">
+      <button type="button" class="icon-btn" onclick="doCapture()" aria-label="캡처">&#128247;</button>
+      <button type="button" class="icon-btn-text" id="webAdminBtn" onclick="toggleWebAdmin()">관리자</button>
+      <button type="button" class="icon-btn-text" onclick="location.reload()">갱신</button>
+    </div>
+  </div>
+  <div class="app-nav">
+    <button type="button" onclick="jumpToCard('monitorCard')">상황</button>
+    <button type="button" onclick="jumpToCard('pcPowerCard')">장치</button>
+    <button type="button" onclick="jumpToCard('adSettingCard')">광고</button>
+    <button type="button" onclick="jumpToCard('gatePanel')">운영</button>
+    <button type="button" onclick="jumpToCard('baeminDelayCard')">지연</button>
+  </div>
+  <div class="alert" id="alertB"></div>
+  <div class="alert" id="anomalyB"></div>
+</div>
+
+<div class="section-title">
+  <div class="section-title-block">
+    <span class="section-eyebrow">상황</span>
+    <span class="section-heading">상황 모니터</span>
+    <span class="section-note">실시간 상황과 설정값을 나란히 봅니다. 임계는 관리자 웹, 광고/배달료는 공장, 수락·중지는 PC입니다.</span>
+  </div>
+  <span class="section-chip">Live Ops</span>
+</div>
+<div class="card card-monitor" id="monitorCard">
+  <div class="monitor-shell">
+    <div class="hero-grid">
+      <div class="hero-panel primary">
+        <div class="monitor-title-row" style="margin-bottom:4px">
+          <span class="hero-label" style="letter-spacing:.08em">동작</span>
+          <span id="mStatus" class="hero-status">-</span>
+          <span id="mOutputTimer" class="hero-status" title="가동 타이머" style="min-width:48px;justify-content:center;font-family:monospace">--</span>
+        </div>
+        <div class="hero-number-row">
+          <span id="mCount" class="hero-number">--</span><span id="kdsHeroUnit" class="hero-unit">건</span>
+          <span class="src-lights" aria-label="원본 또는 보정">
+            <span id="kdsRawLight" class="src-light raw">원본</span>
+            <span id="kdsAdjLight" class="src-light adj">보정</span>
+          </span>
+        </div>
+        <div id="kdsUnitHint" class="unit-hint">시각 --</div>
+      </div>
+      <div class="hero-panel">
+        <span class="hero-label">프린터</span>
+        <div class="hero-number-row"><span id="printerCount" class="hero-number-sm">0</span><span class="hero-unit">건</span></div>
+        <div class="hero-meta"><span id="printerDot2" class="dot dd"></span><span id="heroPrinterState">OFF</span></div>
+        <div id="heroCaptureTime" class="hero-meta">수집 --</div>
+      </div>
+      <div class="hero-panel">
+        <span class="hero-label">가게배달</span>
+        <div class="hero-number-row"><span id="heroFeeCurrent" class="hero-number-sm">0원</span></div>
+        <div id="heroFeeMode" class="hero-meta accent">OFF</div>
+        <div class="hero-meta">설정 <span id="heroFeeThreshold">8건</span> · <span id="heroFeeValid">30분</span></div>
+      </div>
+    </div>
+    <div class="fresh-row">
+      <span class="sync-badge"><span id="sKd" class="dot dd"></span><span id="sKt" class="text-secondary">KDS --</span></span>
+      <span class="sync-badge"><span id="subDot2" class="dot dd"></span><span id="subStatus2" class="text-secondary">서브폰 대기...</span></span>
+      <span id="engineBadge2" class="board-last"></span>
+      <span id="mRefresh" class="board-last">수집 --</span>
+      <button class="board-refresh" onclick="doForceRefresh()">수집</button>
+    </div>
+    <div class="mini-gauges">
+      <div class="mini-gauge">
+        <div class="mini-gauge-head"><span style="color:var(--c-baemin)">배민</span><span id="bSt"></span></div>
+        <div class="gauge" id="bG"></div>
+      </div>
+      <div class="mini-gauge">
+        <div class="mini-gauge-head"><span style="color:var(--c-coupang)">쿠팡</span><span id="cSt"></span></div>
+        <div class="gauge" id="cG"></div>
+      </div>
+    </div>
+    <div id="gaugeLegend" style="display:none;gap:8px;justify-content:center;padding-top:2px"></div>
+    <div id="groupSummary" class="summary-grid"></div>
+    <div id="delayPred" class="prediction-grid">
+      <div class="prediction-card">
+        <span class="prediction-title">조리</span>
+        <span id="dpSpeed" class="prediction-value">-</span>
+        <span class="prediction-note">최근 완료 기록 기준</span>
+      </div>
+      <div class="prediction-card">
+        <span class="prediction-title">배민</span>
+        <span id="dpBaemin" class="prediction-value">-</span>
+        <span class="prediction-note">목표시간 대비 예상 차이</span>
+      </div>
+      <div class="prediction-card">
+        <span class="prediction-title">쿠팡</span>
+        <span id="dpCoupang" class="prediction-value">-</span>
+        <span class="prediction-note">실시간 조리속도 반영</span>
+      </div>
+    </div>
+    <div class="ops-log-panel">
+      <div class="ops-log-head">
+        <span class="ops-log-title">최근 동작</span>
+        <span id="opsLogUpdated" class="ops-log-time">--</span>
+      </div>
+      <div id="mLast" class="board-last">마지막: --</div>
+      <div id="opsLogList" class="ops-log-list"><div class="ops-log-empty">수집 대기</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">
+  <div class="section-title-block">
+    <span class="section-eyebrow">제어</span>
+    <span class="section-heading">장치 / 조리 제어</span>
+    <span class="section-note">개인폰에서 즉시 변경하고, 상황판에서 결과를 바로 대조하는 조작 영역입니다.</span>
+  </div>
+  <span class="section-chip">Control</span>
+</div>
+<div id="standaloneReadOnlyNotice" class="standalone-readonly" role="status">공개 웹은 읽기 전용입니다. 임계 변경은 관리자, 실행은 공장/PC입니다.</div>
+<!-- ═══ 2-0. 메인 PC 전원 ═══ -->
+<div class="card card-power" id="pcPowerCard">
+  <div class="row" style="justify-content:space-between; margin-bottom:10px">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px; font-weight:600; color:var(--text-secondary)">메인 PC</span>
+      <span id="pcRelayDot" class="dot dd" title="WoL 릴레이"></span>
+    </div>
+    <span id="pcStatusPill" class="hero-status">-- 확인 중</span>
+  </div>
+  <div class="row" style="gap:8px">
+    <button id="pcOnBtn" data-native-control class="btn bg native-control" style="flex:1; min-height:48px; font-size:14px; font-weight:700">켜기</button>
+    <button id="pcOffBtn" data-native-control class="btn bred native-control" style="flex:1; min-height:48px; font-size:14px; font-weight:700">끄기</button>
+  </div>
+  <div id="pcLastHb" class="note" style="text-align:right; margin-top:6px">박동 --</div>
+</div>
+
+<!-- ═══ 2. 조리모드 ═══ -->
+<div class="card card-control" id="cookCard">
+  <div class="ch" onclick="togSec('ckB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">조리모드</span>
+      <div class="tog" id="tog_cook_mode" onclick="event.stopPropagation();togCookMode()"></div>
+      <span id="ckStatus" style="font-size:11px;font-weight:600;color:var(--c-on)"></span>
+    </div>
+    <span id="ckA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="ckB">
+    <div class="sr"><span class="sl" style="color:var(--c-on)">전체</span><div class="sv"><button class="btn bs bn" onclick="adjCk('target',-10)">-</button><span id="ck_target_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">25:00</span><button class="btn bs bn" onclick="adjCk('target',10)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-mid)">조리</span><div class="sv"><button class="btn bs bn" onclick="adjCk('mid',-10)">-</button><span id="ck_mid_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">17:00</span><button class="btn bs bn" onclick="adjCk('mid',10)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-off)">포장</span><div class="sv"><button class="btn bs bn" onclick="adjCk('finish',-10)">-</button><span id="ck_finish_disp" style="color:var(--text-bright);font-size:13px;font-weight:bold;min-width:44px;text-align:center">4:00</span><button class="btn bs bn" onclick="adjCk('finish',10)">+</button></div></div>
+    <input type="hidden" id="ck_target" value="1500"><input type="hidden" id="ck_mid" value="1020"><input type="hidden" id="ck_finish" value="240">
+    <div id="cookQ" style="margin-top:6px;font-size:12px;color:var(--text-secondary)">대기중</div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+  </div>
+  <!-- 실시간 리스트 (설정 접힘과 무관하게 항상 표시) -->
+  <div id="cookListArea" style="display:none;margin-top:6px;border-top:1px solid var(--bg-input);padding-top:6px">
+    <div id="cookList"></div>
+  </div>
+</div>
+
+<div class="section-title">
+  <div class="section-title-block">
+    <span class="section-eyebrow">광고</span>
+    <span class="section-heading">광고 / 할인</span>
+    <span class="section-note">광고비는 50원 단위이며 실제 적용 상태를 상황판에서 대조합니다.</span>
+  </div>
+  <span class="section-chip">Ads</span>
+</div>
+<!-- ═══ 3a. 배민 광고 ═══ -->
+<div class="card card-ad" id="adSettingCard">
+  <div class="ch" onclick="togSec('adB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--c-baemin)">배민 광고</span>
+      <div class="tog" id="tog_baemin_auto_enabled" onclick="event.stopPropagation();togS('baemin_auto_enabled')"></div>
+      <span id="adSummary" class="acc-summary"></span>
+    </div>
+    <span id="adA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="adB">
+    <!-- 배민 수동 버튼 + 상태 -->
+    <div class="row" style="justify-content:flex-end;margin-bottom:4px">
+      <div class="row" style="gap:6px">
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px" onclick="exAd('baemin','max')">최대</button>
+        <button data-native-control class="btn bs bor native-control" style="min-width:36px" onclick="exAd('baemin','mid')">중간</button>
+        <button data-native-control class="btn bs bred native-control" style="min-width:36px" onclick="exAd('baemin','min')">최소</button>
+      </div>
+    </div>
+    <div class="sec" style="color:var(--c-baemin)">배민 광고비 <span class="unit-hint">50원 단위 · 0~1,000원 · 0원=현재값 유지</span></div>
+    <div class="sr"><span class="sl" style="color:var(--c-on)">최대</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_amount',-50)">-</button><input type="number" id="set_baemin_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-mid)">중간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_mid_amount',-50)">-</button><input type="number" id="set_baemin_mid_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_mid_amount',50)">+</button></div></div>
+    <div class="sr"><span class="sl" style="color:var(--c-off)">최소</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',-50)">-</button><input type="number" id="set_baemin_reduced_amount" style="width:65px" readonly><button class="btn bs bn" onclick="adjS('baemin_reduced_amount',50)">+</button></div></div>
+    <div class="sec">토글</div>
+    <div class="sr"><span class="sl" style="font-weight:bold;color:var(--c-coupang)">영업</span><div class="tog" id="tog_kds_open" onclick="togKdsOpen()"></div></div>
+    <div class="sr"><span class="sl">광고 마스터</span><div class="tog" id="tog_ad_enabled" onclick="togS('ad_enabled')"></div></div>
+    <div class="sr"><span class="sl">건수 자동</span><div class="tog" id="tog_order_auto_off_enabled" onclick="togS('order_auto_off_enabled')"></div></div>
+    <input type="time" id="schTimePicker" style="position:absolute;opacity:0;pointer-events:none">
+    <div class="row" style="gap:6px;margin-top:6px;justify-content:flex-end">
+      <span class="auto-save-note">자동저장</span>
+      <button class="btn bs bn" onclick="restoreAll()" style="font-size:12px;padding:8px 12px">다시읽기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 3b. 쿠팡 광고 ═══ -->
+<div class="card card-coupang" id="coupangAdCard">
+  <div class="ch" onclick="togSec('cadB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--c-coupang)">쿠팡 광고</span>
+      <div class="tog" id="tog_coupang_auto_enabled" onclick="event.stopPropagation();togS('coupang_auto_enabled')"></div>
+      <span id="cadSummary" class="acc-summary"></span>
+    </div>
+    <span id="cadA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="cadB">
+    <div class="row" style="justify-content:flex-end;margin-bottom:4px">
+      <div class="row" style="gap:6px">
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px" onclick="exAd('coupang','on')">ON</button>
+        <button data-native-control class="btn bs bred native-control" style="min-width:36px" onclick="exAd('coupang','off')">OFF</button>
+      </div>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+  </div>
+</div>
+
+<!-- ═══ 공통 스케줄 (배민+쿠팡) ═══ -->
+<div class="card card-control" id="scheduleCard">
+  <div class="ch" onclick="togSec('schB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">광고 스케줄</span>
+      <div class="tog" id="tog_schedule_enabled3" onclick="event.stopPropagation();togS('schedule_enabled')"></div>
+      <span class="dot dr" id="schDot3"></span>
+    </div>
+    <span id="schSummary" class="acc-summary"></span>
+    <span id="schA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="schB">
+    <div class="sr">
+      <span class="sl">시간</span>
+      <div class="row" style="gap:4px">
+        <span id="schOnDisp2" class="time-pill" onclick="pickTime('on')">--:--</span>
+        <span style="color:var(--text-secondary);font-size:12px">~</span>
+        <span id="schOffDisp2" class="time-pill" onclick="pickTime('off')">--:--</span>
+      </div>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+  </div>
+</div>
+
+<!-- ═══ 3b2. 배민 즉시할인 ═══ -->
+<div class="card card-ad" id="discountCard">
+  <div class="ch" onclick="togSec('discB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--c-baemin)">즉시할인</span>
+      <span id="discSummary" class="acc-summary"></span>
+    </div>
+    <span id="discA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="discB">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <span id="discSt" style="font-size:11px"></span>
+      <div class="row" style="gap:3px;flex-wrap:wrap">
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1000)">1천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(1500)">1.5천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2000)">2천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(2500)">2.5천</button>
+        <button data-native-control class="btn bs bg native-control" style="min-width:36px;font-size:11px;padding:8px 6px" onclick="exDiscount(3000)">3천</button>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">정액</div>
+    <div class="sec" style="font-size:11px;color:var(--text-secondary)">주문유형</div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;padding:2px 0">
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_SINGLE" onchange="updDiscDt()" checked><span>알뜰</span></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_COMMON" onchange="updDiscDt()" checked><span>한집</span></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_AGENCY_DELIVERY" onchange="updDiscDt()" checked><span>가게배달</span></label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" id="dt_VISIT" onchange="updDiscDt()" checked><span>픽업</span></label>
+    </div>
+    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
+      <div class="row" style="justify-content:space-between">
+        <span style="font-size:11px;color:var(--text-secondary)">가게배달 팁</span>
+        <button data-native-control class="btn bs bg native-control" style="font-size:11px;padding:6px 12px" onclick="exDiscount(-1)">등록</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">전액</div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px">
+      <div class="row" style="justify-content:flex-end;gap:4px">
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-98)">금액 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-97)">배달팁 종료</button>
+        <button data-native-control class="btn bs bred native-control" style="font-size:10px;padding:5px 8px" onclick="exDiscount(-99)">전체 종료</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">배민배달</div>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+  </div>
+</div>
+
+<div class="section-title">
+  <div class="section-title-block">
+    <span class="section-eyebrow">임계값</span>
+    <span class="section-heading">배달료 조정 / 운영 임계값</span>
+    <span class="section-note">프린터 30분 활성건수 기준 · 금액 0~4000원/500원 단위</span>
+  </div>
+  <span class="section-chip">조정</span>
+</div>
+<!-- ═══ 3e. 배달료 조정 설정 ═══ -->
+<div class="card card-fee" id="gatePanel">
+  <div class="ch" onclick="togCB('gate_body')">
+    <div class="row">
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">배달료 조정</span>
+      <div class="tog" id="tog_gate" onclick="event.stopPropagation();togGate()"></div>
+    </div>
+    <span id="gateSummary" class="acc-summary"></span>
+    <span id="gatePanelArrow" style="font-size:11px;color:var(--text-muted);transition:transform .25s">&#9654;</span>
+  </div>
+  <div class="cb" id="gate_body">
+    <div class="panel-shell">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="printerDot" class="dot dg" style="width:8px;height:8px"></span>
+          <span id="printerLabel" style="font-size:11px;color:var(--c-on)">ON</span>
+        </div>
+        <span id="captureTime" style="font-size:10px;color:var(--text-muted)">--</span>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-box">
+          <span class="compare-label">실제</span>
+          <div class="hero-number-row"><span id="feeValidNum" class="compare-value">0</span><span class="hero-unit">건</span></div>
+          <span class="compare-sub"><span id="feeLiveSource">프린터</span><br><span id="feeLiveClock">수집 --</span></span>
+        </div>
+        <div class="compare-box">
+          <span class="compare-label">설정</span>
+          <div class="hero-number-row"><span id="feeThresholdNum" class="compare-value">8</span><span class="hero-unit">건</span></div>
+          <span class="compare-sub"><span id="feeLiveValid">30분</span><br><span id="feeLiveHint">8건 남음</span></span>
+        </div>
+        <div class="compare-box" id="fee_current_status">
+          <span class="compare-label">현재값</span>
+          <span id="fee_current_value" class="compare-value">0원</span>
+          <span class="compare-sub"><span id="feeLiveState">OFF</span><br>기준이상 <span id="fee_set_up" style="color:var(--c-mid)">2,000</span>원 · 미만/0건 <span id="fee_set_base" style="color:var(--c-on)">0</span>원</span>
+        </div>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;margin-bottom:4px"><div id="feeGaugeBar" style="height:100%;width:0%;background:#4FC3F7;border-radius:3px;transition:width .4s"></div></div>
+      <div id="feeChannelRow" class="badge-row"><span class="text-xs text-muted">채널별</span></div>
+    </div>
+    <div class="order-shell">
+      <div class="order-header" onclick="togFeeList()">
+        <span style="font-size:11px;font-weight:600;color:var(--text-secondary)">주문</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="feeListCount" style="font-size:11px;color:#4FC3F7;font-weight:600">0건</span>
+          <span id="feeListArrow" style="font-size:11px;color:var(--text-muted)">&#9660;</span>
+        </div>
+      </div>
+      <div class="order-note">주소 참고용 · 건수/경과 대조</div>
+      <div id="feeOrderListWrap" style="max-height:220px;overflow-y:auto;transition:max-height .3s ease">
+        <div id="feeOrderList" style="padding:2px 0"><div class="order-empty">대기</div></div>
+      </div>
+      <div style="display:flex;justify-content:center;padding:4px 0">
+        <button onclick="togFeeListExpand()" id="feeExpandBtn" style="background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);font-size:10px;font-weight:600;padding:4px 16px;cursor:pointer;min-height:32px">더보기</button>
+      </div>
+    </div>
+    <div class="sr">
+      <span class="sl">기준</span>
+      <div class="sv"><span class="auto-save-note">프린터 30분 활성건수</span></div>
+    </div>
+    <div style="margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span>가게배달</span><span id="gate_fee_count" style="color:#4FC3F7;font-weight:bold">0건</span></div>
+      <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_fee_bar" style="height:100%;width:0%;background:#4FC3F7;transition:width .3s"></div></div>
+    </div>
+    <div id="gateUnitHint" class="unit-hint">가게배달=프린터 30분 활성건수</div>
+    <div class="settings-block" id="gateStopDefensePanel" style="margin-top:8px">
+      <div class="settings-title">
+        <span>배달료 연동 자동정지</span>
+        <small id="stopModeLabel">모드 확인 중</small>
+      </div>
+      <div class="setting-hint">플랫폼별 정책 영업정지와 별도입니다. 현재 운영 모드가 자동정지를 포함할 때만 이 기준을 사용합니다.</div>
+      <div class="sr">
+        <span class="sl">건수 소스</span>
+        <div class="sv" style="gap:4px">
+          <button class="btn bs" id="stop_src_printer" type="button" onclick="setStopSource('PRINTER')">프린터</button>
+          <button class="btn bs" id="stop_src_kds" type="button" onclick="setStopSource('KDS')">KDS 환산</button>
+        </div>
+      </div>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary)"><span id="gate_stop_label">연동 영업정지</span><span id="gate_stop_count" style="color:var(--c-off);font-weight:bold">0건</span></div>
+        <div style="height:6px;background:var(--border);margin-top:2px"><div id="gate_stop_bar" style="height:100%;width:0%;background:var(--c-off);transition:width .3s"></div></div>
+      </div>
+      <div class="sr"><span class="sl">정지 임계값</span><div class="sv"><button class="btn bs bn" onclick="adjStop('threshold',-1)">-</button><span id="stop_threshold_disp" style="color:var(--c-off);font-size:14px;font-weight:bold;min-width:44px;text-align:center">15건</span><button class="btn bs bn" onclick="adjStop('threshold',1)">+</button></div></div>
+      <div class="badge-row">
+        <span class="badge"><span id="stop_src_label">KDS 환산</span></span>
+        <span class="badge">상태 <b id="stopLiveState">OFF</b></span>
+        <span class="badge" id="stopLiveThreshold">임계 15건</span>
+        <span class="badge" id="stopLiveHint">대기</span>
+      </div>
+    </div>
+    <div style="margin:8px 0">
+      <div class="sr"><span class="sl" style="color:var(--c-mid)">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjGate('threshold',-1)">-</button><span id="gate_threshold" style="color:var(--c-mid);font-size:14px;font-weight:bold;min-width:44px;text-align:center">8건</span><button class="btn bs bn" onclick="adjGate('threshold',1)">+</button></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>1건 이상부터 기준이상 금액</span><span>0건은 미만/0건 금액</span></div>
+    </div>
+    <div style="margin:8px 0">
+      <div class="sr"><span class="sl">유효시간</span><div class="sv"><button class="btn bs bn" onclick="adjGate('valid',-5)">-</button><span id="gate_valid" style="color:var(--c-mid);font-size:13px;font-weight:bold;min-width:44px;text-align:center">30분</span><button class="btn bs bn" onclick="adjGate('valid',5)">+</button></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);padding:2px 0"><span>min 10분</span><span>max 60분</span></div>
+    </div>
+    <div style="padding:6px 0"><span class="sl">기준이상 금액</span>
+      <div class="preset-grid" id="fee_presets">
+        <button class="btn bs bn" onclick="setGateFee(0)">0</button>
+        <button class="btn bs bn" onclick="setGateFee(500)">500</button>
+        <button class="btn bs bn" onclick="setGateFee(1000)">1,000</button>
+        <button class="btn bs bn" onclick="setGateFee(1500)">1,500</button>
+        <button class="btn bs bn" onclick="setGateFee(2000)">2,000</button>
+        <button class="btn bs bn" onclick="setGateFee(2500)">2,500</button>
+        <button class="btn bs bn" onclick="setGateFee(3000)">3,000</button>
+        <button class="btn bs bn" onclick="setGateFee(3500)">3,500</button>
+        <button class="btn bs bn" onclick="setGateFee(4000)">4,000</button>
+      </div>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <button class="btn bs bor" onclick="manualDefense('fee_up', gateSettings.fee)" id="btn_fee_up">기준값 적용</button>
+        <button class="btn bs bg" onclick="manualDefense('fee_restore', 0)" id="btn_fee_restore">미만값 적용</button>
+      </div>
+    </div>
+    <div style="padding:6px 0"><span class="sl">미만/0건 금액</span>
+      <div class="preset-grid" id="base_presets">
+        <button class="btn bs bn" onclick="setGateBase(0)">0</button>
+        <button class="btn bs bn" onclick="setGateBase(500)">500</button>
+        <button class="btn bs bn" onclick="setGateBase(1000)">1,000</button>
+        <button class="btn bs bn" onclick="setGateBase(1500)">1,500</button>
+        <button class="btn bs bn" onclick="setGateBase(2000)">2,000</button>
+        <button class="btn bs bn" onclick="setGateBase(2500)">2,500</button>
+        <button class="btn bs bn" onclick="setGateBase(3000)">3,000</button>
+        <button class="btn bs bn" onclick="setGateBase(3500)">3,500</button>
+        <button class="btn bs bn" onclick="setGateBase(4000)">4,000</button>
+      </div>
+    </div>
+    <div class="sr"><span class="sl" style="color:var(--c-baemin)">미만값 0원일 때 클럽 배달팁</span><div class="tog" id="tog_gate_club" role="switch" tabindex="0" aria-checked="false" onclick="togGateClub()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togGateClub()}"></div></div>
+    <div id="gateClubApplyStatus" class="unit-hint">클럽 자동 미사용</div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+    <div id="gate_status" style="display:none;padding:6px 0;font-size:12px;font-weight:600;color:var(--c-mid)"></div>
+  </div>
+</div>
+
+<!-- ═══ 운영모드 / 피크시간 ═══ -->
+<div class="card card-control" id="timeModePanel">
+  <div class="ch" onclick="togCB('time_mode_body')">
+    <div class="row">
+      <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">운영모드</span>
+    </div>
+    <span id="timeModeSummary" class="acc-summary"></span>
+    <span id="timeModePanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
+  </div>
+  <div class="cb settings-panel" id="time_mode_body">
+    <div class="setting-hint">피크시간 안은 일반, 밖은 1인근무 임계값을 자동수락과 영업정지에 같이 적용합니다.</div>
+    <div class="settings-block">
+      <div class="settings-title"><span>피크시간</span><small>일반 임계값 적용</small></div>
+      <div class="policy-row"><span class="policy-label">피크1</span><div class="policy-control"><input type="time" id="policy_peak1_start" class="policy-time"><span>~</span><input type="time" id="policy_peak1_end" class="policy-time"></div></div>
+      <div class="policy-row"><span class="policy-label">피크2</span><div class="policy-control"><input type="time" id="policy_peak2_start" class="policy-time"><span>~</span><input type="time" id="policy_peak2_end" class="policy-time"></div></div>
+    </div>
+    <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
+      <span class="auto-save-note policy-save-state">자동저장</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 자동수락 ═══ -->
+<div class="card card-control" id="autoAcceptPanel">
+  <div class="ch" onclick="togCB('auto_accept_body')">
+    <div class="row">
+      <span style="font-size:12px;font-weight:600;color:var(--c-mid)">자동수락</span>
+      <div class="tog" id="tog_auto_accept" onclick="event.stopPropagation();togAutoAccept()"></div>
+    </div>
+    <span id="autoAcceptSummary" class="acc-summary"></span>
+    <span id="autoAcceptPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
+  </div>
+  <div class="cb settings-panel" id="auto_accept_body">
+    <div class="compact-thresholds">
+      <div class="compact-block">
+        <div class="compact-head">
+          <span class="compact-title">배민 자동수락</span>
+          <select id="policy_baemin_auto_source"><option value="KDS">KDS</option><option value="PRINTER">프린터</option></select>
+        </div>
+        <div class="compact-table">
+          <span></span><span>1단계</span><span>2단계</span><span>3단계</span>
+          <span class="compact-row-label">시간</span>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_min_1" min="5" max="70" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_min_2" min="5" max="70" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_min_3" min="5" max="70" step="5"><b>분</b></div>
+          <span class="compact-row-label">일반</span>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_count_1" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_count_2" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_count_3" min="0" max="999"><b>건</b></div>
+          <span class="compact-row-label">1인</span>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_one_count_1" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_one_count_2" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_baemin_auto_one_count_3" min="0" max="999"><b>건</b></div>
+        </div>
+      </div>
+      <div class="compact-block">
+        <div class="compact-head">
+          <span class="compact-title">배민배달 자동수락</span>
+          <select id="policy_store_auto_source"><option value="KDS">KDS</option><option value="PRINTER">프린터</option></select>
+        </div>
+        <div class="compact-table">
+          <span></span><span>1단계</span><span>2단계</span><span>3단계</span>
+          <span class="compact-row-label">시간</span>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_min_1" min="5" max="30" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_min_2" min="5" max="30" step="5"><b>분</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_min_3" min="5" max="30" step="5"><b>분</b></div>
+          <span class="compact-row-label">일반</span>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_count_1" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_count_2" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_count_3" min="0" max="999"><b>건</b></div>
+          <span class="compact-row-label">1인</span>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_one_count_1" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_one_count_2" min="0" max="999"><b>건</b></div>
+          <div class="compact-cell"><input type="number" id="policy_store_auto_one_count_3" min="0" max="999"><b>건</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
+      <span class="auto-save-note policy-save-state">자동저장</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 영업정지 ═══ -->
+<div class="card card-stop" id="stopPanel">
+  <div class="ch" onclick="togCB('stop_body')">
+    <div class="row">
+      <span style="font-size:12px;font-weight:600;color:var(--c-off)">영업정지</span>
+      <div class="tog" id="tog_stop" onclick="event.stopPropagation();togStop()"></div>
+    </div>
+    <span id="stopSummary" class="acc-summary"></span>
+    <span id="stopPanelArrow" style="font-size:11px;color:var(--text-muted)">&#9654;</span>
+  </div>
+  <div class="cb settings-panel" id="stop_body">
+    <div id="stopUnitHint" class="setting-hint">피크시간 안은 일반, 밖은 1인근무 · 영업정지 KDS=3만원 환산, 자동수락 KDS=처리중 장수</div>
+    <div class="threshold-grid">
+      <div class="threshold-card">
+        <div class="threshold-title">배민1</div>
+        <div class="policy-row"><span class="policy-label">일반 중지</span><div class="policy-control"><input type="number" id="policy_baemin1_pause" class="policy-num" min="1" max="100">건</div></div>
+        <div class="policy-row"><span class="policy-label">일반 재개</span><div class="policy-control"><input type="number" id="policy_baemin1_resume" class="policy-num" min="0" max="99">건</div></div>
+        <div class="policy-row"><span class="policy-label">1인 중지</span><div class="policy-control"><input type="number" id="policy_baemin1_one_pause" class="policy-num" min="1" max="100">건</div></div>
+        <div class="policy-row"><span class="policy-label">1인 재개</span><div class="policy-control"><input type="number" id="policy_baemin1_one_resume" class="policy-num" min="0" max="99">건</div></div>
+        <div class="policy-row"><span class="policy-label">일시중지</span><div class="policy-control"><input type="text" id="policy_baemin1_duration" class="readonly-pill" value="30분" readonly></div></div>
+      </div>
+      <div class="threshold-card">
+        <div class="threshold-title">쿠팡이츠</div>
+        <div class="policy-row"><span class="policy-label">일반 중지</span><div class="policy-control"><input type="number" id="policy_coupang_pause" class="policy-num" min="1" max="100">건</div></div>
+        <div class="policy-row"><span class="policy-label">일반 재개</span><div class="policy-control"><input type="number" id="policy_coupang_resume" class="policy-num" min="0" max="99">건</div></div>
+        <div class="policy-row"><span class="policy-label">1인 중지</span><div class="policy-control"><input type="number" id="policy_coupang_one_pause" class="policy-num" min="1" max="100">건</div></div>
+        <div class="policy-row"><span class="policy-label">1인 재개</span><div class="policy-control"><input type="number" id="policy_coupang_one_resume" class="policy-num" min="0" max="99">건</div></div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:flex-end;gap:6px;margin-top:8px">
+      <span class="auto-save-note policy-save-state">자동저장</span>
+    </div>
+
+  </div>
+</div>
+
+<div class="section-title">
+  <div class="section-title-block">
+    <span class="section-eyebrow">제어</span>
+    <span class="section-heading">플랫폼 지연 설정</span>
+    <span class="section-note">플랫폼별 목표시간과 지연 알림 기준을 설정합니다.</span>
+  </div>
+  <span class="section-chip">Delay</span>
+</div>
+<!-- ═══ 배민 지연 ═══ -->
+<div class="card card-delay" id="baeminDelayCard">
+  <div class="ch" onclick="togSec('bdlB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--c-baemin)">배민 지연</span>
+      <div class="tog" id="tog_baemin_delay_enabled" onclick="event.stopPropagation();togS('baemin_delay_enabled')"></div>
+      <span id="bdlSummary" class="acc-summary"></span>
+    </div>
+    <span id="bdlA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="bdlB">
+    <div style="font-size:10px;color:var(--text-secondary);padding:2px 0">알림 전용</div>
+    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_target_time',-1)">-</button><input type="number" id="set_baemin_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('baemin_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',-1)">-</button><input type="number" id="set_baemin_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('baemin_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',-1)">-</button><input type="number" id="set_baemin_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('baemin_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">지연 시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('baemin_delay_minutes',-5)">-</button><input type="number" id="set_baemin_delay_minutes" min="5" max="30" readonly style="width:40px"><button class="btn bs bn" onclick="adjS('baemin_delay_minutes',5)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">앱 조작 없음</div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+  </div>
+</div>
+
+<!-- ═══ 쿠팡 지연 ═══ -->
+<div class="card card-delay" id="coupangDelayCard">
+  <div class="ch" onclick="togSec('cdlB')">
+    <div class="row" style="gap:6px">
+      <span style="font-size:12px;font-weight:600;color:var(--c-coupang)">쿠팡 지연</span>
+      <div class="tog" id="tog_coupang_delay_enabled" onclick="event.stopPropagation();togS('coupang_delay_enabled');S.coupang_delay_auto=S.coupang_delay_enabled;_lastSaveKeys.push('coupang_delay_auto');_autoSave()"></div>
+      <span id="cdlSummary" class="acc-summary"></span>
+    </div>
+    <span id="cdlA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="cdlB">
+    <div class="sr"><span class="sl">목표시간</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_target_time',-1)">-</button><input type="number" id="set_coupang_target_time" min="15" max="30" readonly><button class="btn bs bn" onclick="adjS('coupang_target_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">고정조리</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',-1)">-</button><input type="number" id="set_coupang_fixed_cook_time" min="0" max="20" readonly><button class="btn bs bn" onclick="adjS('coupang_fixed_cook_time',1)">+</button><span style="color:var(--text-secondary);font-size:10px">분</span></div></div>
+    <div class="sr"><span class="sl">임계값</span><div class="sv"><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',-1)">-</button><input type="number" id="set_coupang_delay_threshold" min="1" max="10" readonly><button class="btn bs bn" onclick="adjS('coupang_delay_threshold',1)">+</button><span style="color:var(--text-secondary);font-size:10px">건</span></div></div>
+    <div class="sr"><span class="sl">지연 시간</span><div class="sv"><button class="btn bs bn" onclick="adjCoupangDelayMin(-5)">5분</button><button class="btn bs bn" onclick="adjCoupangDelayMin(10)">10분</button><span id="set_coupang_delay_minutes_disp" style="color:var(--c-coupang);font-size:13px;font-weight:bold;min-width:40px;text-align:center">10분</span></div></div>
+    <div style="font-size:9px;color:var(--text-muted);padding:2px 0">최대 10분 · 서브폰 자동처리</div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><span class="auto-save-note">자동저장</span></div>
+  </div>
+</div>
+
+<!-- 구 feeMonitorCard/feeOrderListCard 제거 (gatePanel에 통합됨) -->
+
+<!-- ═══ D. 원문 진단 (운영 설정의 접힌 보조 카드) ═══ -->
+<div class="card card-diag" id="diagCard">
+  <div class="ch" onclick="togSec('diagB')">
+    <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">원문 진단</span>
+    <span id="diagSummary" class="acc-summary"></span>
+    <span id="diagA" style="color:var(--text-secondary)">&#9654;</span>
+  </div>
+  <div class="cb" id="diagB">
+    <!-- 차트 -->
+    <div style="margin-bottom:8px">
+      <div style="font-size:11px;color:var(--text-muted);padding:4px 0">건수 변동 (2시간)</div>
+      <canvas id="hChart"></canvas>
+    </div>
+    <!-- 로그 -->
+    <div style="border-top:1px solid var(--border);padding-top:8px">
+      <div class="tabs">
+        <div class="tab active" onclick="sLt('flow',this)">흐름</div>
+        <div class="tab" onclick="sLt('kds',this)">KDS</div>
+        <div class="tab" onclick="sLt('posdelay',this)">posweb</div>
+        <div class="tab" onclick="sLt('dump',this)">Dump</div>
+      </div>
+      <div class="logbox" id="logC">...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 8. 권한 ═══ -->
+<div class="card" id="permCard" style="display:none">
+  <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">권한 / 앱 설정</div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pdD"></span><span class="sl" style="margin-left:4px">지연 접근성</span></div><button class="btn bs bb" onclick="nb('openAccessibilitySettings')">설정</button></div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pkD"></span><span class="sl" style="margin-left:4px">KDS 접근성</span></div><button class="btn bs bb" onclick="nb('openAccessibilitySettings')">설정</button></div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pnD"></span><span class="sl" style="margin-left:4px">알림 리스너</span></div><button class="btn bs bb" onclick="nb('openNotificationSettings')">설정</button></div>
+  <div class="sr"><div class="row"><span class="dot dd" id="pbD"></span><span class="sl" style="margin-left:4px">배터리 최적화 면제</span></div><button class="btn bs bb" onclick="nb('openBatterySettings')">설정</button></div>
+  <div class="sr"><span class="sl">앱 버전</span><span id="appVerPerm" style="color:var(--text-bright);font-size:12px">-</span></div>
+  <div class="row" style="gap:4px;margin-top:6px">
+    <button class="btn bb" onclick="nb('showLoginDialog','baemin')" style="flex:1">배민 로그인</button>
+    <button class="btn bcp" onclick="nb('showLoginDialog','coupang')" style="flex:1">쿠팡 로그인</button>
+  </div>
+  <button class="nbtn bn" onclick="nb('openAppSettings')">앱 정보 (제한해제)</button>
+</div>
+
+<div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
+<script src="posdelay_ad_receipt.js"></script>
+<script src="posweb_admin.js"></script>
+<script>
+function trackUrls(file, extra){
+  var out=[], seen={};
+  function add(u){
+    u=String(u||'');
+    if(!u||seen[u])return;
+    seen[u]=1;
+    out.push(u);
+  }
+  var bases=(typeof poswebFactory==='object'&&poswebFactory.origins)?poswebFactory.origins():[''];
+  bases.forEach(function(b){
+    add((b?b.replace(/\/$/,'')+'/':'/')+file.replace(/^\//,''));
+  });
+  (extra||[]).forEach(add);
+  return out;
+}
+const TRACK={
+  get kds(){return trackUrls('kds_status.json');},
+  get bus(){return trackUrls('posdelay_bus.json',[
+    'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/posdelay_bus.json',
+    'https://rentry.co/bbqposdelaybus/raw'
+  ]);},
+  get snapshot(){return trackUrls('signal_snapshot.json');},
+  get exec(){return trackUrls('posdelay_factory_exec.json');}
+};
+let _bus={},_kds=null,_snap=null;
+let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
+let aTS=0;let sseLoaded=false;
+const KDS_NO_CHANGE_ZERO_MS=7*60*1000;
+let _kdsLastChange=Date.now(),_kdsLastCount=-1;
+let lastKdsTime=0; // KDS가 마지막으로 보낸 시각 (epoch ms)
+let avgInterval=3.0,avgCookDur=0; // avgCookDur: 실제 완료 기록 기반 평균 조리시간(ms)
+let cookLog=[]; // 완료 기록: {num, t, doneAt, cookDur}
+let latestEngineState=null,latestSubphoneState=null;
+let activitySnapshot={ad:null,kds:null};
+let lastCaptureSnapshot={orders:[],printerConnected:false,status:'',lastCaptureAt:'--',thresholdFee:8};
+function hasNativeBridge(){
+  try{return typeof window!=='undefined'&&!!window.NativeBridge&&typeof window.NativeBridge.executeAd==='function';}catch(e){return false;}
+}
+const isApp=hasNativeBridge();
+function applyStandaloneReadOnly(){
+  if(isApp)return;
+  document.querySelectorAll('[data-native-control]').forEach(function(button){
+    button.disabled=true;
+    button.setAttribute('aria-disabled','true');
+    button.title='실행 버튼은 앱/공장 전용입니다. 임계는 관리자 웹에서 바꿉니다.';
+  });
+  if(typeof applyWebAdminUi==='function')applyWebAdminUi();
+  else {
+    var notice=document.getElementById('standaloneReadOnlyNotice');
+    if(notice)notice.style.display='block';
+  }
+}
+applyStandaloneReadOnly();
+// null-safe getter: 0도 유효한 값으로 처리
+function g(obj,key,def){const v=obj[key];return v!=null?v:def;}
+function setAppVersionText(version){
+  var text='v'+version;
+  var top=document.getElementById('appVer');
+  var perm=document.getElementById('appVerPerm');
+  if(top)top.textContent=text;
+  if(perm)perm.textContent=text;
+}
+
+function doCapture(){if(!window.NativeBridge)return;var h=Math.min(document.body.scrollHeight,4096);try{NativeBridge.captureScreen(h);}catch(e){try{NativeBridge.captureScreen();}catch(e2){}}}
+
+function jumpToCard(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var sticky=document.querySelector('.page-sticky');
+  var offset=(sticky?sticky.getBoundingClientRect().height:0)+8;
+  var top=Math.max(0,el.getBoundingClientRect().top+window.pageYOffset-offset);
+  try{window.scrollTo({top:top,behavior:'smooth'});}catch(e){window.scrollTo(0,top);}
+}
+
+function nb(fn,...args){
+  if(!isApp)return;
+  try{
+    if(fn==='executeAd')NativeBridge.executeAd(args[0],args[1]??0);
+    else if(fn==='showLoginDialog')NativeBridge.showLoginDialog(args[0]);
+    else if(fn==='refreshAndCorrect')NativeBridge.refreshAndCorrect();
+    else if(fn==='forceRefresh')NativeBridge.forceRefresh();
+    else if(fn==='openAccessibilitySettings')NativeBridge.openAccessibilitySettings();
+    else if(fn==='openNotificationSettings')NativeBridge.openNotificationSettings();
+    else if(fn==='openAppSettings')NativeBridge.openAppSettings();
+    else if(fn==='trackUsage')NativeBridge.trackUsage(args[0]);
+  }catch(e){}
+}
+function requireAppControl(){
+  if(isApp)return true;
+  if(typeof isWebAdmin==='function'&&isWebAdmin())return true;
+  toast('관리자를 먼저 켜세요.','warn');
+  return false;
+}
+function toggleWebAdmin(){
+  if(typeof doToggleWebAdmin==='function')return doToggleWebAdmin();
+}
+
+if(isApp){
+  document.getElementById('permCard').style.display='block';
+  try{setAppVersionText(NativeBridge.getAppVersion());}catch(e){}
+  setInterval(()=>{try{
+    const p=JSON.parse(NativeBridge.getPermissions());
+    document.getElementById('pdD').className='dot '+(p.delay?'dg':'dr');
+    document.getElementById('pkD').className='dot '+(p.kds?'dg':'dr');
+    document.getElementById('pnD').className='dot '+(p.notification?'dg':'dr');
+    document.getElementById('pbD').className='dot '+(p.battery?'dg':'dr');
+  }catch(e){}},3000);
+}
+
+function busPath(obj,path){
+  if(!obj||!path)return null;
+  var cur=obj;
+  String(path).replace(/^\//,'').replace(/\.json$/,'')
+    .split('/').filter(Boolean).forEach(function(p){cur=cur&&typeof cur==='object'?cur[p]:null;});
+  return cur==null?null:cur;
+}
+function parseTrackJson(text){
+  var t=(text||'').trim();
+  if(!t||t==='null')throw new Error('empty');
+  if(t.charAt(0)==='{')return JSON.parse(t);
+  var i=t.indexOf('{');
+  if(i<0)throw new Error('nojson');
+  var depth=0;
+  for(var j=i;j<t.length;j++){
+    if(t[j]==='{')depth++;
+    else if(t[j]==='}'){depth--;if(depth===0)return JSON.parse(t.slice(i,j+1));}
+  }
+  throw new Error('nojson');
+}
+function fetchJson(url){
+  return fetch(url+(url.indexOf('?')>=0?'&':'?')+'t='+Date.now(),{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error(String(r.status));return r.text();})
+    .then(parseTrackJson);
+}
+function fetchFirst(urls){
+  var p=Promise.reject(new Error('none'));
+  urls.forEach(function(u){p=p.catch(function(){return fetchJson(u);});});
+  return p;
+}
+// === 주소판 폴링 (파이어 SSE 없음). 공장 HTTP → gist → rentry ===
+let _sseConns=[],_sseGen=0;
+function sse(path,cb){
+  _sseConns.push({path:path,cb:cb,gen:_sseGen});
+}
+function dispatchBus(){
+  _sseConns.forEach(function(s){
+    var path=String(s.path||'').replace(/^\//,'').replace(/\.json$/,'');
+    var data=path==='kds_status'?_kds:busPath(_bus,path);
+    if(data==null||data==='null')return;
+    try{s.cb({path:'/',data:data});}catch(e){}
+  });
+}
+function updC(ok){
+  document.getElementById('cD').className='dot '+(ok?'dg':'dr');
+  const t=document.getElementById('cT');t.textContent=ok?'실시간':'폴링';t.style.color=ok?'#2ECC71':'#E67E22';
+  if(!ok)_sseOk=false; // 에러 시만 해제, true는 데이터 도착 시 설정
+}
+
+// === Data Handlers ===
+function hKds(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/'){kS={...m.data};if(!Array.isArray(kS.orders))kS.orders=[];}
+  else kS[m.path.slice(1)]=m.data;
+  if(!Array.isArray(kS.orders))kS.orders=[];
+  // 7분 무변동=0 은 weighted 히어로 기준. 원문 kds.count는 자동수락만.
+  if(kS.time){const p=new Date(kS.time.replace(' ','T')+'+09:00');if(!isNaN(p))lastKdsTime=p.getTime();}
+  updMonitor();
+}
+function hSnap(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/')_snap=m.data;
+  else{
+    if(!_snap||typeof _snap!=='object')_snap={};
+    _snap[m.path.slice(1)]=m.data;
+  }
+  updMonitor();
+}
+let _lastAdAction=null;
+// 3단계 알림 정책 화이트리스트: 시도/완료/실패만 toast/Notification, 내부 상태 변화는 제외
+const _AD_NOTIFY_SKIP=['서킷','쿨다운','CHECK','이미','retry','wait','스킵','복구 시도','자동복구','해결중','해결 중','접근성','일시 차단','일시중단'];
+function hASt(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/')Object.assign(aS,m.data);else aS[m.path.slice(1)]=m.data;
+  const cur=aS.last_ad_action;
+  if(cur&&cur!==_lastAdAction){
+    if(_lastAdAction!==null){
+      const _skip=_AD_NOTIFY_SKIP.some(function(k){return cur.indexOf(k)>=0;});
+      if(!_skip){
+        toast('광고: '+cur,'ok');
+        if('Notification'in window&&Notification.permission==='granted'){
+          try{new Notification('광고 실행',{body:cur,tag:'ad_action'});}catch(e){}
+        }
+      }
+    }
+    _lastAdAction=cur;
+  }
+  updMonitor();
+  syncGateClubToggle();
+}
+function hStatus(m){
+  if(!m.data||m.data==='null')return;
+  if(Date.now()<_localEditUntil)return; // 로컬 변경 중 SSE 무시
+  if(m.path==='/')Object.assign(stS,m.data);else stS[m.path.slice(1)]=m.data;
+  updSyncStatus();updMonitor();
+}
+function hHist(m){
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/'&&m.data.entries)hD=m.data.entries;
+  calcAvgInterval();drawChart();updDelayPred();
+}
+
+// === 건수: 히어로=보정(weighted). 원문=자동수락만. kds.count 폴백 금지 ===
+function toCount(v){
+  var n=parseInt(v,10);
+  return isNaN(n)?0:Math.max(0,n);
+}
+function snapshotWeighted(){
+  var k=_snap&&_snap.kds;
+  if(!k||typeof k!=='object')return null;
+  if(k.weighted_count!=null)return k.weighted_count;
+  if(k.weighted!=null)return k.weighted;
+  return null;
+}
+function adsCurrentCount(){
+  var d=aS&&aS.last_decision_reason;
+  if(typeof d==='string'){
+    try{d=JSON.parse(d);}catch(e){return null;}
+  }
+  if(d&&typeof d==='object'&&d.current_count!=null)return d.current_count;
+  return null;
+}
+function getKdsWeightedCount(){
+  var w=snapshotWeighted();
+  if(w==null&&stS.order_count_weighted!=null)w=stS.order_count_weighted;
+  if(w==null)w=adsCurrentCount();
+  if(w==null)return 0;
+  w=toCount(w);
+  if(w!==_kdsLastCount){_kdsLastCount=w;_kdsLastChange=Date.now();}
+  if(_kdsLastCount!==-1&&Date.now()-_kdsLastChange>=KDS_NO_CHANGE_ZERO_MS)return 0;
+  return w;
+}
+function getActiveCount(){
+  return getKdsWeightedCount();
+}
+function getKdsSourceMs(){
+  if(lastKdsTime>0)return lastKdsTime;
+  var t=stS.kds_sync;
+  if(typeof t==='number'&&t>1e12)return t;
+  if(typeof t==='number'&&t>1e9)return t*1000;
+  return 0;
+}
+function kdsAgeText(ms){
+  if(!ms||ms<=0)return '시각 --';
+  var ago=Math.floor((Date.now()-ms)/1000);
+  if(ago<0)ago=0;
+  var tm=new Date(ms);
+  var clock=tm.getHours()+':'+String(tm.getMinutes()).padStart(2,'0');
+  var age=ago<60?ago+'초 전':ago<3600?Math.floor(ago/60)+'분 전':Math.floor(ago/3600)+'시간 전';
+  return clock+' · '+age;
+}
+function applyKdsHero(ops, raw, sourceMs){
+  if(sourceMs!=null&&sourceMs>0)lastKdsTime=sourceMs;
+  var opsN=toCount(ops);
+  var rawN=toCount(raw);
+  var el=document.getElementById('mCount');
+  if(el)el.textContent=opsN;
+  var unit=document.getElementById('kdsHeroUnit');
+  if(unit)unit.textContent='건';
+  var isRaw=rawN===opsN;
+  var rawL=document.getElementById('kdsRawLight');
+  var adjL=document.getElementById('kdsAdjLight');
+  if(rawL)rawL.classList.toggle('on', isRaw);
+  if(adjL)adjL.classList.toggle('on', !isRaw);
+  var age=document.getElementById('kdsUnitHint');
+  if(age){
+    var srcMs=getKdsSourceMs();
+    age.textContent=kdsAgeText(srcMs);
+    var ago=srcMs?Math.floor((Date.now()-srcMs)/1000):0;
+    age.style.color=(!srcMs)?'':(ago>=420?'#E67E22':'');
+  }
+  var gateHint=document.getElementById('gateUnitHint');
+  if(gateHint){
+    var gs=null;
+    try{gs=gateSettings;}catch(e){gs=null;}
+    gateHint.textContent='가게배달=프린터 30분 활성 '+(gs&&gs._validCount!=null?gs._validCount:0)+'건';
+  }
+  return opsN;
+}
+function updateKdsUnitHints(){
+  applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+}
+function baeminMinLabel(){
+  const v=g(S,'baemin_reduced_amount',50);
+  if(v===0)return '0원(유지)';
+  return v+'원';
+}
+function baeminBidLabel(v){
+  if(v!=null&&v>0)return v+'원';
+  if(v===0&&g(S,'baemin_reduced_amount',50)===0)return '0원';
+  return '-';
+}
+function isGateClubMode(){
+  return gateSettings && gateSettings.base===0 && !!gateSettings.clubAuto;
+}
+function gateBaseLabel(){
+  var v=gateSettings?clampFeeValue(gateSettings.base):0;
+  return v===0 && isGateClubMode() ? '0+클럽' : v.toLocaleString();
+}
+
+// === 모니터링 ===
+function updMonitor(){
+  const c=applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+  const st=document.getElementById('mStatus');
+  if(c!=null){
+    const ci=Math.min(c,10);
+    const cz=getZones('coupang'),bz=getZones('baemin');
+    const cState=cz[ci],bState=bz[ci];
+    if(cState===2||bState===3){st.textContent='OFF/최소';st.style.color='#E74C3C';}
+    else if(bState===2){st.textContent='중간';st.style.color='#E67E22';}
+    else if(cState===1||bState===1){st.textContent='ON';st.style.color='#2ECC71';}
+    else{st.textContent='-';st.style.color='#A0A0BC';}
+  }
+  var _mLast=document.getElementById('mLast');if(_mLast)_mLast.textContent='마지막: '+(aS.last_ad_action??'--');
+  updCooldown();
+  updCkQueue();updGauges(c);updDelayPred();chkAlert(c);renderGroupSummary();renderOpsLog();
+}
+
+// === 쿨타임 게이지 (상시 모니터링) ===
+const CD_TOTAL=60000; // 1분
+function updCooldown(){
+  const now=Date.now();
+  // 배민: 금액 변경 쿨다운
+  const bEnd=aS.cooldown_end_baemin||0;
+  _updRing('cdBaemin','cdBaeminArc','cdBaeminTxt',bEnd,now);
+  // 쿠팡: ON/OFF 중 더 늦게 끝나는 쿨다운
+  const cOnEnd=aS.cooldown_end_coupang_on||0;
+  const cOffEnd=aS.cooldown_end_coupang_off||0;
+  const cEnd=Math.max(cOnEnd,cOffEnd);
+  _updRing('cdCoupang','cdCoupangArc','cdCoupangTxt',cEnd,now);
+}
+function _updRing(wrId,arcId,txtId,endMs,now){
+  const wr=document.getElementById(wrId);
+  if(!wr)return; // DOM 제거된 경우 안전 탈출
+  const remain=endMs-now;
+  const circ=106.8; // 2*PI*17
+  if(!endMs||remain<=0){
+    // 쿨다운 없음 = 비활성 상태 (상시표시)
+    wr.classList.remove('active');
+    document.getElementById(arcId).setAttribute('stroke-dashoffset',circ);
+    document.getElementById(txtId).textContent='--';
+    return;
+  }
+  wr.classList.add('active');
+  const ratio=Math.min(remain/CD_TOTAL,1);
+  document.getElementById(arcId).setAttribute('stroke-dashoffset',circ*(1-ratio));
+  const sec=Math.ceil(remain/1000);
+  document.getElementById(txtId).textContent=sec>=60?Math.floor(sec/60)+':'+(('0'+(sec%60)).slice(-2)):sec+'s';
+}
+setInterval(updCooldown,1000);
+setInterval(function(){
+  applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+},10000);
+
+// === 동기화 상태 ===
+function factoryKdsTimeMs(){
+  if(kS&&kS.time){
+    const p=new Date(String(kS.time).replace(' ','T')+'+09:00');
+    if(!isNaN(p))return p.getTime();
+  }
+  if(kS&&kS.updated_at){
+    const n=Number(kS.updated_at);
+    if(n>0)return n;
+  }
+  return 0;
+}
+function updSyncStatus(){
+  updSyncItem('sKd','sKt','KDS',factoryKdsTimeMs());
+}
+function updSyncItem(dotId,txtId,label,ts){
+  const d=document.getElementById(dotId),t=document.getElementById(txtId);
+  if(!ts||ts===0){d.className='dot dr';t.textContent=label+' --';t.style.color='#E74C3C';return;}
+  const ago=Math.floor((Date.now()-ts)/1000);
+  const agoStr=ago<60?ago+'초':ago<3600?Math.floor(ago/60)+'분':Math.floor(ago/3600)+'시간';
+  const tm=new Date(ts);
+  const tmStr=tm.getHours()+':'+String(tm.getMinutes()).padStart(2,'0')+':'+String(tm.getSeconds()).padStart(2,'0');
+  t.textContent=label+' '+tmStr+' ('+agoStr+')';
+  if(ago<90){d.className='dot dg';t.style.color='#2ECC71';}
+  else{d.className='dot dr';t.style.color='#E74C3C';}
+}
+
+// === 게이지 (셀 배열 기반) ===
+// 쿠팡: 0=hold, 1=on(초록), 2=off(빨강)
+// 배민: 0=hold, 1=max(초록), 2=mid(주황), 3=min(빨강)
+const CZ_DEF=[1,1,1,0,0,2,2,2,2,2,2]; // 쿠팡 기본
+const BZ_DEF=[1,1,1,0,2,2,0,3,3,3,3]; // 배민 기본
+const CZ_COLORS={'0':'#2A2A45','1':'#2ECC71','2':'#E74C3C'};
+const BZ_COLORS={'0':'#2A2A45','1':'#2ECC71','2':'#E67E22','3':'#E74C3C'};
+const CZ_NEXT={'0':1,'1':2,'2':0}; // 순환: hold→on→off→hold
+const BZ_NEXT={'0':1,'1':2,'2':3,'3':0}; // hold→max→mid→min→hold
+
+function getZones(platform){
+  const key=platform==='coupang'?'coupang_zones':'baemin_zones';
+  const def=platform==='coupang'?CZ_DEF:BZ_DEF;
+  let z=S[key];
+  if(!z||!Array.isArray(z)||z.length!==11){
+    return def.slice();
+  }
+  return z.slice();
+}
+function setZones(platform,zones){
+  if(!requireAppControl())return false;
+  const key=platform==='coupang'?'coupang_zones':'baemin_zones';
+  S[key]=zones;
+  updGauges(getKdsWeightedCount());
+  _lastSaveKeys=[key];_autoSave();
+}
+function tapGauge(platform,idx){
+  if(!requireAppControl())return false;
+  nb('trackUsage','gauge_paint_'+platform+'_'+idx);
+  const zones=getZones(platform);
+  const next=platform==='coupang'?CZ_NEXT:BZ_NEXT;
+  zones[idx]=next[zones[idx]]??0;
+  setZones(platform,zones);
+}
+
+function updGauges(c){
+  const cz=getZones('coupang'), bz=getZones('baemin');
+  // 조리모드 구간 예상: 현재 건수 + 조리속도 기반
+  let ckMidIdx=-1,ckFinIdx=-1; // 조리시작/포장시작 건수
+  if(ckOn&&c!=null&&avgInterval>0){
+    const tgtMin=(parseInt(document.getElementById('ck_target').value)||1500)/60;
+    const midMin=(parseInt(document.getElementById('ck_mid').value)||1020)/60;
+    const finMin=(parseInt(document.getElementById('ck_finish').value)||240)/60;
+    ckMidIdx=Math.ceil((tgtMin-midMin)/avgInterval);
+    ckFinIdx=Math.ceil((tgtMin-finMin)/avgInterval);
+  }
+  function cellMark(i){
+    if(!ckOn||ckMidIdx<0)return '';
+    if(i>=ckFinIdx)return '<span style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#E74C3C;opacity:.8"></span>';
+    if(i>=ckMidIdx)return '<span style="position:absolute;bottom:0;left:0;right:0;height:2px;background:#E67E22;opacity:.8"></span>';
+    return '';
+  }
+  let h='';
+  for(let i=0;i<=10;i++){
+    h+=`<div class="gc${c!=null&&i===c?' act':''}" style="background:${CZ_COLORS[cz[i]]};position:relative" onclick="tapGauge('coupang',${i})">${i}${cellMark(i)}</div>`;
+  }
+  document.getElementById('cG').innerHTML=h;
+  if(c!=null){
+    const cs=cz[c];
+    document.getElementById('cSt').innerHTML=cs===2?'<span style="color:#E74C3C">OFF</span>':cs===1?'<span style="color:#2ECC71">ON</span>':'<span style="color:#A0A0BC">-</span>';
+  }
+  h='';
+  for(let i=0;i<=10;i++){
+    h+=`<div class="gc${c!=null&&i===c?' act':''}" style="background:${BZ_COLORS[bz[i]]};position:relative" onclick="tapGauge('baemin',${i})">${i}${cellMark(i)}</div>`;
+  }
+  document.getElementById('bG').innerHTML=h;
+  const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
+  if(c!=null){
+    const bs2=bz[c];
+    document.getElementById('bSt').innerHTML=bs2===3?`<span style="color:#E74C3C">최소 ${baeminMinLabel()}</span>`:bs2===2?`<span style="color:#E67E22">중간 ${bma}원</span>`:bs2===1?`<span style="color:#2ECC71">최대 ${ba}원</span>`:'<span style="color:#A0A0BC">-</span>';
+  }
+  // 게이지 아래 조리구간 범례
+  const lgEl=document.getElementById('gaugeLegend');
+  if(lgEl){
+    if(ckOn&&ckMidIdx>=0){
+      lgEl.style.display='flex';
+      const avgDurStr=avgCookDur>0?` 평균${Math.floor(avgCookDur/60000)}:${String(Math.floor((avgCookDur%60000)/1000)).padStart(2,'0')}`:'';
+      lgEl.innerHTML=`<span style="color:#2ECC71;font-size:9px">대기 0~${ckMidIdx-1}</span><span style="color:#E67E22;font-size:9px">조리 ${ckMidIdx}~${ckFinIdx-1}</span><span style="color:#E74C3C;font-size:9px">포장 ${ckFinIdx}+</span><span style="color:#9898B0;font-size:9px">(${avgInterval.toFixed(1)}분/건)</span><span style="color:#2AC1BC;font-size:9px">${avgDurStr}</span>`;
+    }else{lgEl.style.display='none';}
+  }
+}
+
+function sendCmd(action,amount){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return false;}
+  toast('앱 버튼으로 실행하세요.','warn');
+  return false;
+}
+function doForceRefresh(){
+  if(isApp){nb('forceRefresh');}
+  else{
+    // 웹에서는 SSE 재연결 + 전체 데이터 새로 가져오기
+    _sseOk=false;pollAll(true);toast('갱신중');
+  }
+}
+
+// === 실행 버튼 ===
+function exAd(platform,action){
+  const ba=g(S,'baemin_amount',200),bma=g(S,'baemin_mid_amount',100),bra=g(S,'baemin_reduced_amount',50);
+  if(isApp){
+    nb('trackUsage','exec_'+platform+'_'+action);
+    if(platform==='coupang'){
+      if(action==='on')nb('executeAd','COUPANG_AD_ON',0);
+      else nb('executeAd','COUPANG_AD_OFF',0);
+    }else{
+      if(action==='max')nb('executeAd','BAEMIN_SET_AMOUNT',ba);
+      else if(action==='mid')nb('executeAd','BAEMIN_SET_AMOUNT',bma);
+      else{
+        nb('executeAd','BAEMIN_SET_AMOUNT',bra);
+      }
+    }
+  }else{
+    if(platform==='coupang'){
+      sendCmd(action==='on'?'COUPANG_AD_ON':'COUPANG_AD_OFF');
+    }else{
+      const amounts={max:ba,mid:bma,min:bra};
+      sendCmd('BAEMIN_SET_AMOUNT',amounts[action]);
+    }
+  }
+}
+var _discBusy=false;
+function exDiscount(amount){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  if(_discBusy){return;}
+  _discBusy=true;setTimeout(function(){_discBusy=false;},5000);
+  if(isApp){
+    nb('trackUsage','exec_discount_'+amount);
+    nb('executeAd','BAEMIN_DISCOUNT_SET',amount);
+  }else{
+    sendCmd('BAEMIN_DISCOUNT_SET',amount);
+  }
+  var el=document.getElementById('discSt');
+  var msg=amount<0?'변경중':amount+'원 변경중';
+  if(el)el.innerHTML='<span style="color:var(--c-warn)">'+msg+'</span>';
+}
+function updDiscDt(){
+  if(!requireAppControl())return false;
+  var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
+  var sel=types.filter(function(t){var cb=document.getElementById('dt_'+t);return cb&&cb.checked;});
+  var csv=sel.join(',');
+  S.baemin_discount_dt=csv;
+  _lastSaveKeys=['baemin_discount_dt'];_autoSave();
+}
+function loadDiscDt(){
+  var csv=(S.baemin_discount_dt||'SINGLE,COMMON,AGENCY_DELIVERY,VISIT');
+  var types=['SINGLE','COMMON','AGENCY_DELIVERY','VISIT'];
+  types.forEach(function(t){var cb=document.getElementById('dt_'+t);if(cb)cb.checked=csv.indexOf(t)>=0;});
+}
+
+// === 조리 속도 ===
+function calcAvgInterval(){
+  if(!hD||hD.length<3)return;
+  const ct=[];
+  for(let i=1;i<hD.length;i++){
+    if(hD[i].count<hD[i-1].count){
+      const d=(hD[i].time-hD[i-1].time)/60000;
+      ct.push(Math.max(2,Math.min(4,d)));
+    }
+  }
+  if(ct.length>=2){const r=ct.slice(-10);avgInterval=r.reduce((a,b)=>a+b,0)/r.length;}
+}
+
+// === 실제 완료 기록 기반 조리속도 ===
+function calcCookSpeed(){
+  if(cookLog.length<1)return;
+  // 평균 조리시간 (1.5~5분만 유효, 나머지 오차 무시)
+  const valid=cookLog.filter(o=>o.cookDur>=90000&&o.cookDur<=300000);
+  if(valid.length>0){
+    const recent=valid.slice(-10);
+    avgCookDur=recent.reduce((s,o)=>s+o.cookDur,0)/recent.length;
+  }
+  // 완료 간격 기반 avgInterval (1.5~5분만 유효)
+  if(cookLog.length>=2){
+    const sorted=[...cookLog].sort((a,b)=>a.doneAt-b.doneAt);
+    const intervals=[];
+    for(let i=1;i<sorted.length;i++){
+      const d=(sorted[i].doneAt-sorted[i-1].doneAt)/60000;
+      if(d>=1.5&&d<=5)intervals.push(d);
+    }
+    if(intervals.length>=2){
+      const r=intervals.slice(-10);
+      avgInterval=r.reduce((a,b)=>a+b,0)/r.length;
+    }
+  }
+}
+
+// === 지연 예측 ===
+function updDelayPred(){
+  const c=getKdsWeightedCount();
+  const dp=document.getElementById('delayPred');
+  if(!dp)return;
+  dp.style.display='grid';
+  document.getElementById('dpSpeed').textContent=avgInterval>0?avgInterval.toFixed(1)+'분/건':'대기';
+  if(c==null||c<1){
+    const bIdle=document.getElementById('dpBaemin');
+    const cIdle=document.getElementById('dpCoupang');
+    if(bIdle){bIdle.textContent='0분';bIdle.style.color='#2ECC71';}
+    if(cIdle){cIdle.textContent='0분';cIdle.style.color='#2ECC71';}
+    var bdlIdle=document.getElementById('bdlSummary');
+    if(bdlIdle){bdlIdle.textContent='목표'+g(S,'baemin_target_time',20)+'분';bdlIdle.style.color='var(--text-secondary)';}
+    var cdlIdle=document.getElementById('cdlSummary');
+    if(cdlIdle){
+      cdlIdle.textContent='목표'+g(S,'coupang_target_time',20)+'분'+(S.coupang_delay_auto?' 자동':'');
+      cdlIdle.style.color='var(--text-secondary)';
+    }
+    return;
+  }
+  const btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
+  const bDelay=Math.max(0,Math.round(c*avgInterval+bfc-btt));
+  const bEl=document.getElementById('dpBaemin');
+  if(bDelay>0){bEl.textContent=bDelay+'분';bEl.style.color='#E74C3C';}
+  else{bEl.textContent='0분';bEl.style.color='#2ECC71';}
+  const ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
+  const cDelay=Math.max(0,Math.round(c*avgInterval+cfc-ctt));
+  const cEl=document.getElementById('dpCoupang');
+  if(cDelay>0){cEl.textContent=cDelay+'분';cEl.style.color='#E74C3C';}
+  else{cEl.textContent='0분';cEl.style.color='#2ECC71';}
+  // 지연설정 접힌 헤더 요약 (분리된 카드)
+  var bdlSum=document.getElementById('bdlSummary');
+  if(bdlSum){
+    var bt2=g(S,'baemin_target_time',20);
+    bdlSum.textContent='목표'+bt2+'분'+(bDelay>0?' +'+bDelay+'분':'');
+    bdlSum.style.color=bDelay>0?'var(--c-off)':'var(--text-secondary)';
+  }
+  var cdlSum=document.getElementById('cdlSummary');
+  if(cdlSum){
+    var ct3=g(S,'coupang_target_time',20);
+    var cdAuto=S.coupang_delay_auto;
+    cdlSum.textContent='목표'+ct3+'분'+(cDelay>0?' +'+cDelay+'분':'')+(cdAuto?' 자동':'');
+    cdlSum.style.color=cDelay>0?'var(--c-off)':'var(--text-secondary)';
+  }
+}
+
+// === 설정 UI ===
+function updSetUI(){
+  const fields=['baemin_amount','baemin_mid_amount','baemin_reduced_amount','baemin_target_time','baemin_fixed_cook_time','baemin_delay_threshold','baemin_delay_minutes','coupang_target_time','coupang_fixed_cook_time','coupang_delay_threshold','coupang_delay_minutes'];
+  fields.forEach(f=>{const e=document.getElementById('set_'+f);if(e&&S[f]!=null)e.value=S[f];});
+  // 쿠팡 지연 분수 표시 동기화
+  var cdmd=document.getElementById('set_coupang_delay_minutes_disp');
+  if(cdmd&&S.coupang_delay_minutes!=null)cdmd.textContent=S.coupang_delay_minutes+'분';
+  updSchDisp();
+  ['ad_enabled','order_auto_off_enabled','coupang_auto_enabled','baemin_auto_enabled','schedule_enabled','baemin_delay_enabled','coupang_delay_enabled'].forEach(f=>{
+    const e=document.getElementById('tog_'+f);if(e)e.className='tog'+(S[f]?' on':'');
+  });
+  const se3=document.getElementById('tog_schedule_enabled3');if(se3)se3.className='tog'+(S.schedule_enabled?' on':'');
+  const sd3=document.getElementById('schDot3');if(sd3)sd3.className='dot '+(S.schedule_enabled?'dg':'dr');
+  const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
+  updGauges(getKdsWeightedCount());
+  loadDiscDt();
+  // 배민 광고 접힌 헤더 요약
+  var adSum=document.getElementById('adSummary');
+  if(adSum){
+    var bBid2=aS.baemin_current_bid;
+    var adMaster=S.ad_enabled;
+    adSum.textContent=(adMaster?'ON':'OFF')+(baeminBidLabel(bBid2)!=='-'?' '+baeminBidLabel(bBid2):'');
+    adSum.style.color=adMaster?'var(--c-on)':'var(--text-muted)';
+  }
+}
+
+// === 그룹 상태 요약 (monitorCard) ===
+function expandCardForSummary(cardId){
+  var targets={
+    cookCard:{body:'ckB',mode:'togSec'},
+    adSettingCard:{body:'adB',mode:'togSec'},
+    coupangAdCard:{body:'cadB',mode:'togSec'},
+    scheduleCard:{body:'schB',mode:'togSec'},
+    discountCard:{body:'discB',mode:'togSec'},
+    baeminDelayCard:{body:'bdlB',mode:'togSec'},
+    coupangDelayCard:{body:'cdlB',mode:'togSec'},
+    gatePanel:{body:'gate_body',mode:'togCB'},
+    timeModePanel:{body:'time_mode_body',mode:'togCB'},
+    autoAcceptPanel:{body:'auto_accept_body',mode:'togCB'},
+    stopPanel:{body:'stop_body',mode:'togCB'},
+    diagCard:{body:'diagB',mode:'togSec'}
+  };
+  var target=targets[cardId];
+  if(!target)return false;
+  var body=document.getElementById(target.body);
+  if(!body||body.classList.contains('open'))return false;
+  if(target.mode==='togCB')togCB(target.body);
+  else togSec(target.body);
+  return true;
+}
+function scrollToCard(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var expanded=expandCardForSummary(id);
+  function move(){
+    var top=el.getBoundingClientRect().top+window.pageYOffset-72;
+    window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  }
+  if(expanded){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(move);
+    });
+    return;
+  }
+  move();
+}
+function renderGroupSummary(){
+  var gs=document.getElementById('groupSummary');
+  if(!gs)return;
+  var c2=getKdsWeightedCount();
+  var items=[];
+  // Zone에서 OFF/최소가 시작되는 건수 찾기
+  function findZoneThreshold(zones,offVal){for(var i=0;i<zones.length;i++){if(zones[i]>=offVal)return i;}return zones.length;}
+  // 배민 광고 (3=최소, 2=중간에서 변동 시작)
+  var bAdOn=S.baemin_auto_enabled;
+  var bBid=aS.baemin_current_bid;
+  var bz=getZones('baemin');var bAdTh=findZoneThreshold(bz,3);
+  var bMax=g(S,'baemin_amount',500),bMid=g(S,'baemin_mid_amount',300),bMin=g(S,'baemin_reduced_amount',50);
+  items.push({name:'배민광고',color:'var(--c-baemin)',on:bAdOn,detail:baeminBidLabel(bBid)==='-'?'OFF':baeminBidLabel(bBid),setting:bMax+'/'+bMid+'/'+baeminMinLabel(),card:'adSettingCard',count:c2,threshold:bAdTh,unit:'환산',exceeded:c2>=bAdTh&&bAdTh<=10});
+  // 쿠팡 광고 (2=OFF)
+  var cAdOn=S.coupang_auto_enabled;
+  var cOn=aS.coupang_current_on;
+  var cz=getZones('coupang');var cAdTh=findZoneThreshold(cz,2);
+  items.push({name:'쿠팡광고',color:'var(--c-coupang)',on:cAdOn,detail:cOn===true?'ON':cOn===false?'OFF':'-',setting:cAdTh+'건↑OFF',card:'coupangAdCard',count:c2,threshold:cAdTh,unit:'환산',exceeded:c2>=cAdTh&&cAdTh<=10});
+  // 배민 지연
+  var bdt=g(S,'baemin_delay_threshold',5);
+  var btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
+  var bDel=c2>0?Math.max(0,Math.round(c2*avgInterval+bfc-btt)):0;
+  var bdOn=S.baemin_delay_enabled!==false;
+  items.push({name:'배민지연',color:'var(--c-baemin)',on:bdOn,detail:bDel+'분',setting:'목표'+btt+'분',card:'baeminDelayCard',count:c2,threshold:bdt,unit:'환산',exceeded:bDel>0});
+  // 쿠팡 지연
+  var cdt=g(S,'coupang_delay_threshold',5);
+  var ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
+  var cDel=c2>0?Math.max(0,Math.round(c2*avgInterval+cfc-ctt)):0;
+  var cdOn=S.coupang_delay_enabled!==false;
+  var cdAuto=S.coupang_delay_auto;
+  items.push({name:'쿠팡지연',color:'var(--c-coupang)',on:cdOn,detail:cDel+'분',setting:'목표'+ctt+'분'+(cdAuto?' · 자동':''),card:'coupangDelayCard',count:c2,threshold:cdt,unit:'환산',exceeded:cDel>0});
+  // 배달료
+  var feeThreshold=gateSettings.threshold||8;
+  var confirmedFee=gateSettings._lastAppliedFee;
+  items.push({name:'배달료조정',color:'#4FC3F7',on:gateSettings.enabled,detail:confirmedFee!=null?confirmedFee.toLocaleString()+'원':'확인 중',setting:'프린터 · 임계'+feeThreshold+' · '+(gateSettings.valid||30)+'분'+(isGateClubMode()?' · 클럽':''),card:'gatePanel',count:gateSettings._validCount||0,threshold:feeThreshold,unit:'프린터'});
+  // 정책 영업정지와 로컬 DefenseEngine 연동 정지는 서로 다른 실행 경로다.
+  var stopMode=policySettings.time_mode_enabled?'피크설정':'항상일반';
+  var stopSetting=stopMode+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at;
+  items.push({name:'정책 영업정지',color:'var(--c-off)',on:policySettings.enabled,detail:policySettings.enabled?'정책 ON':'OFF',setting:stopSetting,card:'stopPanel'});
+  var defenseStopMode=gateSettings._defenseMode||gateSettings.mode||'B';
+  if(defenseStopMode==='A'||defenseStopMode==='BA'||gateSettings._stopDefending){
+    items.push({name:'배달료 연동정지',color:'var(--c-off)',on:gateSettings.enabled,detail:gateSettings._stopDefending?'정지중':gateSettings.enabled?'대기':'OFF',setting:defenseStopMode+' · '+(gateSettings._stopSource==='PRINTER'?'프린터':'KDS환산')+' · 임계'+(gateSettings.threshold_stop||15)+'건',card:'gatePanel'});
+  }
+  // 즉시할인
+  var discCur=g(S,'baemin_discount_current',g(aS,'baemin_discount_current',0));
+  var clubTip=!!(S.baemin_club_tip_active||aS.baemin_club_tip_active);
+  items.push({name:'즉시할인',color:'var(--c-baemin)',on:discCur!==0||clubTip,detail:clubTip&&discCur>0?discCur.toLocaleString()+'원+팁':clubTip||discCur===-1?'배달팁':discCur>0?discCur.toLocaleString()+'원':'OFF',card:'discountCard'});
+  items.sort(function(a,b){
+    var ao=a.on?1:0, bo=b.on?1:0;
+    if(ao!==bo)return bo-ao;
+    var ae=a.exceeded?1:0, be=b.exceeded?1:0;
+    if(ae!==be)return be-ae;
+    return 0;
+  });
+  var h='';
+  items.forEach(function(it){
+    var hasGauge=it.threshold!=null;
+    var ratio=hasGauge&&it.threshold?Math.min((it.count||0)/it.threshold*100,150):0;
+    var fillColor=!it.on?'#555':ratio>=100||it.exceeded?'#E74C3C':ratio>70?'#E67E22':it.color;
+    var detailColor=it.exceeded?'#E74C3C':it.on?'var(--text-bright)':'var(--text-muted)';
+    var countText=hasGauge?(it.count||0)+'/'+it.threshold:(it.on?'ON':'OFF');
+    var metaLeft=hasGauge?((it.unit?it.unit+' ':'')+(it.count||0)+'건'):(it.on?'ON':'OFF');
+    var metaRight=it.setting||'-';
+    h+='<button type="button" class="summary-card'+(it.on?'':' off')+'" onclick="scrollToCard(\''+it.card+'\')">';
+    h+='<span class="summary-head"><span class="dot '+(it.on?'dg':'dd')+'"></span><span class="summary-name" style="color:'+(it.on?it.color:'#707088')+'">'+it.name+'</span><span class="summary-count" style="color:'+(it.on?fillColor:'#555')+'">'+countText+'</span></span>';
+    h+='<span class="summary-meter"><span style="width:'+(hasGauge?Math.min(ratio,100):(it.on?100:0))+'%;background:'+fillColor+'"></span></span>';
+    h+='<span class="summary-detail" style="color:'+detailColor+'">'+it.detail+'</span>';
+    h+='<span class="summary-meta"><span>'+metaLeft+'</span><span>'+metaRight+'</span></span>';
+    h+='</button>';
+  });
+  gs.innerHTML=h;
+  // 쿠팡 광고 카드 요약
+  var cadSum=document.getElementById('cadSummary');
+  if(cadSum){
+    var cOn2=aS.coupang_current_on;
+    cadSum.textContent=cOn2===true?'ON':cOn2===false?'OFF':'-';
+    cadSum.style.color=cOn2===true?'var(--c-on)':cOn2===false?'var(--c-off)':'var(--text-muted)';
+  }
+}
+
+// 설정 변경 → NativeBridge로 직접 SharedPreferences 저장 (Firebase 경유 없음)
+let _localEditUntil=0;
+let _lastSaveKeys=[];
+function _autoSave(){
+  _localEditUntil=Date.now()+3000;
+  if(!isApp){
+    if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function'){
+      saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings).then(function(ok){
+        if(!ok)toast('공장 저장 실패','warn');
+      });
+    }
+    return;
+  }
+  _lastSaveKeys.forEach(k=>{
+    const v=S[k];
+    try{NativeBridge.setSetting(k,typeof v==='object'?JSON.stringify(v):String(v));}catch(e){}
+  });
+  _lastSaveKeys=[];
+}
+function adjS(k,d){
+  if(!requireAppControl())return false;
+  const e=document.getElementById('set_'+k);if(!e)return;
+  const isBid=['baemin_amount','baemin_mid_amount','baemin_reduced_amount'].includes(k);
+  const step=isBid?50:1,max=isBid?1000:9999;
+  const min=0;
+  const cur=parseInt(e.value??0)||0;
+  const next=Math.max(min,Math.min(max,Math.round((cur+d)/step)*step));
+  e.value=next;S[k]=next;_lastSaveKeys=[k];updMonitor();_autoSave();
+}
+function adjCoupangDelayMin(v){if(!requireAppControl())return false;S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
+function saveS(k,v){if(!requireAppControl())return false;S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
+function togS(k){if(!requireAppControl())return false;S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
+function togKdsOpen(){
+  if(!requireAppControl())return false;
+  const paused=!stS.kds_paused;
+  stS.kds_paused=paused;
+  const e=document.getElementById('tog_kds_open');
+  if(e)e.className='tog'+(paused?'':' on');
+  if(isApp){try{NativeBridge.setSetting('kds_paused',String(paused));}catch(ex){}}
+  updSyncStatus();
+  toast(paused?'OFF':'ON', paused?'warn':'ok');
+}
+
+// === 스케줄 시간 ===
+let _pickTarget='';
+function pickTime(which){
+  if(!requireAppControl())return false;
+  _pickTarget=which;
+  const pk=document.getElementById('schTimePicker');
+  pk.style.pointerEvents='auto';pk.focus();pk.click();
+  pk.onchange=function(){
+    const v=pk.value;if(!v)return;
+    if(_pickTarget==='on'){saveS('ad_on_time',v);var so2=document.getElementById('schOnDisp2');if(so2)so2.textContent=v;}
+    else{saveS('ad_off_time',v);var sf2=document.getElementById('schOffDisp2');if(sf2)sf2.textContent=v;}
+    pk.style.pointerEvents='none';
+  };
+}
+function updSchDisp(){
+  const on=S.ad_on_time||'';const off=S.ad_off_time||'';
+  var so2=document.getElementById('schOnDisp2');if(so2)so2.textContent=on||'--:--';
+  var sf2=document.getElementById('schOffDisp2');if(sf2)sf2.textContent=off||'--:--';
+  var ss=document.getElementById('schSummary');
+  if(ss){
+    ss.textContent=(on||'--:--')+' ~ '+(off||'--:--')+(S.schedule_enabled?' · ON':' · OFF');
+    ss.style.color=S.schedule_enabled?'var(--text-bright)':'var(--text-muted)';
+  }
+}
+
+// === 설정 다시읽기 ===
+function restoreAll(){
+  // NativeBridge에서 로컬 설정 다시 불러오기
+  if(!isApp){toast('앱 전용');return;}
+  try{const d=JSON.parse(NativeBridge.getSettings());Object.assign(S,d);sseLoaded=true;updSetUI();updMonitor();toast('완료');}catch(e){toast('오류');}
+}
+
+// === 알림 ===
+let alertMode='normal';
+let lastAlertTime=0;
+const ALERT_REPEAT=180000;
+
+function chkAlert(c){
+  if(c==null)return;
+  const bdt=g(S,'baemin_delay_threshold',5),cdt=g(S,'coupang_delay_threshold',5);
+  const btt=g(S,'baemin_target_time',20),bfc=g(S,'baemin_fixed_cook_time',15);
+  const ctt=g(S,'coupang_target_time',20),cfc=g(S,'coupang_fixed_cook_time',15);
+  const bn=document.getElementById('alertB');
+  const now=Date.now();
+  let msgs=[];
+  const bDelay=Math.max(0,Math.round(c*avgInterval+bfc-btt));
+  const cDelay=Math.max(0,Math.round(c*avgInterval+cfc-ctt));
+  const bBrk=avgInterval>0?Math.floor((btt-bfc)/avgInterval):0;
+  const cBrk=avgInterval>0?Math.floor((ctt-cfc)/avgInterval):0;
+  if(c>=bdt&&bDelay>0)msgs.push('배민 '+bDelay+'분 '+Math.max(0,c-bBrk)+'건');
+  if(c>=cdt&&cDelay>0)msgs.push('쿠팡 '+cDelay+'분 '+Math.max(0,c-cBrk)+'건');
+  if(msgs.length>0){
+    const timeStr=fmtHM(aTS>0?new Date(aTS):new Date(now));
+    bn.className='alert warn';
+    bn.innerHTML=`&#9888; ${timeStr} 이후 지연 ${msgs.join(', ')}`;
+    if(alertMode!=='delayed'){
+      alertMode='delayed';aTS=now;lastAlertTime=now;
+      sendNotif('주문 지연',`${fmtHM(new Date(now))} 이후 지연 ${msgs.join(', ')}`);
+    }else if(now-lastAlertTime>=ALERT_REPEAT){
+      lastAlertTime=now;
+      const el=Math.floor((now-aTS)/60000);
+      sendNotif('주문 지연 지속',`${timeStr} 이후 지연 ${msgs.join(', ')} (${el}분 경과)`);
+    }
+  }else{
+    if(alertMode==='delayed'){
+      alertMode='normal';
+      const el=Math.floor((now-aTS)/60000);
+      bn.className='alert ok';bn.textContent=`복귀 ${el}분`;
+      sendNotif('복귀',`복귀 ${el}분`);
+      setTimeout(()=>{bn.className='alert';},10000);
+    }
+    aTS=0;
+  }
+}
+function sendNotif(title,body){
+  if('Notification'in window&&Notification.permission==='granted'){
+    new Notification(title,{body:body,tag:'pd-alert'});
+  }
+}
+
+// === 차트 ===
+function drawChart(){
+  const cv=document.getElementById('hChart');if(!cv||!hD||hD.length<2)return;
+  const ctx=cv.getContext('2d');
+  const now=Date.now(),t2h=now-7200000,data=hD.filter(e=>e.time>=t2h);if(data.length<2)return;
+  const W=cv.width=cv.offsetWidth*2,H=cv.height=200;ctx.clearRect(0,0,W,H);
+  const p={t:16,r:8,b:24,l:30},cw=W-p.l-p.r,ch=H-p.t-p.b;
+  const mT=data[0].time,xT=data[data.length-1].time,mC=Math.max(...data.map(d=>d.count),5);
+  const x=t=>p.l+((t-mT)/(xT-mT||1))*cw,y=c2=>p.t+ch-(c2/mC)*ch;
+  ctx.strokeStyle='#2A2A45';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const gy=p.t+(ch/4)*i;ctx.beginPath();ctx.moveTo(p.l,gy);ctx.lineTo(W-p.r,gy);ctx.stroke();ctx.fillStyle='#9898B0';ctx.font='16px sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(mC-(mC/4)*i),p.l-4,gy+4);}
+  ctx.textAlign='center';const ts=(xT-mT)/3;
+  for(let i=0;i<=3;i++){const t=mT+ts*i,d=new Date(t);ctx.fillText(d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'),x(t),H-4);}
+  const co3=g(S,'coupang_off_threshold',5);ctx.strokeStyle='#E74C3C44';ctx.lineWidth=2;ctx.setLineDash([6,3]);ctx.beginPath();ctx.moveTo(p.l,y(co3));ctx.lineTo(W-p.r,y(co3));ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='#2AC1BC';ctx.lineWidth=2;ctx.beginPath();
+  data.forEach((d,i)=>{const px=x(d.time),py=y(d.count);i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});ctx.stroke();
+  data.forEach(d=>{ctx.fillStyle=d.count>=co3?'#E74C3C':'#2ECC71';ctx.beginPath();ctx.arc(x(d.time),y(d.count),3,0,Math.PI*2);ctx.fill();});
+}
+
+// === 로그 ===
+function buildActivityLog(ad,kds){
+  var txt='=== KDS 현황 ===\n';
+  txt+='건수: '+getKdsWeightedCount()+'건\n';
+  txt+='시간: '+((kds&&kds.time)||'--')+'\n\n';
+  txt+='=== 광고 상태 ===\n';
+  txt+='배민 입찰: '+((ad&&ad.baemin_current_bid)||'-')+'원\n';
+  txt+='쿠팡 ON: '+(ad&&ad.coupang_current_on!=null?ad.coupang_current_on:'-')+'\n';
+  txt+='마지막: '+((ad&&ad.last_ad_action)||'--')+'\n';
+  if(ad&&ad.cooldown_end_baemin)txt+='배민 쿨다운: '+Math.max(0,Math.ceil((ad.cooldown_end_baemin-Date.now())/1000))+'초\n';
+  if(ad&&(ad.cooldown_end_coupang_on||ad.cooldown_end_coupang_off))txt+='쿠팡 쿨다운: '+Math.max(0,Math.ceil((Math.max(ad.cooldown_end_coupang_on||0,ad.cooldown_end_coupang_off||0)-Date.now())/1000))+'초\n';
+  if(latestEngineState&&Array.isArray(latestEngineState.tasks)&&latestEngineState.tasks.length){
+    txt+='\n=== 자동화 엔진 ===\n';
+    latestEngineState.tasks.forEach(function(task){
+      var summary=task.summary||task.state||'-';
+      txt+='- '+task.name+': '+summary+'\n';
+    });
+  }
+  if(latestSubphoneState){
+    var ago=Math.max(0,Math.floor((Date.now()-(latestSubphoneState.ts||0))/1000));
+    txt+='\n=== 서브폰 ===\n';
+    txt+='기기: '+(latestSubphoneState.device||'S10+')+'\n';
+    txt+='배터리: '+(latestSubphoneState.battery!=null?latestSubphoneState.battery+'%':'-')+'\n';
+    txt+='KDS: '+(latestSubphoneState.kds_count>=0?latestSubphoneState.kds_count:'-')+'건\n';
+    txt+='최근 수신: '+ago+'초 전\n';
+  }
+  return txt;
+}
+function escHtml(value){
+  return String(value==null?'':value).replace(/[&<>"']/g,function(ch){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+  });
+}
+function parseOpsTime(value,key){
+  if(typeof value==='number')return value<10000000000?value*1000:value;
+  var text=String(value||key||'').trim();
+  if(!text)return 0;
+  var normalized=/^\d{4}-\d{2}-\d{2} /.test(text)?text.replace(' ','T')+'+09:00':text;
+  var ts=Date.parse(normalized);
+  if(!isNaN(ts))return ts;
+  var keyText=String(key||'');
+  var keyMatch=keyText.match(/^(\d{8})_(\d{6})/);
+  if(keyMatch){
+    var d=keyMatch[1],t=keyMatch[2];
+    ts=Date.parse(d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)+'T'+t.slice(0,2)+':'+t.slice(2,4)+':'+t.slice(4,6)+'+09:00');
+    if(!isNaN(ts))return ts;
+  }
+  return 0;
+}
+function fmtOpsStamp(value,key){
+  var ts=parseOpsTime(value,key);
+  if(ts){
+    try{
+      return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date(ts));
+    }catch(e){
+      var d=new Date(ts);
+      if(!isNaN(d))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+    }
+  }
+  return '현재';
+}
+function normalizeOpsLogEntries(data){
+  if(Array.isArray(data))return data.filter(Boolean).map(function(item){
+    var time=item.time||item.ts||item.updated_at||'';
+    return {time:time,ts:parseOpsTime(time),name:'로그',msg:item.msg||item.message||String(item)};
+  });
+  if(data&&typeof data==='object'){
+    return Object.keys(data).map(function(key){
+      var item=data[key];
+      if(item&&typeof item==='object'){
+        var time=item.time||item.ts||item.updated_at||key;
+        return {time:time,ts:parseOpsTime(time,key),name:'로그',msg:item.msg||item.message||JSON.stringify(item)};
+      }
+      return {time:key,ts:parseOpsTime(key,key),name:'로그',msg:String(item)};
+    });
+  }
+  return [];
+}
+function normalizeOpsActionEntries(data){
+  if(!data||typeof data!=='object')return [];
+  return Object.keys(data).map(function(key){
+    var item=data[key];
+    if(!item||typeof item!=='object')return null;
+    var time=item.time||item.ts||key;
+    var task=String(item.task||item.taskId||'자동화');
+    var msg=String(item.message||item.msg||item.result||'완료').replace(/\s+/g,' ').trim();
+    if(task&&msg.indexOf(task)<0)msg=task+' · '+msg;
+    return {time:time,ts:parseOpsTime(time,key),name:'완료',msg:msg};
+  }).filter(Boolean);
+}
+function normalizeOpsErrorEntries(data){
+  if(!data||typeof data!=='object')return [];
+  return Object.keys(data).map(function(key){
+    var item=data[key];
+    if(!item||typeof item!=='object')return null;
+    var time=item.time||item.ts||key;
+    var name=item.type==='inactivity'?'주의':'오류';
+    var msg=item.type==='inactivity'
+      ? '무활동 '+(item.inactive_minutes||'?')+'분 · '+(item.reason||'원인 확인 필요')
+      : ((item.task?item.task+' · ':'')+(item.error||item.reason||item.groq_reason||'오류 기록'));
+    return {time:time,ts:parseOpsTime(time,key),name:name,msg:String(msg).replace(/\s+/g,' ').trim()};
+  }).filter(Boolean);
+}
+function renderOpsLog(){
+  var list=document.getElementById('opsLogList');
+  if(!list)return;
+  var rows=opsLogEntries.concat(opsActionEntries,opsErrorEntries)
+    .filter(function(entry){return entry&&String(entry.msg||'').trim();})
+    .sort(function(a,b){return (a.ts||0)-(b.ts||0);})
+    .slice(-14);
+  var updated=document.getElementById('opsLogUpdated');
+  if(updated)updated.textContent=rows.length?rows.length+'건 · 최신 아래':'기록 없음';
+  if(!rows.length){
+    list.innerHTML='<div class="ops-log-empty">기록 없음</div>';
+    if(cLt==='flow'){var emptyLc=document.getElementById('logC');if(emptyLc)emptyLc.textContent='최근 동작 없음';}
+    return;
+  }
+  list.innerHTML=rows.map(function(row){
+    return '<div class="ops-log-row">'+
+      '<div class="ops-log-stamp">'+escHtml(fmtOpsStamp(row.time,row.time))+'</div>'+
+      '<div class="ops-log-main"><div class="ops-log-name">'+escHtml(row.name||'기록')+'</div><div class="ops-log-meta">'+escHtml(String(row.msg||'').slice(0,140))+'</div></div>'+
+      '</div>';
+  }).join('');
+  requestAnimationFrame(function(){list.scrollTop=list.scrollHeight;});
+  if(cLt==='flow'){
+    var lc=document.getElementById('logC');
+    if(lc){
+      lc.textContent=rows.map(function(row){return '['+fmtOpsStamp(row.time,row.time)+'] '+(row.name||'기록')+' '+String(row.msg||'');}).join('\n');
+      lc.scrollTop=lc.scrollHeight;
+    }
+  }
+}
+function loadOpsLogs(){
+  try{
+    opsLogEntries=normalizeOpsLogEntries(busPath(_bus,'posdelay/logs')||[]);
+    opsActionEntries=normalizeOpsActionEntries(busPath(_bus,'posdelay/action_log')||{});
+    opsErrorEntries=normalizeOpsErrorEntries(busPath(_bus,'posdelay/error_reports')||{});
+    renderOpsLog();
+  }catch(e){renderOpsLog();}
+}
+function refreshActivityLog(){
+  var lc=document.getElementById('logC');
+  if(cLt!=='activity'||!lc||!activitySnapshot.ad||!activitySnapshot.kds)return;
+  lc.textContent=buildActivityLog(activitySnapshot.ad,activitySnapshot.kds);
+}
+function sLt(tab,el){
+  cLt=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');
+  const lc=document.getElementById('logC');lc.textContent='로딩...';
+  if(tab==='flow'){
+    renderOpsLog();
+    return;
+  }
+  if(tab==='activity'){
+    activitySnapshot={ad:busPath(_bus,'posdelay/ad_state')||aS||{},kds:_kds||kS||{}};
+    refreshActivityLog();
+    return;
+  }
+  if(tab==='kds'){lc.textContent='KDS 로그는 공개 주소판에 없습니다.';return;}
+  if(tab==='dump'){lc.textContent='덤프는 공개 주소판에 없습니다.';return;}
+  if(tab==='posdelay'){
+    var d=busPath(_bus,'posdelay/logs');
+    lc.textContent=Array.isArray(d)?d.map(function(e){return '['+(e.time||'')+'] '+(e.msg||'');}).join('\n'):(d?JSON.stringify(d,null,2):'로그 없음');
+    lc.scrollTop=lc.scrollHeight;
+  }
+}
+setTimeout(loadOpsLogs,1000);
+setInterval(loadOpsLogs,30000);
+
+// === 유틸 ===
+function togSec(id){const e=document.getElementById(id),o=e.classList.toggle('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML=o?'&#9660;':'&#9654;';if(id==='diagB'&&o)setTimeout(drawChart,100);try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');if(o)delete c[id];else c[id]=1;localStorage.setItem('_collapsed',JSON.stringify(c));}catch(e){}}
+// 수동 접기 복원 (togSec 계열: adB, dlB, diagB)
+try{const c=JSON.parse(localStorage.getItem('_collapsed')||'{}');Object.keys(c).forEach(id=>{const e=document.getElementById(id);if(e){e.classList.remove('open');const a=document.getElementById(id.replace('B','A'));if(a)a.innerHTML='&#9654;';}});}catch(e){}
+// togCB 계열 접힘 복원
+try{var cbc=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');Object.keys(cbc).forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('open');var am={gate_body:'gatePanelArrow',time_mode_body:'timeModePanelArrow',auto_accept_body:'autoAcceptPanelArrow',stop_body:'stopPanelArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}});}catch(e){}
+// 기본 접힘: 최초 방문 시 (사용자가 한번도 열지 않은 섹션)
+(function(){
+  var defaults_togSec=['adB','bdlB','cdlB','cadB','diagB','schB'];
+  var defaults_togCB=['gate_body','time_mode_body','auto_accept_body','stop_body'];
+  try{var c=JSON.parse(localStorage.getItem('_collapsed')||'{}');
+  defaults_togSec.forEach(function(id){
+    var e=document.getElementById(id);if(!e)return;
+    // 사용자가 명시적으로 연 적 없으면(localStorage에 기록 없으면) 접기
+    if(c[id]===undefined&&!e.classList.contains('open')){/* 이미 접혀있음 */}
+    // adB는 HTML에서 이미 open 없음, 나머지도 확인
+  });}catch(ex){}
+  try{var cb=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');
+  defaults_togCB.forEach(function(id){
+    var e=document.getElementById(id);if(!e)return;
+    if(cb[id]===undefined){e.classList.remove('open');var am={gate_body:'gatePanelArrow',time_mode_body:'timeModePanelArrow',auto_accept_body:'autoAcceptPanelArrow',stop_body:'stopPanelArrow'};var ai=am[id];if(ai){var ar=document.getElementById(ai);if(ar)ar.innerHTML='&#9654;';}}
+  });}catch(ex){}
+})();
+function fmtHM(dt){return dt.getHours()+'시'+String(dt.getMinutes()).padStart(2,'0')+'분';}
+let _toastTimer=null;
+function toast(m,type){
+  const bn=document.getElementById('alertB');
+  if(!bn)return;
+  // 타입: ok(초록)/warn(빨강)/info(기본)
+  const t=type||'ok';
+  bn.className='alert '+t;
+  bn.textContent=m;
+  if(_toastTimer)clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{bn.className='alert';_toastTimer=null;},3000);
+}
+
+// === 풀투리프레시 제거 — 버튼(↻)으로만 새로고침 ===
+
+// === 조리모드 (주문번호 기반) ===
+let ckOn=false,ckQ=[]; // ckQ: {num, t, onKds, ma, fa, da}
+
+function togCookMode(){if(!requireAppControl())return false;ckOn=!ckOn;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');if(!ckOn){ckQ=[];updCkUI();}saveCk();}
+
+function updCkQueue(){
+  if(!ckOn)return;
+  const orders=kS.orders||[];
+  let changed=false;
+  // 새 주문번호 등장 → 타이머 시작 (Firebase order_tracking 시간 우선)
+  orders.forEach(n=>{
+    const existing=ckQ.find(o=>o.num===n);
+    if(!existing){
+      const fbTime=oT[String(n)];
+      ckQ.push({num:n,t:fbTime||lastKdsTime||Date.now(),onKds:true,ma:false,fa:false,da:false});
+      changed=true;
+    } else {
+      // oT 데이터가 나중에 도착하면 접수시간 업데이트
+      const fbTime=oT[String(n)];
+      if(fbTime && existing.t!==fbTime) existing.t=fbTime;
+    }
+  });
+  // KDS에서 사라진 주문 = 완료. 실제 완료 시점 기록
+  ckQ.forEach(o=>{
+    const was=o.onKds;
+    o.onKds=orders.includes(o.num);
+    if(was && !o.onKds && !o.doneAt){
+      o.doneAt=Date.now();
+      o.cookDur=o.doneAt-o.t;
+      cookLog.push({num:o.num,t:o.t,doneAt:o.doneAt,cookDur:o.cookDur});
+      if(cookLog.length>50)cookLog=cookLog.slice(-30); // 최근 30건 유지
+      changed=true;
+    } else if(was!==o.onKds) changed=true;
+  });
+  if(changed){saveCk();calcCookSpeed();}
+}
+
+let _lastCkCheck=0;
+function chkCkAlerts(){
+  if(!ckOn)return;
+  const tgtS=parseInt(document.getElementById('ck_target').value)||1500;
+  const midS=parseInt(document.getElementById('ck_mid').value)||1020;
+  const finS=parseInt(document.getElementById('ck_finish').value)||240;
+  const tgtMs=tgtS*1000;const cookStartMs=tgtMs-midS*1000;const pkgStartMs=tgtMs-finS*1000;
+  const now=Date.now();
+  // 백그라운드 복귀 감지: 간격 > 3초면 밀린 알림 무시 (네이티브가 처리)
+  const gap=_lastCkCheck>0?now-_lastCkCheck:0;
+  _lastCkCheck=now;
+  const skipAlerts=gap>3000;
+  // 자동 삭제: 완료 후 25분 / 미완료 60분 안전장치 + 탭 삭제 예약
+  const prevLen=ckQ.length;
+  ckQ=ckQ.filter(o=>{
+    if(o.doneAt&&(now-o.doneAt)>=1500000)return false; // 완료 후 25분 삭제
+    if(!o.doneAt&&(now-o.t)>=3600000)return false; // 미완료 60분 안전장치
+    if(o.delAt&&now>=o.delAt)return false; // 탭 2초 후 삭제
+    return true;
+  });
+  if(ckQ.length!==prevLen)saveCk(); // 리스트 변동 시 저장
+  ckQ.forEach(o=>{
+    const elMs=now-o.t;
+    if(isApp&&!o.delAt){
+      if(elMs>=cookStartMs&&!o.ma){o.ma=true;if(!skipAlerts&&o.onKds){try{NativeBridge.speakCook(o.num+'번 조리');}catch(e){}}}
+      if(elMs>=pkgStartMs&&!o.fa){o.fa=true;if(!skipAlerts){try{NativeBridge.speakCook(o.num+'번 포장');}catch(e){}}}
+      if(elMs>=tgtMs&&!o.da){o.da=true;if(!skipAlerts){try{NativeBridge.speakCook(o.num+'번 시간초과');}catch(e){}}}
+    }
+  });
+  updCkQueue(); // zero-stabilization 중에도 onKds 즉시 반영
+  updCkUI();
+}
+
+function updCkUI(){
+  const listArea=document.getElementById('cookListArea');
+  const listEl=document.getElementById('cookList');
+  const settingsEl=document.getElementById('cookQ');
+  const ckStEl=document.getElementById('ckStatus');
+  const cookOrders=ckQ.filter(o=>o.onKds);
+  const pkgOrders=ckQ.filter(o=>!o.onKds&&o.doneAt).sort((a,b)=>a.doneAt-b.doneAt);
+  const activeOrders=cookOrders.length;
+  if(ckStEl){
+    if(!ckOn){ckStEl.textContent='';ckStEl.style.color='#9898B0';}
+    else if(activeOrders===0&&pkgOrders.length===0){ckStEl.textContent='대기';ckStEl.style.color='#A0A0BC';}
+    else{
+      let st=[];
+      if(activeOrders>0)st.push('조리'+activeOrders);
+      if(pkgOrders.length>0)st.push('포장'+pkgOrders.length);
+      ckStEl.textContent=st.join(' ');
+      ckStEl.style.color=activeOrders>3?'#E74C3C':activeOrders>1?'#E67E22':'#2ECC71';
+    }
+  }
+  if(!ckOn||ckQ.length===0){
+    if(listArea)listArea.style.display=ckOn?'block':'none';
+    if(settingsEl)settingsEl.innerHTML='<span style="color:#9898B0">대기중</span>';
+    if(listEl&&ckOn)listEl.innerHTML='<div style="text-align:center;color:#9898B0;font-size:11px;padding:8px">주문 대기중</div>';
+    updateOutputTimer();
+    return;
+  }
+  if(listArea)listArea.style.display='block';
+  const tgtS=parseInt(document.getElementById('ck_target').value)||1500;
+  const midS=parseInt(document.getElementById('ck_mid').value)||1020;
+  const finS=parseInt(document.getElementById('ck_finish').value)||240;
+  const tgtMs=tgtS*1000;const midMs=midS*1000;const finMs=finS*1000;
+  const cookStartMs=tgtMs-midMs;const pkgStartMs=tgtMs-finMs;
+  const now=Date.now();
+  function mmss(ms){const neg=ms<0;const a=Math.abs(ms);const m=Math.floor(a/60000),s=Math.floor((a%60000)/1000);return(neg?'-':'')+m+':'+String(s).padStart(2,'0');}
+  // === 조리중 섹션 ===
+  const urg=o=>{const e=now-o.t;return e>=tgtMs?0:e>=pkgStartMs?1:e>=cookStartMs?2:3;};
+  const sortedCook=[...cookOrders].sort((a,b)=>{const ua=urg(a),ub=urg(b);return ua!==ub?ua-ub:a.t-b.t;});
+  const bTgt=g(S,'baemin_target_time',27),bCook=g(S,'baemin_fixed_cook_time',17);
+  const cTgt=g(S,'coupang_target_time',22),cCook=g(S,'coupang_fixed_cook_time',15);
+  let h='';
+  // === 통합 긴급 배너 (조리+포장 모두) ===
+  const urgOver=[],urgPkg=[],urgCook=[];
+  cookOrders.forEach(o=>{const el=now-o.t;if(el>=tgtMs)urgOver.push(o.num);else if(el>=pkgStartMs)urgPkg.push(o.num);else if(el>=cookStartMs)urgCook.push(o.num);});
+  const pkgOverdue=pkgOrders.filter(o=>(now-o.t)>=tgtMs);
+  const cookFocus=urgCook.length>0&&urgPkg.length===0&&urgOver.length===0;
+  const busyCookFocus=activeOrders>2&&urgCook.length>0&&urgOver.length===0;
+  const hasUrgent=urgOver.length+urgPkg.length+urgCook.length+pkgOverdue.length>0;
+  if(hasUrgent){
+    const isRed=urgOver.length||urgPkg.length||pkgOverdue.length;
+    h+='<div style="padding:5px 8px;font-size:13px;font-weight:bold;border-radius:5px;margin:2px 0;'+(isRed?'background:#E74C3C22':'background:#E67E2218')+'">';
+    if(urgOver.length)h+=`<span style="color:#E74C3C">조리초과 ${urgOver.map(n=>n+'번').join(' ')}</span> `;
+    if(pkgOverdue.length)h+=`<span style="color:#E74C3C">포장초과 ${pkgOverdue.map(n=>n.num+'번').join(' ')}</span> `;
+    if(urgPkg.length)h+=`<span style="color:#E74C3C">포장급함 ${urgPkg.map(n=>n+'번').join(' ')}</span> `;
+    if(cookFocus||busyCookFocus)h+=`<span style="color:#E67E22">조리집중 ${urgCook.map(n=>n+'번').join(' ')}</span>`;
+    else if(urgCook.length&&!cookFocus)h+=`<span style="color:#E67E22">조리중 ${urgCook.map(n=>n+'번').join(' ')}</span>`;
+    h+='</div>';
+  }
+  // === 조리중 섹션 ===
+  if(activeOrders>0||pkgOrders.length===0){
+    h+='<div style="padding:4px 8px;font-size:11px;font-weight:bold;color:#E67E22;border-bottom:1px solid #2A2A45;background:#E67E2208">조리중 '+activeOrders+'건</div>';
+    h+='<div style="display:flex;align-items:center;padding:3px 8px;font-size:10px;color:#9898B0;border-bottom:1px solid #2A2A45"><span style="min-width:48px">주문</span><span style="min-width:42px">접수</span><span style="min-width:42px;text-align:center;color:#2ECC71">경과</span><span style="flex:1"></span><span style="min-width:52px;text-align:center;color:#E67E22;background:#E67E2218;border-radius:3px;padding:1px 0">조리</span><span style="min-width:52px;text-align:center;color:#E74C3C;background:#E74C3C18;border-radius:3px;padding:1px 0">포장</span><span style="min-width:42px;text-align:center;color:#E74C3C">배</span><span style="min-width:42px;text-align:center;color:#E74C3C">쿠</span></div>';
+  }
+  let maxBDelay=0,maxCDelay=0;
+  const activeOldest=sortedCook.slice().sort((a,b)=>a.t-b.t);
+  const posMap={};activeOldest.forEach((x,i)=>{posMap[x.num]=i;});
+  function calcDelay(pos,ai,tgt,cook){if(ai<=0)return 0;const wait=(pos+1)*ai;const d=Math.max(0,wait+cook-tgt);return d>0?Math.ceil(d/5)*5:0;}
+  sortedCook.slice(0,15).forEach(o=>{
+    const elMs=now-o.t;
+    const cookRem=cookStartMs-elMs;
+    const pkgRem=pkgStartMs-elMs;
+    let st,bgCl;
+    if(elMs>=tgtMs){st='초과';bgCl='#E74C3C';}
+    else if(elMs>=pkgStartMs){st='포장';bgCl='#E74C3C';}
+    else if(elMs>=cookStartMs){st='조리';bgCl='#E67E22';}
+    else{st='대기';bgCl='#2ECC71';}
+    const cookCl=cookRem<0?'#E74C3C':cookRem<60000?'#E67E22':'#FFFFFF';
+    const pkgCl=pkgRem<0?'#E74C3C':pkgRem<60000?'#E67E22':'#FFFFFF';
+    const pos=posMap[o.num]??0;
+    const bDelay=calcDelay(pos,avgInterval,bTgt,bCook);
+    const cDelay=calcDelay(pos,avgInterval,cTgt,cCook);
+    if(bDelay>maxBDelay)maxBDelay=bDelay;
+    if(cDelay>maxCDelay)maxCDelay=cDelay;
+    const hasDelay=bDelay>0||cDelay>0;
+    const dying=o.delAt?' ck-dying':'';
+    const oDate=new Date(o.t);
+    const oTime=String(oDate.getHours()).padStart(2,'0')+':'+String(oDate.getMinutes()).padStart(2,'0');
+    const rowBg=hasDelay?'background:#FF6B6B22;':'';
+    const elSec=Math.floor(elMs/1000);const elMin=Math.floor(elSec/60);const elS=elSec%60;const elStr=elMin+':'+String(elS).padStart(2,'0');
+    h+=`<div class="ck-row${dying}" onclick="ckTapDel(${o.num})" style="display:flex;align-items:center;padding:5px 8px;border-bottom:1px solid #2A2A45;font-family:monospace;cursor:pointer;${rowBg}">
+<span style="min-width:48px;font-size:14px;font-weight:bold;color:#E0E0EC">${o.num}번</span>
+<span style="min-width:42px;font-size:11px;color:#A0A0BC">${oTime}</span>
+<span style="min-width:42px;text-align:center;font-size:13px;font-weight:bold;color:#2ECC71">${elStr}</span>
+<span style="flex:1;font-size:11px;font-weight:bold;color:${bgCl}">${st}</span>
+<span style="min-width:52px;text-align:center;font-size:15px;font-weight:bold;color:${cookCl};background:#E67E2215;border-radius:3px;padding:2px 0">${mmss(cookRem)}</span>
+<span style="min-width:52px;text-align:center;font-size:15px;font-weight:bold;color:${pkgCl};background:#E74C3C15;border-radius:3px;padding:2px 0">${mmss(pkgRem)}</span>
+<span style="min-width:42px;text-align:center;font-size:13px;font-weight:bold;color:${bDelay>0?'#E74C3C':'transparent'}">${bDelay>0?bDelay:''}</span>
+<span style="min-width:42px;text-align:center;font-size:13px;font-weight:bold;color:${cDelay>0?'#E74C3C':'transparent'}">${cDelay>0?cDelay:''}</span>
+</div>`;
+  });
+  if(activeOrders===0&&pkgOrders.length>0){h+='<div style="text-align:center;color:#9898B0;font-size:11px;padding:6px">조리 대기중</div>';}
+  // === 포장중 섹션 ===
+  if(pkgOrders.length>0){
+    // 포장 긴급 분석: 전체목표 초과 여부
+    const pkgUrgent=pkgOrders.filter(o=>(now-o.t)>=tgtMs);
+    h+='<div style="padding:4px 8px;font-size:11px;font-weight:bold;color:#E74C3C;border-top:2px solid #E74C3C33;border-bottom:1px solid #2A2A45;margin-top:2px;background:#E74C3C08">포장중 '+pkgOrders.length+'건'+(pkgUrgent.length>0?' <span style="color:#E74C3C">초과'+pkgUrgent.length+'</span>':'')+'</div>';
+    h+='<div style="display:flex;align-items:center;padding:3px 8px;font-size:10px;color:#9898B0;border-bottom:1px solid #2A2A45"><span style="min-width:48px">주문</span><span style="min-width:48px">완료</span><span style="min-width:52px;text-align:center">포장경과</span><span style="flex:1"></span><span style="min-width:70px;text-align:center;color:#E74C3C">남은시간</span></div>';
+    pkgOrders.forEach(o=>{
+      const pkgElMs=now-o.doneAt;
+      const overallRem=(o.t+tgtMs)-now;
+      const doneDate=new Date(o.doneAt);
+      const doneTime=String(doneDate.getHours()).padStart(2,'0')+':'+String(doneDate.getMinutes()).padStart(2,'0');
+      const remCl=overallRem<=0?'#E74C3C':overallRem<120000?'#E67E22':'#2ECC71';
+      const dying=o.delAt?' ck-dying':'';
+      h+=`<div class="ck-row${dying}" onclick="ckTapDel(${o.num})" style="display:flex;align-items:center;padding:5px 8px;border-bottom:1px solid #2A2A45;font-family:monospace;cursor:pointer">
+<span style="min-width:48px;font-size:14px;font-weight:bold;color:#E0E0EC">${o.num}번</span>
+<span style="min-width:48px;font-size:11px;color:#2AC1BC">${doneTime}</span>
+<span style="min-width:52px;text-align:center;font-size:13px;font-weight:bold;color:#A0A0BC">${mmss(pkgElMs)}</span>
+<span style="flex:1"></span>
+<span style="min-width:70px;text-align:center;font-size:16px;font-weight:bold;color:${remCl};background:${remCl}15;border-radius:4px;padding:2px 0">${mmss(overallRem)}</span>
+</div>`;
+    });
+  }
+  if(listEl)listEl.innerHTML=h;
+  const delayMsg=[];if(maxBDelay>0)delayMsg.push('<span style="color:#E74C3C">배'+maxBDelay+'분</span>');if(maxCDelay>0)delayMsg.push('<span style="color:#E74C3C">쿠'+maxCDelay+'분</span>');
+  const avgStr=avgCookDur>0?` <span style="color:#2AC1BC;font-size:10px">평균 ${mmss(avgCookDur)}</span>`:'';
+  let focusMsg='';
+  if(urgOver.length)focusMsg=` <span style="color:#E74C3C;font-weight:bold">초과${urgOver.length}</span>`;
+  else if(urgPkg.length)focusMsg=` <span style="color:#E74C3C;font-weight:bold">포장급함${urgPkg.length}</span>`;
+  else if(cookFocus||busyCookFocus)focusMsg=` <span style="color:#E67E22;font-weight:bold">조리집중</span>`;
+  if(settingsEl)settingsEl.innerHTML=`<span style="color:#9898B0">${activeOrders}건</span>`+(pkgOrders.length>0?` <span style="color:#E74C3C">포장${pkgOrders.length}</span>`:'')+`${focusMsg}${avgStr}`+(delayMsg.length>0?' <span style="font-weight:bold">지연 '+delayMsg.join(' ')+'</span>':'');
+  updateOutputTimer();
+}
+
+function ckDisp(k){const e=document.getElementById('ck_'+k);const d=document.getElementById('ck_'+k+'_disp');if(!e||!d)return;const v=parseInt(e.value)||0;const m=Math.floor(v/60),s=v%60;d.textContent=m+':'+String(s).padStart(2,'0');}
+function adjCk(k,d){if(!requireAppControl())return false;const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
+function saveCk(){try{const t=parseInt(document.getElementById('ck_target').value)||1500,m=parseInt(document.getElementById('ck_mid').value)||1020,f=parseInt(document.getElementById('ck_finish').value)||240;localStorage.setItem('ck',JSON.stringify({on:ckOn,t:t,m:m,f:f,q:ckQ,cl:cookLog}));if(isApp)try{NativeBridge.syncCookSettings(ckOn,t,m,f);}catch(e){}}catch(e){}}
+function ckTapDel(num){if(!requireAppControl())return false;const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
+function loadCk(){try{const s=JSON.parse(localStorage.getItem('ck'));if(s){ckOn=!!s.on;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');
+  // 구버전 분단위(< 100) → 초단위 자동변환
+  const t=s.t||1500;const m=s.m||1020;const f=s.f||240;
+  document.getElementById('ck_target').value=t<100?t*60:t;
+  document.getElementById('ck_mid').value=m<100?m*60:m;
+  document.getElementById('ck_finish').value=f<100?f*60:f;
+  // 완료 기록 복원
+  if(s.cl&&Array.isArray(s.cl))cookLog=s.cl.slice(-30);
+  // 조리 리스트 복원
+  if(s.q&&Array.isArray(s.q)&&s.q.length>0){ckQ=s.q.filter(o=>o&&o.num&&o.t);calcCookSpeed();updCkUI();}
+  }ckDisp('target');ckDisp('mid');ckDisp('finish');}catch(e){}}
+loadCk();
+try{const v=NativeBridge.getAppVersion();if(v)setAppVersionText(v);}catch(e){}
+setInterval(chkCkAlerts,1000);
+
+// === 초기화 ===
+if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();
+// 설정은 NativeBridge에서 직접 로드 (Firebase 경유 없음)
+if(isApp){try{const d=JSON.parse(NativeBridge.getSettings());Object.assign(S,d);sseLoaded=true;updSetUI();updMonitor();}catch(e){}}
+else if(typeof loadWebSettings==='function'){loadWebSettings().then(function(){sseLoaded=true;if(typeof updSetUI==='function')updSetUI();if(typeof updMonitor==='function')updMonitor();});}
+sse('/posdelay/order_tracking.json',m=>{
+  if(!m.data||m.data==='null')return;
+  if(m.path==='/')Object.assign(oT,m.data);else oT[m.path.slice(1)]=m.data;
+});
+sse('/kds_status.json',hKds);
+sse('/posdelay/signal_snapshot.json',hSnap);
+sse('/posdelay/ad_state.json',hASt);
+sse('/posdelay/status.json',hStatus);
+sse('/kds_history.json',hHist);
+// 이상신호 SSE
+sse('/posdelay/alert.json',m=>{
+  const ab=document.getElementById('anomalyB');
+  if(!m.data||m.data==='null'){ab.className='alert';return;}
+  const d=m.path==='/'?m.data:null;
+  if(!d)return;
+  const ts=d.timestamp||0;
+  if(Date.now()-ts>10*60*1000){ab.className='alert';return;} // 10분 지난 알림 무시
+  ab.className='alert warn';
+  ab.innerHTML='&#9888; ['+d.type+'] '+d.message+' ('+d.time+')';
+  if('Notification'in window&&Notification.permission==='granted'){
+    new Notification('이상신호',{body:d.message,tag:'anomaly'});
+  }
+});
+// 5초 폴링 — 공장/gist/rentry. 파이어 없음.
+let _sseOk=false;
+function pollAll(force){
+  Promise.allSettled([
+    fetchFirst(TRACK.kds),
+    fetchFirst(TRACK.bus),
+    fetchFirst(TRACK.snapshot),
+    fetchFirst(TRACK.exec||[])
+  ]).then(function(res){
+    var got=false;
+    if(res[0].status==='fulfilled'&&res[0].value){_kds=res[0].value;got=true;}
+    if(res[1].status==='fulfilled'&&res[1].value){_bus=res[1].value;got=true;}
+    if(res[2].status==='fulfilled'&&res[2].value){_snap=res[2].value;got=true;}
+    if(got){
+      _sseOk=true;
+      updC(true);
+      dispatchBus();
+      if(_kds){kS={..._kds};if(!Array.isArray(kS.orders))kS.orders=[];}
+      var a=busPath(_bus,'posdelay/ad_state');if(a)Object.assign(aS,a);
+      var st=busPath(_bus,'posdelay/status');if(st)Object.assign(stS,st);
+      if(!(res[2].status==='fulfilled'&&res[2].value)){
+        var snap=busPath(_bus,'posdelay/signal_snapshot');
+        if(snap)_snap=snap;
+      }
+      if(res[3]&&res[3].status==='fulfilled'&&res[3].value){
+        var ex=res[3].value;
+        var sub2=document.getElementById('subStatus2');
+        var subDot=document.getElementById('subDot2');
+        if(sub2&&ex.owner==='factory'){
+          sub2.textContent=ex.cookies&&(ex.cookies.baemin||ex.cookies.coupang)?'공장 실행기':'공장(쿠키없음)';
+          if(subDot)subDot.className='dot '+(ex.session_ok===false?'dr':'dg');
+        }
+      }
+      updSyncStatus();updMonitor();
+    }else{
+      updC(false);
+    }
+  }).catch(function(){updC(false);});
+}
+setInterval(pollAll,5000);
+if(typeof poswebFactory==='object'&&poswebFactory.resolveOrigin){
+  poswebFactory.resolveOrigin().then(function(){pollAll();}).catch(function(){pollAll();});
+}else{
+  setTimeout(pollAll,400);
+}
+setInterval(()=>{
+  const ls=stS.kds_sync??0;
+  if(ls>0){const ago=Math.floor((Date.now()-ls)/1000);const rem=Math.max(0,90-ago%90);document.getElementById('mRefresh').textContent='수집 '+rem+'초';}
+  applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+},1000);
+window.addEventListener('resize',drawChart);
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden){
+    if(ckOn){_lastCkCheck=0;updCkQueue();updCkUI();}
+    pollAll(true);
+  }
+});
+
+// ═══ 게이트(배달료) ═══
+let gateSettings = {threshold:8, threshold_stop:15, valid:30, fee:4000, base:0, clubAuto:false, enabled:false, _stopSource:'KDS', _defenseMode:'B'};
+let policySettings = {
+  enabled:false,
+  auto_accept_enabled:true,
+  time_mode_enabled:false,
+  peak1_start:'',
+  peak1_end:'',
+  peak2_start:'',
+  peak2_end:'',
+  baemin_auto_enabled:true,
+  baemin_auto_source:'KDS',
+  baemin_auto_min_1:20,
+  baemin_auto_min_2:25,
+  baemin_auto_min_3:30,
+  baemin_auto_count_1:0,
+  baemin_auto_count_2:2,
+  baemin_auto_count_3:4,
+  baemin_auto_one_count_1:0,
+  baemin_auto_one_count_2:1,
+  baemin_auto_one_count_3:2,
+  store_auto_enabled:true,
+  store_auto_source:'KDS',
+  store_auto_min_1:20,
+  store_auto_min_2:25,
+  store_auto_min_3:30,
+  store_auto_count_1:0,
+  store_auto_count_2:2,
+  store_auto_count_3:4,
+  store_auto_one_count_1:0,
+  store_auto_one_count_2:1,
+  store_auto_one_count_3:2,
+  baemin1_pause_at:10,
+  baemin1_resume_at:2,
+  baemin1_one_pause_at:10,
+  baemin1_one_resume_at:2,
+  baemin1_pause_duration:'30분',
+  coupang_pause_at:12,
+  coupang_resume_at:3,
+  coupang_one_pause_at:12,
+  coupang_one_resume_at:3
+};
+
+function syncPolicySummary() {
+  var peakLabel = policySettings.time_mode_enabled ? '피크설정' : '항상일반';
+  var timeSummary=document.getElementById('timeModeSummary');
+  if(timeSummary){
+    var ranges=[];
+    if(policySettings.peak1_start&&policySettings.peak1_end)ranges.push(policySettings.peak1_start+'~'+policySettings.peak1_end);
+    if(policySettings.peak2_start&&policySettings.peak2_end)ranges.push(policySettings.peak2_start+'~'+policySettings.peak2_end);
+    timeSummary.textContent=ranges.length?ranges.join(' · '):'항상일반';
+  }
+  var autoSummary=document.getElementById('autoAcceptSummary');
+  if(autoSummary)autoSummary.textContent=policySettings.auto_accept_enabled
+    ? '배민 '+srcLabel(policySettings.baemin_auto_source)+' · 배민배달 '+srcLabel(policySettings.store_auto_source)
+    : 'OFF';
+  var autoTog=document.getElementById('tog_auto_accept');
+  if(autoTog)autoTog.classList.toggle('on',!!policySettings.auto_accept_enabled);
+  var stopSummary=document.getElementById('stopSummary');
+  if(stopSummary)stopSummary.textContent=policySettings.enabled
+    ? peakLabel+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
+    : 'OFF';
+  var stopTog=document.getElementById('tog_stop');
+  if(stopTog)stopTog.classList.toggle('on',!!policySettings.enabled);
+}
+
+function applyPolicySettingsToUI() {
+  var pairs=[
+    ['policy_peak1_start',policySettings.peak1_start],
+    ['policy_peak1_end',policySettings.peak1_end],
+    ['policy_peak2_start',policySettings.peak2_start],
+    ['policy_peak2_end',policySettings.peak2_end],
+    ['policy_baemin_auto_source',policySettings.baemin_auto_source],
+    ['policy_baemin_auto_min_1',policySettings.baemin_auto_min_1],
+    ['policy_baemin_auto_min_2',policySettings.baemin_auto_min_2],
+    ['policy_baemin_auto_min_3',policySettings.baemin_auto_min_3],
+    ['policy_baemin_auto_count_1',policySettings.baemin_auto_count_1],
+    ['policy_baemin_auto_count_2',policySettings.baemin_auto_count_2],
+    ['policy_baemin_auto_count_3',policySettings.baemin_auto_count_3],
+    ['policy_baemin_auto_one_count_1',policySettings.baemin_auto_one_count_1],
+    ['policy_baemin_auto_one_count_2',policySettings.baemin_auto_one_count_2],
+    ['policy_baemin_auto_one_count_3',policySettings.baemin_auto_one_count_3],
+    ['policy_store_auto_source',policySettings.store_auto_source],
+    ['policy_store_auto_min_1',policySettings.store_auto_min_1],
+    ['policy_store_auto_min_2',policySettings.store_auto_min_2],
+    ['policy_store_auto_min_3',policySettings.store_auto_min_3],
+    ['policy_store_auto_count_1',policySettings.store_auto_count_1],
+    ['policy_store_auto_count_2',policySettings.store_auto_count_2],
+    ['policy_store_auto_count_3',policySettings.store_auto_count_3],
+    ['policy_store_auto_one_count_1',policySettings.store_auto_one_count_1],
+    ['policy_store_auto_one_count_2',policySettings.store_auto_one_count_2],
+    ['policy_store_auto_one_count_3',policySettings.store_auto_one_count_3],
+    ['policy_baemin1_pause',policySettings.baemin1_pause_at],
+    ['policy_baemin1_resume',policySettings.baemin1_resume_at],
+    ['policy_baemin1_one_pause',policySettings.baemin1_one_pause_at],
+    ['policy_baemin1_one_resume',policySettings.baemin1_one_resume_at],
+    ['policy_baemin1_duration',policySettings.baemin1_pause_duration],
+    ['policy_coupang_pause',policySettings.coupang_pause_at],
+    ['policy_coupang_resume',policySettings.coupang_resume_at],
+    ['policy_coupang_one_pause',policySettings.coupang_one_pause_at],
+    ['policy_coupang_one_resume',policySettings.coupang_one_resume_at]
+  ];
+  pairs.forEach(function(pair){
+    var el=document.getElementById(pair[0]);
+    if(el)el.value=pair[1];
+  });
+  syncPolicySummary();
+}
+
+function readPolicyInt(id,label,min,max,silent){
+  var el=document.getElementById(id);
+  if(!el)return null;
+  var v=parseInt(el.value,10);
+  if(!Number.isFinite(v)||v<min||v>max){
+    if(!silent)toast(label+' 범위 확인','warn');
+    try{el.focus();}catch(e){}
+    return null;
+  }
+  return v;
+}
+
+function srcLabel(src){return src==='PRINTER'?'프린터':'KDS';}
+
+function buttonValueSpec(id){
+  if(/^policy_(baemin|store)_auto_min_[123]$/.test(id)){
+    const max=id.includes('baemin_auto')?70:30;
+    return {min:5,max,step:5,unit:'분',kind:'minute'};
+  }
+  const autoCount=id.match(/^policy_(baemin|store)_auto_(one_)?count_([123])$/);
+  if(autoCount){
+    return {min:0,max:99,step:1,unit:'건',locked:autoCount[3]==='1'};
+  }
+  if(/^policy_(baemin1|coupang)_(one_)?pause$/.test(id)) return {min:1,max:99,step:1,unit:'건'};
+  if(/^policy_(baemin1|coupang)_(one_)?resume$/.test(id)) return {min:0,max:98,step:1,unit:'건'};
+  return null;
+}
+
+function normalizeButtonValue(input,spec){
+  const raw=parseInt(input.value,10);
+  let value=Number.isFinite(raw)?raw:spec.min;
+  value=Math.max(spec.min,Math.min(spec.max,value));
+  value=Math.round(value/spec.step)*spec.step;
+  value=Math.max(spec.min,Math.min(spec.max,value));
+  if(spec.locked) value=spec.min;
+  input.value=value;
+  return value;
+}
+
+function syncButtonValueControl(input){
+  const spec=buttonValueSpec(input.id);
+  if(!spec) return;
+  const value=normalizeButtonValue(input,spec);
+  const control=document.querySelector(`[data-button-value-for="${input.id}"]`);
+  if(!control) return;
+  const text=control.querySelector('.button-value-text');
+  const minus=control.querySelector('[data-delta="-1"]');
+  const plus=control.querySelector('[data-delta="1"]');
+  if(text) text.textContent=`${value}${spec.unit||''}`;
+  if(minus) minus.disabled=spec.locked||value<=spec.min;
+  if(plus) plus.disabled=spec.locked||value>=spec.max;
+}
+
+function setButtonValue(input,delta){
+  if(!requireAppControl())return false;
+  const spec=buttonValueSpec(input.id);
+  if(!spec) return;
+  const current=normalizeButtonValue(input,spec);
+  input.value=current+(delta*spec.step);
+  normalizeButtonValue(input,spec);
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  input.dispatchEvent(new Event('change',{bubbles:true}));
+  syncButtonValueControl(input);
+}
+
+function initButtonValueControls(){
+  document.querySelectorAll('input[type="number"][id^="policy_"]').forEach(input=>{
+    const spec=buttonValueSpec(input.id);
+    if(!spec || document.querySelector(`[data-button-value-for="${input.id}"]`)) return;
+    input.readOnly=true;
+    input.classList.add('button-value-source');
+    const control=document.createElement('div');
+    control.className=`button-value-control${spec.kind==='minute'?' is-minute':''}`;
+    control.dataset.buttonValueFor=input.id;
+    const minus=document.createElement('button');
+    minus.type='button';
+    minus.className='button-value-btn';
+    minus.dataset.delta='-1';
+    minus.textContent='-';
+    const text=document.createElement('span');
+    text.className='button-value-text';
+    const plus=document.createElement('button');
+    plus.type='button';
+    plus.className='button-value-btn';
+    plus.dataset.delta='1';
+    plus.textContent='+';
+    minus.addEventListener('click',()=>setButtonValue(input,-1));
+    plus.addEventListener('click',()=>setButtonValue(input,1));
+    control.append(minus,text,plus);
+    input.insertAdjacentElement('afterend',control);
+    const unitNode=control.nextSibling;
+    if(unitNode && unitNode.nodeType===3 && unitNode.textContent.trim())unitNode.textContent='';
+    const unitEl=control.nextElementSibling;
+    if(unitEl && unitEl.tagName==='B')unitEl.style.display='none';
+    syncButtonValueControl(input);
+  });
+}
+
+function syncButtonValueControls(){
+  document.querySelectorAll('input.button-value-source').forEach(syncButtonValueControl);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  initButtonValueControls();
+  syncButtonValueControls();
+  setInterval(syncButtonValueControls,1000);
+});
+
+function readPolicySource(id){
+  var el=document.getElementById(id);
+  return el && el.value==='PRINTER' ? 'PRINTER' : 'KDS';
+}
+
+function readAutoPolicy(prefix,label,maxMinute,silent){
+  var out={};
+  out[prefix+'_enabled']=true;
+  out[prefix+'_source']=readPolicySource('policy_'+prefix+'_source');
+  var mins=[], counts=[], oneCounts=[];
+  for(var i=1;i<=3;i++){
+    var mn=readPolicyInt('policy_'+prefix+'_min_'+i,label+' '+i+'단계 시간',5,maxMinute,silent);
+    var ct=readPolicyInt('policy_'+prefix+'_count_'+i,label+' '+i+'단계 일반',0,999,silent);
+    var oc=readPolicyInt('policy_'+prefix+'_one_count_'+i,label+' '+i+'단계 1인',0,999,silent);
+    if(mn===null||ct===null||oc===null)return null;
+    if(mn%5!==0){
+      if(!silent)toast(label+' 시간은 5분 단위만 가능합니다','warn');
+      return null;
+    }
+    mins.push(mn);counts.push(ct);oneCounts.push(oc);
+    out[prefix+'_min_'+i]=mn;
+    out[prefix+'_count_'+i]=ct;
+    out[prefix+'_one_min_'+i]=mn;
+    out[prefix+'_one_count_'+i]=oc;
+  }
+  if(new Set(mins).size!==3 || new Set(counts).size!==3 || new Set(oneCounts).size!==3){
+    if(!silent)toast(label+' 단계값 중복 확인','warn');
+    return null;
+  }
+  return out;
+}
+
+function readPolicyTime(id){
+  var el=document.getElementById(id);
+  return el ? String(el.value||'').trim() : '';
+}
+
+function validatePeakPair(startId,endId,label){
+  var start=readPolicyTime(startId);
+  var end=readPolicyTime(endId);
+  if(!start && !end)return {ok:true,start:'',end:''};
+  if(!start || !end || start===end){
+    toast(label+' 시간 확인','warn');
+    return {ok:false,start:start,end:end};
+  }
+  return {ok:true,start:start,end:end};
+}
+
+function normalizePolicySettings() {
+  if(policySettings.threshold_20!==undefined && policySettings.baemin_auto_count_1===undefined){
+    policySettings.baemin_auto_min_1=20;policySettings.baemin_auto_count_1=policySettings.threshold_20;
+    policySettings.baemin_auto_min_2=25;policySettings.baemin_auto_count_2=policySettings.threshold_25;
+    policySettings.baemin_auto_min_3=30;policySettings.baemin_auto_count_3=policySettings.threshold_30;
+    policySettings.store_auto_min_1=20;policySettings.store_auto_count_1=policySettings.threshold_20;
+    policySettings.store_auto_min_2=25;policySettings.store_auto_count_2=policySettings.threshold_25;
+    policySettings.store_auto_min_3=30;policySettings.store_auto_count_3=policySettings.threshold_30;
+  }
+  for(var i=1;i<=3;i++){
+    if(policySettings['baemin_auto_one_count_'+i]===undefined)policySettings['baemin_auto_one_count_'+i]=policySettings['baemin_auto_count_'+i];
+    if(policySettings['store_auto_one_count_'+i]===undefined)policySettings['store_auto_one_count_'+i]=policySettings['store_auto_count_'+i];
+  }
+  if(!policySettings.baemin1_one_pause_at)policySettings.baemin1_one_pause_at=policySettings.baemin1_pause_at;
+  if(policySettings.baemin1_one_resume_at===undefined||policySettings.baemin1_one_resume_at===null)policySettings.baemin1_one_resume_at=policySettings.baemin1_resume_at;
+  if(!policySettings.coupang_one_pause_at)policySettings.coupang_one_pause_at=policySettings.coupang_pause_at;
+  if(policySettings.coupang_one_resume_at===undefined||policySettings.coupang_one_resume_at===null)policySettings.coupang_one_resume_at=policySettings.coupang_resume_at;
+  policySettings.time_mode_enabled=!!(policySettings.peak1_start||policySettings.peak2_start);
+}
+
+function loadPolicySettings() {
+  if(typeof NativeBridge!=='undefined' && NativeBridge.getPolicyConfig){
+    try {
+      var saved = JSON.parse(NativeBridge.getPolicyConfig()||'{}');
+      Object.assign(policySettings, saved);
+      normalizePolicySettings();
+      applyPolicySettingsToUI();
+      initButtonValueControls();
+      syncButtonValueControls();
+    } catch(e) {}
+    return;
+  }
+  if(typeof loadWebSettings==='function')loadWebSettings();
+}
+
+var _policySaveTimer=null;
+function setPolicySaveStatus(text, mode){
+  document.querySelectorAll('.policy-save-state').forEach(function(el){
+    el.textContent=text;
+    el.classList.remove('ok','warn','error');
+    if(mode)el.classList.add(mode);
+  });
+}
+function schedulePolicyAutoSave(){
+  clearTimeout(_policySaveTimer);
+  setPolicySaveStatus('변경됨', 'warn');
+  _policySaveTimer=setTimeout(function(){
+    if(savePolicySettings(true))setPolicySaveStatus('자동저장됨','ok');
+    else setPolicySaveStatus('확인 필요','error');
+  }, 700);
+}
+function bindPolicyAutoSave(){
+  [
+    'policy_peak1_start','policy_peak1_end','policy_peak2_start','policy_peak2_end',
+    'policy_baemin_auto_source',
+    'policy_baemin_auto_min_1','policy_baemin_auto_min_2','policy_baemin_auto_min_3',
+    'policy_baemin_auto_count_1','policy_baemin_auto_count_2','policy_baemin_auto_count_3',
+    'policy_baemin_auto_one_count_1','policy_baemin_auto_one_count_2','policy_baemin_auto_one_count_3',
+    'policy_store_auto_source',
+    'policy_store_auto_min_1','policy_store_auto_min_2','policy_store_auto_min_3',
+    'policy_store_auto_count_1','policy_store_auto_count_2','policy_store_auto_count_3',
+    'policy_store_auto_one_count_1','policy_store_auto_one_count_2','policy_store_auto_one_count_3',
+    'policy_baemin1_pause','policy_baemin1_resume',
+    'policy_baemin1_one_pause','policy_baemin1_one_resume',
+    'policy_coupang_pause','policy_coupang_resume',
+    'policy_coupang_one_pause','policy_coupang_one_resume'
+  ].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.addEventListener('change', schedulePolicyAutoSave);
+  });
+}
+setTimeout(bindPolicyAutoSave, 0);
+
+function savePolicySettings(silent) {
+  if(!requireAppControl())return false;
+  if((typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig) && !(typeof isWebAdmin==='function'&&isWebAdmin())){
+    if(!silent)toast('앱 전용','warn');
+    if(silent)setPolicySaveStatus('앱 전용','error');
+    return false;
+  }
+  syncButtonValueControls();
+  var isSilent=!!silent;
+  var peak1=validatePeakPair('policy_peak1_start','policy_peak1_end','피크1');
+  if(!peak1.ok)return false;
+  var peak2=validatePeakPair('policy_peak2_start','policy_peak2_end','피크2');
+  if(!peak2.ok)return false;
+  var baeminAuto=readAutoPolicy('baemin_auto','배민 자동수락',70,isSilent);
+  if(!baeminAuto)return false;
+  var storeAuto=readAutoPolicy('store_auto','배민배달 자동수락',30,isSilent);
+  if(!storeAuto)return false;
+  var next = {
+    enabled: !!policySettings.enabled,
+    auto_accept_enabled: !!policySettings.auto_accept_enabled,
+    time_mode_enabled: !!(peak1.start || peak2.start),
+    peak1_start: peak1.start,
+    peak1_end: peak1.end,
+    peak2_start: peak2.start,
+    peak2_end: peak2.end,
+    baemin1_pause_at: readPolicyInt('policy_baemin1_pause','배민1 중지',1,100,isSilent),
+    baemin1_resume_at: readPolicyInt('policy_baemin1_resume','배민1 재개',0,99,isSilent),
+    baemin1_one_pause_at: readPolicyInt('policy_baemin1_one_pause','1인 배민1 중지',1,100,isSilent),
+    baemin1_one_resume_at: readPolicyInt('policy_baemin1_one_resume','1인 배민1 재개',0,99,isSilent),
+    baemin1_pause_duration: '30분',
+    coupang_pause_at: readPolicyInt('policy_coupang_pause','쿠팡 중지',1,100,isSilent),
+    coupang_resume_at: readPolicyInt('policy_coupang_resume','쿠팡 재개',0,99,isSilent),
+    coupang_one_pause_at: readPolicyInt('policy_coupang_one_pause','1인 쿠팡 중지',1,100,isSilent),
+    coupang_one_resume_at: readPolicyInt('policy_coupang_one_resume','1인 쿠팡 재개',0,99,isSilent)
+  };
+  Object.assign(next,baeminAuto,storeAuto);
+  if(Object.keys(next).some(function(k){return next[k]===null;}))return false;
+  if(next.baemin1_pause_at<=next.baemin1_resume_at){
+    if(!silent)toast('배민1 중지값이 재개값보다 커야 합니다','warn');
+    return false;
+  }
+  if(next.baemin1_one_pause_at<=next.baemin1_one_resume_at){
+    if(!silent)toast('1인 배민1 중지값이 재개값보다 커야 합니다','warn');
+    return false;
+  }
+  if(next.coupang_pause_at<=next.coupang_resume_at){
+    if(!silent)toast('쿠팡 중지값이 재개값보다 커야 합니다','warn');
+    return false;
+  }
+  if(next.coupang_one_pause_at<=next.coupang_one_resume_at){
+    if(!silent)toast('1인 쿠팡 중지값이 재개값보다 커야 합니다','warn');
+    return false;
+  }
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&(typeof NativeBridge==='undefined'||!NativeBridge.updatePolicyConfig)){
+    Object.assign(policySettings, next);
+    applyPolicySettingsToUI();
+    saveWebPolicy(next).then(function(ok){
+      if(ok){if(!silent)toast('저장 완료','ok');setPolicySaveStatus('자동저장됨','ok');}
+      else {if(!silent)toast('저장 실패','warn');setPolicySaveStatus('확인 필요','error');}
+    });
+    return true;
+  }
+  try {
+    var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify(next));
+    if(!ok){
+      if(!silent)toast('저장 실패','warn');
+      return false;
+    }
+    Object.assign(policySettings, next);
+    applyPolicySettingsToUI();
+    if(!silent)toast('저장 완료','ok');
+    return true;
+  } catch(e) {
+    if(!silent)toast('저장 실패','warn');
+    return false;
+  }
+}
+
+const FEE_MIN=0, FEE_MAX=4000, FEE_STEP=500;
+function clampFeeValue(value){
+  var n=parseInt(value,10);
+  if(!Number.isFinite(n))n=0;
+  n=Math.max(FEE_MIN,Math.min(FEE_MAX,n));
+  return Math.round(n/FEE_STEP)*FEE_STEP;
+}
+function clampFeeThreshold(value){
+  var n=parseInt(value,10);
+  if(!Number.isFinite(n))n=8;
+  return Math.max(1,Math.min(50,n));
+}
+function parseClubReadbackTimestamp(value){
+  if(value===null||value===undefined||value==='')return 0;
+  var numeric=typeof value==='number'?value:Number(value);
+  if(Number.isFinite(numeric)&&numeric>0)return numeric<1000000000000?numeric*1000:numeric;
+  var parsed=Date.parse(String(value));
+  return Number.isFinite(parsed)&&parsed>0?parsed:0;
+}
+function isFreshClubReadback(adState,nowMs){
+  if(!adState||adState.baemin_club_tip_verification_source!=='baemin_api_readback')return false;
+  if(adState.baemin_club_tip_verification_fresh!==true)return false;
+  if(typeof adState.baemin_club_tip_active!=='boolean')return false;
+  var phoneRole=String(adState.phone_role||'').trim().toLowerCase();
+  var engineRole=String(adState.engine_role||'').trim().toUpperCase();
+  if(!((phoneRole==='kitchen'&&engineRole==='PRIMARY')||engineRole==='TAKEOVER'))return false;
+  var now=Number.isFinite(nowMs)?nowMs:Date.now();
+  var verifiedAt=parseClubReadbackTimestamp(adState.baemin_club_tip_verified_at);
+  var updatedAt=parseClubReadbackTimestamp(adState.updated_at_ms);
+  if(!verifiedAt||!updatedAt)return false;
+  var verifiedAge=now-verifiedAt;
+  var updatedAge=now-updatedAt;
+  return verifiedAge>=-60000&&verifiedAge<=10*60*1000&&updatedAge>=-60000&&updatedAge<=10*60*1000;
+}
+function gateClubStatusModel(autoEnabled,adState,nowMs){
+  if(!autoEnabled)return{text:'클럽 자동 미사용',color:'var(--text-muted)'};
+  if(!isFreshClubReadback(adState,nowMs))return{text:'서버 상태 확인 중',color:'var(--text-muted)'};
+  if(adState.baemin_club_tip_active)return{text:'배민클럽 ON · 서버 확인',color:'var(--c-on)'};
+  return{text:'현재 OFF · 조건 충족 시 자동 ON',color:'var(--text-bright)'};
+}
+function syncGateClubToggle(){
+  var autoEnabled=isGateClubMode();
+  var el=document.getElementById('tog_gate_club');
+  if(el){
+    el.className='tog'+(autoEnabled?' on':'');
+    if(el.setAttribute)el.setAttribute('aria-checked',autoEnabled?'true':'false');
+  }
+  var status=document.getElementById('gateClubApplyStatus');
+  if(status){
+    var hasServerState=typeof aS!=='undefined'&&Object.prototype.hasOwnProperty.call(aS,'baemin_club_tip_active');
+    var model=gateClubStatusModel(autoEnabled,hasServerState?aS:null,Date.now());
+    status.textContent=model.text;
+    status.style.color=model.color;
+  }
+}
+setInterval(syncGateClubToggle,30000);
+
+// 페이지 로드 시 Kotlin에서 저장된 설정 복원
+try {
+  if (typeof NativeBridge !== 'undefined' && NativeBridge.getGateSettings) {
+    var saved = JSON.parse(NativeBridge.getGateSettings());
+    Object.assign(gateSettings, saved);
+    gateSettings.threshold = clampFeeThreshold(gateSettings.threshold);
+    gateSettings.fee = clampFeeValue(gateSettings.fee);
+    gateSettings.base = clampFeeValue(gateSettings.base);
+    gateSettings._activeTab='PRINTER';
+    gateSettings._stopSource=saved.stopSource||gateSettings._stopSource||'KDS';
+    gateSettings._defenseMode=saved.mode||gateSettings._defenseMode||'B';
+    // UI 즉시 반영
+    document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건';
+    document.getElementById('gate_valid').textContent = gateSettings.valid+'분';
+    document.getElementById('stop_threshold_disp').textContent = (gateSettings.threshold_stop||15)+'건';
+    document.getElementById('feeThresholdNum').textContent = gateSettings.threshold;
+    setTimeout(function(){setFeeSource('PRINTER');}, 300);
+    document.getElementById('tog_gate').classList.toggle('on', !!gateSettings.enabled);
+    syncGatePriceDisplay();
+    syncGateClubToggle();
+    syncGateDashboardState();
+  }
+  // 프린터 주문 리스트 즉시 복원
+  if (typeof NativeBridge !== 'undefined' && NativeBridge.getCaptureStatus) {
+    onCaptureStatusUpdate(NativeBridge.getCaptureStatus());
+  }
+  loadPolicySettings();
+} catch(e) {}
+
+function adjGate(key, delta) {
+  if(!requireAppControl())return false;
+  if (key==='threshold') { gateSettings.threshold = clampFeeThreshold((gateSettings.threshold||8)+delta); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
+  if (key==='valid') { gateSettings.valid = Math.max(10, Math.min(60, gateSettings.valid+delta)); document.getElementById('gate_valid').textContent = gateSettings.valid+'분'; }
+  if (key==='fee') { gateSettings.fee = clampFeeValue((gateSettings.fee||0)+delta); syncGatePriceDisplay(); }
+  if (key==='base') { gateSettings.base = clampFeeValue((gateSettings.base||0)+delta); syncGatePriceDisplay(); }
+  syncGateDashboardState();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+}
+
+function adjStop(key, delta) {
+  if(!requireAppControl())return false;
+  if(key!=='threshold')return;
+  var min=Math.max(4,(gateSettings.threshold||8)+1);
+  gateSettings.threshold_stop=Math.max(min,Math.min(100,(gateSettings.threshold_stop||15)+delta));
+  var display=document.getElementById('stop_threshold_disp');
+  if(display)display.textContent=gateSettings.threshold_stop+'건';
+  syncGateDashboardState();
+  if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({threshold_stop:gateSettings.threshold_stop}));
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+}
+
+function setGateFee(v) {
+  if(!requireAppControl())return false;
+  gateSettings.fee = clampFeeValue(v);
+  syncGatePriceDisplay();
+  syncGateDashboardState();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+}
+function setGateBase(v) {
+  if(!requireAppControl())return false;
+  gateSettings.base = clampFeeValue(v);
+  if (gateSettings.base !== 0) gateSettings.clubAuto = false;
+  syncGatePriceDisplay();
+  syncGateDashboardState();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+}
+
+function togGateClub() {
+  if(!requireAppControl())return false;
+  gateSettings.clubAuto = !gateSettings.clubAuto;
+  if (gateSettings.clubAuto) gateSettings.base = 0;
+  syncGatePriceDisplay();
+  syncGateClubToggle();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({
+    base: gateSettings.base,
+    clubAuto: gateSettings.clubAuto
+  }));
+}
+
+function togGate() {
+  if(!requireAppControl())return false;
+  // 배달료 조정 ON/OFF
+  gateSettings.enabled = !gateSettings.enabled;
+  gateSettings._activeTab = 'PRINTER';
+  var el = document.getElementById('tog_gate');
+  if(el) el.classList.toggle('on', gateSettings.enabled);
+  syncGateDashboardState();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: 'PRINTER'}));
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+}
+
+function togStop() {
+  if(!requireAppControl())return false;
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&(typeof NativeBridge==='undefined'||!NativeBridge.updatePolicyConfig)){
+    policySettings.enabled=!policySettings.enabled;
+    syncPolicySummary();
+    return savePolicySettings(true);
+  }
+  if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
+    toast('앱 전용','warn');
+    return false;
+  }
+  var prev = policySettings.enabled;
+  policySettings.enabled = !policySettings.enabled;
+  syncPolicySummary();
+  try {
+    var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify({enabled: !!policySettings.enabled}));
+    if(!ok){
+      policySettings.enabled = prev;
+      syncPolicySummary();
+      toast('저장 실패','warn');
+      return;
+    }
+    toast(policySettings.enabled?'자동중지 ON':'자동중지 OFF','ok');
+  } catch(e) {
+    policySettings.enabled = prev;
+    syncPolicySummary();
+    toast('저장 실패','warn');
+  }
+}
+
+function togAutoAccept() {
+  if(!requireAppControl())return false;
+  var prev = policySettings.auto_accept_enabled;
+  policySettings.auto_accept_enabled = !policySettings.auto_accept_enabled;
+  syncPolicySummary();
+  if(!savePolicySettings(true)){
+    policySettings.auto_accept_enabled = prev;
+    syncPolicySummary();
+    toast('저장 실패','warn');
+    return;
+  }
+  toast(policySettings.auto_accept_enabled?'자동수락 ON':'자동수락 OFF','ok');
+}
+
+function setFeeSource(src) {
+  if(!requireAppControl())return false;
+  gateSettings._activeTab = 'PRINTER';
+  syncGateDashboardState();
+  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: 'PRINTER'}));
+}
+
+function setStopSource(src) {
+  if(!requireAppControl())return false;
+  gateSettings._stopSource=src==='PRINTER'?'PRINTER':'KDS';
+  syncGateDashboardState();
+  if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({stopSource:gateSettings._stopSource}));
+}
+
+function togCB(id) {
+  const e = document.getElementById(id);
+  if(!e) return;
+  const isOpen = e.classList.toggle('open');
+  // 화살표 업데이트
+  var arrowMap = {gate_body:'gatePanelArrow', time_mode_body:'timeModePanelArrow', auto_accept_body:'autoAcceptPanelArrow', stop_body:'stopPanelArrow'};
+  var arrId = arrowMap[id];
+  if(arrId) { var arr = document.getElementById(arrId); if(arr) arr.innerHTML = isOpen ? '&#9660;' : '&#9654;'; }
+  // 접힘 상태 localStorage 저장
+  try{var c=JSON.parse(localStorage.getItem('_cb_collapsed')||'{}');if(isOpen)delete c[id];else c[id]=1;localStorage.setItem('_cb_collapsed',JSON.stringify(c));}catch(ex){}
+}
+
+// ─── 주문 리스트 펼침/접힘 ───
+let _feeListOpen = true;
+let _feeListExpanded = false;
+function togFeeList() {
+  _feeListOpen = !_feeListOpen;
+  const wrap = document.getElementById('feeOrderListWrap');
+  const arrow = document.getElementById('feeListArrow');
+  const expandBtn = document.getElementById('feeExpandBtn');
+  if(wrap) wrap.style.maxHeight = _feeListOpen ? (_feeListExpanded ? '800px' : '220px') : '0px';
+  if(arrow) arrow.innerHTML = _feeListOpen ? '&#9660;' : '&#9654;';
+  if(expandBtn) expandBtn.style.display = _feeListOpen ? '' : 'none';
+}
+function togFeeListExpand() {
+  _feeListExpanded = !_feeListExpanded;
+  const wrap = document.getElementById('feeOrderListWrap');
+  const btn = document.getElementById('feeExpandBtn');
+  if(!_feeListOpen) return;
+  if(wrap) wrap.style.maxHeight = _feeListExpanded ? '800px' : '220px';
+  if(btn) { btn.textContent = _feeListExpanded ? '접기' : '더보기'; btn.style.color = _feeListExpanded ? '#4FC3F7' : '#9090A8'; btn.style.borderColor = _feeListExpanded ? '#4FC3F7' : '#2E2E52'; }
+}
+
+function highlightPresetButtons(selector, value) {
+  document.querySelectorAll(selector+' .btn').forEach(function(button){
+    var buttonValue=parseInt(button.textContent.replace(/,/g,''));
+    var isActive=buttonValue===value;
+    button.style.background=isActive?'#E67E22':'#2A2A45';
+    button.style.color=isActive?'#FFF':'#E0E0EC';
+  });
+}
+function syncGatePriceDisplay() {
+  var upValue=gateSettings.fee||0;
+  var baseValue=gateSettings.base||0;
+  var up=document.getElementById('fee_set_up');
+  var base=document.getElementById('fee_set_base');
+  if(up)up.textContent=upValue.toLocaleString();
+  if(base)base.textContent=gateBaseLabel();
+  highlightPresetButtons('#fee_presets', upValue);
+  highlightPresetButtons('#base_presets', baseValue);
+  syncGateClubToggle();
+  syncGateDashboardState();
+}
+function getOrderChannelColor(channel){
+  return channel==='배민'?'#2AC1BC':channel==='쿠팡'?'#FFD700':'#E74C3C';
+}
+function getOrderElapsedColor(elapsed){
+  return elapsed>=25?'#E74C3C':elapsed>=15?'#E67E22':'#9090A8';
+}
+function syncGateDashboardState() {
+  gateSettings.threshold=clampFeeThreshold(gateSettings.threshold);
+  gateSettings.fee=clampFeeValue(gateSettings.fee);
+  gateSettings.base=clampFeeValue(gateSettings.base);
+  gateSettings._activeTab='PRINTER';
+  var threshold=gateSettings.threshold||8;
+  var valid=gateSettings.valid||30;
+  var validCount=gateSettings._validCount||0;
+  var stopThreshold=gateSettings.threshold_stop||15;
+  var stopMode=gateSettings._defenseMode||gateSettings.mode||'B';
+  var stopEnabledByMode=stopMode==='A'||stopMode==='BA';
+  var stopSource=gateSettings._stopSource==='PRINTER'?'프린터':'KDS 환산';
+  var stopCount=gateSettings._stopCount||0;
+  var stopRemain=Math.max(0,stopThreshold-stopCount);
+  var feeSource='프린터';
+  var feeRemain=Math.max(0,threshold-validCount);
+  var feeCurrent=gateSettings._lastAppliedFee;
+  var feeState=gateSettings._stopDefending?'정지중':gateSettings._isFeeDefending?'변경중':gateSettings.enabled?'ON':'OFF';
+  var feePrinter=document.getElementById('src_printer');
+  if(feePrinter){feePrinter.style.background='#2AC1BC';feePrinter.style.color='#FFF';}
+  var stopPrinter=document.getElementById('stop_src_printer');
+  var stopKds=document.getElementById('stop_src_kds');
+  if(stopPrinter){stopPrinter.style.background=gateSettings._stopSource==='PRINTER'?'#2AC1BC':'#2A2A45';stopPrinter.style.color=gateSettings._stopSource==='PRINTER'?'#FFF':'#E0E0EC';}
+  if(stopKds){stopKds.style.background=gateSettings._stopSource==='KDS'?'#2AC1BC':'#2A2A45';stopKds.style.color=gateSettings._stopSource==='KDS'?'#FFF':'#E0E0EC';}
+  var feeLiveSource=document.getElementById('feeLiveSource');
+  if(feeLiveSource)feeLiveSource.textContent=feeSource;
+  var feeThresholdNum=document.getElementById('feeThresholdNum');
+  if(feeThresholdNum)feeThresholdNum.textContent=threshold;
+  var feeLiveValid=document.getElementById('feeLiveValid');
+  if(feeLiveValid)feeLiveValid.textContent=valid+'분';
+  var heroFeeThreshold=document.getElementById('heroFeeThreshold');
+  if(heroFeeThreshold)heroFeeThreshold.textContent=threshold+'건';
+  var heroFeeValid=document.getElementById('heroFeeValid');
+  if(heroFeeValid)heroFeeValid.textContent=valid+'분';
+  var feeLiveHint=document.getElementById('feeLiveHint');
+  if(feeLiveHint)feeLiveHint.textContent=feeRemain>0?feeRemain+'건 남음':'도달';
+  var feeLiveState=document.getElementById('feeLiveState');
+  if(feeLiveState)feeLiveState.textContent=feeState;
+  var heroFeeCurrent=document.getElementById('heroFeeCurrent');
+  if(heroFeeCurrent)heroFeeCurrent.textContent=feeCurrent!=null?feeCurrent.toLocaleString()+'원':'확인 중';
+  var heroFeeMode=document.getElementById('heroFeeMode');
+  if(heroFeeMode){
+    heroFeeMode.textContent=feeState;
+    heroFeeMode.style.color=gateSettings._stopDefending?'#E74C3C':gateSettings._isFeeDefending?'#E67E22':'var(--text-secondary)';
+  }
+  var stopModeLabel=document.getElementById('stopModeLabel');
+  if(stopModeLabel)stopModeLabel.textContent=stopMode+(stopEnabledByMode?' · 자동정지 사용':' · 배달료 전용');
+  var stopSrcLabel=document.getElementById('stop_src_label');
+  if(stopSrcLabel)stopSrcLabel.textContent=stopSource;
+  var stopCountEl=document.getElementById('gate_stop_count');
+  if(stopCountEl)stopCountEl.textContent=stopCount+'건';
+  var stopThresholdEl=document.getElementById('stop_threshold_disp');
+  if(stopThresholdEl)stopThresholdEl.textContent=stopThreshold+'건';
+  var stopLiveThreshold=document.getElementById('stopLiveThreshold');
+  if(stopLiveThreshold)stopLiveThreshold.textContent='임계 '+stopThreshold+'건';
+  var stopLiveState=document.getElementById('stopLiveState');
+  if(stopLiveState)stopLiveState.textContent=gateSettings._stopDefending?'정지중':stopEnabledByMode&&gateSettings.enabled?'대기':'OFF';
+  var stopLiveHint=document.getElementById('stopLiveHint');
+  if(stopLiveHint)stopLiveHint.textContent=!stopEnabledByMode?'B 모드 미사용':gateSettings._stopDefending?'임계 도달':stopRemain>0?stopRemain+'건 남음':'도달';
+  var stopBar=document.getElementById('gate_stop_bar');
+  if(stopBar){var stopRatio=Math.min(stopCount/Math.max(1,stopThreshold)*100,150);stopBar.style.width=stopRatio+'%';stopBar.style.background=gateSettings._stopDefending?'#E74C3C':stopRatio>70?'#E67E22':'#4FC3F7';}
+  var gateSummary=document.getElementById('gateSummary');
+  if(gateSummary)gateSummary.textContent=(feeCurrent!=null?feeCurrent.toLocaleString()+'원':'확인 중')+'  임계'+threshold+'건'+(isGateClubMode()?' · 클럽':'');
+  var stopSummary=document.getElementById('stopSummary');
+  if(stopSummary)stopSummary.textContent=policySettings.enabled
+    ? (policySettings.time_mode_enabled?'피크설정':'항상일반')+' · 배민1 '+policySettings.baemin1_pause_at+'/'+policySettings.baemin1_resume_at+'|'+policySettings.baemin1_one_pause_at+'/'+policySettings.baemin1_one_resume_at+' · 쿠팡 '+policySettings.coupang_pause_at+'/'+policySettings.coupang_resume_at+'|'+policySettings.coupang_one_pause_at+'/'+policySettings.coupang_one_resume_at
+    : 'OFF';
+  if(document.getElementById('groupSummary'))renderGroupSummary();
+  renderOpsLog();
+}
+setTimeout(syncGateDashboardState,0);
+function renderFeeOrderList(orders){
+  var list=document.getElementById('feeOrderList');
+  if(!list)return;
+  var wrap=document.getElementById('feeOrderListWrap');
+  var expandBtn=document.getElementById('feeExpandBtn');
+  if(!orders.length){
+    list.innerHTML='<div class="order-empty">주문 없음</div>';
+    if(wrap)wrap.style.maxHeight='40px';
+    if(expandBtn)expandBtn.style.display='none';
+    return;
+  }
+  if(wrap)wrap.style.maxHeight=_feeListOpen?(_feeListExpanded?'800px':'160px'):'0px';
+  if(expandBtn)expandBtn.style.display=_feeListOpen?'':'none';
+  var html='';
+  var validLimit=gateSettings.valid||30;
+  orders.slice().sort(function(a,b){return (b.elapsed||0)-(a.elapsed||0);}).forEach(function(order){
+    var channel=order.channel||'-';
+    var elapsed=order.elapsed||0;
+    var color=getOrderChannelColor(channel);
+    var remain=Math.max(0,validLimit-elapsed);
+    var status=elapsed>=validLimit?'초과':remain<=10?'임박':'유효';
+    var statusColor=elapsed>=validLimit?'#E74C3C':remain<=10?'#E67E22':getOrderElapsedColor(elapsed);
+    html+='<div class="order-row">';
+    html+='<div class="order-main"><div class="order-channel-line"><span class="order-channel" style="color:'+color+';background:'+color+'22">'+channel+'</span><span class="order-status-mini" style="color:'+statusColor+'">'+status+'</span></div><span class="order-address">'+(order.address||'-')+'</span></div>';
+    html+='<div class="order-elapsed"><span class="elapsed-main" style="color:'+statusColor+'">'+elapsed+'분</span><span class="elapsed-sub">'+(elapsed>=validLimit?'초과':(remain+'분 남음'))+'</span></div>';
+    html+='</div>';
+  });
+  list.innerHTML=html;
+}
+function renderFeeChannelBadges(orders){
+  var row=document.getElementById('feeChannelRow');
+  if(!row)return;
+  var html='<span class="text-xs text-muted">채널별</span>';
+  if(!orders.length){row.innerHTML=html;return;}
+  var counts={};
+  orders.forEach(function(order){counts[order.channel]=(counts[order.channel]||0)+1;});
+  Object.keys(counts).forEach(function(channel){
+    var color=getOrderChannelColor(channel);
+    html+=' <span class="badge-chip" style="background:'+color+'22;color:'+color+'">'+channel+' '+counts[channel]+'</span>';
+  });
+  row.innerHTML=html;
+}
+function updateOutputTimer(){
+  var timer=document.getElementById('mOutputTimer');
+  if(!timer)return;
+  if(!ckOn||!ckQ.length){
+    timer.textContent='--';
+    timer.style.color='#707088';
+    return;
+  }
+  var now=Date.now();
+  var tgtMs=(parseInt(document.getElementById('ck_target').value)||1500)*1000;
+  var midMs=(parseInt(document.getElementById('ck_mid').value)||1020)*1000;
+  var finMs=(parseInt(document.getElementById('ck_finish').value)||240)*1000;
+  var cookStartMs=tgtMs-midMs;
+  var pkgStartMs=tgtMs-finMs;
+  var active=ckQ.filter(function(o){
+    return o&&!o.delAt&&(o.onKds||o.doneAt)&&(!o.doneAt||now-o.doneAt<1500000);
+  }).sort(function(a,b){return (a.t||0)-(b.t||0);}).slice(0,6);
+  if(!active.length){
+    timer.textContent='--';
+    timer.style.color='#707088';
+    return;
+  }
+  timer.textContent=active.map(function(o){return String(o.num).slice(-1);}).join('');
+  var maxElapsed=active.reduce(function(max,o){return Math.max(max,now-(o.t||now));},0);
+  timer.style.color=maxElapsed>=pkgStartMs?'#E74C3C':maxElapsed>=cookStartMs?'#E67E22':'#E0E0EC';
+}
+function renderCaptureSnapshot(patch){
+  lastCaptureSnapshot=Object.assign({}, lastCaptureSnapshot, patch||{});
+  var orders=(lastCaptureSnapshot.orders||[]).filter(function(order){return order&&!order.expired;}).sort(function(a,b){return (b.elapsed||0)-(a.elapsed||0);});
+  var connected=!!lastCaptureSnapshot.printerConnected;
+  var threshold=gateSettings.threshold||lastCaptureSnapshot.thresholdFee||8;
+  gateSettings._validCount=orders.length;
+  gateSettings._printerConnected=connected;
+  gateSettings._captureStatus=lastCaptureSnapshot.status||'';
+  var printerLabel=(connected?'ON':'OFF')+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
+  var printerDotClass='dot '+(connected?'dg':'dr');
+  var labelColor=connected?'#2ECC71':'#E74C3C';
+  var feeGaugeRatio=Math.min((orders.length/threshold)*100,150);
+  var feeGauge=document.getElementById('feeGaugeBar');
+  var feeValue=document.getElementById('feeValidNum');
+  var feeCount=document.getElementById('feeListCount');
+  var printerCount=document.getElementById('printerCount');
+  var printerDot=document.getElementById('printerDot');
+  var printerDot2=document.getElementById('printerDot2');
+  var printerText=document.getElementById('printerLabel');
+  var captureTime=document.getElementById('captureTime');
+  var heroPrinterState=document.getElementById('heroPrinterState');
+  var heroCaptureTime=document.getElementById('heroCaptureTime');
+  var feeLiveClock=document.getElementById('feeLiveClock');
+  if(printerDot)printerDot.className=printerDotClass;
+  if(printerDot2)printerDot2.className=printerDotClass;
+  if(printerText){printerText.textContent=printerLabel;printerText.style.color=labelColor;}
+  if(captureTime)captureTime.textContent=lastCaptureSnapshot.lastCaptureAt||'--';
+  if(heroPrinterState)heroPrinterState.textContent=(connected?'ON':'OFF')+' · '+orders.length+'건'+(lastCaptureSnapshot.status?' · '+lastCaptureSnapshot.status:'');
+  if(heroCaptureTime)heroCaptureTime.textContent='수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
+  if(feeLiveClock)feeLiveClock.textContent='수집 '+(lastCaptureSnapshot.lastCaptureAt||'--');
+  if(feeValue)feeValue.textContent=orders.length;
+  if(feeCount)feeCount.textContent=orders.length+'건';
+  if(printerCount)printerCount.textContent=orders.length;
+  updateOutputTimer();
+  if(feeGauge){feeGauge.style.width=feeGaugeRatio+'%';feeGauge.style.background=feeGaugeRatio>=100?'#E74C3C':feeGaugeRatio>70?'#E67E22':'#4FC3F7';}
+  renderFeeOrderList(orders);
+  renderFeeChannelBadges(orders);
+  syncGateDashboardState();
+}
+setInterval(updateOutputTimer,1000);
+
+// NativeBridge에서 게이트 설정 수신
+function onGateSettingsUpdate(json) {
+  try {
+    const s = JSON.parse(json);
+    gateSettings = Object.assign(gateSettings, s);
+    gateSettings.threshold=clampFeeThreshold(gateSettings.threshold);
+    gateSettings.fee=clampFeeValue(gateSettings.fee);
+    gateSettings.base=clampFeeValue(gateSettings.base);
+    gateSettings._activeTab='PRINTER';
+    if(s.stopSource)gateSettings._stopSource=s.stopSource==='PRINTER'?'PRINTER':'KDS';
+    if(s.mode)gateSettings._defenseMode=s.mode;
+    if(s.threshold_stop!=null||s.thresholdStop!=null)gateSettings.threshold_stop=s.threshold_stop!=null?s.threshold_stop:s.thresholdStop;
+    if(s.threshold!=null){var gateThreshold=document.getElementById('gate_threshold');if(gateThreshold)gateThreshold.textContent=s.threshold+'건';var feeThreshold=document.getElementById('feeThresholdNum');if(feeThreshold)feeThreshold.textContent=s.threshold;}
+    if(s.valid!=null){var gateValid=document.getElementById('gate_valid');if(gateValid)gateValid.textContent=s.valid+'분';}
+    syncGatePriceDisplay();
+    var gateToggle=document.getElementById('tog_gate');
+    if(gateToggle)gateToggle.classList.toggle('on', !!gateSettings.enabled);
+    var gateStatus=document.getElementById('gate_status');
+    if(gateStatus){
+      if(s.defending||s.isFeeDefending){gateStatus.style.display='';gateStatus.textContent='변경중 · '+(gateSettings.fee||0).toLocaleString()+'원';gateStatus.style.color='#E67E22';}
+      else{gateStatus.style.display='none';}
+    }
+    syncGateDashboardState();
+  } catch(e) {}
+}
+
+function onGateStatusUpdate(jsonStr) {
+  try {
+    var s = JSON.parse(jsonStr);
+    // gateSettings 동기화 (새로고침 후 복원)
+    if(s.thresholdFee) { gateSettings.threshold = clampFeeThreshold(s.thresholdFee); var el=document.getElementById('gate_threshold'); if(el) el.textContent=gateSettings.threshold+'건'; }
+    if(s.thresholdFee) { var el3=document.getElementById('feeThresholdNum'); if(el3) el3.textContent=gateSettings.threshold; }
+    if(s.thresholdStop) gateSettings.threshold_stop=s.thresholdStop;
+    if(s.currentFee != null) gateSettings.fee = clampFeeValue(s.currentFee);
+    if(s.baseFee !== undefined) gateSettings.base = clampFeeValue(s.baseFee);
+    if(Object.prototype.hasOwnProperty.call(s,'lastAppliedFee')) gateSettings._lastAppliedFee = s.lastAppliedFee;
+    if(s.gateEnabled !== undefined) gateSettings.enabled = s.gateEnabled;
+    gateSettings._activeTab = 'PRINTER';
+    if(s.stopSource)gateSettings._stopSource=s.stopSource==='PRINTER'?'PRINTER':'KDS';
+    if(s.defenseMode)gateSettings._defenseMode=s.defenseMode;
+    gateSettings._isFeeDefending = !!s.isFeeDefending;
+    gateSettings._stopDefending = !!s.isStopDefending;
+    gateSettings._stopCount = gateSettings._stopSource==='PRINTER' ? (s.validCount||0) : (s.totalCount||0);
+    gateSettings._currentFeeApplied = gateSettings._lastAppliedFee;
+    syncGatePriceDisplay();
+    // 건수 표시
+    var fc = document.getElementById('gate_fee_count');
+    if(fc) fc.textContent = (s.validCount||0)+'건';
+    updateKdsUnitHints();
+
+    // 게이지 바
+    var fb = document.getElementById('gate_fee_bar');
+    if(fb) { var r=Math.min((s.validCount||0)/(s.thresholdFee||8)*100, 150); fb.style.width=r+'%'; fb.style.background=s.isFeeDefending?'#E74C3C':r>70?'#E67E22':'#4FC3F7'; }
+
+    // 현재 배달료 상태 표시
+    var fcv = document.getElementById('fee_current_value');
+    var fcs = document.getElementById('fee_current_status');
+    if(fcv) {
+      if(gateSettings._lastAppliedFee==null) {
+        fcv.textContent = '확인 중';
+        fcv.style.color = '#E67E22';
+        if(fcs) fcs.style.borderLeft = '3px solid #E67E22';
+      } else if(s.isFeeDefending) {
+        fcv.textContent = gateSettings._lastAppliedFee.toLocaleString()+'원';
+        fcv.style.color = '#E74C3C';
+        if(fcs) fcs.style.borderLeft = '3px solid #E74C3C';
+      } else {
+        fcv.textContent = gateSettings._lastAppliedFee.toLocaleString()+'원';
+        fcv.style.color = '#2ECC71';
+        if(fcs) fcs.style.borderLeft = '3px solid #2ECC71';
+      }
+    }
+    // 조정 상태 (배달료 패널)
+    var gateStatus = document.getElementById('gate_status');
+    if(gateStatus) {
+      if(s.isStopDefending) { gateStatus.style.display=''; gateStatus.textContent='정지중'; gateStatus.style.color='#E74C3C'; }
+      else if(s.isFeeDefending) { gateStatus.style.display=''; gateStatus.textContent='변경중 · '+(s.currentFee||0).toLocaleString()+'원'; gateStatus.style.color='#E67E22'; }
+      else { gateStatus.style.display='none'; }
+    }
+
+    // 토글 상태 — 활성(대기 이상)이면 ON
+    var tog = document.getElementById('tog_gate');
+    if(tog) tog.classList.toggle('on', s.gateEnabled && !!s.activeTab);
+
+    renderCaptureSnapshot({
+      orders:s.captureOrders!==undefined?s.captureOrders:lastCaptureSnapshot.orders,
+      printerConnected:s.printerConnected!==undefined?s.printerConnected:lastCaptureSnapshot.printerConnected,
+      status:s.captureStatus!==undefined?s.captureStatus:lastCaptureSnapshot.status,
+      lastCaptureAt:s.lastCaptureAt!==undefined?s.lastCaptureAt:lastCaptureSnapshot.lastCaptureAt,
+      thresholdFee:gateSettings.threshold||s.thresholdFee||lastCaptureSnapshot.thresholdFee||8
+    });
+
+    // ═══ 접힌 헤더 요약값 업데이트 ═══
+    var gateSummary = document.getElementById('gateSummary');
+    if(gateSummary) gateSummary.textContent = (gateSettings._lastAppliedFee!=null?gateSettings._lastAppliedFee.toLocaleString()+'원':'확인 중')+'  임계'+(s.thresholdFee||8)+'건'+(isGateClubMode()?' · 클럽':'');
+    syncGateDashboardState();
+  } catch(e) {}
+}
+
+// ═══ 캡처(프린터) 주문 리스트 ═══
+function onCaptureStatusUpdate(jsonStr) {
+  try {
+    var s = JSON.parse(jsonStr);
+    renderCaptureSnapshot({
+      orders:s.orders||[],
+      printerConnected:s.printerConnected,
+      status:s.status,
+      lastCaptureAt:s.lastCaptureAt,
+      thresholdFee:lastCaptureSnapshot.thresholdFee||gateSettings.threshold||8
+    });
+  } catch(e) {}
+}
+
+// ═══ 수동 배달료/영업 조정 ═══
+function manualDefense(action, fee) {
+  if(!requireAppControl())return false;
+  var parsedFee=parseInt(fee,10);
+  var configuredFee=parseInt(gateSettings.fee,10);
+  var finalFee=action.includes('fee_up')
+    ? String(Number.isFinite(parsedFee)?parsedFee:(Number.isFinite(configuredFee)?configuredFee:4000))
+    : String(Number.isFinite(parsedFee)?parsedFee:0);
+  if(action.includes('fee_up'))finalFee=String(clampFeeValue(finalFee));
+  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, finalFee);
+}
+// ═══ 자동화 엔진 UI ═══
+function renderEngineTasks(engineJson) {
+  try {
+    latestEngineState = typeof engineJson === 'string' ? JSON.parse(engineJson) : engineJson;
+    var tasks = Array.isArray(latestEngineState.tasks) ? latestEngineState.tasks : [];
+    var running = tasks.filter(function(task){return task.state==='RUNNING';}).length;
+    var failed = tasks.filter(function(task){return task.state==='FAILED';}).length;
+    var enabled = tasks.filter(function(task){return task.enabled;}).length;
+    var badge2 = document.getElementById('engineBadge2');
+    if (badge2) badge2.textContent = tasks.length ? '엔진 '+enabled+'/'+tasks.length+(running>0?' · '+running+' 실행':'')+(failed>0?' · 실패 '+failed:'') : '';
+    refreshActivityLog();renderOpsLog();
+  } catch(ex) { console.error('엔진 UI:', ex); }
+}
+
+function updateSubphoneStatus(json) {
+  try {
+    latestSubphoneState = typeof json === 'string' ? JSON.parse(json) : json;
+    var dot2 = document.getElementById('subDot2');
+    var txt2 = document.getElementById('subStatus2');
+    var ago = Math.floor((Date.now() - latestSubphoneState.ts) / 1000);
+    var cls = ago < 120 ? 'dot dg' : ago < 300 ? 'dot do' : 'dot dr';
+    var msg = '서브폰 ' + (latestSubphoneState.device||'S10+') + ' 배터리' + (latestSubphoneState.battery||'?') + '% KDS ' + (latestSubphoneState.kds_count>=0?latestSubphoneState.kds_count:'?') + '건 ' + ago + '초전';
+    if (dot2) dot2.className = cls;
+    if (txt2) txt2.textContent = msg;
+    refreshActivityLog();renderOpsLog();
+  } catch(e) {}
+}
+
+// ═══ 메인 PC 전원 (WoL + Shutdown) ═══
+var pcState = {
+  lastHb: 0,
+  cleanShutdown: false,
+  bootId: null,
+  relayTs: 0,
+  wakingUntil: 0,
+  fastUntil: 0,
+  state: 'UNKNOWN',
+  pollTimer: null,
+  hbTimer: null,
+  cdTimer: null
+};
+
+function pcRand6(){var s='';var c='abcdefghijklmnopqrstuvwxyz0123456789';for(var i=0;i<6;i++)s+=c.charAt(Math.floor(Math.random()*c.length));return s;}
+
+function pcRelTime(ms){
+  if(!ms)return '--';
+  var diff=Date.now()-ms;
+  if(diff<0)diff=0;
+  if(diff<10000)return '방금';
+  if(diff<60000)return Math.floor(diff/1000)+'초 전';
+  if(diff<3600000)return Math.floor(diff/60000)+'분 전';
+  if(diff<86400000)return Math.floor(diff/3600000)+'시간 전';
+  return Math.floor(diff/86400000)+'일 전';
+}
+
+function pcUpdateLastHb(){
+  var el=document.getElementById('pcLastHb');
+  if(!el)return;
+  if(pcState.cleanShutdown){el.textContent='정상 종료됨';return;}
+  if(!pcState.lastHb){el.textContent='박동 --';return;}
+  el.textContent='박동 '+pcRelTime(pcState.lastHb);
+}
+
+function pcApplyStatus(state){
+  pcState.state=state;
+  var pill=document.getElementById('pcStatusPill');
+  if(!pill)return;
+  pill.classList.remove('pc-pulse');
+  var bg='', bd='', cl='', tx='';
+  if(state==='ON'){tx='\u{1F7E2} ON';bg='rgba(46,204,113,.15)';bd='rgba(46,204,113,.40)';cl='#2ECC71';}
+  else if(state==='WAKING'){tx='⏳ 깨우는 중';bg='rgba(230,126,34,.14)';bd='rgba(230,126,34,.38)';cl='#E67E22';pill.classList.add('pc-pulse');}
+  else if(state==='STALE'){tx='\u{1F7E1} 느림';bg='rgba(230,126,34,.14)';bd='rgba(230,126,34,.38)';cl='#E67E22';}
+  else if(state==='OFF'){tx='⚪ OFF';bg='rgba(112,112,136,.12)';bd='rgba(112,112,136,.30)';cl='#9090A8';}
+  else {tx='-- 확인 중';bg='rgba(255,255,255,.06)';bd='rgba(255,255,255,.08)';cl='var(--text-muted)';}
+  pill.textContent=tx;
+  pill.style.background=bg;
+  pill.style.borderColor=bd;
+  pill.style.color=cl;
+}
+
+function pcUpdateRelayDot(){
+  var dot=document.getElementById('pcRelayDot');
+  if(!dot)return;
+  if(!pcState.relayTs){dot.className='dot dd';return;}
+  var ago=Date.now()-pcState.relayTs;
+  if(ago<=120000)dot.className='dot dg';
+  else if(ago<=600000)dot.className='dot do';
+  else dot.className='dot dr';
+}
+
+function pcEvalState(){
+  var now=Date.now();
+  if(pcState.wakingUntil && now < pcState.wakingUntil){
+    pcApplyStatus('WAKING');
+    return;
+  }
+  if(pcState.cleanShutdown===true){pcApplyStatus('OFF');return;}
+  if(!pcState.lastHb){pcApplyStatus('UNKNOWN');return;}
+  var d=now-pcState.lastHb;
+  if(d<=90000)pcApplyStatus('ON');
+  else if(d<=300000)pcApplyStatus('STALE');
+  else pcApplyStatus('OFF');
+}
+
+function pcSchedulePoll(){
+  if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+  var now=Date.now();
+  var interval=(pcState.fastUntil && now < pcState.fastUntil) ? 10000 : 60000;
+  pcState.pollTimer=setTimeout(pollPcPower, interval);
+}
+
+function pcTryNativeWake(target){
+  if(typeof NativeBridge==='undefined' || !NativeBridge.wakeMainPc || !target || !target.mac) return false;
+  try {
+    return !!NativeBridge.wakeMainPc(String(target.mac||''), String(target.ip||''));
+  } catch (e) {
+    console.warn('[pcPower] native wake 실패', e);
+    return false;
+  }
+}
+
+function pollPcPower(){
+  Promise.resolve().then(function(){
+    return [
+      busPath(_bus,'packhelper/heartbeat/main_pc'),
+      busPath(_bus,'packhelper/heartbeat/wol_relay')
+    ];
+  }).then(function(arr){
+    var mp=arr[0]||{}, wr=arr[1]||{};
+    var prevHb=pcState.lastHb;
+    var hb=(typeof mp.ts_epoch_ms==='number')?mp.ts_epoch_ms:0;
+    pcState.lastHb=hb;
+    pcState.cleanShutdown=(mp.clean_shutdown===true);
+    pcState.bootId=mp.boot_id||null;
+    pcState.relayTs=(typeof wr.ts_epoch_ms==='number')?wr.ts_epoch_ms:((typeof wr.ts_ms==='number')?wr.ts_ms:0);
+    // heartbeat 갱신 감지 시 waking 해제
+    if(pcState.wakingUntil && hb && hb > prevHb && (Date.now()-hb) <= 90000){
+      pcState.wakingUntil=0;
+      pcState.fastUntil=0;
+      pcResetButtons();
+    }
+    // 가속 종료 (만료)
+    if(pcState.fastUntil && Date.now() >= pcState.fastUntil){
+      pcState.fastUntil=0;
+    }
+    pcEvalState();
+    pcUpdateRelayDot();
+    pcUpdateLastHb();
+  }).catch(function(){
+    pcEvalState();
+  }).then(function(){
+    pcSchedulePoll();
+  });
+}
+
+function pcResetButtons(){
+  var b=document.getElementById('pcOnBtn');
+  if(b){b.textContent='켜기';b.style.opacity='';b.style.pointerEvents='';}
+}
+
+function pcOnClickWake(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  pcShowWakeConfirm();
+}
+
+function pcShowWakeConfirm(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  pcShowOverlay(
+    '<div class="pc-dialog-title" id="pcWakeDialogTitle">메인 PC 켜기 확인</div>'+
+    '<div class="pc-dialog-msg">메인 PC를 켜시겠습니까?</div>'+
+    '<div class="pc-dialog-row">'+
+      '<button class="btn bn" id="pcWakeCancel" autofocus>취소</button>'+
+      '<button class="btn bg" id="pcWakeConfirm">확인 → 켜기</button>'+
+    '</div>'
+  );
+  var c=document.getElementById('pcWakeCancel');
+  var k=document.getElementById('pcWakeConfirm');
+  if(c)c.addEventListener('click',pcHideOverlay);
+  if(k)k.addEventListener('click',pcSendWake);
+}
+
+function pcSendWake(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  var btn=document.getElementById('pcOnBtn');
+  if(!btn)return;
+  // wol_relay 점이 회색이면 경고만 출력 (다이얼로그 없이)
+  var dot=document.getElementById('pcRelayDot');
+  if(dot && dot.classList.contains('dd')){
+    console.warn('[pcPower] wol_relay 비활성 — 명령은 보내지만 깨우지 못할 수 있음');
+  }
+  var now=Date.now();
+  btn.textContent='깨우는 중...';
+  btn.style.opacity='.45';
+  btn.style.pointerEvents='none';
+  pcState.wakingUntil=now+60000;
+  pcState.fastUntil=now+120000;
+  pcApplyStatus('WAKING');
+  pcTryNativeWake(busPath(_bus,'packhelper/wol_targets/main_pc')||null);
+  // 가속 폴링 즉시 시작
+  if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+  pcHideOverlay();
+  setTimeout(pollPcPower, 1500);
+}
+
+function pcShowOverlay(html){
+  var ov=document.getElementById('pcOverlay');
+  if(!ov)return;
+  ov.innerHTML='<div class="pc-dialog" role="dialog" aria-modal="true" aria-label="PC 원격 제어 확인">'+html+'</div>';
+  ov.classList.add('show');
+}
+function pcHideOverlay(){
+  var ov=document.getElementById('pcOverlay');
+  if(!ov)return;
+  ov.classList.remove('show');
+  ov.innerHTML='';
+  if(pcState.cdTimer){clearInterval(pcState.cdTimer);pcState.cdTimer=null;}
+}
+
+function pcOnClickShutdown(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  pcShowOverlay(
+    '<div class="pc-dialog-title" id="pcShutdownDialogTitle">메인 PC 종료 확인</div>'+
+    '<div class="pc-dialog-msg">메인 PC를 끄시겠습니까?</div>'+
+    '<div class="pc-dialog-row">'+
+      '<button class="btn bn" id="pcCancel1" autofocus>취소</button>'+
+      '<button class="btn bred" id="pcConfirm1">확인 → 계속</button>'+
+    '</div>'
+  );
+  var c=document.getElementById('pcCancel1');
+  var k=document.getElementById('pcConfirm1');
+  if(c)c.addEventListener('click',pcHideOverlay);
+  if(k)k.addEventListener('click',pcShowCountdown);
+}
+
+function pcShowCountdown(){
+  pcShowOverlay(
+    '<div class="pc-dialog-title" id="pcCountdownDialogTitle">PC를 종료합니다</div>'+
+    '<div class="pc-dialog-count" id="cdCountText" aria-live="assertive">5초 후 명령 전송...</div>'+
+    '<button class="btn bn" id="pcCdCancel" style="width:100%; min-height:52px; font-size:14px; font-weight:700">취소</button>'
+  );
+  var cancel=document.getElementById('pcCdCancel');
+  if(cancel)cancel.addEventListener('click',pcHideOverlay);
+  var remain=5;
+  if(pcState.cdTimer)clearInterval(pcState.cdTimer);
+  pcState.cdTimer=setInterval(function(){
+    remain--;
+    var el=document.getElementById('cdCountText');
+    if(remain>0){
+      if(el)el.textContent=remain+'초 후 명령 전송...';
+    } else {
+      clearInterval(pcState.cdTimer);
+      pcState.cdTimer=null;
+      pcSendShutdown();
+    }
+  },1000);
+}
+
+function pcSendShutdown(){
+  if(!isApp){toast('공개 웹은 읽기 전용입니다.','warn');return;}
+  var now=Date.now();
+  // 최신 boot_id 확보 후 명령 PUT
+  Promise.resolve(busPath(_bus,'packhelper/heartbeat/main_pc'))
+    .then(function(mp){
+      toast('종료 명령은 파이어 없이 보내지 않습니다. 메인 PC에서 끄세요.','warn');
+      pcHideOverlay();
+      var btn=document.getElementById('pcOffBtn');
+      if(btn){
+        btn.style.opacity='.45';
+        btn.style.pointerEvents='none';
+        setTimeout(function(){btn.style.opacity='';btn.style.pointerEvents='';},30000);
+      }
+      pcState.fastUntil=Date.now()+120000;
+      if(pcState.pollTimer){clearTimeout(pcState.pollTimer);pcState.pollTimer=null;}
+      setTimeout(pollPcPower,1500);
+    });
+}
+
+// overlay/이벤트/폴링 부팅
+(function pcBootstrap(){
+  if(!document.getElementById('pcOverlay')){
+    var ov=document.createElement('div');
+    ov.id='pcOverlay';
+    ov.className='pc-overlay';
+    ov.addEventListener('click',function(e){if(e.target===ov)pcHideOverlay();});
+    document.body.appendChild(ov);
+  }
+  var on=document.getElementById('pcOnBtn');
+  var off=document.getElementById('pcOffBtn');
+  if(on)on.addEventListener('click',pcOnClickWake);
+  if(off)off.addEventListener('click',pcOnClickShutdown);
+  // 1분 주기 상대시간 갱신
+  if(pcState.hbTimer)clearInterval(pcState.hbTimer);
+  pcState.hbTimer=setInterval(pcUpdateLastHb,60000);
+  // 초기 폴링
+  pcApplyStatus('UNKNOWN');
+  setTimeout(pollPcPower,1200);
+})();
+</script>
+</body>
+</html>

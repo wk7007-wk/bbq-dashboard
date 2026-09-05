@@ -2,7 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const vm = require('vm');
 
-const source = fs.readFileSync(require('path').join(__dirname, '..', 'posdelay.html'), 'utf8');
+const source = fs.readFileSync(require('path').join(__dirname, '..', 'posweb.html'), 'utf8');
 
 function extractFunction(name) {
   const marker = `function ${name}(`;
@@ -77,6 +77,8 @@ const context = {
   renderCaptureSnapshot() {},
   syncGateDashboardState() {},
   isGateClubMode() { return context.gateClubMode; },
+  requireAppControl() { return true; },
+  isWebAdmin() { return false; },
   NativeBridge: {
     manualDefense(action, fee) { calls.push([action, fee]); },
     updateGateSettings(json) { gateWrites.push(JSON.parse(json)); }

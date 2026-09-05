@@ -207,7 +207,7 @@ function domHarness() {
   assert.strictEqual(h.controller.getLog().length, 6, 'local receipt history must stay bounded');
 }
 
-const pageSource = fs.readFileSync(path.join(__dirname, '..', 'posdelay.html'), 'utf8');
+const pageSource = fs.readFileSync(path.join(__dirname, '..', 'posweb.html'), 'utf8');
 assert(pageSource.includes('<script src="posdelay_ad_receipt.js"></script>'));
 for (const token of ['baeminAdControls', 'baeminAdReceiptStatus', 'baeminAdReceiptDetail', 'baeminAdReceiptLog']) {
   assert(pageSource.includes(`id="${token}"`), `receipt UI node missing: ${token}`);
