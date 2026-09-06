@@ -47,14 +47,14 @@
       "id": "chicken-timer",
       "label": "치킨타이머",
       "apkName": "ChickenTimer_latest.apk",
-      "versionName": "0822.0112",
-      "versionCode": 29788812,
+      "versionName": "0906.1105",
+      "versionCode": 29811056,
       "packageName": "com.chickentimer.board.v2",
       "enabled": true,
       "apkUrl": "/updates/chicken-timer/ChickenTimer_latest.apk",
       "metadataUrl": "/updates/chicken-timer/version.json",
-      "sha256": "d297b517027efc90f19838622c65d5d637f15c70607b759c513a8cd31005daa3",
-      "sizeBytes": 1580032
+      "sha256": "7a89809b53c4775561b0baeaa7a81e1cd0a3883c60c962a24352ca59ccee1c1e",
+      "sizeBytes": 1501468
     },
     {
       "id": "deliveryhelper",

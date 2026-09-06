@@ -1,14 +1,14 @@
 {
-  "appVersionCode": 29788812,
-  "appVersionName": "0822.0112",
-  "apkUrl": "http://125.176.112.214:2421/updates/chicken-timer/ChickenTimer_latest.apk",
-  "sha256": "d297b517027efc90f19838622c65d5d637f15c70607b759c513a8cd31005daa3",
-  "sizeBytes": 1580032,
+  "appVersionCode": 29811056,
+  "appVersionName": "0906.1105",
+  "apkUrl": "/updates/chicken-timer/ChickenTimer_latest.apk",
+  "sha256": "7a89809b53c4775561b0baeaa7a81e1cd0a3883c60c962a24352ca59ccee1c1e",
+  "sizeBytes": 1501468,
   "packageName": "com.chickentimer.board.v2",
   "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
   "enabled": true,
-  "releaseNotes": "가로 26px 레일이 56px를 이김",
-  "updatedAt": "2026-08-22T01:12:48+09:00",
-  "historyUrl": "http://125.176.112.214:2421/updates/chicken-timer/history.json",
-  "artifactUrl": "http://125.176.112.214:2421/updates/chicken-timer/ChickenTimer_latest.apk"
+  "releaseNotes": "주소판 endpoints.json 체인. 공장 IP 리터럴 없음.",
+  "updatedAt": "2026-09-06T11:05:41+0900",
+  "historyUrl": "/updates/chicken-timer/history.json",
+  "artifactUrl": "/updates/chicken-timer/ChickenTimer_latest.apk"
 }
