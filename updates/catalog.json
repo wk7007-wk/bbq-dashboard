@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-06T10:26:14+09:00",
+  "updatedAt": "2026-09-06T12:06:15+09:00",
   "notices": [
     {
       "date": "2026-09-06",
       "title": "오늘 올린 것",
       "items": [
+        "치킨타이머 0906.1105 — 주소판 체인. 공장 IP 리터럴 없음",
         "PosDelay 0906.0613 — 깃허브 주소판의 factory JSON을 봄. KDS/버스/임계값 파이어 아님",
         "PosKDS 0906.0608 — 주소판 factory에 kds_status PUT. Gist는 2차",
         "배달도우미 0906.0610 — KDS는 공장 파일 폴링. 파이어 SSE 제거",
