@@ -10,7 +10,7 @@
 </head>
 <body style="font-family:sans-serif;background:#111;color:#eee;padding:24px;max-width:40rem">
   <p>공장 주소를 찾는 중…</p>
-  <p style="color:#888;font-size:14px">노트북은 Tailscale 없이 매장 LAN을 먼저 붙습니다. 메인 PC Tailscale 주소는 쓰지 않습니다.</p>
+  <p style="color:#888;font-size:14px">1차 공장, 실패하면 깃허브.</p>
   <p id="alt" style="display:none;margin-top:16px"></p>
   <script>
   (function () {
@@ -25,11 +25,13 @@
       "chicken-timer": "/chicken-timer/",
       updates: "/updates/"
     };
+    var GH = "https://wk7007-wk.github.io/bbq-dashboard";
     var params = new URLSearchParams(location.search);
     var to = params.get("to") || "posweb";
-    var via = (params.get("via") || "lan").toLowerCase();
+    var via = (params.get("via") || "auto").toLowerCase();
     params.delete("to");
     params.delete("via");
+    params.delete("stay");
     var extra = params.toString();
     var path = PATHS[to] || PATHS.posweb;
     if (extra) path += (path.indexOf("?") >= 0 ? "&" : "?") + extra;
@@ -37,34 +39,105 @@
     function join(base, suffix) {
       return String(base || "").replace(/\/$/, "") + suffix;
     }
+    function pageHttps() {
+      return String(location.protocol || "") === "https:";
+    }
+    function canUse(u) {
+      u = String(u || "").replace(/\/$/, "");
+      if (!u || u.indexOf("http") !== 0) return false;
+      if (pageHttps() && u.indexOf("http://") === 0) return false;
+      if (u.indexOf("github.io") >= 0) return false;
+      return true;
+    }
+    function withStay(url) {
+      return url + (url.indexOf("?") >= 0 ? "&" : "?") + "stay=1";
+    }
+    function probe(base) {
+      var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+      var t = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 2500);
+      return fetch(join(base, "/health?t=" + Date.now()), {
+        cache: "no-store",
+        mode: "no-cors",
+        signal: ctrl ? ctrl.signal : undefined
+      }).then(function () {
+        clearTimeout(t);
+        return base;
+      }).catch(function (err) {
+        clearTimeout(t);
+        throw err;
+      });
+    }
+    function firstFactory(bases) {
+      if (!bases.length) return Promise.reject(new Error("none"));
+      return new Promise(function (resolve, reject) {
+        var left = bases.length;
+        var done = false;
+        bases.forEach(function (base) {
+          probe(base).then(function () {
+            if (done) return;
+            done = true;
+            resolve(base);
+          }).catch(function () {
+            left -= 1;
+            if (!done && left <= 0) reject(new Error("none"));
+          });
+        });
+      });
+    }
+    function showAlt(ghUrl, factoryUrl) {
+      var alt = document.getElementById("alt");
+      if (!alt) return;
+      var bits = [];
+      if (factoryUrl) bits.push('<a href="' + factoryUrl + '" style="color:#8cf">공장 주소</a>');
+      if (ghUrl) bits.push('<a href="' + withStay(ghUrl) + '" style="color:#8cf">깃허브 주소</a>');
+      if (!bits.length) return;
+      alt.style.display = "block";
+      alt.innerHTML = "안 열리면 " + bits.join(" · ");
+    }
 
-    function go(ep) {
+    function run(ep) {
       var f = (ep && ep.sets && ep.sets.factory) || {};
+      var primarySet = (ep && ep.sets && ep.sets.primary) || {};
       var lan = String(f.site_lan_base || "").replace(/\/$/, "");
       var wan = String(f.wan_base || "").replace(/\/$/, "");
-      var primary = via === "wan" ? wan : lan;
-      var other = via === "wan" ? lan : wan;
-      if (!primary && other) primary = other;
-      if (!primary) throw new Error("no base");
-      var alt = document.getElementById("alt");
-      if (alt && other && other !== primary) {
-        alt.style.display = "block";
-        var otherVia = primary === lan ? "wan" : "lan";
-        var otherLabel = otherVia === "wan" ? "외부(공인) 주소" : "매장 LAN 주소";
-        alt.innerHTML = '안 열리면 <a href="?to=' + encodeURIComponent(to) + '&via=' + otherVia + (extra ? '&' + extra : '') + '" style="color:#8cf">' + otherLabel + '</a>로 다시 붙기';
+      var gh = String(primarySet.pages_base || GH).replace(/\/$/, "");
+      var ghUrl = join(gh, path);
+      var factoryHttps = [];
+      ["wan_https", "magic_base", "pages_base"].forEach(function (k) {
+        var u = String(f[k] || "").replace(/\/$/, "");
+        if (canUse(u) && factoryHttps.indexOf(u) < 0) factoryHttps.push(u);
+      });
+      if (via === "lan" && lan) {
+        showAlt(ghUrl, wan ? join(wan, path) : "");
+        location.replace(join(lan, path));
+        return;
       }
-      location.replace(join(primary, path));
+      if (via === "wan" && wan) {
+        showAlt(ghUrl, lan ? join(lan, path) : "");
+        location.replace(join(wan, path));
+        return;
+      }
+      if (via === "gh") {
+        location.replace(withStay(ghUrl));
+        return;
+      }
+      showAlt(ghUrl, wan ? join(wan, path) : (lan ? join(lan, path) : ""));
+      firstFactory(factoryHttps).then(function (base) {
+        location.replace(join(base, path));
+      }).catch(function () {
+        location.replace(withStay(ghUrl));
+      });
     }
 
     function next(i) {
       if (i >= books.length) {
-        document.body.innerHTML = "<p>공장 주소를 못 읽었습니다. 잠시 후 다시 열어 주세요.</p>";
+        location.replace(withStay(join(GH, path)));
         return;
       }
       fetch(books[i], { cache: "no-store" }).then(function (r) {
         if (!r.ok) throw new Error("http");
         return r.json();
-      }).then(go).catch(function () { next(i + 1); });
+      }).then(run).catch(function () { next(i + 1); });
     }
     next(0);
   })();

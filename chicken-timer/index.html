@@ -9,8 +9,8 @@
   <script>
 (function(){
   var host = location.hostname || "";
-  if (host === "wk7007-wk.github.io") {
-    var jump = new URLSearchParams(location.search);
+  var jump = new URLSearchParams(location.search);
+  if (host === "wk7007-wk.github.io" && jump.get("stay") !== "1") {
     jump.set("to", "chicken-timer");
     location.replace("/bbq-dashboard/go.html?" + jump.toString());
     return;

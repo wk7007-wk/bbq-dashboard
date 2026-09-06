@@ -962,17 +962,23 @@ async function ensureFactoryHttpsPutReady() {
     return 'blocked';
   };
   const run = async () => {
-    if (isGithubPagesHost()) {
+    const stay = (function () {
+      try { return new URLSearchParams(location.search).get('stay') === '1'; } catch (e) { return false; }
+    })();
+    if (isGithubPagesHost() && !stay) {
       const jump = new URLSearchParams(location.search);
+      jump.delete('stay');
       jump.set('to', 'orderhelper');
       location.replace('/bbq-dashboard/go.html?' + jump.toString());
       return 'jump';
     }
-    window.__factoryHttpsBase = factoryHttpsBaseFallback();
-    window.__factoryRw = true;
-    window.__factorySyncMode = 'same-origin';
-    FACTORY_ORDER_URL = '/order_desk.json';
-    FACTORY_BROWSER_URL = '/orderhelper_browser.json';
+    if (!isGithubPagesHost()) {
+      window.__factoryHttpsBase = factoryHttpsBaseFallback();
+      window.__factoryRw = true;
+      window.__factorySyncMode = 'same-origin';
+      FACTORY_ORDER_URL = '/order_desk.json';
+      FACTORY_BROWSER_URL = '/orderhelper_browser.json';
+    }
     const ep = await loadEp();
     const mode = await pick(ep);
     window.__factorySyncMode = mode;
