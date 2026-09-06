@@ -122,7 +122,10 @@
         return;
       }
       showAlt(ghUrl, wan ? join(wan, path) : (lan ? join(lan, path) : ""));
-      firstFactory(factoryHttps).then(function (base) {
+      var bases = [];
+      if (wan) bases.push(wan);
+      factoryHttps.forEach(function (u) { if (bases.indexOf(u) < 0) bases.push(u); });
+      firstFactory(bases).then(function (base) {
         location.replace(join(base, path));
       }).catch(function () {
         location.replace(withStay(ghUrl));
