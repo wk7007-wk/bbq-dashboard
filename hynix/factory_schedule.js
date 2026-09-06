@@ -36,13 +36,22 @@
     }
     return next();
   }
-  function httpsBase(ep) {
+  function httpsCandidates(ep) {
     var f = (ep && ep.factory) || (ep && ep.sets && ep.sets.factory) || {};
-    var wanHttps = String(f.wan_https || '').replace(/\/$/, '');
-    if (wanHttps.indexOf('https://') === 0) return wanHttps;
-    var magic = String(f.magic_base || (ep && ep.magic_base) || '').replace(/\/$/, '');
-    if (magic.indexOf('https://') === 0) return magic;
-    return '';
+    var h = (ep && ep.health) || {};
+    var out = [];
+    function add(kind, base, health) {
+      base = String(base || '').replace(/\/$/, '');
+      if (base.indexOf('https://') !== 0) return;
+      for (var i = 0; i < out.length; i++) { if (out[i].base === base) return; }
+      health = String(health || '').replace(/\/$/, '');
+      if (health.indexOf('https://') !== 0) health = base + '/health';
+      out.push({ kind: kind, base: base, health: health });
+    }
+    add('wan', f.wan_https, h.wan_https || h.factory_wan_https);
+    add('magic', f.magic_base || (ep && ep.magic_base), h.magic_https || h.factory_magic);
+    add('pages', f.pages_base, h.pages_https);
+    return out;
   }
   function boot(force) {
     if (ready && !force) return ready;
@@ -55,14 +64,20 @@
       return ready;
     }
     ready = loadTable().then(function (ep) {
-      var base = httpsBase(ep);
-      var health = (ep && ep.health && (ep.health.magic_https || ep.health.factory_magic)) || (base ? base + '/health' : '');
-      return probe(health).then(function (ok) {
-        if (ok && base) {
-          URL = base + '/workschedule.json';
+      var cands = httpsCandidates(ep);
+      if (!cands.length) {
+        URL = '';
+        rw = false;
+        lastSource = 'blocked';
+        return 'blocked';
+      }
+      return Promise.all(cands.map(function (c) { return probe(c.health); })).then(function (oks) {
+        for (var i = 0; i < cands.length; i++) {
+          if (!oks[i]) continue;
+          URL = cands[i].base + '/workschedule.json';
           rw = true;
           lastSource = 'factory';
-          return 'magic';
+          return cands[i].kind;
         }
         URL = '';
         rw = false;
