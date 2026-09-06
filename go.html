@@ -122,6 +122,11 @@
         return;
       }
       showAlt(ghUrl, wan ? join(wan, path) : (lan ? join(lan, path) : ""));
+      // Pages https cannot probe http wan (mixed content). Bookmark stays github; data path = wan jump.
+      if (wan && (to === "orderhelper" || path.indexOf("OrderHelper") >= 0)) {
+        location.replace(join(wan, path));
+        return;
+      }
       var bases = [];
       if (wan) bases.push(wan);
       factoryHttps.forEach(function (u) { if (bases.indexOf(u) < 0) bases.push(u); });
