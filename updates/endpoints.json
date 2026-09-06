@@ -22,7 +22,7 @@
     "note_viewers": "메인PC Tailscale 북마크=policy.bookmarks. 노트북(Tailscale 없음)=policy.bookmarks_public github.io 점프 → 매장 LAN 공장. 타이머 노트북은 사이트가 아니라 PackHelper Edge --app 335x900.",
     "bookmarks": {
       "posweb": "https://wsl-ubuntu.tail785e65.ts.net/posweb.html",
-      "orderhelper": "http://125.176.112.214:2421/OrderHelper/",
+      "orderhelper": "https://wk7007-wk.github.io/OrderHelper/",
       "hynix": "https://wsl-ubuntu.tail785e65.ts.net/hynix/",
       "chicken_timer": "https://wsl-ubuntu.tail785e65.ts.net/chicken-timer/",
       "chicken_timer_phone": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/phone.html",
