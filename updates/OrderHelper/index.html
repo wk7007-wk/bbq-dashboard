@@ -786,7 +786,7 @@
 </div>
 
 <script>
-const APP_VERSION = '0905.0638';
+const APP_VERSION = '0907.0356';
 const FACTORY_STAFF_POLL_MS = 3000;
 (function(){
   var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";
@@ -814,6 +814,7 @@ const FACTORY_ENDPOINTS_CANDIDATES = [
   '/endpoints.json',
   '/factory_bridge.json'
 ];
+const GIST_DESK_URL = 'https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/order_desk.json';
 function isGithubPagesHost() {
   try { return String(location.hostname || '').includes('github.io'); } catch (e) { return false; }
 }
@@ -833,13 +834,40 @@ function factoryJsonUrl(name) {
 }
 let FACTORY_MAGIC_HEALTH = '';
 let FACTORY_MAGIC_BASE = '';
+// address-book ts_base/pages_base_http: http://wsl-ubuntu.tail785e65.ts.net:2421
 window.__factoryRw = false;
+function isFactoryWriteHost() {
+  try {
+    const h = String(location.hostname || '').toLowerCase();
+    if (h === 'localhost' || h === '127.0.0.1' || h === '::1') return true;
+    if (h === '125.176.112.214') return true;
+    if (h === 'wsl-ubuntu.tail785e65.ts.net') return true;
+    if (h === '100.65.156.49') return true;
+    return false;
+  } catch (e) { return false; }
+}
+function factoryPutHeaders() {
+  // Phone/WAN: never send legacy write secrets. Writes = factory localhost + write_token via bots/CLI.
+  return { 'Content-Type': 'application/json' };
+}
+function canFactoryBrowserPut() {
+  return isFactoryWriteHost() && window.__factoryRw === true && isFactoryLiveOrderUrl(FACTORY_ORDER_URL);
+}
+
 let FACTORY_ORDER_URL = '';
 let FACTORY_BROWSER_URL = factoryJsonUrl('orderhelper_browser.json');
 window.__factoryReady = null;
 function isFactoryHttpsOrderUrl(url) {
   const u = String(url || '');
   return u.indexOf('https://') === 0 && u.indexOf('githubusercontent.com') < 0 && u.indexOf('order_desk.json') >= 0;
+}
+function isFactoryLiveOrderUrl(url) {
+  const u = String(url || '');
+  if (u.indexOf('order_desk.json') < 0) return false;
+  if (u.indexOf('githubusercontent.com') >= 0) return false;
+  if (u.indexOf('github.io') >= 0) return false;
+  if (u.charAt(0) === '/') return true;
+  return u.indexOf('http://') === 0 || u.indexOf('https://') === 0;
 }
 async function forceMagicHttpsFactory() {
   try {
@@ -872,11 +900,11 @@ async function forceMagicHttpsFactory() {
 }
 async function ensureFactoryHttpsPutReady() {
   try { if (window.__factoryReady) await window.__factoryReady; } catch (e) {}
-  if (window.__factoryRw === true && isFactoryHttpsOrderUrl(FACTORY_ORDER_URL)) return true;
-  if (await forceMagicHttpsFactory()) return true;
+  if (window.__factoryRw === true && isFactoryLiveOrderUrl(FACTORY_ORDER_URL)) return true;
   try { if (typeof window.__factoryRepick === 'function') await window.__factoryRepick(); } catch (e) {}
-  if (window.__factoryRw === true && isFactoryHttpsOrderUrl(FACTORY_ORDER_URL)) return true;
-  return await forceMagicHttpsFactory();
+  if (window.__factoryRw === true && isFactoryLiveOrderUrl(FACTORY_ORDER_URL)) return true;
+  if (await forceMagicHttpsFactory()) return true;
+  return window.__factoryRw === true && isFactoryLiveOrderUrl(FACTORY_ORDER_URL);
 }
 (function applyFactoryEndpointsSoT() {
   const setRw = (base) => {
@@ -886,12 +914,11 @@ async function ensureFactoryHttpsPutReady() {
       try {
         const u = new URL(b);
         if (String(u.hostname || '').endsWith('.ts.net')) b = 'https://' + u.hostname;
-        else if (isGithubPagesHost()) return;
-      } catch (e) { if (isGithubPagesHost()) return; }
+      } catch (e) {}
     }
-    if (isGithubPagesHost() && b.indexOf('https://') !== 0) return;
     window.__factoryHttpsBase = b;
     window.__factoryRw = true;
+    window.__factorySyncMode = window.__factorySyncMode || 'endpoints';
     FACTORY_ORDER_URL = window.__factoryHttpsBase + '/order_desk.json';
     FACTORY_BROWSER_URL = window.__factoryHttpsBase + '/orderhelper_browser.json';
   };
@@ -943,31 +970,43 @@ async function ensureFactoryHttpsPutReady() {
     const wanHttps = String(f.wan_https || '').replace(/\/$/, '');
     const wanHttp = String(f.wan_base || '').replace(/\/$/, '');
     const siteLan = String(f.site_lan_base || '').replace(/\/$/, '');
+    if (siteLan && await probe(siteLan + '/health')) { setRw(siteLan); return 'site_lan'; }
+    if (wanHttp && await probe(wanHttp + '/health')) { setRw(wanHttp); return 'wan'; }
     if (wanHttps && await probe(wanHttps + '/health')) { setRw(wanHttps); return 'wan_https'; }
     if (await probe(magicHealth)) { setRw(magicBase); return 'magic'; }
-    if (wanHttp && !isGithubPagesHost() && await probe(wanHttp + '/health')) { setRw(wanHttp); return 'wan'; }
-    if (siteLan && !isGithubPagesHost() && await probe(siteLan + '/health')) { setRw(siteLan); return 'site_lan'; }
+    if (await probe(tsHealth)) { setRw(tsBase); return 'ts'; }
     setBlocked();
     return 'blocked';
   };
   const run = async () => {
-    if (!isGithubPagesHost()) {
-      window.__factoryHttpsBase = factoryHttpsBaseFallback();
-      window.__factoryRw = true;
-      window.__factorySyncMode = 'same-origin';
-      FACTORY_ORDER_URL = '/order_desk.json';
-      FACTORY_BROWSER_URL = '/orderhelper_browser.json';
-    }
-    if (await forceMagicHttpsFactory()) {
-      if (isGithubPagesHost()) {
-        window.__factorySyncMode = 'magic';
-        return 'magic';
+    if (isGithubPagesHost()) {
+      // Bookmark = github.io; UI entry OK but http wan cannot be probed/fetched from https (mixed content).
+      // Always jump to wan_base for same-origin GET sync. stay=1 keeps Pages shell only (no live desk).
+      const stay = new URLSearchParams(location.search).get('stay') === '1';
+      if (!stay) {
+        try {
+          const ep0 = await loadEp();
+          const f0 = (ep0 && ep0.sets && ep0.sets.factory) || (ep0 && ep0.factory) || {};
+          let wan0 = String(f0.wan_base || '').replace(/\/$/, '');
+          if (!wan0) wan0 = 'http://125.176.112.214:2421';
+          if (wan0.indexOf('218.147.118.71') >= 0) wan0 = 'http://125.176.112.214:2421';
+          const q = location.search || '';
+          const join = wan0 + '/OrderHelper/' + (q ? (q.indexOf('?') === 0 ? q : '?' + q) : '');
+          location.replace(join);
+          return 'wan_jump';
+        } catch (e) {}
+        const jump = new URLSearchParams(location.search);
+        jump.set('to', 'orderhelper');
+        jump.set('via', 'wan');
+        location.replace('/bbq-dashboard/go.html?' + jump.toString());
+        return 'jump';
       }
-      window.__factorySyncMode = 'same-origin';
-      FACTORY_ORDER_URL = '/order_desk.json';
-      FACTORY_BROWSER_URL = '/orderhelper_browser.json';
-      return 'same-origin';
     }
+    window.__factoryHttpsBase = factoryHttpsBaseFallback();
+    window.__factoryRw = true;
+    window.__factorySyncMode = 'same-origin';
+    FACTORY_ORDER_URL = '/order_desk.json';
+    FACTORY_BROWSER_URL = '/orderhelper_browser.json';
     const ep = await loadEp();
     const mode = await pick(ep);
     window.__factorySyncMode = mode;
@@ -990,9 +1029,11 @@ async function ensureFactoryHttpsPutReady() {
     }
   };
   window.__factoryRepick = async () => {
-    if (await forceMagicHttpsFactory()) return 'magic';
     const ep = await loadEp();
-    return pick(ep);
+    const mode = await pick(ep);
+    if (mode && mode !== 'blocked') return mode;
+    if (await forceMagicHttpsFactory()) return 'magic';
+    return mode || 'blocked';
   };
   window.__factoryReady = run();
 })();
@@ -1075,6 +1116,15 @@ async function fetchOrderDeskRead() {
     }
     return { ok: true, status: res.status || 200, notModified: false, json: async () => obj };
   } catch (e) {
+    try {
+      const g = await fetch(GIST_DESK_URL + '?_=' + Date.now(), { cache: 'no-cache' });
+      if (g && g.ok) {
+        const parsed = await parseFactoryOrderDeskBody(g);
+        if (parsed.obj && parsed.obj.current && typeof parsed.obj.current === 'object') {
+          return { ok: true, status: g.status || 200, notModified: false, json: async () => parsed.obj };
+        }
+      }
+    } catch (_) {}
     return factoryReadFailure(0, e && e.message);
   }
 }
@@ -9036,10 +9086,11 @@ async function publishBrowserDiag(trigger = 'tick') {
     factory: lastBrowserFactory,
     put: lastBrowserPut
   };
+  if (!isFactoryWriteHost()) return;
   try {
     await fetch(FACTORY_BROWSER_URL, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Authorization: 'token grok-ops', 'X-Write-Token': 'storebot-bus' },
+      headers: factoryPutHeaders(),
       body: JSON.stringify(packet)
     });
   } catch (_) {}
@@ -10316,6 +10367,9 @@ function deleteRow(id) {
 
 function resetStocks() {
   if (!confirm('모든 재고 값을 비울까요? 구역, 여유, 일사용은 유지됩니다.')) return;
+  const resetAt = Date.now();
+  activeSyncResetMarker = { id: 'stock-reset-' + resetAt, resetAt };
+  try { localStorage.setItem(SYNC_RESET_STORAGE_KEY, JSON.stringify(activeSyncResetMarker)); } catch (_) {}
   entries.forEach(ent => {
     ent.stock = null;
     stampEntryStock(ent);
@@ -10742,9 +10796,11 @@ async function putConfirmedSaveTargets(commit, timeoutMs = SAVE_REQUEST_TIMEOUT_
     const fail = factoryReadFailure(0, e && e.message);
     return { currentResponse: fail, historyResponse: fail, payload: localPayload, body: '', attempts: 0 };
   }
+  const forceLocal = commit.reason === 'reset' || commit.reason === 'factoryForce';
   const basePayload = buildLastWriteWinsPayload(currentRemote, historyRemote[commit.dateKey], localPayload, Date.now(), {
-    untypedLocalOverridePolicy: 'remote',
-    typedStaffFields: typedStaffFieldSet(commit.typedStaffFields)
+    untypedLocalOverridePolicy: forceLocal ? 'local' : 'remote',
+    typedStaffFields: typedStaffFieldSet(commit.typedStaffFields),
+    forceLocalInputFields: forceLocal
   });
   const shots = Math.max(1, Math.min(3, Number(maxAttempts) || 3));
   const putMax = 1800000;
@@ -10765,10 +10821,16 @@ async function putConfirmedSaveTargets(commit, timeoutMs = SAVE_REQUEST_TIMEOUT_
         }));
       body = JSON.stringify({ current: sendPayload, history });
       if (body.length > putMax && attempt < shots) continue;
-      if (window.__factoryRw === false || !isFactoryHttpsOrderUrl(FACTORY_ORDER_URL)) {
+      if (!isFactoryWriteHost()) {
+        const hint = 'wan_readonly · 폰/공인은 GET sync만. 쓰기는 공장 localhost+write_token';
+        lastBrowserPut = { ok: false, at: Date.now(), error: hint, trigger: 'put_skip', probe: 'wan_readonly' };
+        const fail = factoryReadFailure(0, hint);
+        return { currentResponse: fail, historyResponse: fail, payload: sendPayload, body, attempts: attempt };
+      }
+      if (window.__factoryRw === false || !isFactoryLiveOrderUrl(FACTORY_ORDER_URL)) {
         const forced = await ensureFactoryHttpsPutReady();
-        if (!forced || window.__factoryRw === false || !isFactoryHttpsOrderUrl(FACTORY_ORDER_URL)) {
-          const hint = 'factory_https_unreachable · 폰 Tailscale ON + MagicDNS · 새탭에서 https://wsl-ubuntu.tail785e65.ts.net/health 확인';
+        if (!forced || window.__factoryRw === false || !isFactoryLiveOrderUrl(FACTORY_ORDER_URL)) {
+          const hint = 'factory_https_unreachable · 깃허브 주소판의 factory(매장 LAN/공인)로 붙은 뒤 저장. MagicDNS는 Tailscale 있을 때만';
           lastBrowserPut = { ok: false, at: Date.now(), error: hint, trigger: 'put_skip', probe: window.__factoryLastProbeError || '' };
           const fail = factoryReadFailure(0, hint);
           return { currentResponse: fail, historyResponse: fail, payload: sendPayload, body, attempts: attempt };
@@ -10776,7 +10838,7 @@ async function putConfirmedSaveTargets(commit, timeoutMs = SAVE_REQUEST_TIMEOUT_
       }
       response = await fetch(FACTORY_ORDER_URL, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: 'token grok-ops', 'X-Write-Token': 'storebot-bus' },
+        headers: factoryPutHeaders(),
         body,
         signal: controller.signal
       });
