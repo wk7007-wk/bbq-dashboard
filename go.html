@@ -52,19 +52,25 @@
     function withStay(url) {
       return url + (url.indexOf("?") >= 0 ? "&" : "?") + "stay=1";
     }
+    function healthOk(j) {
+      return !!(j && (j.ok === true || j.status === "ok" || j.http));
+    }
     function probe(base) {
       var ctrl = typeof AbortController === "function" ? new AbortController() : null;
       var t = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 2500);
       return fetch(join(base, "/health?t=" + Date.now()), {
         cache: "no-store",
-        mode: "no-cors",
         signal: ctrl ? ctrl.signal : undefined
-      }).then(function () {
+      }).then(function (r) {
         clearTimeout(t);
-        return base;
-      }).catch(function (err) {
+        if (!r || !r.ok) throw new Error("http");
+        return r.json().then(function (j) {
+          if (!healthOk(j)) throw new Error("health");
+          return base;
+        });
+      }).catch(function () {
         clearTimeout(t);
-        throw err;
+        throw new Error("down");
       });
     }
     function firstFactory(bases) {
@@ -107,34 +113,29 @@
         var u = String(f[k] || "").replace(/\/$/, "");
         if (canUse(u) && factoryHttps.indexOf(u) < 0) factoryHttps.push(u);
       });
-      if (via === "lan" && lan) {
-        showAlt(ghUrl, wan ? join(wan, path) : "");
-        location.replace(join(lan, path));
-        return;
+      function goGithub() {
+        location.replace(withStay(ghUrl));
       }
-      if (via === "wan" && wan) {
-        showAlt(ghUrl, lan ? join(lan, path) : "");
-        location.replace(join(wan, path));
-        return;
+      function goFactory(base) {
+        location.replace(join(base, path));
       }
       if (via === "gh") {
-        location.replace(withStay(ghUrl));
+        goGithub();
         return;
       }
       showAlt(ghUrl, wan ? join(wan, path) : (lan ? join(lan, path) : ""));
-      // Pages https cannot probe http wan (mixed content). Bookmark stays github; data path = wan jump.
-      if (wan && (to === "orderhelper" || path.indexOf("OrderHelper") >= 0)) {
-        location.replace(join(wan, path));
+      var prefer = "";
+      if (via === "lan") prefer = lan;
+      if (via === "wan") prefer = wan;
+      var bases = [];
+      if (canUse(prefer)) bases.push(prefer);
+      if (canUse(wan) && bases.indexOf(wan) < 0) bases.push(wan);
+      factoryHttps.forEach(function (u) { if (bases.indexOf(u) < 0) bases.push(u); });
+      if (!bases.length) {
+        goGithub();
         return;
       }
-      var bases = [];
-      if (wan) bases.push(wan);
-      factoryHttps.forEach(function (u) { if (bases.indexOf(u) < 0) bases.push(u); });
-      firstFactory(bases).then(function (base) {
-        location.replace(join(base, path));
-      }).catch(function () {
-        location.replace(withStay(ghUrl));
-      });
+      firstFactory(bases).then(goFactory).catch(goGithub);
     }
 
     function next(i) {

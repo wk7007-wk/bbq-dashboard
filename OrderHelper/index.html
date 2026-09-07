@@ -786,7 +786,7 @@
 </div>
 
 <script>
-const APP_VERSION = '0907.0356';
+const APP_VERSION = '0907.1412';
 const FACTORY_STAFF_POLL_MS = 3000;
 (function(){
   var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";
@@ -839,11 +839,8 @@ window.__factoryRw = false;
 function isFactoryWriteHost() {
   try {
     const h = String(location.hostname || '').toLowerCase();
-    if (h === 'localhost' || h === '127.0.0.1' || h === '::1') return true;
-    if (h === '125.176.112.214') return true;
-    if (h === 'wsl-ubuntu.tail785e65.ts.net') return true;
-    if (h === '100.65.156.49') return true;
-    return false;
+    // Browser PUT only on loopback. Phone/WAN = GET sync; writes via factory localhost+write_token.
+    return h === 'localhost' || h === '127.0.0.1' || h === '::1';
   } catch (e) { return false; }
 }
 function factoryPutHeaders() {
@@ -924,7 +921,8 @@ async function ensureFactoryHttpsPutReady() {
   };
   const setBlocked = () => {
     window.__factoryRw = false;
-    FACTORY_ORDER_URL = '';
+    FACTORY_ORDER_URL = GIST_DESK_URL;
+    window.__factorySyncMode = 'github_fallback';
   };
   const probe = async (url) => {
     if (!url) return false;
@@ -970,46 +968,41 @@ async function ensureFactoryHttpsPutReady() {
     const wanHttps = String(f.wan_https || '').replace(/\/$/, '');
     const wanHttp = String(f.wan_base || '').replace(/\/$/, '');
     const siteLan = String(f.site_lan_base || '').replace(/\/$/, '');
-    if (siteLan && await probe(siteLan + '/health')) { setRw(siteLan); return 'site_lan'; }
-    if (wanHttp && await probe(wanHttp + '/health')) { setRw(wanHttp); return 'wan'; }
     if (wanHttps && await probe(wanHttps + '/health')) { setRw(wanHttps); return 'wan_https'; }
     if (await probe(magicHealth)) { setRw(magicBase); return 'magic'; }
+    if (siteLan && await probe(siteLan + '/health')) { setRw(siteLan); return 'site_lan'; }
+    if (wanHttp && await probe(wanHttp + '/health')) { setRw(wanHttp); return 'wan'; }
     if (await probe(tsHealth)) { setRw(tsBase); return 'ts'; }
     setBlocked();
     return 'blocked';
   };
   const run = async () => {
-    if (isGithubPagesHost()) {
-      // Bookmark = github.io; UI entry OK but http wan cannot be probed/fetched from https (mixed content).
-      // Always jump to wan_base for same-origin GET sync. stay=1 keeps Pages shell only (no live desk).
-      const stay = new URLSearchParams(location.search).get('stay') === '1';
-      if (!stay) {
-        try {
-          const ep0 = await loadEp();
-          const f0 = (ep0 && ep0.sets && ep0.sets.factory) || (ep0 && ep0.factory) || {};
-          let wan0 = String(f0.wan_base || '').replace(/\/$/, '');
-          if (!wan0) wan0 = 'http://125.176.112.214:2421';
-          if (wan0.indexOf('218.147.118.71') >= 0) wan0 = 'http://125.176.112.214:2421';
-          const q = location.search || '';
-          const join = wan0 + '/OrderHelper/' + (q ? (q.indexOf('?') === 0 ? q : '?' + q) : '');
-          location.replace(join);
-          return 'wan_jump';
-        } catch (e) {}
-        const jump = new URLSearchParams(location.search);
-        jump.set('to', 'orderhelper');
-        jump.set('via', 'wan');
-        location.replace('/bbq-dashboard/go.html?' + jump.toString());
-        return 'jump';
-      }
-    }
-    window.__factoryHttpsBase = factoryHttpsBaseFallback();
-    window.__factoryRw = true;
-    window.__factorySyncMode = 'same-origin';
-    FACTORY_ORDER_URL = '/order_desk.json';
-    FACTORY_BROWSER_URL = '/orderhelper_browser.json';
     const ep = await loadEp();
-    const mode = await pick(ep);
-    window.__factorySyncMode = mode;
+    let mode = '';
+    if (isGithubPagesHost()) {
+      const stay = new URLSearchParams(location.search).get('stay') === '1';
+      mode = await pick(ep);
+      window.__factorySyncMode = mode;
+      const httpsBase = String(window.__factoryHttpsBase || '');
+      if (!stay && mode && mode !== 'blocked' && httpsBase.indexOf('https://') === 0) {
+        const q = location.search || '';
+        location.replace(httpsBase.replace(/\/$/, '') + '/OrderHelper/' + (q ? (q.indexOf('?') === 0 ? q : '?' + q) : ''));
+        return 'factory_https_jump';
+      }
+      if (mode === 'blocked') {
+        window.__factoryRw = false;
+        FACTORY_ORDER_URL = GIST_DESK_URL;
+        window.__factorySyncMode = 'github_fallback';
+      }
+    } else {
+      window.__factoryHttpsBase = factoryHttpsBaseFallback();
+      window.__factoryRw = true;
+      window.__factorySyncMode = 'same-origin';
+      FACTORY_ORDER_URL = '/order_desk.json';
+      FACTORY_BROWSER_URL = '/orderhelper_browser.json';
+      mode = await pick(ep);
+      window.__factorySyncMode = mode;
+    }
     const reloadBook = async () => {
       const ep2 = await loadEp();
       if (ep2) await pick(ep2);
@@ -6519,14 +6512,21 @@ function currentOrderDaysValue() {
   return Number.isFinite(fromUi) && fromUi >= 1 && fromUi <= 7 ? fromUi : recommendedDays();
 }
 
-function syncDailySalesToOrderDays(days = currentOrderDaysValue()) {
+function syncDailySalesToOrderDays(days = currentOrderDaysValue(), opts) {
   const n = Math.max(0, Math.ceil(Number(days) || 0));
   if (!Array.isArray(dailySales)) dailySales = [];
   if (!Array.isArray(dailySalesAt)) dailySalesAt = [];
+  const before = dailySales.length;
   if (dailySales.length > n) dailySales = dailySales.slice(0, n);
   if (dailySalesAt.length > n) dailySalesAt = dailySalesAt.slice(0, n);
   while (dailySales.length < n) dailySales.push(null);
   while (dailySalesAt.length < n) dailySalesAt.push(0);
+  if (before !== n && opts && opts.warn) {
+    const msg = `매출칸 ${before} → 발주일 ${n} 맞춤 (sales${before} vs days${n})`;
+    try { pushSaveLog(msg, before > n ? 'warn' : 'muted'); } catch (_) {}
+    if (before > n) { try { toast(msg); } catch (_) {} }
+  }
+  return dailySales.length === n;
 }
 
 function currentCalcSnapshot(days = currentOrderDaysValue()) {
@@ -9012,13 +9012,15 @@ function collectBrowserDiag() {
     `주소 ${location.href.split('#')[0]}`,
     `로컬 품목 ${entries.length} / 재고입력 ${stocked} / dirty ${localDirty ? '예' : '아니오'}`,
     `확정큐 ${queueLabel} / 메모리커밋 ${lastMemoryCommit ? '있음' : '없음'}`,
-    `공장 current 저장 ${lastBrowserFactory.savedAt ? new Date(lastBrowserFactory.savedAt).toLocaleString('ko-KR') : '-'} / 칸 ${lastBrowserFactory.entries} / 재고 ${lastBrowserFactory.stocked}`,
+    `공장 current 저장 ${lastBrowserFactory.savedAt ? new Date(lastBrowserFactory.savedAt).toLocaleString('ko-KR') : '-'} / 칸 ${lastBrowserFactory.entries} / 재고 ${lastBrowserFactory.stocked} / dateKey ${lastBrowserFactory.dateKey || '-'}`,
+    `불일치 ${(lastBrowserFactory.mismatch && lastBrowserFactory.mismatch.length) ? lastBrowserFactory.mismatch.join(' · ') : '없음'}`,
     `마지막송신 ${lastBrowserPut.ok == null ? '-' : (lastBrowserPut.ok ? '성공' : '실패')} ${lastBrowserPut.error || ''} ${lastBrowserPut.trigger || ''}`,
     `큐용량 ${lsBytes(CONFIRMED_SAVE_QUEUE_STORAGE_KEY)}자 / 엔트리 ${lsBytes('bbq_entries')}자`
   ].join('\n');
+  const mismatch = Boolean(lastBrowserFactory.mismatch && lastBrowserFactory.mismatch.length);
   const tone = confirmedSaveQueueBlocked || lastBrowserPut.ok === false || (stocked && lastBrowserFactory.ok === true && lastBrowserFactory.stocked === 0)
     ? 'err'
-    : (queue.active || localDirty ? 'warn' : '');
+    : (queue.active || localDirty || mismatch ? 'warn' : '');
   return { line, detail, tone, stocked, queueLabel, addr };
 }
 
@@ -9039,6 +9041,68 @@ function toggleBrowserDiag() {
   renderBrowserDiag();
 }
 
+
+function stockStats(list) {
+  let sum = 0, filled = 0, empty = 0;
+  (Array.isArray(list) ? list : []).forEach(e => {
+    if (e && e.stock != null && e.stock !== '' && Number.isFinite(Number(e.stock))) {
+      filled += 1;
+      sum += Number(e.stock);
+    } else empty += 1;
+  });
+  return { sum: Math.round(sum * 1000) / 1000, filled, empty, n: (Array.isArray(list) ? list : []).length };
+}
+
+function localSyncResetGuard() {
+  const stored = storedSyncResetMarker();
+  if (stored && stored.resetAt) return stored;
+  if (activeSyncResetMarker && activeSyncResetMarker.id && activeSyncResetMarker.resetAt) return activeSyncResetMarker;
+  return null;
+}
+
+function remoteStocksBlockedByLocalReset(remote) {
+  const localReset = localSyncResetGuard();
+  if (!localReset) return false;
+  const remoteReset = syncResetMarkerFromPayload(remote);
+  if (remoteReset && remoteReset.id === localReset.id && remoteReset.resetAt >= localReset.resetAt) return false;
+  const remoteSaved = Number(remote && remote.savedAt || 0);
+  // After local all-zero reset, block older server stocks from re-injecting until our reset PUT lands.
+  if (remoteSaved && remoteSaved < localReset.resetAt) return true;
+  if (!remoteReset || remoteReset.resetAt < localReset.resetAt) return true;
+  return false;
+}
+
+function syncMismatchLines(remoteCurrent) {
+  const lines = [];
+  if (!remoteCurrent || typeof remoteCurrent !== 'object') return lines;
+  const localDk = kstDateKey(Date.now());
+  const remoteDk = normalizeHistoryDateKey(remoteCurrent.dateKey) || '';
+  const loc = stockStats(entries);
+  const rem = stockStats(remoteCurrent.entries);
+  if (remoteDk && remoteDk !== localDk) lines.push(`dateKey 공장 ${remoteDk} ≠ 로컬 ${localDk}`);
+  if (loc.filled !== rem.filled || Math.abs(loc.sum - rem.sum) > 0.05) {
+    lines.push(`재고 공장 sum${rem.sum}/${rem.filled}칸 ≠ 로컬 sum${loc.sum}/${loc.filled}칸`);
+  }
+  const locEmpty = loc.filled === 0;
+  const remEmpty = rem.filled === 0;
+  if (locEmpty !== remEmpty) lines.push(`empty 공장${remEmpty ? '빈값' : '값있음'} ≠ 로컬${locEmpty ? '빈값' : '값있음'}`);
+  return lines;
+}
+
+let lastSyncMismatchKey = '';
+function warnSyncMismatchIfNeeded(remoteCurrent) {
+  const lines = syncMismatchLines(remoteCurrent);
+  lastBrowserFactory.mismatch = lines.slice();
+  if (!lines.length) return;
+  const key = lines.join('|');
+  if (key === lastSyncMismatchKey) return;
+  lastSyncMismatchKey = key;
+  const msg = '동기화 불일치 · ' + lines[0];
+  try { pushSaveLog(msg, 'warn'); } catch (_) {}
+  try { toast(msg); } catch (_) {}
+  renderBrowserDiag();
+}
+
 function noteFactoryEnvelope(remote) {
   const env = factoryEnvelopeForWriteMerge(remote);
   if (!env.ok) {
@@ -9052,9 +9116,12 @@ function noteFactoryEnvelope(remote) {
     savedAt: Number(cur.savedAt || 0),
     entries: ents.length,
     stocked: ents.filter(e => e && e.stock != null && e.stock !== '').length,
+    dateKey: normalizeHistoryDateKey(cur.dateKey) || '',
     error: '',
+    mismatch: [],
     at: Date.now()
   };
+  warnSyncMismatchIfNeeded(cur);
   renderBrowserDiag();
 }
 
@@ -10382,6 +10449,7 @@ function resetStocks() {
   }
   render();
   pushSaveLog('재고 리셋', 'muted');
+  try { toast('재고 리셋 · Enter로 공장 반영 전엔 서버 옛값 덮어쓰기 가드'); } catch (_) {}
   saveToFB('reset');
 }
 
@@ -10491,6 +10559,7 @@ function bindBaseSalesInput() {
 
 function renderSalesInputs() {
   const days = currentOrderDaysValue();
+  syncDailySalesToOrderDays(days);
   const lost = recommendedLostDays();
   const wrap = document.getElementById('salesInputs');
   if (!wrap) return;
@@ -11375,7 +11444,21 @@ function applyIncomingStaffFieldsIfEmpty(remote, options) {
   const nextOverrides = preserved.overrides && typeof preserved.overrides === 'object' ? preserved.overrides : overrides;
   const nextSales = Array.isArray(preserved.dailySales) ? preserved.dailySales : dailySales;
   const nextSalesAt = Array.isArray(preserved.dailySalesAt) ? preserved.dailySalesAt : dailySalesAt;
-  const nextEntries = Array.isArray(preserved.entries) ? preserved.entries : entries;
+  let nextEntries = Array.isArray(preserved.entries) ? preserved.entries : entries;
+  if (remoteStocksBlockedByLocalReset(remote)) {
+    // Keep post-reset local stocks (null/0); do not re-inject older server stocks.
+    const byId = new Map((entries || []).map(e => [String(e && (e.entryKey || e.id || '')), e]));
+    nextEntries = nextEntries.map(e => {
+      const key = String(e && (e.entryKey || e.id || ''));
+      const loc = byId.get(key);
+      if (!loc) return { ...e, stock: null };
+      const out = { ...e, stock: loc.stock };
+      if (loc.stockAt != null) out.stockAt = loc.stockAt;
+      else delete out.stockAt;
+      return out;
+    });
+    try { pushSaveLog('리셋 가드 · 서버 옛 재고 재주입 막음', 'warn'); } catch (_) {}
+  }
   const nextBase = preserved.baseSales;
   const nextBaseAt = numericFieldAt(preserved.baseSalesAt);
   const nextDays = preserved.orderDays;
@@ -11620,6 +11703,7 @@ window.addEventListener('pagehide', () => flushDeferredInputWork());
 
 function handleOrderDaysChange() {
   setOrderDaysValue(document.getElementById('orderDays')?.value, true);
+  syncDailySalesToOrderDays(currentOrderDaysValue(), { warn: true });
   saveLocal('orderDays');
   renderSalesInputs();
   render();

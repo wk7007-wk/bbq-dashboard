@@ -56,6 +56,13 @@
   function boot(force) {
     if (ready && !force) return ready;
     if (force) ready = null;
+    function githubFallback(ep) {
+      var pages = originJson();
+      var gist = '';
+      try { gist = String((((ep || {}).sets || {}).fallback || {}).workschedule || '').trim(); } catch (e) {}
+      if (isGithubPagesHost() && pages) return pages;
+      return gist || pages;
+    }
     if (!isGithubPagesHost()) {
       URL = originJson();
       rw = true;
@@ -64,13 +71,20 @@
       return ready;
     }
     ready = loadTable().then(function (ep) {
-      var cands = httpsCandidates(ep);
-      if (!cands.length) {
-        URL = '';
+      function useGithub() {
+        var fb = githubFallback(ep);
         rw = false;
+        if (fb) {
+          URL = fb;
+          lastSource = 'github_fallback';
+          return 'github_fallback';
+        }
+        URL = '';
         lastSource = 'blocked';
         return 'blocked';
       }
+      var cands = httpsCandidates(ep);
+      if (!cands.length) return useGithub();
       return Promise.all(cands.map(function (c) { return probe(c.health); })).then(function (oks) {
         for (var i = 0; i < cands.length; i++) {
           if (!oks[i]) continue;
@@ -79,10 +93,7 @@
           lastSource = 'factory';
           return cands[i].kind;
         }
-        URL = '';
-        rw = false;
-        lastSource = 'blocked';
-        return 'blocked';
+        return useGithub();
       });
     });
     return ready;
@@ -137,13 +148,13 @@
     }
     try {
       var tree = await fetchJson(URL, 4000);
-      lastSource = rw ? 'factory' : 'blocked';
+      lastSource = rw ? 'factory' : (URL ? 'github_fallback' : 'blocked');
       cache = tree || {};
       cacheAt = Date.now();
       if (!planning(cache)) lastSource = 'empty';
       return cache;
     } catch (e) {
-      lastSource = rw ? 'factory_down' : 'blocked_down';
+      lastSource = rw ? 'factory_down' : (URL ? 'github_fallback_down' : 'blocked_down');
       cacheAt = Date.now();
       if (!(cache && planning(cache))) cache = {};
       return cache;

@@ -77,6 +77,7 @@
 - 복구 히스토리는 진행 중인 타이머가 있는 스냅샷만 보관한다. 종료값이 바뀌는 추가/보정/분할 변경은 10초 간격과 무관하게 바로 기록해 최근 상태가 빠지지 않아야 한다.
 - `lastCompleted`는 기존 `durationSeconds/completedAt`을 읽되, 새 저장은 `presetKey/baseDurationSeconds/finalDurationSeconds/adjustedDeltaSeconds/completedAtServerMs`를 분리한다.
 - 동기화 상태는 서버시간 보정 기준으로 `동기화됨/보정중/오프라인`을 표시한다. 오프라인 dirty 재전송은 같은 슬롯의 최신 원격 진행 타이머를 덮지 않는다.
+- 앱과 사이트는 HTML을 하나로 묶지 않는다. 앱은 번들 보드, 사이트는 사이트 진입을 쓰고, 같은 공장 `chicken_timer.json`만 보면 4면이 동기화된다. 공장 먹통일 때만 GitHub/gist 2차 GET. 파이어는 보드 본체가 아니다. 앱 WebView에 `go.html` 공장 점프를 넣지 않는다.
 - 동기화의 장기 방향은 파이어 의존이 아니다. 같은 봉투·충돌 규칙 위에 가장 먼저 살아있는 길을 붙인다. 우선순위는 같은 공간 직통(와이파이/핫스팟/유선, 기억된 주소 재시도) → 인터넷 공유방(파이어) → 나중에만 블루투스 같은 근거리 예비다. Note9/Tab WebView는 `onopen`만으로 스트림을 믿지 않고 실제 put/patch가 오기 전·좀비 연결에는 화면이 보일 때만 4~12초 GET 안전망을 쓰며, 입증된 스트림과 hidden에서는 멈춘다. 안드로이드는 ui_refresh 전용 EventSource를 열지 않는다. 로컬 직통은 원격 보드를 쓰지 않는다. Grok 원격 새로고침(`/packhelper/chicken_timer/ui_refresh/{syncKey}`)은 보드를 쓰지 않고 로컬 복구 스냅샷을 남긴 뒤 화면만 다시 연다.
 - 서버시간 확인 실패가 사용자 터치를 버리면 안 된다. 기존 로컬 시각으로 `endAt`을 확정하고 `오프라인 · 동기화 대기`를 표시하며, dirty 쓰기는 유한 backoff 후 재연결 때 기존 revision/슬롯 충돌 gate를 거쳐 보낸다.
 

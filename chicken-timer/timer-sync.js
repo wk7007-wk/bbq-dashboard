@@ -200,7 +200,7 @@
     const profile = options.profile;
     const syncKey = options.syncKey;
     const stateUrls = buildStateUrls(global);
-    const writeUrls = stateUrls.filter((url) => String(url).indexOf("githubusercontent.com") < 0);
+    const writeUrls = stateUrls.filter((url) => !isGistOrPagesJson(url));
     const stateUrl = writeUrls[0] || stateUrls[0];
     const auditRootUrl = `${FB_BASE_URL}/${AUDIT_ROOT}/${syncKey}`;
     const refreshUrl = `${FB_BASE_URL}/${UI_REFRESH_ROOT}/${syncKey}.json`;
@@ -1496,7 +1496,33 @@
 
   let FACTORY_WAN_HOST = "";
   let FACTORY_WAN_JSON = "";
+  let LAST_EP = null;
   let sotReady = null;
+  const GIST_TIMER_JSON = "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/chicken_timer.json";
+
+  function isGistOrPagesJson(url) {
+    const u = String(url || "");
+    return u.indexOf("githubusercontent.com") >= 0 || u.indexOf("github.io") >= 0;
+  }
+
+  function fallbackStateUrls() {
+    const out = [];
+    function add(u) {
+      u = String(u || "").trim();
+      if (!u || u.indexOf("http") !== 0) return;
+      if (out.indexOf(u) < 0) out.push(u);
+    }
+    const ep = LAST_EP || {};
+    const fb = (ep.sets && ep.sets.fallback) || {};
+    const primary = (ep.sets && ep.sets.primary) || {};
+    add(fb.chicken_timer);
+    const liveFb = String(fb.live_base || "").replace(/\/$/, "");
+    if (liveFb) add(liveFb + "/chicken_timer.json");
+    const liveP = String(primary.live_base || "").replace(/\/$/, "");
+    if (liveP) add(liveP + "/chicken_timer.json");
+    add(GIST_TIMER_JSON);
+    return out;
+  }
 
   function factorySotCandidates() {
     return [
@@ -1525,6 +1551,7 @@
   }
 
   function applyFactorySot(ep) {
+    if (ep && typeof ep === "object") LAST_EP = ep;
     const local = sameOriginJson("chicken_timer.json");
     if (local) {
       FACTORY_WAN_JSON = local;
@@ -1637,14 +1664,17 @@
   }
 
   function buildStateUrls(globalObj) {
-    if (!androidNative(globalObj)) {
-      return [FACTORY_WAN_JSON];
-    }
     const urls = [];
-    lanFactoryJsonUrls(globalObj).forEach((url) => {
-      if (urls.indexOf(url) < 0) urls.push(url);
-    });
-    if (urls.indexOf(FACTORY_WAN_JSON) < 0) urls.push(FACTORY_WAN_JSON);
+    function add(u) {
+      u = String(u || "").trim();
+      if (!u) return;
+      if (urls.indexOf(u) < 0) urls.push(u);
+    }
+    if (androidNative(globalObj)) {
+      lanFactoryJsonUrls(globalObj).forEach(add);
+    }
+    add(FACTORY_WAN_JSON);
+    fallbackStateUrls().forEach(add);
     return urls;
   }
 
@@ -1669,17 +1699,20 @@
   }
 
   function fetchFirstJson(urls) {
-    if (Array.isArray(urls) && urls.length) return raceFirst(urls, fetchJson);
-    const lan = lanFactoryJsonUrls(global);
-    if (lan.length) {
-      return raceFirst(lan, fetchJson).catch(function () {
-        return loadFactorySot().then(function () {
-          return raceFirst(buildStateUrls(global), fetchJson);
-        });
-      });
-    }
+    const run = function (list) {
+      const live = (list || []).filter(function (u) { return u && !isGistOrPagesJson(u); });
+      const fallback = (list || []).filter(isGistOrPagesJson);
+      const first = function (xs) {
+        return xs.length ? raceFirst(xs, fetchJson) : Promise.reject(new Error("none"));
+      };
+      if (live.length) {
+        return first(live).catch(function () { return first(fallback); });
+      }
+      return first(fallback);
+    };
+    if (Array.isArray(urls) && urls.length) return run(urls);
     return loadFactorySot().then(function () {
-      return raceFirst(buildStateUrls(global), fetchJson);
+      return run(buildStateUrls(global));
     });
   }
 
