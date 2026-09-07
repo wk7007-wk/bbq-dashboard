@@ -635,6 +635,7 @@
     onGithubPages: onGithubPages,
     origins: factoryOrigins,
     isLive: function () { return factoryLive; },
-    githubEndpoints: GITHUB_ENDPOINTS
+    githubEndpoints: GITHUB_ENDPOINTS,
+    putJson: factoryPutJson
   };
 })(typeof window !== "undefined" ? window : globalThis);
