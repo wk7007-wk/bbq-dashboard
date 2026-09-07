@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0906-nocache12">
+<html lang="ko" data-web-v="0907.1618">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -982,8 +982,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0906-nocache12"></script>
-<script src="posweb_admin.js?v=0906-nocache12"></script>
+<script src="posdelay_ad_receipt.js?v=0907.1618"></script>
+<script src="posweb_admin.js?v=0907.1618"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1007,7 +1007,10 @@ const TRACK={
     'https://rentry.co/bbqposdelaybus/raw'
   ]);},
   get snapshot(){return trackUrls('signal_snapshot.json');},
-  get exec(){return trackUrls('posdelay_factory_exec.json');}
+  get exec(){return trackUrls('posdelay_factory_exec.json');},
+  get gate_result(){return trackUrls('posdelay_gate_result.json');},
+  get runtime_v2(){return trackUrls('runtime_config_v2.json');},
+  get ad_settings(){return trackUrls('posdelay_ad_settings.json');}
 };
 let _bus={},_kds=null,_snap=null;
 let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
@@ -2407,12 +2410,31 @@ function pollAll(force){
     fetchFirst(TRACK.kds),
     fetchFirst(TRACK.bus),
     fetchFirst(TRACK.snapshot),
-    fetchFirst(TRACK.exec||[])
+    fetchFirst(TRACK.exec||[]),
+    fetchFirst(TRACK.gate_result||[]),
+    fetchFirst(TRACK.runtime_v2||trackUrls('runtime_config_v2.json')),
+    fetchFirst(TRACK.ad_settings||trackUrls('posdelay_ad_settings.json'))
   ]).then(function(res){
     var got=false;
     if(res[0].status==='fulfilled'&&res[0].value){_kds=res[0].value;got=true;}
     if(res[1].status==='fulfilled'&&res[1].value){_bus=res[1].value;got=true;}
     if(res[2].status==='fulfilled'&&res[2].value){_snap=res[2].value;got=true;}
+    var ex=(res[3]&&res[3].status==='fulfilled')?res[3].value:null;
+    var gr=(res[4]&&res[4].status==='fulfilled')?res[4].value:null;
+    var v2=(res[5]&&res[5].status==='fulfilled')?res[5].value:null;
+    var ad=(res[6]&&res[6].status==='fulfilled')?res[6].value:null;
+    if(typeof applyPolledFactorySettings==='function'){
+      try{applyPolledFactorySettings(ad,v2,{initControls:false});}catch(e){}
+    }else if(v2&&v2.version===2&&window.policySettings&&typeof applyRuntimeV2ToPolicy==='function'){
+      applyRuntimeV2ToPolicy(v2,window.policySettings);
+      if(typeof normalizePolicySettings==='function')normalizePolicySettings();
+      if(typeof applyPolicySettingsToUI==='function')applyPolicySettingsToUI();
+    }
+    var fee=null;
+    if(ex&&ex.fee!=null&&ex.fee!=='')fee=Number(ex.fee);
+    if((fee==null||!isFinite(fee))&&gr&&gr.readback_fee!=null&&gr.readback_fee!=='')fee=Number(gr.readback_fee);
+    var fcv=document.getElementById('fee_current_value');
+    if(fcv&&fee!=null&&isFinite(fee))fcv.textContent=Number(fee).toLocaleString()+'원';
     if(got){
       _sseOk=true;
       updC(true);
@@ -2424,8 +2446,7 @@ function pollAll(force){
         var snap=busPath(_bus,'posdelay/signal_snapshot');
         if(snap)_snap=snap;
       }
-      if(res[3]&&res[3].status==='fulfilled'&&res[3].value){
-        var ex=res[3].value;
+      if(ex){
         var sub2=document.getElementById('subStatus2');
         var subDot=document.getElementById('subDot2');
         if(sub2&&ex.owner==='factory'){
@@ -3043,6 +3064,7 @@ function togGateClub() {
     base: gateSettings.base,
     clubAuto: gateSettings.clubAuto
   }));
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
 }
 
 function togGate() {
@@ -3179,6 +3201,8 @@ function syncGateDashboardState() {
   gateSettings.fee=clampFeeValue(gateSettings.fee);
   gateSettings.base=clampFeeValue(gateSettings.base);
   gateSettings._activeTab='PRINTER';
+  var togSync=document.getElementById('tog_gate');
+  if(togSync){togSync.classList.toggle('on', !!gateSettings.enabled); if(togSync.setAttribute)togSync.setAttribute('aria-checked', gateSettings.enabled?'true':'false');}
   var threshold=gateSettings.threshold||8;
   var valid=gateSettings.valid||30;
   var validCount=gateSettings._validCount||0;
@@ -3439,7 +3463,7 @@ function onGateStatusUpdate(jsonStr) {
 
     // 토글 상태 — 활성(대기 이상)이면 ON
     var tog = document.getElementById('tog_gate');
-    if(tog) tog.classList.toggle('on', s.gateEnabled && !!s.activeTab);
+    if(tog) tog.classList.toggle('on', !!gateSettings.enabled);
 
     renderCaptureSnapshot({
       orders:s.captureOrders!==undefined?s.captureOrders:lastCaptureSnapshot.orders,
@@ -3479,7 +3503,23 @@ function manualDefense(action, fee) {
     ? String(Number.isFinite(parsedFee)?parsedFee:(Number.isFinite(configuredFee)?configuredFee:4000))
     : String(Number.isFinite(parsedFee)?parsedFee:0);
   if(action.includes('fee_up'))finalFee=String(clampFeeValue(finalFee));
-  if (typeof NativeBridge !== 'undefined') NativeBridge.manualDefense(action, finalFee);
+  if (typeof NativeBridge !== 'undefined' && NativeBridge && typeof NativeBridge.manualDefense === 'function') {
+    NativeBridge.manualDefense(action, finalFee);
+    return;
+  }
+  var now=Date.now();
+  var cmd={
+    action:action,
+    request_id:'gate_'+now,
+    issued_at_ms:now,
+    ts:Math.floor(now/1000),
+    status:'REQUESTED',
+    target_fee:Number(finalFee)||0,
+    source:'web_admin'
+  };
+  if(typeof poswebFactory==='object'&&typeof poswebFactory.putJson==='function'){
+    poswebFactory.putJson('posdelay_gate_command.json', cmd);
+  }
 }
 // ═══ 자동화 엔진 UI ═══
 function renderEngineTasks(engineJson) {
