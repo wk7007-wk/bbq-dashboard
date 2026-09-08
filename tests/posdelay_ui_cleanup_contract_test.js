@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'posweb.html'), 'utf8');
+const adminSource = fs.readFileSync(path.join(__dirname, '..', 'posweb_admin.js'), 'utf8');
+const allJs = source + '\n' + adminSource;
 const scripts = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
 assert(scripts.length > 0, 'dashboard script block missing');
 for (const script of scripts) {
@@ -15,10 +17,10 @@ assert.deepStrictEqual(duplicateIds, [], `duplicate element ids: ${duplicateIds.
 
 const clickHandlers = [...source.matchAll(/onclick="([A-Za-z_$][\w$]*)\s*\(/g)].map((match) => match[1]);
 const missingClickHandlers = [...new Set(clickHandlers)].filter((name) =>
-  !source.includes(`function ${name}(`) &&
-  !source.includes(`const ${name}=`) &&
-  !source.includes(`let ${name}=`) &&
-  !source.includes(`var ${name}=`)
+  !allJs.includes(`function ${name}(`) &&
+  !allJs.includes(`const ${name}=`) &&
+  !allJs.includes(`let ${name}=`) &&
+  !allJs.includes(`var ${name}=`)
 );
 assert.deepStrictEqual(missingClickHandlers, [], `missing click handlers: ${missingClickHandlers.join(', ')}`);
 
@@ -96,5 +98,10 @@ assert(weightedBody.includes('snapshotWeighted()'), 'hero count must use snapsho
 assert(weightedBody.includes('order_count_weighted'), 'hero count must use status.order_count_weighted');
 assert(!weightedBody.includes('kS.count'), 'getKdsWeightedCount must not fall back to kds.count');
 assert(!weightedBody.includes('kds.count'), 'getKdsWeightedCount must not fall back to kds.count');
+assert(source.includes("get status(){return trackUrls('posdelay_status.json');}"), 'posweb must poll live posdelay_status.json');
+assert(source.includes("get ad_state(){return trackUrls('posdelay_ad_state.json');}"), 'posweb must poll live posdelay_ad_state.json');
+assert(source.includes('function getKdsRawCount('), 'raw lamp must have getKdsRawCount');
+assert(source.includes('applyKdsHero(getKdsWeightedCount(), getKdsRawCount()'), 'hero raw lamp must use kds raw, not weighted twice');
+assert(source.includes('clockMs(st)>=clockMs(stLive||stS)'), 'stale bus must not overwrite live status');
 
 console.log('PASS posdelay UI cleanup/navigation/native-callback contract');

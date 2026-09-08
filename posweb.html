@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0907.1851">
+<html lang="ko" data-web-v="0908.1645">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -982,8 +982,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0907.1851"></script>
-<script src="posweb_admin.js?v=0907.1851"></script>
+<script src="posdelay_ad_receipt.js?v=0908.1645"></script>
+<script src="posweb_admin.js?v=0908.1645"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1007,7 +1007,12 @@ const TRACK={
     'https://rentry.co/bbqposdelaybus/raw'
   ]);},
   get snapshot(){return trackUrls('signal_snapshot.json');},
-  get exec(){return trackUrls('posdelay_factory_exec.json');}
+  get exec(){return trackUrls('posdelay_factory_exec.json');},
+  get gate_result(){return trackUrls('posdelay_gate_result.json');},
+  get runtime_v2(){return trackUrls('runtime_config_v2.json');},
+  get ad_settings(){return trackUrls('posdelay_ad_settings.json');},
+  get status(){return trackUrls('posdelay_status.json');},
+  get ad_state(){return trackUrls('posdelay_ad_state.json');}
 };
 let _bus={},_kds=null,_snap=null;
 let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
@@ -1236,6 +1241,28 @@ function getKdsWeightedCount(){
 function getActiveCount(){
   return getKdsWeightedCount();
 }
+function getKdsRawCount(){
+  if(kS&&kS.count!=null)return toCount(kS.count);
+  var k=_snap&&_snap.kds;
+  if(k&&k.count!=null)return toCount(k.count);
+  if(stS.order_count_raw!=null)return toCount(stS.order_count_raw);
+  return 0;
+}
+function clockMs(obj){
+  if(!obj||typeof obj!=='object')return 0;
+  var t=obj.time||obj._written_at;
+  if(typeof t==='number'){
+    if(t>1e12)return t;
+    if(t>1e9)return t*1000;
+    return 0;
+  }
+  if(typeof t==='string'&&t){
+    var p=new Date(t.replace(' ','T')+(t.indexOf('+')>=0||t.indexOf('Z')>=0?'':'+09:00'));
+    if(!isNaN(p))return p.getTime();
+  }
+  if(typeof obj.kds_sync==='number'&&obj.kds_sync>1e12)return obj.kds_sync;
+  return 0;
+}
 function getKdsSourceMs(){
   if(lastKdsTime>0)return lastKdsTime;
   var t=stS.kds_sync;
@@ -1308,7 +1335,7 @@ function applyKdsHero(ops, raw, sourceMs){
   return opsN;
 }
 function updateKdsUnitHints(){
-  applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+  applyKdsHero(getKdsWeightedCount(), getKdsRawCount(), getKdsSourceMs());
 }
 function baeminMinLabel(){
   const v=g(S,'baemin_reduced_amount',50);
@@ -1331,7 +1358,7 @@ function gateBaseLabel(){
 // === 모니터링 ===
 function updMonitor(){
   applyPrinterHero();
-  const c=applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+  const c=applyKdsHero(getKdsWeightedCount(), getKdsRawCount(), getKdsSourceMs());
   const st=document.getElementById('mStatus');
   if(c!=null){
     const ci=Math.min(c,10);
@@ -1380,7 +1407,7 @@ function _updRing(wrId,arcId,txtId,endMs,now){
 }
 setInterval(updCooldown,1000);
 setInterval(function(){
-  applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+  applyKdsHero(getKdsWeightedCount(), getKdsRawCount(), getKdsSourceMs());
 },10000);
 
 // === 동기화 상태 ===
@@ -2407,25 +2434,51 @@ function pollAll(force){
     fetchFirst(TRACK.kds),
     fetchFirst(TRACK.bus),
     fetchFirst(TRACK.snapshot),
-    fetchFirst(TRACK.exec||[])
+    fetchFirst(TRACK.exec||[]),
+    fetchFirst(TRACK.gate_result||[]),
+    fetchFirst(TRACK.runtime_v2||trackUrls('runtime_config_v2.json')),
+    fetchFirst(TRACK.ad_settings||trackUrls('posdelay_ad_settings.json')),
+    fetchFirst(TRACK.status||trackUrls('posdelay_status.json')),
+    fetchFirst(TRACK.ad_state||trackUrls('posdelay_ad_state.json'))
   ]).then(function(res){
     var got=false;
     if(res[0].status==='fulfilled'&&res[0].value){_kds=res[0].value;got=true;}
     if(res[1].status==='fulfilled'&&res[1].value){_bus=res[1].value;got=true;}
     if(res[2].status==='fulfilled'&&res[2].value){_snap=res[2].value;got=true;}
+    var ex=(res[3]&&res[3].status==='fulfilled')?res[3].value:null;
+    var gr=(res[4]&&res[4].status==='fulfilled')?res[4].value:null;
+    var v2=(res[5]&&res[5].status==='fulfilled')?res[5].value:null;
+    var ad=(res[6]&&res[6].status==='fulfilled')?res[6].value:null;
+    if(typeof applyPolledFactorySettings==='function'){
+      try{applyPolledFactorySettings(ad,v2,{initControls:false});}catch(e){}
+    }else if(v2&&v2.version===2&&window.policySettings&&typeof applyRuntimeV2ToPolicy==='function'){
+      applyRuntimeV2ToPolicy(v2,window.policySettings);
+      if(typeof normalizePolicySettings==='function')normalizePolicySettings();
+      if(typeof applyPolicySettingsToUI==='function')applyPolicySettingsToUI();
+    }
+    var fee=null;
+    if(ex&&ex.fee!=null&&ex.fee!=='')fee=Number(ex.fee);
+    if((fee==null||!isFinite(fee))&&gr&&gr.readback_fee!=null&&gr.readback_fee!=='')fee=Number(gr.readback_fee);
+    var fcv=document.getElementById('fee_current_value');
+    if(fcv&&fee!=null&&isFinite(fee))fcv.textContent=Number(fee).toLocaleString()+'원';
     if(got){
       _sseOk=true;
       updC(true);
       dispatchBus();
       if(_kds){kS={..._kds};if(!Array.isArray(kS.orders))kS.orders=[];}
-      var a=busPath(_bus,'posdelay/ad_state');if(a)Object.assign(aS,a);
-      var st=busPath(_bus,'posdelay/status');if(st)Object.assign(stS,st);
+      var stLive=(res[7]&&res[7].status==='fulfilled')?res[7].value:null;
+      var adLive=(res[8]&&res[8].status==='fulfilled')?res[8].value:null;
+      if(stLive)Object.assign(stS,stLive);
+      if(adLive)Object.assign(aS,adLive);
+      var a=busPath(_bus,'posdelay/ad_state');
+      if(a&&clockMs(a)>=clockMs(adLive||aS))Object.assign(aS,a);
+      var st=busPath(_bus,'posdelay/status');
+      if(st&&clockMs(st)>=clockMs(stLive||stS))Object.assign(stS,st);
       if(!(res[2].status==='fulfilled'&&res[2].value)){
         var snap=busPath(_bus,'posdelay/signal_snapshot');
         if(snap)_snap=snap;
       }
-      if(res[3]&&res[3].status==='fulfilled'&&res[3].value){
-        var ex=res[3].value;
+      if(ex){
         var sub2=document.getElementById('subStatus2');
         var subDot=document.getElementById('subDot2');
         if(sub2&&ex.owner==='factory'){
@@ -2462,7 +2515,7 @@ if(isApp){
 setInterval(()=>{
   const ls=stS.kds_sync??0;
   if(ls>0){const ago=Math.floor((Date.now()-ls)/1000);const rem=Math.max(0,90-ago%90);document.getElementById('mRefresh').textContent='수집 '+rem+'초';}
-  applyKdsHero(getKdsWeightedCount(), getActiveCount(), getKdsSourceMs());
+  applyKdsHero(getKdsWeightedCount(), getKdsRawCount(), getKdsSourceMs());
 },1000);
 window.addEventListener('resize',drawChart);
 document.addEventListener('visibilitychange',()=>{

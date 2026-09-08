@@ -7,6 +7,7 @@
   var factoryLive = false;
   var addressBook = null;
   var originReady = null;
+  var adSettingsVersion = 0;
 
   function onGithubPages() {
     try {
@@ -417,12 +418,25 @@
 
   function buildAdSettingsPayload(S, gateSettings) {
     var now = Date.now();
+    var nextVersion = (Number(adSettingsVersion) || 0) + 1;
+    if (nextVersion < 1) nextVersion = 1;
+    adSettingsVersion = nextVersion;
+    var defense = {
+      gate_enabled: !!(gateSettings && gateSettings.enabled),
+      fee_threshold: Number(gateSettings && gateSettings.threshold) || 8,
+      fee_configured_high: Number(gateSettings && gateSettings.fee) || 0,
+      fee_configured_base: Number(gateSettings && gateSettings.base) || 0,
+      valid_minutes: Number(gateSettings && gateSettings.valid) || 30,
+      stop_threshold: Number(gateSettings && gateSettings.threshold_stop) || 7,
+      stop_source: (gateSettings && gateSettings._stopSource) || "PRINTER",
+      mode: (gateSettings && (gateSettings._defenseMode || gateSettings.mode)) || "B"
+    };
     return {
       schema: "posdelay_ad_settings/v1",
       _source: "web_admin",
+      _version: nextVersion,
       _updated_at: now,
       _epoch: now,
-      _version: (Number(S && S._version) || 0) + 1,
       gate_enabled: !!(gateSettings && gateSettings.enabled),
       gate_current_fee: Number(gateSettings && gateSettings.fee) || 0,
       gate_base_fee: Number(gateSettings && gateSettings.base) || 0,
@@ -455,16 +469,15 @@
       coupang_delay_minutes: Number(S.coupang_delay_minutes) || 0,
       coupang_target_time: Number(S.coupang_target_time) || 0,
       coupang_fixed_cook_time: Number(S.coupang_fixed_cook_time) || 0,
-      defense: {
-        gate_enabled: !!(gateSettings && gateSettings.enabled),
-        fee_threshold: Number(gateSettings && gateSettings.threshold) || 8,
-        fee_configured_high: Number(gateSettings && gateSettings.fee) || 0,
-        fee_configured_base: Number(gateSettings && gateSettings.base) || 0,
-        valid_minutes: Number(gateSettings && gateSettings.valid) || 30,
-        stop_threshold: Number(gateSettings && gateSettings.threshold_stop) || 7,
-        stop_source: (gateSettings && gateSettings._stopSource) || "PRINTER",
-        mode: (gateSettings && (gateSettings._defenseMode || gateSettings.mode)) || "B"
-      }
+      defense: defense,
+      gate_enabled: defense.gate_enabled,
+      gate_threshold_fee: defense.fee_threshold,
+      gate_current_fee: defense.fee_configured_high,
+      gate_base_fee: defense.fee_configured_base,
+      gate_valid_minutes: defense.valid_minutes,
+      gate_threshold_stop: defense.stop_threshold,
+      gate_stop_source: defense.stop_source,
+      gate_defense_mode: defense.mode
     };
   }
 
@@ -586,40 +599,65 @@
     return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next));
   }
 
-  function loadWebSettings() {
-    return Promise.all([factoryGetJson("posdelay_ad_settings.json"), factoryGetJson("runtime_config_v2.json")]).then(function (pair) {
-      var ad = pair[0] || {};
-      var v2 = pair[1] || {};
-      var S = root.S;
-      if (ad && (ad.ad_enabled != null || ad.baemin_amount != null) && S) {
-        Object.keys(ad).forEach(function (k) {
-          if (k === "defense" || k.charAt(0) === "_" || k === "schema") return;
-          S[k] = ad[k];
-        });
-        settingsReady = Number(S.baemin_amount) > 0;
-        if (ad.defense && root.gateSettings) {
-          root.gateSettings.enabled = !!ad.defense.gate_enabled;
-          if (ad.defense.fee_threshold != null) root.gateSettings.threshold = ad.defense.fee_threshold;
-          if (ad.defense.fee_configured_high != null) root.gateSettings.fee = ad.defense.fee_configured_high;
-          if (ad.defense.fee_configured_base != null) root.gateSettings.base = ad.defense.fee_configured_base;
-          if (ad.defense.valid_minutes != null) root.gateSettings.valid = ad.defense.valid_minutes;
-          if (ad.defense.stop_threshold != null) root.gateSettings.threshold_stop = ad.defense.stop_threshold;
-          if (ad.defense.stop_source) root.gateSettings._stopSource = ad.defense.stop_source;
-          if (ad.defense.mode) root.gateSettings._defenseMode = ad.defense.mode;
-        }
-        if (typeof root.updSetUI === "function") root.updSetUI();
-        if (typeof root.syncGatePriceDisplay === "function") {
-          try { root.syncGatePriceDisplay(); } catch (e) {}
-        }
+  function applyAdSettingsObject(ad) {
+    if (!ad || (ad.ad_enabled == null && ad.baemin_amount == null)) return false;
+    var loadedVersion = Number(ad._version) || 0;
+    if (loadedVersion > adSettingsVersion) adSettingsVersion = loadedVersion;
+    var S = root.S;
+    if (!S) return false;
+    Object.keys(ad).forEach(function (k) {
+      if (k === "defense" || k.charAt(0) === "_" || k === "schema") return;
+      if (k.indexOf("gate_") === 0) return;
+      if (k === "auto_accept" || k === "shop_pause" || k === "time_mode") return;
+      S[k] = ad[k];
+    });
+    settingsReady = Number(S.baemin_amount) > 0;
+    if (root.gateSettings) {
+      if (ad.defense) {
+        root.gateSettings.enabled = !!ad.defense.gate_enabled;
+        if (ad.defense.fee_threshold != null) root.gateSettings.threshold = ad.defense.fee_threshold;
+        if (ad.defense.fee_configured_high != null) root.gateSettings.fee = ad.defense.fee_configured_high;
+        if (ad.defense.fee_configured_base != null) root.gateSettings.base = ad.defense.fee_configured_base;
+        if (ad.defense.valid_minutes != null) root.gateSettings.valid = ad.defense.valid_minutes;
+        if (ad.defense.stop_threshold != null) root.gateSettings.threshold_stop = ad.defense.stop_threshold;
+        if (ad.defense.stop_source) root.gateSettings._stopSource = ad.defense.stop_source;
+        if (ad.defense.mode) root.gateSettings._defenseMode = ad.defense.mode;
       }
-      if (v2 && v2.version === 2 && root.policySettings) {
-        applyRuntimeV2ToPolicy(v2, root.policySettings);
-        policyReady = true;
-        if (typeof root.normalizePolicySettings === "function") root.normalizePolicySettings();
-        if (typeof root.applyPolicySettingsToUI === "function") root.applyPolicySettingsToUI();
+      if (ad.gate_enabled != null) root.gateSettings.enabled = !!ad.gate_enabled;
+      if (ad.gate_threshold_fee != null) root.gateSettings.threshold = ad.gate_threshold_fee;
+      if (ad.gate_current_fee != null) root.gateSettings.fee = ad.gate_current_fee;
+      if (ad.gate_base_fee != null) root.gateSettings.base = ad.gate_base_fee;
+      if (ad.gate_valid_minutes != null) root.gateSettings.valid = ad.gate_valid_minutes;
+      if (ad.gate_threshold_stop != null) root.gateSettings.threshold_stop = ad.gate_threshold_stop;
+      if (ad.gate_stop_source) root.gateSettings._stopSource = ad.gate_stop_source;
+      if (ad.gate_defense_mode) root.gateSettings._defenseMode = ad.gate_defense_mode;
+    }
+    if (typeof root.updSetUI === "function") root.updSetUI();
+    if (typeof root.syncGatePriceDisplay === "function") {
+      try { root.syncGatePriceDisplay(); } catch (e) {}
+    }
+    return true;
+  }
+
+  function applyPolledFactorySettings(ad, v2, opts) {
+    opts = opts || {};
+    if (ad) applyAdSettingsObject(ad);
+    if (v2 && v2.version === 2 && root.policySettings) {
+      applyRuntimeV2ToPolicy(v2, root.policySettings);
+      policyReady = true;
+      if (typeof root.normalizePolicySettings === "function") root.normalizePolicySettings();
+      if (typeof root.applyPolicySettingsToUI === "function") root.applyPolicySettingsToUI();
+      if (opts.initControls !== false) {
         if (typeof root.initButtonValueControls === "function") root.initButtonValueControls();
         if (typeof root.syncButtonValueControls === "function") root.syncButtonValueControls();
       }
+    }
+    return true;
+  }
+
+  function loadWebSettings() {
+    return Promise.all([factoryGetJson("posdelay_ad_settings.json"), factoryGetJson("runtime_config_v2.json")]).then(function (pair) {
+      applyPolledFactorySettings(pair[0] || {}, pair[1] || {});
       return true;
     });
   }
@@ -633,12 +671,15 @@
   root.saveWebAdSettings = saveWebAdSettings;
   root.saveWebPolicy = saveWebPolicy;
   root.loadWebSettings = loadWebSettings;
+  root.applyPolledFactorySettings = applyPolledFactorySettings;
+  root.applyAdSettingsObject = applyAdSettingsObject;
   root.countsToRanges = countsToRanges;
   root.buildRuntimeV2 = buildRuntimeV2;
   root.buildAdSettingsPayload = buildAdSettingsPayload;
   root.applyRuntimeV2ToPolicy = applyRuntimeV2ToPolicy;
   root.poswebFactory = {
     jsonUrl: factoryJsonUrl,
+    putJson: factoryPutJson,
     resolveOrigin: resolveFactoryOrigin,
     refreshAddressBook: refreshAddressBook,
     onGithubPages: onGithubPages,

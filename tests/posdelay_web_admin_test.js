@@ -10,6 +10,12 @@ assert(html.includes('function toggleWebAdmin('), 'toggleWebAdmin handler missin
 assert(html.includes("typeof isWebAdmin==='function'&&isWebAdmin()"), 'requireAppControl must allow web admin');
 assert(html.includes('saveWebAdSettings'), 'ad autosave must write factory settings');
 assert(html.includes('saveWebPolicy'), 'policy save must write runtime_config_v2');
+const pollIdx = html.indexOf('function pollAll');
+assert(pollIdx >= 0, 'pollAll missing');
+assert(html.indexOf('runtime_config_v2.json', pollIdx) >= 0, 'pollAll must GET runtime_config_v2.json');
+assert(html.indexOf('posdelay_ad_settings.json', pollIdx) >= 0, 'pollAll must GET posdelay_ad_settings.json');
+assert(html.includes('applyRuntimeV2ToPolicy'), 'poll must apply v2 to policy');
+assert(html.includes('applyPolicySettingsToUI'), 'poll must apply policy to UI');
 
 const js = fs.readFileSync(path.join(__dirname, '..', 'posweb_admin.js'), 'utf8');
 const sandbox = { window: {}, globalThis: {}, Date, JSON, Number, Array, Object };
@@ -55,6 +61,30 @@ const payload = sandbox.buildAdSettingsPayload(
 );
 assert.strictEqual(payload.baemin_amount, 800);
 assert.strictEqual(payload.defense.fee_threshold, 1);
+assert.strictEqual(payload.gate_threshold_fee, 1);
+assert.strictEqual(payload.gate_enabled, false);
+assert.strictEqual(payload.gate_current_fee, 2000);
+assert.strictEqual(payload.gate_base_fee, 0);
+assert.strictEqual(payload.gate_valid_minutes, 30);
+assert.strictEqual(payload.gate_threshold_stop, 7);
+assert.strictEqual(payload.gate_stop_source, 'PRINTER');
+assert.strictEqual(payload.gate_defense_mode, 'B');
+assert.strictEqual(payload.defense.fee_configured_high, 2000);
 assert.strictEqual(payload._source, 'web_admin');
+assert.ok(payload._version >= 1, 'ad settings payload must carry _version>=1');
+const nextPayload = sandbox.buildAdSettingsPayload(
+  { ad_enabled: true, baemin_amount: 800 },
+  { enabled: true, threshold: 2, fee: 3000, base: 0, valid: 30 }
+);
+assert.strictEqual(nextPayload._version, payload._version + 1);
+
+const dest = {};
+sandbox.applyRuntimeV2ToPolicy({
+  version: 2,
+  auto_accept: { enabled: true, per_channel: { baemin: { source: 'PRINTER', printer_to_minutes: [{ min: 0, max: 1, target: 30 }] }, baemin_one: { source: 'KDS', kds_to_minutes: [{ min: 0, max: 1, target: 20 }] } } },
+  shop_pause: { enabled: true, per_channel: { baemin_one: { pause_at: 7, resume_at: 4, one_person_pause_at: 4, one_person_resume_at: 2 }, coupang_eats: { pause_at: 5, resume_at: 3, one_person_pause_at: 3, one_person_resume_at: 1 } } }
+}, dest);
+assert.strictEqual(dest.baemin1_pause_at, 7);
+assert.strictEqual(typeof sandbox.applyPolledFactorySettings, 'function');
 
 console.log('PASS posweb_admin');
