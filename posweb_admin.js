@@ -447,6 +447,7 @@
       gate_defense_mode: (gateSettings && (gateSettings._defenseMode || gateSettings.mode)) || "B",
       ad_enabled: !!S.ad_enabled,
       schedule_enabled: !!S.schedule_enabled,
+      schedule_mode: (S.schedule_mode === 'auto_humanville') ? 'auto_humanville' : 'manual',
       order_auto_off_enabled: !!S.order_auto_off_enabled,
       baemin_auto_enabled: !!S.baemin_auto_enabled,
       coupang_auto_enabled: !!S.coupang_auto_enabled,

@@ -562,8 +562,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <div class="cb" id="schB">
     <div class="sr">
-      <span class="sl">시간</span>
-      <div class="row" style="gap:4px">
+      <span class="sl">모드·시간</span>
+      <div class="row" style="gap:4px;flex-wrap:wrap">
+        <span id="schModeManual" class="time-pill" onclick="setScheduleMode('manual')">수동</span>
+        <span id="schModeAuto" class="time-pill" onclick="setScheduleMode('auto_humanville')">자동(휴먼빌)</span>
+        <span style="color:var(--text-secondary);font-size:12px;margin:0 2px">|</span>
         <span id="schOnDisp2" class="time-pill" onclick="pickTime('on')">--:--</span>
         <span style="color:var(--text-secondary);font-size:12px">~</span>
         <span id="schOffDisp2" class="time-pill" onclick="pickTime('off')">--:--</span>
@@ -982,8 +985,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0908.1645"></script>
-<script src="posweb_admin.js?v=0908.1645"></script>
+<script src="posdelay_ad_receipt.js?v=0909.0141"></script>
+<script src="posweb_admin.js?v=0909.0141"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1694,6 +1697,7 @@ function updSetUI(){
   });
   const se3=document.getElementById('tog_schedule_enabled3');if(se3)se3.className='tog'+(S.schedule_enabled?' on':'');
   const sd3=document.getElementById('schDot3');if(sd3)sd3.className='dot '+(S.schedule_enabled?'dg':'dr');
+  if(typeof syncScheduleModeUI==='function')syncScheduleModeUI();
   const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
   updGauges(getKdsWeightedCount());
   renderFactorySot();
@@ -1859,6 +1863,31 @@ function adjS(k,d){
 }
 function adjCoupangDelayMin(v){if(!requireAppControl())return false;S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
 function saveS(k,v){if(!requireAppControl())return false;S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
+
+function syncScheduleModeUI(){
+  const m=(S.schedule_mode==='auto_humanville')?'auto_humanville':'manual';
+  S.schedule_mode=m;
+  const a=document.getElementById('schModeManual');
+  const b=document.getElementById('schModeAuto');
+  if(a){a.className='time-pill'+(m==='manual'?' on':'');a.style.outline=m==='manual'?'2px solid var(--c-mid)':'';}
+  if(b){b.className='time-pill'+(m==='auto_humanville'?' on':'');b.style.outline=m==='auto_humanville'?'2px solid var(--c-mid)':'';}
+  const ss=document.getElementById('schSummary');
+  if(ss){
+    const on=S.ad_on_time||'--:--', off=S.ad_off_time||'--:--';
+    const modeLabel=m==='auto_humanville'?'자동(휴먼빌)':'수동';
+    ss.textContent=modeLabel+' · '+(on)+' ~ '+(off)+(S.schedule_enabled?' · ON':' · OFF');
+    ss.style.color=S.schedule_enabled?'var(--text-bright)':'var(--text-muted)';
+  }
+}
+function setScheduleMode(m){
+  if(!requireAppControl())return false;
+  S.schedule_mode=(m==='auto_humanville')?'auto_humanville':'manual';
+  syncScheduleModeUI();
+  _lastSaveKeys=['schedule_mode'];
+  updMonitor();
+  _autoSave();
+  return true;
+}
 function togS(k){if(!requireAppControl())return false;S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
 function togKdsOpen(){
   if(!requireAppControl())return false;
@@ -1891,6 +1920,7 @@ function updSchDisp(){
   var sf2=document.getElementById('schOffDisp2');if(sf2)sf2.textContent=off||'--:--';
   var ss=document.getElementById('schSummary');
   if(ss){
+    if(typeof syncScheduleModeUI==='function'){syncScheduleModeUI();return;}
     ss.textContent=(on||'--:--')+' ~ '+(off||'--:--')+(S.schedule_enabled?' · ON':' · OFF');
     ss.style.color=S.schedule_enabled?'var(--text-bright)':'var(--text-muted)';
   }
