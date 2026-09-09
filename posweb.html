@@ -568,6 +568,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
       <div class="row" style="gap:4px;flex-wrap:wrap">
         <span id="schModeManual" class="time-pill" onclick="setScheduleMode('manual')">수동</span>
         <span id="schModeAuto" class="time-pill" onclick="setScheduleMode('auto_humanville')">자동(휴먼빌)</span>
+        <span id="hvStatusChip" class="time-pill" title="휴먼빌 영업상태" style="margin-left:4px">휴먼빌 · —</span>
         <span style="color:var(--text-secondary);font-size:12px;margin:0 2px">|</span>
         <span id="schOnDisp2" class="time-pill" onclick="pickTime('on')">--:--</span>
         <span style="color:var(--text-secondary);font-size:12px">~</span>
@@ -988,7 +989,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0909.0208"></script>
-<script src="posweb_admin.js?v=0909.1508"></script>
+<script src="posweb_admin.js?v=0909.1520"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -3949,6 +3950,40 @@ function pcSendShutdown(){
   pcApplyStatus('UNKNOWN');
   setTimeout(pollPcPower,1200);
 })();
+
+function paintHvChip(st){
+  const el=document.getElementById('hvStatusChip');
+  if(!el)return;
+  const active=st&&st.isNowActive===true;
+  const closed=st&&st.isNowActive===false;
+  const label=active?'휴먼빌 · 영업중':(closed?'휴먼빌 · 영업종료':'휴먼빌 · ?');
+  el.textContent=label;
+  el.style.outline=active?'2px solid #2ECC71':(closed?'2px solid #E74C3C':'');
+  el.style.opacity=1;
+}
+function pollHumanvilleStatus(){
+  const bases=[];
+  try{
+    if(typeof poswebFactory!=='undefined'&&poswebFactory&&poswebFactory.origins){
+      (poswebFactory.origins()||[]).forEach(function(b){if(b)bases.push(String(b).replace(/\/$/,''));});
+    }
+  }catch(e){}
+  if(!bases.length){bases.push('');}
+  let p=Promise.reject(new Error('none'));
+  bases.forEach(function(base){
+    const url=(base?base+'/':'/')+'humanville_status.json?t='+Date.now();
+    p=p.catch(function(){
+      return fetch(url,{cache:'no-store'}).then(function(r){
+        if(!r.ok)throw new Error(String(r.status));
+        return r.json();
+      });
+    });
+  });
+  p.then(paintHvChip).catch(function(){paintHvChip(null);});
+}
+setInterval(pollHumanvilleStatus,30000);
+document.addEventListener('DOMContentLoaded',function(){setTimeout(pollHumanvilleStatus,800);});
+
 </script>
 </body>
 </html>
