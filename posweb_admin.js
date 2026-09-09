@@ -451,6 +451,7 @@
       gate_threshold_stop: Number(gateSettings && gateSettings.threshold_stop) || 7,
       gate_stop_source: (gateSettings && gateSettings._stopSource) || "PRINTER",
       gate_defense_mode: (gateSettings && (gateSettings._defenseMode || gateSettings.mode)) || "B",
+      kds_paused: !!(S.kds_paused || (root.stS && root.stS.kds_paused)),
       ad_enabled: !!S.ad_enabled,
       schedule_enabled: !!S.schedule_enabled,
       order_auto_off_enabled: !!S.order_auto_off_enabled,
@@ -612,6 +613,19 @@
     return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next));
   }
 
+  function saveWebCookSettings(on, t, m, f) {
+    if (!isWebAdmin()) return Promise.resolve(false);
+    return factoryPutJson("posdelay_cook_settings.json", {
+      schema: "posdelay_cook_settings/v1",
+      on: !!on,
+      target: Number(t) || 0,
+      mid: Number(m) || 0,
+      finish: Number(f) || 0,
+      _source: "web_admin",
+      _updated_at: Date.now()
+    });
+  }
+
   function applyAdSettingsObject(ad) {
     if (!ad || (ad.ad_enabled == null && ad.baemin_amount == null)) return false;
     var loadedVersion = Number(ad._version) || 0;
@@ -624,6 +638,10 @@
       if (k === "auto_accept" || k === "shop_pause" || k === "time_mode") return;
       S[k] = ad[k];
     });
+    if (ad.kds_paused != null) {
+      S.kds_paused = !!ad.kds_paused;
+      if (root.stS) root.stS.kds_paused = !!ad.kds_paused;
+    }
     settingsReady = Number(S.baemin_amount) > 0;
     if (root.gateSettings) {
       if (ad.defense) {
@@ -683,6 +701,7 @@
   root.applyWebAdminUi = applyWebAdminUi;
   root.saveWebAdSettings = saveWebAdSettings;
   root.saveWebPolicy = saveWebPolicy;
+  root.saveWebCookSettings = saveWebCookSettings;
   root.loadWebSettings = loadWebSettings;
   root.applyPolledFactorySettings = applyPolledFactorySettings;
   root.applyAdSettingsObject = applyAdSettingsObject;

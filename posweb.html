@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0909.2049">
+<html lang="ko" data-web-v="0910.0325">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -982,8 +982,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0909.2049"></script>
-<script src="posweb_admin.js?v=0909.2049"></script>
+<script src="posdelay_ad_receipt.js?v=0910.0325"></script>
+<script src="posweb_admin.js?v=0910.0325"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1086,6 +1086,81 @@ function requireAppControl(){
 }
 function toggleWebAdmin(){
   if(typeof doToggleWebAdmin==='function')return doToggleWebAdmin();
+}
+
+// Engine/Pages: route 5 NativeBridge writes via factoryPutJson only (App keeps NB).
+function bridgeHasNb(fn){
+  try{return !!(typeof NativeBridge!=='undefined'&&NativeBridge&&typeof NativeBridge[fn]==='function');}catch(e){return false;}
+}
+function bridgeUpdateGateSettings(payload){
+  if(isApp&&bridgeHasNb('updateGateSettings')){
+    try{NativeBridge.updateGateSettings(typeof payload==='string'?payload:JSON.stringify(payload));}catch(e){}
+    return true;
+  }
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function'){
+    saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings);
+    return true;
+  }
+  return false;
+}
+function bridgeSetSetting(k,v){
+  if(isApp&&bridgeHasNb('setSetting')){
+    try{NativeBridge.setSetting(k,typeof v==='object'?JSON.stringify(v):String(v));}catch(e){}
+    return true;
+  }
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function'){
+    try{if(S&&k)S[k]=v;}catch(e){}
+    saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings);
+    return true;
+  }
+  return false;
+}
+function bridgeSyncCookSettings(on,t,m,f){
+  if(isApp&&bridgeHasNb('syncCookSettings')){
+    try{NativeBridge.syncCookSettings(on,t,m,f);}catch(e){}
+    return true;
+  }
+  if(typeof saveWebCookSettings==='function'){
+    saveWebCookSettings(!!on, t, m, f);
+    return true;
+  }
+  if(typeof poswebFactory==='object'&&typeof poswebFactory.putJson==='function'){
+    poswebFactory.putJson('posdelay_cook_settings.json',{
+      schema:'posdelay_cook_settings/v1',on:!!on,target:Number(t)||0,mid:Number(m)||0,finish:Number(f)||0,
+      _source:'web_admin',_updated_at:Date.now()
+    });
+    return true;
+  }
+  return false;
+}
+function bridgeManualDefense(action, fee){
+  if(isApp&&bridgeHasNb('manualDefense')){
+    try{NativeBridge.manualDefense(action, fee);}catch(e){}
+    return true;
+  }
+  var now=Date.now();
+  var act=String(action||'');
+  if(act.indexOf('fee_up')>=0)act='baemin_fee_up';
+  else if(act.indexOf('fee_restore')>=0)act='baemin_fee_restore';
+  var cmd={
+    action:act,request_id:'gate_'+now,issued_at_ms:now,ts:Math.floor(now/1000),
+    status:'REQUESTED',target_fee:Number(fee)||0,source:'web_admin'
+  };
+  if(typeof poswebFactory==='object'&&typeof poswebFactory.putJson==='function'){
+    poswebFactory.putJson('posdelay_gate_command.json', cmd);
+    return true;
+  }
+  return false;
+}
+function bridgeUpdatePolicyConfig(nextObj){
+  if(isApp&&bridgeHasNb('updatePolicyConfig')){
+    try{return !!NativeBridge.updatePolicyConfig(JSON.stringify(nextObj));}catch(e){return false;}
+  }
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebPolicy==='function'){
+    saveWebPolicy(nextObj);
+    return true;
+  }
+  return false;
 }
 
 if(isApp){
@@ -1843,7 +1918,7 @@ function _autoSave(){
   }
   _lastSaveKeys.forEach(k=>{
     const v=S[k];
-    try{NativeBridge.setSetting(k,typeof v==='object'?JSON.stringify(v):String(v));}catch(e){}
+    bridgeSetSetting(k,v);
   });
   _lastSaveKeys=[];
 }
@@ -1866,7 +1941,7 @@ function togKdsOpen(){
   stS.kds_paused=paused;
   const e=document.getElementById('tog_kds_open');
   if(e)e.className='tog'+(paused?'':' on');
-  if(isApp){try{NativeBridge.setSetting('kds_paused',String(paused));}catch(ex){}}
+  bridgeSetSetting('kds_paused', paused);
   updSyncStatus();
   toast(paused?'OFF':'ON', paused?'warn':'ok');
 }
@@ -2381,7 +2456,7 @@ function updCkUI(){
 
 function ckDisp(k){const e=document.getElementById('ck_'+k);const d=document.getElementById('ck_'+k+'_disp');if(!e||!d)return;const v=parseInt(e.value)||0;const m=Math.floor(v/60),s=v%60;d.textContent=m+':'+String(s).padStart(2,'0');}
 function adjCk(k,d){if(!requireAppControl())return false;const e=document.getElementById('ck_'+k);if(!e)return;e.value=Math.max(10,parseInt(e.value||0)+d);ckDisp(k);saveCk();}
-function saveCk(){try{const t=parseInt(document.getElementById('ck_target').value)||1500,m=parseInt(document.getElementById('ck_mid').value)||1020,f=parseInt(document.getElementById('ck_finish').value)||240;localStorage.setItem('ck',JSON.stringify({on:ckOn,t:t,m:m,f:f,q:ckQ,cl:cookLog}));if(isApp)try{NativeBridge.syncCookSettings(ckOn,t,m,f);}catch(e){}}catch(e){}}
+function saveCk(){try{const t=parseInt(document.getElementById('ck_target').value)||1500,m=parseInt(document.getElementById('ck_mid').value)||1020,f=parseInt(document.getElementById('ck_finish').value)||240;localStorage.setItem('ck',JSON.stringify({on:ckOn,t:t,m:m,f:f,q:ckQ,cl:cookLog}));bridgeSyncCookSettings(ckOn,t,m,f);}catch(e){}}
 function ckTapDel(num){if(!requireAppControl())return false;const o=ckQ.find(x=>x.num===num);if(!o)return;if(o.delAt){o.delAt=null;}else{o.delAt=Date.now()+2000;}updCkUI();saveCk();}
 function loadCk(){try{const s=JSON.parse(localStorage.getItem('ck'));if(s){ckOn=!!s.on;document.getElementById('tog_cook_mode').className='tog'+(ckOn?' on':'');
   // 구버전 분단위(< 100) → 초단위 자동변환
@@ -2883,7 +2958,7 @@ setTimeout(bindPolicyAutoSave, 0);
 
 function savePolicySettings(silent) {
   if(!requireAppControl())return false;
-  if((typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig) && !(typeof isWebAdmin==='function'&&isWebAdmin())){
+  if(!(typeof isWebAdmin==='function'&&isWebAdmin()) && !(isApp && bridgeHasNb('updatePolicyConfig'))){
     if(!silent)toast('앱 전용','warn');
     if(silent)setPolicySaveStatus('앱 전용','error');
     return false;
@@ -2934,17 +3009,19 @@ function savePolicySettings(silent) {
     if(!silent)toast('1인 쿠팡 중지값이 재개값보다 커야 합니다','warn');
     return false;
   }
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&(typeof NativeBridge==='undefined'||!NativeBridge.updatePolicyConfig)){
+  if(!isApp || (typeof isWebAdmin==='function'&&isWebAdmin()&&!bridgeHasNb('updatePolicyConfig'))){
     Object.assign(policySettings, next);
     applyPolicySettingsToUI();
-    saveWebPolicy(next).then(function(ok){
-      if(ok){if(!silent)toast('저장 완료','ok');setPolicySaveStatus('자동저장됨','ok');}
-      else {if(!silent)toast('저장 실패','warn');setPolicySaveStatus('확인 필요','error');}
-    });
+    if(typeof saveWebPolicy==='function'){
+      saveWebPolicy(next).then(function(ok){
+        if(ok){if(!silent)toast('저장 완료','ok');setPolicySaveStatus('자동저장됨','ok');}
+        else {if(!silent)toast('저장 실패','warn');setPolicySaveStatus('확인 필요','error');}
+      });
+    }
     return true;
   }
   try {
-    var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify(next));
+    var ok = bridgeUpdatePolicyConfig(next);
     if(!ok){
       if(!silent)toast('저장 실패','warn');
       return false;
@@ -3052,8 +3129,7 @@ function adjGate(key, delta) {
   if (key==='fee') { gateSettings.fee = clampFeeValue((gateSettings.fee||0)+delta); syncGatePriceDisplay(); }
   if (key==='base') { gateSettings.base = clampFeeValue((gateSettings.base||0)+delta); syncGatePriceDisplay(); }
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  bridgeUpdateGateSettings(gateSettings);
 }
 
 function adjStop(key, delta) {
@@ -3064,8 +3140,7 @@ function adjStop(key, delta) {
   var display=document.getElementById('stop_threshold_disp');
   if(display)display.textContent=gateSettings.threshold_stop+'건';
   syncGateDashboardState();
-  if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({threshold_stop:gateSettings.threshold_stop}));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  bridgeUpdateGateSettings({threshold_stop:gateSettings.threshold_stop});
 }
 
 function setGateFee(v) {
@@ -3073,8 +3148,7 @@ function setGateFee(v) {
   gateSettings.fee = clampFeeValue(v);
   syncGatePriceDisplay();
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  bridgeUpdateGateSettings(gateSettings);
 }
 function setGateBase(v) {
   if(!requireAppControl())return false;
@@ -3082,8 +3156,7 @@ function setGateBase(v) {
   if (gateSettings.base !== 0) gateSettings.clubAuto = false;
   syncGatePriceDisplay();
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  bridgeUpdateGateSettings(gateSettings);
 }
 
 function togGateClub() {
@@ -3092,10 +3165,10 @@ function togGateClub() {
   if (gateSettings.clubAuto) gateSettings.base = 0;
   syncGatePriceDisplay();
   syncGateClubToggle();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({
+  bridgeUpdateGateSettings({
     base: gateSettings.base,
     clubAuto: gateSettings.clubAuto
-  }));
+  });
 }
 
 function togGate() {
@@ -3106,18 +3179,17 @@ function togGate() {
   var el = document.getElementById('tog_gate');
   if(el) el.classList.toggle('on', gateSettings.enabled);
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: 'PRINTER'}));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  bridgeUpdateGateSettings({enabled: gateSettings.enabled, activeTab: 'PRINTER'});
 }
 
 function togStop() {
   if(!requireAppControl())return false;
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&(typeof NativeBridge==='undefined'||!NativeBridge.updatePolicyConfig)){
+  if(!isApp || (typeof isWebAdmin==='function'&&isWebAdmin()&&!bridgeHasNb('updatePolicyConfig'))){
     policySettings.enabled=!policySettings.enabled;
     syncPolicySummary();
     return savePolicySettings(true);
   }
-  if(typeof NativeBridge==='undefined' || !NativeBridge.updatePolicyConfig){
+  if(!bridgeHasNb('updatePolicyConfig')){
     toast('앱 전용','warn');
     return false;
   }
@@ -3125,7 +3197,7 @@ function togStop() {
   policySettings.enabled = !policySettings.enabled;
   syncPolicySummary();
   try {
-    var ok = !!NativeBridge.updatePolicyConfig(JSON.stringify({enabled: !!policySettings.enabled}));
+    var ok = bridgeUpdatePolicyConfig({enabled: !!policySettings.enabled});
     if(!ok){
       policySettings.enabled = prev;
       syncPolicySummary();
@@ -3158,14 +3230,14 @@ function setFeeSource(src) {
   if(!requireAppControl())return false;
   gateSettings._activeTab = 'PRINTER';
   syncGateDashboardState();
-  if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({activeTab: 'PRINTER'}));
+  bridgeUpdateGateSettings({activeTab: 'PRINTER'});
 }
 
 function setStopSource(src) {
   if(!requireAppControl())return false;
   gateSettings._stopSource=src==='PRINTER'?'PRINTER':'KDS';
   syncGateDashboardState();
-  if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({stopSource:gateSettings._stopSource}));
+  bridgeUpdateGateSettings({stopSource:gateSettings._stopSource});
 }
 
 function togCB(id) {
@@ -3532,26 +3604,7 @@ function manualDefense(action, fee) {
     ? String(Number.isFinite(parsedFee)?parsedFee:(Number.isFinite(configuredFee)?configuredFee:4000))
     : String(Number.isFinite(parsedFee)?parsedFee:0);
   if(action.includes('fee_up'))finalFee=String(clampFeeValue(finalFee));
-  if (typeof NativeBridge !== 'undefined' && NativeBridge && typeof NativeBridge.manualDefense === 'function') {
-    NativeBridge.manualDefense(action, finalFee);
-    return;
-  }
-  var now=Date.now();
-  var act=String(action||'');
-  if(act.indexOf('fee_up')>=0)act='baemin_fee_up';
-  else if(act.indexOf('fee_restore')>=0)act='baemin_fee_restore';
-  var cmd={
-    action:act,
-    request_id:'gate_'+now,
-    issued_at_ms:now,
-    ts:Math.floor(now/1000),
-    status:'REQUESTED',
-    target_fee:Number(finalFee)||0,
-    source:'web_admin'
-  };
-  if(typeof poswebFactory==='object'&&typeof poswebFactory.putJson==='function'){
-    poswebFactory.putJson('posdelay_gate_command.json', cmd);
-  }
+  bridgeManualDefense(action, finalFee);
 }
 // ═══ 자동화 엔진 UI ═══
 function renderEngineTasks(engineJson) {
