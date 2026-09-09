@@ -469,7 +469,8 @@
     }
   }
 
-  function thresholdsFromZones(zones, platform) {
+  /* ROLLBACK_zones_SoT: do not overwrite configured thresholds from zones */
+  function thresholdsFromZones(zones, platform) { // unused after rollback
     var z = Array.isArray(zones) ? zones : [];
     var out = {};
     if (platform === "coupang") {
@@ -536,8 +537,8 @@
       baemin_reduced_amount: Number(S.baemin_reduced_amount) || 0,
       baemin_zones: S.baemin_zones || undefined,
       coupang_zones: S.coupang_zones || undefined,
-      baemin_thresholds: thresholdsFromZones(S.baemin_zones, "baemin"),
-      coupang_thresholds: thresholdsFromZones(S.coupang_zones, "coupang"),
+      baemin_thresholds: S.baemin_thresholds,
+      coupang_thresholds: S.coupang_thresholds,
       ad_on_time: S.ad_on_time || "08:00",
       ad_off_time: S.ad_off_time || "22:00",
       baemin_delay_enabled: !!S.baemin_delay_enabled,
