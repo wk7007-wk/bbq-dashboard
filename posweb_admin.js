@@ -272,6 +272,12 @@
       setPinMessage("비밀번호를 입력하세요");
       return;
     }
+    // PIN4_NOT_SITE_PASS: site password is factory write_token, not 4-digit PIN
+    if (/^\d{4}$/.test(pw)) {
+      setPinMessage("4자리 PIN이 아닙니다. 공장 쓰기 토큰을 입력하세요");
+      if (inp) inp.value = "";
+      return;
+    }
     setPinMessage("확인 중...");
     verifyPassword(pw).then(function (ok) {
       if (ok) {
@@ -287,7 +293,8 @@
         pinAttempts = 0;
         setPinMessage(PIN_MAX_ATTEMPTS + "회 틀림 — " + PIN_LOCK_MS / 1000 + "초 후 다시");
       } else {
-        setPinMessage("비밀번호가 틀립니다 (" + pinAttempts + "/" + PIN_MAX_ATTEMPTS + ")");
+        var live = typeof factoryLive !== "undefined" && factoryLive;
+        setPinMessage((live ? "비밀번호가 틀립니다 (" : "공장 연결/인증 실패 (") + pinAttempts + "/" + PIN_MAX_ATTEMPTS + ")");
       }
       if (inp) inp.value = "";
     });
