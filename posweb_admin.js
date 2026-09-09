@@ -670,15 +670,11 @@
     opts = opts || {};
     if (!isWebAdmin()) return Promise.resolve({ ok: false, status: 0, base: "", error: "not_admin" });
     S = S || root.S;
-    var gateOnly = !!opts.gateOnly;
-    // Ad persist still requires settingsReady + baemin_amount; gate/fee dedicated persist does not.
-    if (!gateOnly) {
-      if (!settingsReady) return Promise.resolve({ ok: false, status: 0, base: "", error: "settings_not_ready" });
-      if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) {
-        return Promise.resolve({ ok: false, status: 0, base: "", error: "baemin_amount_gate" });
-      }
-    } else if (!S) {
-      return Promise.resolve({ ok: false, status: 0, base: "", error: "no_settings" });
+    // INTENTIONAL: baemin_amount/fee only valid when address present (baemin_amount>0).
+    // gateOnly is a dedicated persist path (toast + GET-verify) — does NOT bypass this gate.
+    if (!settingsReady) return Promise.resolve({ ok: false, status: 0, base: "", error: "settings_not_ready" });
+    if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) {
+      return Promise.resolve({ ok: false, status: 0, base: "", error: "baemin_amount_gate" });
     }
     var gs = gateSettings || root.gateSettings;
     var payload = buildAdSettingsPayload(S, gs);
