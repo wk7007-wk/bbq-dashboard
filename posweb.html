@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0909.2036">
+<html lang="ko" data-web-v="0909.2049">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -321,7 +321,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div class="pin-overlay" id="pinOverlay">
   <h2>posweb</h2>
-  <div class="pin-note">사이트 PIN 2345 (또는 write_token). Pages→MagicHTTPS.</div>
+  <div class="pin-note">비밀번호를 입력하세요.</div>
   <div class="pin-note" id="pinFactoryHint" style="color:var(--text-muted);font-size:11px;margin-top:6px">주소판 깃허브에서 받는 중…</div>
   <input type="password" id="pinInput" placeholder="비밀번호" autocomplete="current-password">
   <button type="button" id="pinSubmit" onclick="checkPoswebPin()">확인</button>
@@ -391,13 +391,11 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
     </div>
     <div class="fresh-row">
       <span class="sync-badge"><span id="sKd" class="dot dd"></span><span id="sKt" class="text-secondary">KDS --</span></span>
-      <span class="sync-badge" id="inspectChip" title="점검시각(전체성공 stamp)"><span id="inspectDot" class="dot dd"></span><span id="inspectTxt" class="text-secondary">점검 --</span></span>
       <span class="sync-badge"><span id="subDot2" class="dot dd"></span><span id="subStatus2" class="text-secondary">서브폰 대기...</span></span>
       <span id="engineBadge2" class="board-last"></span>
       <span id="mRefresh" class="board-last">수집 --</span>
       <button class="board-refresh" onclick="doForceRefresh()">수집</button>
     </div>
-    <div id="inspectAxes" class="unit-hint" style="padding:0 2px 2px;line-height:1.45;color:var(--text-secondary)">레이더 -- · drain -- · host --</div>
     <div class="mini-gauges">
       <div class="mini-gauge">
         <div class="mini-gauge-head"><span style="color:var(--c-baemin)">배민</span><span id="bSt"></span></div>
@@ -564,12 +562,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
   </div>
   <div class="cb" id="schB">
     <div class="sr">
-      <span class="sl">모드·시간</span>
-      <div class="row" style="gap:4px;flex-wrap:wrap">
-        <span id="schModeManual" class="time-pill" onclick="setScheduleMode('manual')">수동</span>
-        <span id="schModeAuto" class="time-pill" onclick="setScheduleMode('auto_humanville')">자동(휴먼빌)</span>
-        <span id="hvStatusChip" class="time-pill" title="휴먼빌 영업상태" style="margin-left:4px">휴먼빌 · —</span>
-        <span style="color:var(--text-secondary);font-size:12px;margin:0 2px">|</span>
+      <span class="sl">시간</span>
+      <div class="row" style="gap:4px">
         <span id="schOnDisp2" class="time-pill" onclick="pickTime('on')">--:--</span>
         <span style="color:var(--text-secondary);font-size:12px">~</span>
         <span id="schOffDisp2" class="time-pill" onclick="pickTime('off')">--:--</span>
@@ -988,8 +982,8 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 </div>
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
-<script src="posdelay_ad_receipt.js?v=0909.2036"></script>
-<script src="posweb_admin.js?v=0909.2036"></script>
+<script src="posdelay_ad_receipt.js?v=0909.2049"></script>
+<script src="posweb_admin.js?v=0909.2049"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1018,8 +1012,7 @@ const TRACK={
   get runtime_v2(){return trackUrls('runtime_config_v2.json');},
   get ad_settings(){return trackUrls('posdelay_ad_settings.json');},
   get status(){return trackUrls('posdelay_status.json');},
-  get ad_state(){return trackUrls('posdelay_ad_state.json');},
-  get inspect_stamp(){return trackUrls('messenger_inspect_stamp.json');}
+  get ad_state(){return trackUrls('posdelay_ad_state.json');}
 };
 let _bus={},_kds=null,_snap=null;
 let S={},aS={},kS={},stS={},hD=[],oT={},cLt='flow',opsLogEntries=[],opsActionEntries=[],opsErrorEntries=[];
@@ -1416,17 +1409,6 @@ setInterval(updCooldown,1000);
 setInterval(function(){
   applyKdsHero(getKdsWeightedCount(), getKdsRawCount(), getKdsSourceMs());
 },10000);
-setInterval(function(){
-  try{
-    fetchFirst(TRACK.inspect_stamp||trackUrls('messenger_inspect_stamp.json')).then(function(d){
-      if(d&&typeof updInspectChip==='function')updInspectChip(d);
-    }).catch(function(){if(typeof updInspectChip==='function')updInspectChip(null);});
-  }catch(e){}
-},30000);
-if(typeof fetchFirst==='function'){
-  try{fetchFirst(TRACK.inspect_stamp||trackUrls('messenger_inspect_stamp.json')).then(function(d){if(typeof updInspectChip==='function')updInspectChip(d);});}catch(e){}
-}
-
 
 // === 동기화 상태 ===
 function factoryKdsTimeMs(){
@@ -1440,58 +1422,6 @@ function factoryKdsTimeMs(){
   }
   return 0;
 }
-
-// === 점검시각 칩 (epoch/UTC age; stamp only on full tick success) ===
-const INSPECT_GREEN_MIN=12, INSPECT_YELLOW_MIN=25;
-let _inspectStamp=null;
-function inspectEpochMs(ep){
-  if(ep==null||ep==='')return 0;
-  const n=Number(ep);
-  if(!isFinite(n)||n<=0)return 0;
-  return n>1e12?n:n*1000; // accept sec or ms
-}
-function inspectChipLevel(okAtEpoch){
-  const ms=inspectEpochMs(okAtEpoch);
-  if(!ms)return 'red';
-  const now=Date.now();
-  if(ms>now+120000)return 'red'; // future/abnormal
-  const mins=(now-ms)/60000;
-  if(mins<=INSPECT_GREEN_MIN)return 'green';
-  if(mins<=INSPECT_YELLOW_MIN)return 'yellow';
-  return 'red';
-}
-function fmtInspectAbsRel(okAtEpoch){
-  const ms=inspectEpochMs(okAtEpoch);
-  if(!ms)return '--';
-  const now=Date.now();
-  if(ms>now+120000)return '이상';
-  const d=new Date(ms);
-  const abs=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-  const ago=Math.max(0,Math.floor((now-ms)/1000));
-  const rel=ago<60?ago+'초':ago<3600?Math.floor(ago/60)+'분':Math.floor(ago/3600)+'시간';
-  return abs+' ('+rel+')';
-}
-function updInspectChip(stamp){
-  _inspectStamp=stamp&&typeof stamp==='object'?stamp:null;
-  const dot=document.getElementById('inspectDot');
-  const txt=document.getElementById('inspectTxt');
-  const axesEl=document.getElementById('inspectAxes');
-  const okAt=_inspectStamp&&_inspectStamp.ok_at_epoch;
-  const lvl=inspectChipLevel(okAt);
-  const color=lvl==='green'?'#2ECC71':lvl==='yellow'?'#F1C40F':'#E74C3C';
-  if(dot)dot.className='dot '+(lvl==='green'?'dg':lvl==='yellow'?'dy':'dr');
-  if(txt){
-    txt.textContent='점검 '+fmtInspectAbsRel(okAt);
-    txt.style.color=color;
-  }
-  const axes=(_inspectStamp&&_inspectStamp.axes)||{};
-  const line=['radar','drain','host'].map(function(k){
-    const ep=axes[k]&&axes[k].last_ok_epoch;
-    return k+' '+fmtInspectAbsRel(ep);
-  }).join(' · ');
-  if(axesEl)axesEl.textContent=line;
-}
-
 function updSyncStatus(){
   updSyncItem('sKd','sKt','KDS',factoryKdsTimeMs());
 }
@@ -1764,7 +1694,6 @@ function updSetUI(){
   });
   const se3=document.getElementById('tog_schedule_enabled3');if(se3)se3.className='tog'+(S.schedule_enabled?' on':'');
   const sd3=document.getElementById('schDot3');if(sd3)sd3.className='dot '+(S.schedule_enabled?'dg':'dr');
-  if(typeof syncScheduleModeUI==='function')syncScheduleModeUI();
   const ko=document.getElementById('tog_kds_open');if(ko)ko.className='tog'+(stS.kds_paused?'':' on');
   updGauges(getKdsWeightedCount());
   renderFactorySot();
@@ -1906,9 +1835,8 @@ function _autoSave(){
   _localEditUntil=Date.now()+3000;
   if(!isApp){
     if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function'){
-      saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings).then(function(res){
-        var ok = res === true || (res && res.ok);
-        if(!ok)toast('공장 저장 실패'+(res&&res.error?(' · '+res.error):'')+(res&&res.status?(' · '+res.status):''),'warn');
+      saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings).then(function(ok){
+        if(!ok)toast('공장 저장 실패','warn');
       });
     }
     return;
@@ -1931,31 +1859,6 @@ function adjS(k,d){
 }
 function adjCoupangDelayMin(v){if(!requireAppControl())return false;S.coupang_delay_minutes=v===5?5:10;var d=document.getElementById('set_coupang_delay_minutes_disp');if(d)d.textContent=S.coupang_delay_minutes+'분';_lastSaveKeys=['coupang_delay_minutes'];_autoSave();}
 function saveS(k,v){if(!requireAppControl())return false;S[k]=isNaN(v)?v:parseInt(v);_lastSaveKeys=[k];updMonitor();_autoSave();}
-
-function syncScheduleModeUI(){
-  const m=(S.schedule_mode==='auto_humanville')?'auto_humanville':'manual';
-  S.schedule_mode=m;
-  const a=document.getElementById('schModeManual');
-  const b=document.getElementById('schModeAuto');
-  if(a){a.className='time-pill'+(m==='manual'?' on':'');a.style.outline=m==='manual'?'2px solid var(--c-mid)':'';}
-  if(b){b.className='time-pill'+(m==='auto_humanville'?' on':'');b.style.outline=m==='auto_humanville'?'2px solid var(--c-mid)':'';}
-  const ss=document.getElementById('schSummary');
-  if(ss){
-    const on=S.ad_on_time||'--:--', off=S.ad_off_time||'--:--';
-    const modeLabel=m==='auto_humanville'?'자동(휴먼빌)':'수동';
-    ss.textContent=modeLabel+' · '+(on)+' ~ '+(off)+(S.schedule_enabled?' · ON':' · OFF');
-    ss.style.color=S.schedule_enabled?'var(--text-bright)':'var(--text-muted)';
-  }
-}
-function setScheduleMode(m){
-  if(!requireAppControl())return false;
-  S.schedule_mode=(m==='auto_humanville')?'auto_humanville':'manual';
-  syncScheduleModeUI();
-  _lastSaveKeys=['schedule_mode'];
-  updMonitor();
-  _autoSave();
-  return true;
-}
 function togS(k){if(!requireAppControl())return false;S[k]=!S[k];const e=document.getElementById('tog_'+k);if(e)e.className='tog'+(S[k]?' on':'');if(k==='schedule_enabled'){const d3=document.getElementById('schDot3');if(d3)d3.className='dot '+(S[k]?'dg':'dr');const t3=document.getElementById('tog_schedule_enabled3');if(t3)t3.className='tog'+(S[k]?' on':'');}_lastSaveKeys=[k];updMonitor();_autoSave();}
 function togKdsOpen(){
   if(!requireAppControl())return false;
@@ -1988,7 +1891,6 @@ function updSchDisp(){
   var sf2=document.getElementById('schOffDisp2');if(sf2)sf2.textContent=off||'--:--';
   var ss=document.getElementById('schSummary');
   if(ss){
-    if(typeof syncScheduleModeUI==='function'){syncScheduleModeUI();return;}
     ss.textContent=(on||'--:--')+' ~ '+(off||'--:--')+(S.schedule_enabled?' · ON':' · OFF');
     ss.style.color=S.schedule_enabled?'var(--text-bright)':'var(--text-muted)';
   }
@@ -2537,8 +2439,7 @@ function pollAll(force){
     fetchFirst(TRACK.runtime_v2||trackUrls('runtime_config_v2.json')),
     fetchFirst(TRACK.ad_settings||trackUrls('posdelay_ad_settings.json')),
     fetchFirst(TRACK.status||trackUrls('posdelay_status.json')),
-    fetchFirst(TRACK.ad_state||trackUrls('posdelay_ad_state.json')),
-    fetchFirst(TRACK.inspect_stamp||trackUrls('messenger_inspect_stamp.json'))
+    fetchFirst(TRACK.ad_state||trackUrls('posdelay_ad_state.json'))
   ]).then(function(res){
     var got=false;
     if(res[0].status==='fulfilled'&&res[0].value){_kds=res[0].value;got=true;}
@@ -2569,8 +2470,6 @@ function pollAll(force){
       var adLive=(res[8]&&res[8].status==='fulfilled')?res[8].value:null;
       if(stLive)Object.assign(stS,stLive);
       if(adLive)Object.assign(aS,adLive);
-      var insp=(res[9]&&res[9].status==='fulfilled')?res[9].value:null;
-      if(typeof updInspectChip==='function')updInspectChip(insp);
       var a=busPath(_bus,'posdelay/ad_state');
       if(a&&clockMs(a)>=clockMs(adLive||aS))Object.assign(aS,a);
       var st=busPath(_bus,'posdelay/status');
@@ -3146,26 +3045,6 @@ try {
   loadPolicySettings();
 } catch(e) {}
 
-
-function _persistGateWeb(label){
-  if(!(typeof isWebAdmin==='function'&&isWebAdmin()))return;
-  var saver = (typeof saveWebGateSettings==='function') ? saveWebGateSettings : saveWebAdSettings;
-  var p = (typeof saveWebGateSettings==='function')
-    ? saveWebGateSettings(gateSettings)
-    : saveWebAdSettings(S, gateSettings, {gateOnly:true});
-  if(!p || !p.then)return;
-  p.then(function(res){
-    var ok = res === true || (res && res.ok);
-    if(!ok){
-      var err = (res && res.error) || '';
-      var detail = err ? (' · ' + err) : '';
-      if (res && res.status) detail += ' · ' + res.status;
-      if (err === 'baemin_amount_gate') detail = ' · 주소/배민금액 필요';
-      toast((label||'배달료')+' 저장 실패'+detail,'warn');
-    }
-  });
-}
-
 function adjGate(key, delta) {
   if(!requireAppControl())return false;
   if (key==='threshold') { gateSettings.threshold = clampFeeThreshold((gateSettings.threshold||8)+delta); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
@@ -3174,7 +3053,7 @@ function adjGate(key, delta) {
   if (key==='base') { gateSettings.base = clampFeeValue((gateSettings.base||0)+delta); syncGatePriceDisplay(); }
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  _persistGateWeb('배달료임계');
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
 }
 
 function adjStop(key, delta) {
@@ -3186,7 +3065,7 @@ function adjStop(key, delta) {
   if(display)display.textContent=gateSettings.threshold_stop+'건';
   syncGateDashboardState();
   if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({threshold_stop:gateSettings.threshold_stop}));
-  _persistGateWeb('배달료');
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
 }
 
 function setGateFee(v) {
@@ -3195,7 +3074,7 @@ function setGateFee(v) {
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  _persistGateWeb('배달료');
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
 }
 function setGateBase(v) {
   if(!requireAppControl())return false;
@@ -3204,7 +3083,7 @@ function setGateBase(v) {
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  _persistGateWeb('배달료');
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
 }
 
 function togGateClub() {
@@ -3228,7 +3107,7 @@ function togGate() {
   if(el) el.classList.toggle('on', gateSettings.enabled);
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: 'PRINTER'}));
-  _persistGateWeb('배달료');
+  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
 }
 
 function togStop() {
@@ -3971,40 +3850,6 @@ function pcSendShutdown(){
   pcApplyStatus('UNKNOWN');
   setTimeout(pollPcPower,1200);
 })();
-
-function paintHvChip(st){
-  const el=document.getElementById('hvStatusChip');
-  if(!el)return;
-  const active=st&&st.isNowActive===true;
-  const closed=st&&st.isNowActive===false;
-  const label=active?'휴먼빌 · 영업중':(closed?'휴먼빌 · 영업종료':'휴먼빌 · ?');
-  el.textContent=label;
-  el.style.outline=active?'2px solid #2ECC71':(closed?'2px solid #E74C3C':'');
-  el.style.opacity=1;
-}
-function pollHumanvilleStatus(){
-  const bases=[];
-  try{
-    if(typeof poswebFactory!=='undefined'&&poswebFactory&&poswebFactory.origins){
-      (poswebFactory.origins()||[]).forEach(function(b){if(b)bases.push(String(b).replace(/\/$/,''));});
-    }
-  }catch(e){}
-  if(!bases.length){bases.push('');}
-  let p=Promise.reject(new Error('none'));
-  bases.forEach(function(base){
-    const url=(base?base+'/':'/')+'humanville_status.json?t='+Date.now();
-    p=p.catch(function(){
-      return fetch(url,{cache:'no-store'}).then(function(r){
-        if(!r.ok)throw new Error(String(r.status));
-        return r.json();
-      });
-    });
-  });
-  p.then(paintHvChip).catch(function(){paintHvChip(null);});
-}
-setInterval(pollHumanvilleStatus,30000);
-document.addEventListener('DOMContentLoaded',function(){setTimeout(pollHumanvilleStatus,800);});
-
 </script>
 </body>
 </html>

@@ -25,30 +25,19 @@
     }
   }
 
-  function normalizeFactoryBase(u) {
-    u = String(u || "").replace(/\/$/, "");
-    // https://host:2421 speaks plain HTTP — Magic/serve is TLS on 443
-    u = u.replace(/^(https:\/\/[A-Za-z0-9.-]+):2421$/, "$1");
-    return u;
-  }
-
   function canUseUrl(u) {
-    u = normalizeFactoryBase(u);
+    u = String(u || "").replace(/\/$/, "");
     if (!u) return false;
     if (pageIsHttps() && u.indexOf("http://") === 0) return false;
-    // reject https://IP:2421 (TLS on plain track3 port). bare https://IP OK (Caddy:443→2421)
-    if (/^https:\/\/\d+\.\d+\.\d+\.\d+:2421$/.test(u)) return false;
     return true;
   }
 
   function basesFromEndpoints(ep) {
     var f = (ep && ep.sets && ep.sets.factory) || {};
-    var keys = onGithubPages()
-      ? ["magic_base", "pages_base", "wan_https", "wan_base", "ts_base"]
-      : ["magic_base", "wan_https", "pages_base", "wan_base", "site_lan_base", "lan_base", "ts_base", "pages_base_http"];
+    var keys = ["wan_https", "magic_base", "pages_base", "wan_base", "site_lan_base", "lan_base", "ts_base", "pages_base_http"];
     var out = [];
     keys.forEach(function (k) {
-      var u = normalizeFactoryBase(f[k] || "");
+      var u = String(f[k] || "").replace(/\/$/, "");
       if (!canUseUrl(u) || u.indexOf("github.io") >= 0) return;
       if (out.indexOf(u) < 0) out.push(u);
     });
@@ -125,7 +114,7 @@
     var chain = Promise.reject(new Error("none"));
     list.forEach(function (base) {
       chain = chain.catch(function () {
-        return fetch(normalizeFactoryBase(base) + "/health?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(4000) : undefined }).then(function (r) {
+        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined }).then(function (r) {
           if (!r.ok) throw new Error(String(r.status));
           factoryOrigin = base;
           factoryLive = true;
@@ -259,35 +248,14 @@
   }
 
   function verifyPassword(pw) {
-    pw = String(pw || "").trim();
-    setWriteToken(pw);
-    var isPin = /^\d{4,6}$/.test(pw);
-    return resolveFactoryOrigin().then(function () {
-      var headers = {
-        "Content-Type": "application/json; charset=utf-8",
-        "X-Write-Token": pw
-      };
-      if (isPin) headers["X-Posweb-Pin"] = pw;
-      var body = JSON.stringify({ ok: true, ts: Date.now(), source: "posweb_login" });
-      var p = Promise.reject(new Error("none"));
-      factoryOrigins().forEach(function (base) {
-        var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + "posdelay_web_admin_ack.json";
-        p = p.catch(function () {
-          return fetch(url, { method: "PUT", headers: headers, body: body }).then(function (r) {
-            if (!r.ok) throw new Error(String(r.status));
-            factoryOrigin = base || factoryOrigin;
-            factoryLive = true;
-            return true;
-          });
-        });
-      });
-      return p;
+    setWriteToken(String(pw || "").trim());
+    return factoryPutJson("posdelay_web_admin_ack.json", {
+      ok: true,
+      ts: Date.now(),
+      source: "posweb_login"
     }).then(function (ok) {
       if (!ok) setWriteToken("");
-      return !!ok;
-    }).catch(function () {
-      setWriteToken("");
-      return false;
+      return ok;
     });
   }
 
@@ -304,7 +272,6 @@
       setPinMessage("비밀번호를 입력하세요");
       return;
     }
-    // digit PIN 4-6 = posweb site PIN (also accepts write_token)
     setPinMessage("확인 중...");
     verifyPassword(pw).then(function (ok) {
       if (ok) {
@@ -320,8 +287,7 @@
         pinAttempts = 0;
         setPinMessage(PIN_MAX_ATTEMPTS + "회 틀림 — " + PIN_LOCK_MS / 1000 + "초 후 다시");
       } else {
-        var live = typeof factoryLive !== "undefined" && factoryLive;
-        setPinMessage((live ? "비밀번호가 틀립니다 (" : "공장 연결/인증 실패 (") + pinAttempts + "/" + PIN_MAX_ATTEMPTS + ")");
+        setPinMessage("비밀번호가 틀립니다 (" + pinAttempts + "/" + PIN_MAX_ATTEMPTS + ")");
       }
       if (inp) inp.value = "";
     });
@@ -405,47 +371,34 @@
   }
 
   function factoryPutJson(name, obj) {
+    // Never PUT empty {} (server also rejects sparse/empty ad_settings)
+    if (obj != null && typeof obj === "object" && !Array.isArray(obj) && Object.keys(obj).length === 0) {
+      return Promise.resolve(false);
+    }
     var tok = writeToken();
     var headers = {
       "Content-Type": "application/json; charset=utf-8",
       "X-Write-Token": tok
     };
     if (/^\d{4,6}$/.test(String(tok || ""))) headers["X-Posweb-Pin"] = tok;
-    // Never PUT empty {}
-    if (obj != null && typeof obj === "object" && !Array.isArray(obj) && Object.keys(obj).length === 0) {
-      return Promise.resolve({ ok: false, status: 0, base: "", error: "empty_body" });
-    }
-    var lastFail = { ok: false, status: 0, base: "", error: "none" };
     return resolveFactoryOrigin().then(function () {
-      var origins = factoryOrigins();
-      if (!origins || !origins.length) {
-        return { ok: false, status: 0, base: "", error: "no_base" };
-      }
       var p = Promise.reject(new Error("none"));
-      origins.forEach(function (base) {
+      factoryOrigins().forEach(function (base) {
         var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + String(name || "").replace(/^\//, "");
         p = p.catch(function () {
           var req = obj == null
             ? fetch(url, { method: "GET", cache: "no-store", headers: headers })
             : fetch(url, { method: "PUT", headers: headers, body: JSON.stringify(obj) });
           return req.then(function (r) {
-            if (!r.ok) {
-              lastFail = { ok: false, status: r.status, base: base || "", error: "http_" + r.status };
-              throw new Error(String(r.status));
-            }
+            if (!r.ok) throw new Error(String(r.status));
             factoryOrigin = base || factoryOrigin;
             factoryLive = true;
-            return { ok: true, status: r.status, base: base || "" };
-          }).catch(function (err) {
-            if (!lastFail.status) {
-              lastFail = { ok: false, status: 0, base: base || "", error: String((err && err.message) || err || "fetch") };
-            }
-            throw err;
+            return true;
           });
         });
       });
       return p;
-    }).catch(function () { return lastFail; });
+    }).catch(function () { return false; });
   }
 
   function countsToRanges(counts, mins) {
@@ -467,34 +420,6 @@
       dest[prefix + "_count_" + (i + 1)] = row.min != null ? row.min : 0;
       dest[prefix + "_min_" + (i + 1)] = row.target != null ? row.target : (i === 0 ? 20 : i === 1 ? 25 : 30);
     }
-  }
-
-  /* ROLLBACK_zones_SoT: do not overwrite configured thresholds from zones */
-  function thresholdsFromZones(zones, platform) { // unused after rollback
-    var z = Array.isArray(zones) ? zones : [];
-    var out = {};
-    if (platform === "coupang") {
-      var on = -1, off = -1;
-      for (var i = 0; i < z.length; i++) {
-        var v = Number(z[i]) || 0;
-        if (on < 0 && v === 1) on = i;
-        if (off < 0 && v >= 2) off = i;
-      }
-      if (on >= 0) out.on = on;
-      if (off >= 0) out.off = off;
-      return out;
-    }
-    var bOn = -1, bMid = -1, bOff = -1;
-    for (var j = 0; j < z.length; j++) {
-      var zv = Number(z[j]) || 0;
-      if (bOn < 0 && zv === 1) bOn = j;
-      if (bMid < 0 && zv === 2) bMid = j;
-      if (bOff < 0 && zv >= 3) bOff = j;
-    }
-    if (bOn >= 0) out.on = bOn;
-    if (bMid >= 0) { out.mid = bMid; out.mid_upper = bMid; }
-    if (bOff >= 0) out.off = bOff;
-    return out;
   }
 
   function buildAdSettingsPayload(S, gateSettings) {
@@ -528,7 +453,6 @@
       gate_defense_mode: (gateSettings && (gateSettings._defenseMode || gateSettings.mode)) || "B",
       ad_enabled: !!S.ad_enabled,
       schedule_enabled: !!S.schedule_enabled,
-      schedule_mode: (S.schedule_mode === 'auto_humanville') ? 'auto_humanville' : 'manual',
       order_auto_off_enabled: !!S.order_auto_off_enabled,
       baemin_auto_enabled: !!S.baemin_auto_enabled,
       coupang_auto_enabled: !!S.coupang_auto_enabled,
@@ -667,53 +591,25 @@
   var settingsReady = false;
   var policyReady = false;
 
-  function saveWebAdSettings(S, gateSettings, opts) {
-    opts = opts || {};
-    if (!isWebAdmin()) return Promise.resolve({ ok: false, status: 0, base: "", error: "not_admin" });
+  function saveWebAdSettings(S, gateSettings) {
+    if (!isWebAdmin()) return Promise.resolve(false);
+    if (!settingsReady) return Promise.resolve(false);
     S = S || root.S;
-    // INTENTIONAL: baemin_amount/fee only valid when address present (baemin_amount>0).
-    // gateOnly is a dedicated persist path (toast + GET-verify) — does NOT bypass this gate.
-    if (!settingsReady) return Promise.resolve({ ok: false, status: 0, base: "", error: "settings_not_ready" });
-    if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) {
-      return Promise.resolve({ ok: false, status: 0, base: "", error: "baemin_amount_gate" });
-    }
-    var gs = gateSettings || root.gateSettings;
-    var payload = buildAdSettingsPayload(S, gs);
+    // INTENTIONAL: fee only when real address present (baemin_amount>0).
+    // 부발읍/대월면 remain filter-only (factory is_real_address); not address.
+    if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) return Promise.resolve(false);
+    var payload = buildAdSettingsPayload(S, gateSettings || root.gateSettings);
     // Only PUT non-empty snapshots (server also rejects {} / sparse).
     if (!payload || typeof payload !== "object" || !Object.keys(payload).length || !payload.schema) {
-      return Promise.resolve({ ok: false, status: 0, base: "", error: "empty_body" });
+      return Promise.resolve(false);
     }
-    var wantFee = Number(payload.defense && payload.defense.fee_threshold);
-    return factoryPutJson("posdelay_ad_settings.json", payload).then(function (res) {
-      if (!res || !res.ok) return res || { ok: false, status: 0, base: "", error: "put_failed" };
-      // GET-verify merge_web_ad_defense / fee_threshold
-      return factoryGetJson("posdelay_ad_settings.json").then(function (got) {
-        if (!got || typeof got !== "object") {
-          return { ok: false, status: res.status, base: res.base, error: "get_verify_empty" };
-        }
-        var gotFee = null;
-        if (got.defense && got.defense.fee_threshold != null) gotFee = Number(got.defense.fee_threshold);
-        else if (got.gate_threshold_fee != null) gotFee = Number(got.gate_threshold_fee);
-        if (wantFee != null && !isNaN(wantFee) && gotFee != null && gotFee !== wantFee) {
-          return { ok: false, status: res.status, base: res.base, error: "get_verify_fee_threshold", want: wantFee, got: gotFee };
-        }
-        return { ok: true, status: res.status, base: res.base, verified: true, fee_threshold: gotFee };
-      }).catch(function () {
-        return { ok: false, status: res.status, base: res.base, error: "get_verify_failed" };
-      });
-    });
-  }
-
-  function saveWebGateSettings(gateSettings) {
-    return saveWebAdSettings(root.S, gateSettings || root.gateSettings, { gateOnly: true });
+    return factoryPutJson("posdelay_ad_settings.json", payload);
   }
 
   function saveWebPolicy(next) {
     if (!isWebAdmin()) return Promise.resolve(false);
     if (!policyReady) return Promise.resolve(false);
-    return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next)).then(function (res) {
-      return !!(res && res.ok);
-    });
+    return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next));
   }
 
   function applyAdSettingsObject(ad) {
@@ -786,7 +682,6 @@
   root.restorePoswebAuth = restorePoswebAuth;
   root.applyWebAdminUi = applyWebAdminUi;
   root.saveWebAdSettings = saveWebAdSettings;
-  root.saveWebGateSettings = saveWebGateSettings;
   root.saveWebPolicy = saveWebPolicy;
   root.loadWebSettings = loadWebSettings;
   root.applyPolledFactorySettings = applyPolledFactorySettings;
