@@ -679,6 +679,10 @@
     }
     var gs = gateSettings || root.gateSettings;
     var payload = buildAdSettingsPayload(S, gs);
+    // Only PUT non-empty snapshots (server also rejects {} / sparse).
+    if (!payload || typeof payload !== "object" || !Object.keys(payload).length || !payload.schema) {
+      return Promise.resolve({ ok: false, status: 0, base: "", error: "empty_body" });
+    }
     var wantFee = Number(payload.defense && payload.defense.fee_threshold);
     return factoryPutJson("posdelay_ad_settings.json", payload).then(function (res) {
       if (!res || !res.ok) return res || { ok: false, status: 0, base: "", error: "put_failed" };
