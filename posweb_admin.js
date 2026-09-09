@@ -594,11 +594,12 @@
 
   function saveWebAdSettings(S, gateSettings) {
     if (!isWebAdmin()) return Promise.resolve(false);
-    if (!settingsReady) return Promise.resolve(false);
     S = S || root.S;
-    // INTENTIONAL: fee only when real address present (baemin_amount>0).
-    // 부발읍/대월면 remain filter-only (factory is_real_address); not address.
-    if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) return Promise.resolve(false);
+    if (!S) return Promise.resolve(false);
+    // Gate/defense toggle must PUT even when baemin_amount==0.
+    // Fee-address intent stays in capture/filter; do not block gate persist.
+    var gateSave = !!(gateSettings && typeof gateSettings === "object");
+    if (!settingsReady && !gateSave) return Promise.resolve(false);
     var payload = buildAdSettingsPayload(S, gateSettings || root.gateSettings);
     // Only PUT non-empty snapshots (server also rejects {} / sparse).
     if (!payload || typeof payload !== "object" || !Object.keys(payload).length || !payload.schema) {
