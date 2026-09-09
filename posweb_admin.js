@@ -25,12 +25,19 @@
     }
   }
 
-  function canUseUrl(u) {
+  function normalizeFactoryBase(u) {
     u = String(u || "").replace(/\/$/, "");
+    // https://host:2421 speaks plain HTTP — Magic/serve is TLS on 443
+    u = u.replace(/^(https:\/\/[A-Za-z0-9.-]+):2421$/, "$1");
+    return u;
+  }
+
+  function canUseUrl(u) {
+    u = normalizeFactoryBase(u);
     if (!u) return false;
     if (pageIsHttps() && u.indexOf("http://") === 0) return false;
-    // reject bare https://A.B.C.D (wan_https without :2421) — not track3
-    if (/^https:\/\/\d+\.\d+\.\d+\.\d+$/.test(u)) return false;
+    // reject https://IP:2421 (TLS on plain track3 port). bare https://IP OK (Caddy:443→2421)
+    if (/^https:\/\/\d+\.\d+\.\d+\.\d+:2421$/.test(u)) return false;
     return true;
   }
 
@@ -41,7 +48,7 @@
       : ["magic_base", "wan_https", "pages_base", "wan_base", "site_lan_base", "lan_base", "ts_base", "pages_base_http"];
     var out = [];
     keys.forEach(function (k) {
-      var u = String(f[k] || "").replace(/\/$/, "");
+      var u = normalizeFactoryBase(f[k] || "");
       if (!canUseUrl(u) || u.indexOf("github.io") >= 0) return;
       if (out.indexOf(u) < 0) out.push(u);
     });
@@ -118,7 +125,7 @@
     var chain = Promise.reject(new Error("none"));
     list.forEach(function (base) {
       chain = chain.catch(function () {
-        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined }).then(function (r) {
+        return fetch(normalizeFactoryBase(base) + "/health?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(4000) : undefined }).then(function (r) {
           if (!r.ok) throw new Error(String(r.status));
           factoryOrigin = base;
           factoryLive = true;
