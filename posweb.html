@@ -321,7 +321,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div class="pin-overlay" id="pinOverlay">
   <h2>posweb</h2>
-  <div class="pin-note">공장 쓰기 토큰(write_token). 4자리 PIN 아님.</div>
+  <div class="pin-note">사이트 PIN(숫자 4~6) 또는 write_token. Pages는 MagicHTTPS로 인증.</div>
   <div class="pin-note" id="pinFactoryHint" style="color:var(--text-muted);font-size:11px;margin-top:6px">주소판 깃허브에서 받는 중…</div>
   <input type="password" id="pinInput" placeholder="비밀번호" autocomplete="current-password">
   <button type="button" id="pinSubmit" onclick="checkPoswebPin()">확인</button>
@@ -989,7 +989,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0909.0208"></script>
-<script src="posweb_admin.js?v=0909.1520"></script>
+<script src="posweb_admin.js?v=0909.1535"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};

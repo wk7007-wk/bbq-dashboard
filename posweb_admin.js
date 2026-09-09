@@ -29,12 +29,16 @@
     u = String(u || "").replace(/\/$/, "");
     if (!u) return false;
     if (pageIsHttps() && u.indexOf("http://") === 0) return false;
+    // reject bare https://A.B.C.D (wan_https without :2421) — not track3
+    if (/^https:\/\/\d+\.\d+\.\d+\.\d+$/.test(u)) return false;
     return true;
   }
 
   function basesFromEndpoints(ep) {
     var f = (ep && ep.sets && ep.sets.factory) || {};
-    var keys = ["wan_https", "magic_base", "pages_base", "wan_base", "site_lan_base", "lan_base", "ts_base", "pages_base_http"];
+    var keys = onGithubPages()
+      ? ["magic_base", "pages_base", "wan_https", "wan_base", "ts_base"]
+      : ["magic_base", "wan_https", "pages_base", "wan_base", "site_lan_base", "lan_base", "ts_base", "pages_base_http"];
     var out = [];
     keys.forEach(function (k) {
       var u = String(f[k] || "").replace(/\/$/, "");
@@ -248,14 +252,35 @@
   }
 
   function verifyPassword(pw) {
-    setWriteToken(String(pw || "").trim());
-    return factoryPutJson("posdelay_web_admin_ack.json", {
-      ok: true,
-      ts: Date.now(),
-      source: "posweb_login"
+    pw = String(pw || "").trim();
+    setWriteToken(pw);
+    var isPin = /^\d{4,6}$/.test(pw);
+    return resolveFactoryOrigin().then(function () {
+      var headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Write-Token": pw
+      };
+      if (isPin) headers["X-Posweb-Pin"] = pw;
+      var body = JSON.stringify({ ok: true, ts: Date.now(), source: "posweb_login" });
+      var p = Promise.reject(new Error("none"));
+      factoryOrigins().forEach(function (base) {
+        var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + "posdelay_web_admin_ack.json";
+        p = p.catch(function () {
+          return fetch(url, { method: "PUT", headers: headers, body: body }).then(function (r) {
+            if (!r.ok) throw new Error(String(r.status));
+            factoryOrigin = base || factoryOrigin;
+            factoryLive = true;
+            return true;
+          });
+        });
+      });
+      return p;
     }).then(function (ok) {
       if (!ok) setWriteToken("");
-      return ok;
+      return !!ok;
+    }).catch(function () {
+      setWriteToken("");
+      return false;
     });
   }
 
@@ -272,12 +297,7 @@
       setPinMessage("비밀번호를 입력하세요");
       return;
     }
-    // PIN4_NOT_SITE_PASS: site password is factory write_token, not 4-digit PIN
-    if (/^\d{4}$/.test(pw)) {
-      setPinMessage("4자리 PIN이 아닙니다. 공장 쓰기 토큰을 입력하세요");
-      if (inp) inp.value = "";
-      return;
-    }
+    // digit PIN 4-6 = posweb site PIN (also accepts write_token)
     setPinMessage("확인 중...");
     verifyPassword(pw).then(function (ok) {
       if (ok) {
@@ -378,10 +398,12 @@
   }
 
   function factoryPutJson(name, obj) {
+    var tok = writeToken();
     var headers = {
       "Content-Type": "application/json; charset=utf-8",
-      "X-Write-Token": writeToken()
+      "X-Write-Token": tok
     };
+    if (/^\d{4,6}$/.test(String(tok || ""))) headers["X-Posweb-Pin"] = tok;
     return resolveFactoryOrigin().then(function () {
       var p = Promise.reject(new Error("none"));
       factoryOrigins().forEach(function (base) {
