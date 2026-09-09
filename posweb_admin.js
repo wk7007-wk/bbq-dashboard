@@ -411,24 +411,41 @@
       "X-Write-Token": tok
     };
     if (/^\d{4,6}$/.test(String(tok || ""))) headers["X-Posweb-Pin"] = tok;
+    // Never PUT empty {}
+    if (obj != null && typeof obj === "object" && !Array.isArray(obj) && Object.keys(obj).length === 0) {
+      return Promise.resolve({ ok: false, status: 0, base: "", error: "empty_body" });
+    }
+    var lastFail = { ok: false, status: 0, base: "", error: "none" };
     return resolveFactoryOrigin().then(function () {
+      var origins = factoryOrigins();
+      if (!origins || !origins.length) {
+        return { ok: false, status: 0, base: "", error: "no_base" };
+      }
       var p = Promise.reject(new Error("none"));
-      factoryOrigins().forEach(function (base) {
+      origins.forEach(function (base) {
         var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + String(name || "").replace(/^\//, "");
         p = p.catch(function () {
           var req = obj == null
             ? fetch(url, { method: "GET", cache: "no-store", headers: headers })
             : fetch(url, { method: "PUT", headers: headers, body: JSON.stringify(obj) });
           return req.then(function (r) {
-            if (!r.ok) throw new Error(String(r.status));
+            if (!r.ok) {
+              lastFail = { ok: false, status: r.status, base: base || "", error: "http_" + r.status };
+              throw new Error(String(r.status));
+            }
             factoryOrigin = base || factoryOrigin;
             factoryLive = true;
-            return true;
+            return { ok: true, status: r.status, base: base || "" };
+          }).catch(function (err) {
+            if (!lastFail.status) {
+              lastFail = { ok: false, status: 0, base: base || "", error: String((err && err.message) || err || "fetch") };
+            }
+            throw err;
           });
         });
       });
       return p;
-    }).catch(function () { return false; });
+    }).catch(function () { return lastFail; });
   }
 
   function countsToRanges(counts, mins) {
@@ -450,6 +467,33 @@
       dest[prefix + "_count_" + (i + 1)] = row.min != null ? row.min : 0;
       dest[prefix + "_min_" + (i + 1)] = row.target != null ? row.target : (i === 0 ? 20 : i === 1 ? 25 : 30);
     }
+  }
+
+  function thresholdsFromZones(zones, platform) {
+    var z = Array.isArray(zones) ? zones : [];
+    var out = {};
+    if (platform === "coupang") {
+      var on = -1, off = -1;
+      for (var i = 0; i < z.length; i++) {
+        var v = Number(z[i]) || 0;
+        if (on < 0 && v === 1) on = i;
+        if (off < 0 && v >= 2) off = i;
+      }
+      if (on >= 0) out.on = on;
+      if (off >= 0) out.off = off;
+      return out;
+    }
+    var bOn = -1, bMid = -1, bOff = -1;
+    for (var j = 0; j < z.length; j++) {
+      var zv = Number(z[j]) || 0;
+      if (bOn < 0 && zv === 1) bOn = j;
+      if (bMid < 0 && zv === 2) bMid = j;
+      if (bOff < 0 && zv >= 3) bOff = j;
+    }
+    if (bOn >= 0) out.on = bOn;
+    if (bMid >= 0) { out.mid = bMid; out.mid_upper = bMid; }
+    if (bOff >= 0) out.off = bOff;
+    return out;
   }
 
   function buildAdSettingsPayload(S, gateSettings) {
@@ -492,8 +536,8 @@
       baemin_reduced_amount: Number(S.baemin_reduced_amount) || 0,
       baemin_zones: S.baemin_zones || undefined,
       coupang_zones: S.coupang_zones || undefined,
-      baemin_thresholds: S.baemin_thresholds,
-      coupang_thresholds: S.coupang_thresholds,
+      baemin_thresholds: thresholdsFromZones(S.baemin_zones, "baemin"),
+      coupang_thresholds: thresholdsFromZones(S.coupang_zones, "coupang"),
       ad_on_time: S.ad_on_time || "08:00",
       ad_off_time: S.ad_off_time || "22:00",
       baemin_delay_enabled: !!S.baemin_delay_enabled,
@@ -622,18 +666,53 @@
   var settingsReady = false;
   var policyReady = false;
 
-  function saveWebAdSettings(S, gateSettings) {
-    if (!isWebAdmin()) return Promise.resolve(false);
-    if (!settingsReady) return Promise.resolve(false);
+  function saveWebAdSettings(S, gateSettings, opts) {
+    opts = opts || {};
+    if (!isWebAdmin()) return Promise.resolve({ ok: false, status: 0, base: "", error: "not_admin" });
     S = S || root.S;
-    if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) return Promise.resolve(false);
-    return factoryPutJson("posdelay_ad_settings.json", buildAdSettingsPayload(S, gateSettings || root.gateSettings));
+    var gateOnly = !!opts.gateOnly;
+    // Ad persist still requires settingsReady + baemin_amount; gate/fee dedicated persist does not.
+    if (!gateOnly) {
+      if (!settingsReady) return Promise.resolve({ ok: false, status: 0, base: "", error: "settings_not_ready" });
+      if (!S || S.baemin_amount == null || Number(S.baemin_amount) <= 0) {
+        return Promise.resolve({ ok: false, status: 0, base: "", error: "baemin_amount_gate" });
+      }
+    } else if (!S) {
+      return Promise.resolve({ ok: false, status: 0, base: "", error: "no_settings" });
+    }
+    var gs = gateSettings || root.gateSettings;
+    var payload = buildAdSettingsPayload(S, gs);
+    var wantFee = Number(payload.defense && payload.defense.fee_threshold);
+    return factoryPutJson("posdelay_ad_settings.json", payload).then(function (res) {
+      if (!res || !res.ok) return res || { ok: false, status: 0, base: "", error: "put_failed" };
+      // GET-verify merge_web_ad_defense / fee_threshold
+      return factoryGetJson("posdelay_ad_settings.json").then(function (got) {
+        if (!got || typeof got !== "object") {
+          return { ok: false, status: res.status, base: res.base, error: "get_verify_empty" };
+        }
+        var gotFee = null;
+        if (got.defense && got.defense.fee_threshold != null) gotFee = Number(got.defense.fee_threshold);
+        else if (got.gate_threshold_fee != null) gotFee = Number(got.gate_threshold_fee);
+        if (wantFee != null && !isNaN(wantFee) && gotFee != null && gotFee !== wantFee) {
+          return { ok: false, status: res.status, base: res.base, error: "get_verify_fee_threshold", want: wantFee, got: gotFee };
+        }
+        return { ok: true, status: res.status, base: res.base, verified: true, fee_threshold: gotFee };
+      }).catch(function () {
+        return { ok: false, status: res.status, base: res.base, error: "get_verify_failed" };
+      });
+    });
+  }
+
+  function saveWebGateSettings(gateSettings) {
+    return saveWebAdSettings(root.S, gateSettings || root.gateSettings, { gateOnly: true });
   }
 
   function saveWebPolicy(next) {
     if (!isWebAdmin()) return Promise.resolve(false);
     if (!policyReady) return Promise.resolve(false);
-    return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next));
+    return factoryPutJson("runtime_config_v2.json", buildRuntimeV2(next)).then(function (res) {
+      return !!(res && res.ok);
+    });
   }
 
   function applyAdSettingsObject(ad) {
@@ -706,6 +785,7 @@
   root.restorePoswebAuth = restorePoswebAuth;
   root.applyWebAdminUi = applyWebAdminUi;
   root.saveWebAdSettings = saveWebAdSettings;
+  root.saveWebGateSettings = saveWebGateSettings;
   root.saveWebPolicy = saveWebPolicy;
   root.loadWebSettings = loadWebSettings;
   root.applyPolledFactorySettings = applyPolledFactorySettings;

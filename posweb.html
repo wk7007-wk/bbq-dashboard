@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0909.1618">
+<html lang="ko" data-web-v="0909.1910">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -989,7 +989,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0909.0208"></script>
-<script src="posweb_admin.js?v=0909.1618"></script>
+<script src="posweb_admin.js?v=0909.1910"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1906,8 +1906,9 @@ function _autoSave(){
   _localEditUntil=Date.now()+3000;
   if(!isApp){
     if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function'){
-      saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings).then(function(ok){
-        if(!ok)toast('공장 저장 실패','warn');
+      saveWebAdSettings(S, typeof gateSettings==='undefined'?null:gateSettings).then(function(res){
+        var ok = res === true || (res && res.ok);
+        if(!ok)toast('공장 저장 실패'+(res&&res.error?(' · '+res.error):'')+(res&&res.status?(' · '+res.status):''),'warn');
       });
     }
     return;
@@ -3145,6 +3146,23 @@ try {
   loadPolicySettings();
 } catch(e) {}
 
+
+function _persistGateWeb(label){
+  if(!(typeof isWebAdmin==='function'&&isWebAdmin()))return;
+  var saver = (typeof saveWebGateSettings==='function') ? saveWebGateSettings : saveWebAdSettings;
+  var p = (typeof saveWebGateSettings==='function')
+    ? saveWebGateSettings(gateSettings)
+    : saveWebAdSettings(S, gateSettings, {gateOnly:true});
+  if(!p || !p.then)return;
+  p.then(function(res){
+    var ok = res === true || (res && res.ok);
+    if(!ok){
+      var detail = (res && (res.error || res.status)) ? (' · ' + (res.error || '') + (res.status ? (' ' + res.status) : '') + (res.base ? (' @') : '')) : '';
+      toast((label||'배달료')+' 저장 실패'+detail,'warn');
+    }
+  });
+}
+
 function adjGate(key, delta) {
   if(!requireAppControl())return false;
   if (key==='threshold') { gateSettings.threshold = clampFeeThreshold((gateSettings.threshold||8)+delta); document.getElementById('gate_threshold').textContent = gateSettings.threshold+'건'; }
@@ -3153,7 +3171,7 @@ function adjGate(key, delta) {
   if (key==='base') { gateSettings.base = clampFeeValue((gateSettings.base||0)+delta); syncGatePriceDisplay(); }
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  _persistGateWeb('배달료임계');
 }
 
 function adjStop(key, delta) {
@@ -3165,7 +3183,7 @@ function adjStop(key, delta) {
   if(display)display.textContent=gateSettings.threshold_stop+'건';
   syncGateDashboardState();
   if(typeof NativeBridge!=='undefined')NativeBridge.updateGateSettings(JSON.stringify({threshold_stop:gateSettings.threshold_stop}));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  _persistGateWeb('배달료');
 }
 
 function setGateFee(v) {
@@ -3174,7 +3192,7 @@ function setGateFee(v) {
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  _persistGateWeb('배달료');
 }
 function setGateBase(v) {
   if(!requireAppControl())return false;
@@ -3183,7 +3201,7 @@ function setGateBase(v) {
   syncGatePriceDisplay();
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify(gateSettings));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  _persistGateWeb('배달료');
 }
 
 function togGateClub() {
@@ -3207,7 +3225,7 @@ function togGate() {
   if(el) el.classList.toggle('on', gateSettings.enabled);
   syncGateDashboardState();
   if (typeof NativeBridge !== 'undefined') NativeBridge.updateGateSettings(JSON.stringify({enabled: gateSettings.enabled, activeTab: 'PRINTER'}));
-  if(typeof isWebAdmin==='function'&&isWebAdmin()&&typeof saveWebAdSettings==='function')saveWebAdSettings(S, gateSettings);
+  _persistGateWeb('배달료');
 }
 
 function togStop() {
