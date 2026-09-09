@@ -231,11 +231,15 @@
     showSite(unlocked);
     var notice = document.getElementById("standaloneReadOnlyNotice");
     if (notice) {
-      notice.style.display = root.isApp ? "none" : (unlocked ? "block" : "none");
-      notice.textContent = "관리자 웹 — 임계는 공장에 저장됩니다. 광고/배달료 실행은 공장, 수락·중지는 PC입니다.";
+      notice.style.display = root.isApp ? "none" : "block";
+      notice.textContent = unlocked
+        ? "잠금 해제됨 — 로컬 편집 중. 공장 PUT 성공 후에만 새로고침 유지됩니다."
+        : "공개 웹은 읽기 전용입니다. 임계 변경은 관리자 잠금 해제 후, 실행은 공장/PC입니다.";
     }
     var btn = document.getElementById("webAdminBtn");
-    if (btn) btn.textContent = unlocked ? "잠금" : "잠금";
+    if (btn) btn.textContent = unlocked ? "관리중·잠금" : "잠금";
+    var chip = document.getElementById("webPersistChip");
+    if (chip) chip.textContent = unlocked ? (settingsSavePending ? "저장중…" : "해제·미저장가능") : "잠금";
     if (unlocked && typeof root.updMonitor === "function") {
       try { root.updMonitor(); } catch (e) {}
     }
@@ -591,6 +595,33 @@
 
   var settingsReady = false;
   var policyReady = false;
+  var settingsSavePending = false;
+
+  function confirmAdSettingsEcho(sent, got) {
+    if (!got || typeof got !== "object") return false;
+    var sv = Number(sent && sent._version) || 0;
+    var gv = Number(got && got._version) || 0;
+    if (sv > 0 && gv > 0 && gv < sv) return false;
+    function same(a, b) {
+      if (typeof a === "boolean" || typeof b === "boolean") return !!a === !!b;
+      if (a == null && b == null) return true;
+      if (typeof a === "number" || typeof b === "number") return Number(a) === Number(b);
+      return String(a) === String(b);
+    }
+    var keys = ["baemin_amount", "ad_enabled", "schedule_enabled", "gate_enabled", "baemin_auto_enabled"];
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (sent[k] == null) continue;
+      if (!same(sent[k], got[k])) return false;
+    }
+    if (sent.defense && sent.defense.gate_enabled != null) {
+      var gEn = (got.defense && got.defense.gate_enabled != null)
+        ? got.defense.gate_enabled
+        : got.gate_enabled;
+      if (!!gEn !== !!sent.defense.gate_enabled) return false;
+    }
+    return true;
+  }
 
   function saveWebAdSettings(S, gateSettings) {
     if (!isWebAdmin()) return Promise.resolve(false);
@@ -605,7 +636,33 @@
     if (!payload || typeof payload !== "object" || !Object.keys(payload).length || !payload.schema) {
       return Promise.resolve(false);
     }
-    return factoryPutJson("posdelay_ad_settings.json", payload);
+    settingsSavePending = true;
+    try { root._adSavePending = true; } catch (e0) {}
+    try { root._localEditUntil = Date.now() + 20000; } catch (e1) {}
+    return factoryPutJson("posdelay_ad_settings.json", payload).then(function (ok) {
+      if (!ok) {
+        settingsSavePending = false;
+        try { root._adSavePending = false; } catch (e2) {}
+        if (typeof root.toast === "function") root.toast("공장 저장 실패 (PUT)", "warn");
+        return false;
+      }
+      return factoryGetJson("posdelay_ad_settings.json").then(function (got) {
+        var match = confirmAdSettingsEcho(payload, got);
+        settingsSavePending = false;
+        try { root._adSavePending = false; } catch (e3) {}
+        if (!match) {
+          if (typeof root.toast === "function") root.toast("공장 저장 확인 실패 (GET≠PUT)", "warn");
+          return false;
+        }
+        try { root._localEditUntil = Date.now() + 2000; } catch (e4) {}
+        return true;
+      });
+    }).catch(function () {
+      settingsSavePending = false;
+      try { root._adSavePending = false; } catch (e5) {}
+      if (typeof root.toast === "function") root.toast("공장 저장 실패", "warn");
+      return false;
+    });
   }
 
   function saveWebPolicy(next) {
@@ -673,6 +730,11 @@
 
   function applyPolledFactorySettings(ad, v2, opts) {
     opts = opts || {};
+    // While PUT+confirm pending, forbid remote overwrite from poll (refresh-reset hole).
+    if (settingsSavePending || root._adSavePending) return false;
+    try {
+      if (typeof root._localEditUntil === "number" && Date.now() < root._localEditUntil) return false;
+    } catch (ePend) {}
     if (ad) applyAdSettingsObject(ad);
     if (v2 && v2.version === 2 && root.policySettings) {
       applyRuntimeV2ToPolicy(v2, root.policySettings);
@@ -706,6 +768,7 @@
   root.loadWebSettings = loadWebSettings;
   root.applyPolledFactorySettings = applyPolledFactorySettings;
   root.applyAdSettingsObject = applyAdSettingsObject;
+  root.isAdSettingsSavePending = function () { return !!settingsSavePending || !!root._adSavePending; };
   root.countsToRanges = countsToRanges;
   root.buildRuntimeV2 = buildRuntimeV2;
   root.buildAdSettingsPayload = buildAdSettingsPayload;
