@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0910.1658">
+<html lang="ko" data-web-v="0910.2208">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -991,7 +991,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0910.0345"></script>
-<script src="posweb_admin.js?v=0910.1658"></script>
+<script src="posweb_admin.js?v=0910.2208"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -3383,6 +3383,14 @@ function syncGateDashboardState() {
   if(stopKds){stopKds.style.background=gateSettings._stopSource==='KDS'?'#2AC1BC':'#2A2A45';stopKds.style.color=gateSettings._stopSource==='KDS'?'#FFF':'#E0E0EC';}
   var feeLiveSource=document.getElementById('feeLiveSource');
   if(feeLiveSource)feeLiveSource.textContent=feeSource;
+  var gateThresholdEl=document.getElementById('gate_threshold');
+  if(gateThresholdEl)gateThresholdEl.textContent=threshold+'건';
+  var gateValidEl=document.getElementById('gate_valid');
+  if(gateValidEl)gateValidEl.textContent=valid+'분';
+  var stopThresholdDisp=document.getElementById('stop_threshold_disp');
+  if(stopThresholdDisp)stopThresholdDisp.textContent=stopThreshold+'건';
+  var togGateEl=document.getElementById('tog_gate');
+  if(togGateEl)togGateEl.classList.toggle('on', !!gateSettings.enabled);
   var feeThresholdNum=document.getElementById('feeThresholdNum');
   if(feeThresholdNum)feeThresholdNum.textContent=threshold;
   var feeLiveValid=document.getElementById('feeLiveValid');

@@ -438,7 +438,7 @@
     adSettingsVersion = nextVersion;
     var defense = {
       gate_enabled: !!(gateSettings && gateSettings.enabled),
-      fee_threshold: Number(gateSettings && gateSettings.threshold) || 8,
+      fee_threshold: (function(n){n=Number(n); return (isFinite(n)&&n>=1)?n:8;})(gateSettings && gateSettings.threshold),
       fee_configured_high: Number(gateSettings && gateSettings.fee) || 0,
       fee_configured_base: Number(gateSettings && gateSettings.base) || 0,
       valid_minutes: Number(gateSettings && gateSettings.valid) || 30,
@@ -455,7 +455,7 @@
       gate_enabled: !!(gateSettings && gateSettings.enabled),
       gate_current_fee: Number(gateSettings && gateSettings.fee) || 0,
       gate_base_fee: Number(gateSettings && gateSettings.base) || 0,
-      gate_threshold_fee: Number(gateSettings && gateSettings.threshold) || 8,
+      gate_threshold_fee: (function(n){n=Number(n); return (isFinite(n)&&n>=1)?n:8;})(gateSettings && gateSettings.threshold),
       gate_valid_minutes: Number(gateSettings && gateSettings.valid) || 30,
       gate_threshold_stop: Number(gateSettings && gateSettings.threshold_stop) || 7,
       gate_stop_source: (gateSettings && gateSettings._stopSource) || "PRINTER",
@@ -613,7 +613,7 @@
       if (typeof a === "number" || typeof b === "number") return Number(a) === Number(b);
       return String(a) === String(b);
     }
-    var keys = ["baemin_amount", "ad_enabled", "schedule_enabled", "gate_enabled", "baemin_auto_enabled"];
+    var keys = ["baemin_amount", "ad_enabled", "schedule_enabled", "gate_enabled", "baemin_auto_enabled", "gate_threshold_fee", "gate_current_fee", "gate_base_fee"];
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
       if (sent[k] == null) continue;
