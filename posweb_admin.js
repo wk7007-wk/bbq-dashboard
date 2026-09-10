@@ -240,7 +240,12 @@
     if (btn) btn.textContent = unlocked ? "관리중·잠금" : "잠금";
     var chip = document.getElementById("webPersistChip");
     if (chip) chip.textContent = unlocked ? (settingsSavePending ? "저장중…" : "해제·미저장가능") : "잠금";
-    if (unlocked && typeof root.updMonitor === "function") {
+    if (typeof root.applyKdsHero === "function") {
+      try {
+        if (unlocked && typeof root.updMonitor === "function") root.updMonitor();
+        else root.applyKdsHero(0, 0, 0);
+      } catch (e) {}
+    } else if (unlocked && typeof root.updMonitor === "function") {
       try { root.updMonitor(); } catch (e) {}
     }
   }

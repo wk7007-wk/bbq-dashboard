@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0910.0458">
+<html lang="ko" data-web-v="0910.1658">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -113,6 +113,12 @@ body.auth-locked>*:not(#pinOverlay){display:none!important;}
 .src-light{font-size:10px;line-height:1;padding:4px 7px;border-radius:999px;border:1px solid rgba(255,255,255,.12);color:var(--text-muted);opacity:.38;font-weight:800;}
 .src-light.raw.on{opacity:1;border-color:#2ECC71;color:#2ECC71;background:rgba(46,204,113,.16);}
 .src-light.adj.on{opacity:1;border-color:#E67E22;color:#E67E22;background:rgba(230,126,34,.16);}
+.hero-raw-chip{display:inline-flex;align-items:center;gap:4px;min-height:22px;padding:2px 8px;border-radius:999px;border:1px solid rgba(46,204,113,.35);background:rgba(46,204,113,.10);color:#2ECC71;font-size:11px;font-weight:800;letter-spacing:-.02em;}
+.hero-raw-chip .raw-n{font-size:13px;font-weight:900;}
+.hero-unlock{color:#E67E22!important;font-size:18px!important;font-weight:800;letter-spacing:-.02em;}
+.gate-status-label{display:inline-flex;align-items:center;min-height:22px;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:800;}
+.gate-status-label.on{border-color:rgba(46,204,113,.45);color:#2ECC71;background:rgba(46,204,113,.12);}
+.gate-status-label.off{border-color:rgba(231,76,60,.45);color:#E74C3C;background:rgba(231,76,60,.12);}
 .hero-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-secondary);line-height:1.35;}
 .hero-meta.strong{align-items:flex-start;font-weight:600;color:var(--text-bright);}
 .hero-meta.accent{color:var(--c-mid);}
@@ -321,7 +327,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div class="pin-overlay" id="pinOverlay">
   <h2>posweb</h2>
-  <div class="pin-note">비밀번호를 입력하세요.</div>
+  <div class="pin-note">해금 후 실시간 건수·게이트가 표시됩니다. 비밀번호를 입력하세요.</div>
   <div class="pin-note" id="pinFactoryHint" style="color:var(--text-muted);font-size:11px;margin-top:6px">주소판 깃허브에서 받는 중…</div>
   <input type="password" id="pinInput" placeholder="비밀번호" autocomplete="current-password">
   <button type="button" id="pinSubmit" onclick="checkPoswebPin()">확인</button>
@@ -368,6 +374,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         </div>
         <div class="hero-number-row">
           <span id="mCount" class="hero-number">--</span><span id="kdsHeroUnit" class="hero-unit">건</span>
+          <span id="kdsRawChip" class="hero-raw-chip" title="공장 원문 건수">원문 <span class="raw-n" id="kdsRawNum">--</span></span>
           <span class="src-lights" aria-label="원본 또는 보정">
             <span id="kdsRawLight" class="src-light raw">원본</span>
             <span id="kdsAdjLight" class="src-light adj">보정</span>
@@ -386,6 +393,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
         <span class="hero-label">가게배달</span>
         <div class="hero-number-row"><span id="heroFeeCurrent" class="hero-number-sm">0원</span></div>
         <div id="heroFeeMode" class="hero-meta accent">OFF</div>
+        <div id="gateStatusLabel" class="gate-status-label off" title="gateSettings.enabled">게이트 OFF</div>
         <div class="hero-meta">설정 <span id="heroFeeThreshold">8건</span> · <span id="heroFeeValid">30분</span></div>
       </div>
     </div>
@@ -983,7 +991,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0910.0345"></script>
-<script src="posweb_admin.js?v=0910.0458"></script>
+<script src="posweb_admin.js?v=0910.1658"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};
@@ -1296,7 +1304,7 @@ function hHist(m){
   calcAvgInterval();drawChart();updDelayPred();
 }
 
-// === 건수: 히어로=보정(weighted). 원문=자동수락만. kds.count 폴백 금지 ===
+// === 건수: 히어로=보정(weighted). 원문=칩. weighted/status 희소 시 kds.count 표시 폴백 ===
 function toCount(v){
   var n=parseInt(v,10);
   return isNaN(n)?0:Math.max(0,n);
@@ -1316,11 +1324,24 @@ function adsCurrentCount(){
   if(d&&typeof d==='object'&&d.current_count!=null)return d.current_count;
   return null;
 }
+function kdsStatusCountFallback(){
+  if(kS&&kS.count!=null)return toCount(kS.count);
+  var k=_snap&&_snap.kds;
+  if(k&&k.count!=null)return toCount(k.count);
+  return null;
+}
+function weightedSparse(w){
+  return w==null||w==='';
+}
 function getKdsWeightedCount(){
   var w=snapshotWeighted();
-  if(w==null&&stS.order_count_weighted!=null)w=stS.order_count_weighted;
-  if(w==null)w=adsCurrentCount();
-  if(w==null)return 0;
+  if(weightedSparse(w)&&stS.order_count_weighted!=null)w=stS.order_count_weighted;
+  if(weightedSparse(w))w=adsCurrentCount();
+  if(weightedSparse(w)){
+    var fb=kdsStatusCountFallback();
+    if(fb!=null)w=fb;
+  }
+  if(weightedSparse(w))return 0;
   w=toCount(w);
   if(w!==_kdsLastCount){_kdsLastCount=w;_kdsLastChange=Date.now();}
   if(_kdsLastCount!==-1&&Date.now()-_kdsLastChange>=KDS_NO_CHANGE_ZERO_MS)return 0;
@@ -1396,18 +1417,34 @@ function applyPrinterHero(){
 }
 function applyKdsHero(ops, raw, sourceMs){
   if(sourceMs!=null&&sourceMs>0)lastKdsTime=sourceMs;
+  var locked=!isApp&&typeof isWebAdmin==='function'&&!isWebAdmin();
+  var el=document.getElementById('mCount');
+  var unit=document.getElementById('kdsHeroUnit');
+  var rawChip=document.getElementById('kdsRawChip');
+  var rawNum=document.getElementById('kdsRawNum');
+  var age=document.getElementById('kdsUnitHint');
+  if(locked){
+    if(el){el.textContent='해금필요';el.classList.add('hero-unlock');}
+    if(unit)unit.textContent='';
+    if(rawChip)rawChip.style.display='none';
+    if(age){age.textContent='PIN 해금 후 실시간 표시';age.style.color='#E67E22';}
+    var rawL=document.getElementById('kdsRawLight');
+    var adjL=document.getElementById('kdsAdjLight');
+    if(rawL)rawL.classList.remove('on');
+    if(adjL)adjL.classList.remove('on');
+    return null;
+  }
   var opsN=toCount(ops);
   var rawN=toCount(raw);
-  var el=document.getElementById('mCount');
-  if(el)el.textContent=opsN;
-  var unit=document.getElementById('kdsHeroUnit');
+  if(el){el.textContent=opsN;el.classList.remove('hero-unlock');}
   if(unit)unit.textContent='건';
+  if(rawChip)rawChip.style.display='';
+  if(rawNum)rawNum.textContent=String(rawN);
   var isRaw=rawN===opsN;
   var rawL=document.getElementById('kdsRawLight');
   var adjL=document.getElementById('kdsAdjLight');
   if(rawL)rawL.classList.toggle('on', isRaw);
   if(adjL)adjL.classList.toggle('on', !isRaw);
-  var age=document.getElementById('kdsUnitHint');
   if(age){
     var srcMs=getKdsSourceMs();
     age.textContent=kdsAgeText(srcMs);
@@ -3363,7 +3400,13 @@ function syncGateDashboardState() {
   var heroFeeMode=document.getElementById('heroFeeMode');
   if(heroFeeMode){
     heroFeeMode.textContent=feeState;
-    heroFeeMode.style.color=gateSettings._stopDefending?'#E74C3C':gateSettings._isFeeDefending?'#E67E22':'var(--text-secondary)';
+    heroFeeMode.style.color=gateSettings._stopDefending?'#E74C3C':gateSettings._isFeeDefending?'#E67E22':gateSettings.enabled?'#2ECC71':'#E74C3C';
+  }
+  var gateStatusLabel=document.getElementById('gateStatusLabel');
+  if(gateStatusLabel){
+    var gateOn=!!gateSettings.enabled;
+    gateStatusLabel.textContent=gateOn?'게이트 ON':'게이트 OFF';
+    gateStatusLabel.className='gate-status-label '+(gateOn?'on':'off');
   }
   var stopModeLabel=document.getElementById('stopModeLabel');
   if(stopModeLabel)stopModeLabel.textContent=stopMode+(stopEnabledByMode?' · 자동정지 사용':' · 배달료 전용');
