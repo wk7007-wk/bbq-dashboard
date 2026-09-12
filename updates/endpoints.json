@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-06T04:51:37+09:00",
+  "updated_at": "2026-09-12T14:31:31+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -36,6 +36,35 @@
       "chicken_timer_subnote": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer&profile=subnote&sync=main",
       "chicken_timer_phone": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/phone.html",
       "updates": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=updates"
+    },
+    "phone_coder": {
+      "schema": "factory_phone_coder/v1",
+      "note": "개인폰은 Tailscale 없이 WAN. 시크릿·server-key 없음. 키는 grok_cli GET.",
+      "prefer": [
+        "wan_http",
+        "wan_https",
+        "magic_https"
+      ],
+      "wan_http": "http://125.176.112.214:2421",
+      "wan_https": "https://125.176.112.214",
+      "magic_https": "https://wsl-ubuntu.tail785e65.ts.net",
+      "grok_ws": "ws://125.176.112.214:2419/ws",
+      "files": {
+        "codex_job": "factory_codex_job.json",
+        "codex_result": "factory_codex_result.json",
+        "claude_job": "factory_claude_job.json",
+        "claude_result": "factory_claude_result.json",
+        "peer_inbox": "factory_peer_inbox.json",
+        "put_paths": "factory_put_paths.json",
+        "grok_cli": "grok_cli.json"
+      },
+      "codex_job": "http://125.176.112.214:2421/factory_codex_job.json",
+      "codex_result": "http://125.176.112.214:2421/factory_codex_result.json",
+      "claude_job": "http://125.176.112.214:2421/factory_claude_job.json",
+      "claude_result": "http://125.176.112.214:2421/factory_claude_result.json",
+      "peer_inbox": "http://125.176.112.214:2421/factory_peer_inbox.json",
+      "put_paths": "http://125.176.112.214:2421/factory_put_paths.json",
+      "grok_cli": "http://125.176.112.214:2421/grok_cli.json"
     }
   },
   "health": {
@@ -80,7 +109,36 @@
       "wan_base_lock": true,
       "wan_base_lock_value": "http://125.176.112.214:2421",
       "wan_https": "https://125.176.112.214",
-      "site_lan_base": "http://192.168.219.42:2421"
+      "site_lan_base": "http://192.168.219.42:2421",
+      "phone_coder": {
+        "schema": "factory_phone_coder/v1",
+        "note": "개인폰은 Tailscale 없이 WAN. 시크릿·server-key 없음. 키는 grok_cli GET.",
+        "prefer": [
+          "wan_http",
+          "wan_https",
+          "magic_https"
+        ],
+        "wan_http": "http://125.176.112.214:2421",
+        "wan_https": "https://125.176.112.214",
+        "magic_https": "https://wsl-ubuntu.tail785e65.ts.net",
+        "grok_ws": "ws://125.176.112.214:2419/ws",
+        "files": {
+          "codex_job": "factory_codex_job.json",
+          "codex_result": "factory_codex_result.json",
+          "claude_job": "factory_claude_job.json",
+          "claude_result": "factory_claude_result.json",
+          "peer_inbox": "factory_peer_inbox.json",
+          "put_paths": "factory_put_paths.json",
+          "grok_cli": "grok_cli.json"
+        },
+        "codex_job": "http://125.176.112.214:2421/factory_codex_job.json",
+        "codex_result": "http://125.176.112.214:2421/factory_codex_result.json",
+        "claude_job": "http://125.176.112.214:2421/factory_claude_job.json",
+        "claude_result": "http://125.176.112.214:2421/factory_claude_result.json",
+        "peer_inbox": "http://125.176.112.214:2421/factory_peer_inbox.json",
+        "put_paths": "http://125.176.112.214:2421/factory_put_paths.json",
+        "grok_cli": "http://125.176.112.214:2421/grok_cli.json"
+      }
     },
     "primary": {
       "pages_base": "https://wk7007-wk.github.io/bbq-dashboard",
@@ -101,5 +159,34 @@
   },
   "public_ip": "125.176.112.214",
   "host": "125.176.112.214",
-  "center_mode": "site"
+  "center_mode": "site",
+  "phone_coder": {
+    "schema": "factory_phone_coder/v1",
+    "note": "개인폰은 Tailscale 없이 WAN. 시크릿·server-key 없음. 키는 grok_cli GET.",
+    "prefer": [
+      "wan_http",
+      "wan_https",
+      "magic_https"
+    ],
+    "wan_http": "http://125.176.112.214:2421",
+    "wan_https": "https://125.176.112.214",
+    "magic_https": "https://wsl-ubuntu.tail785e65.ts.net",
+    "grok_ws": "ws://125.176.112.214:2419/ws",
+    "files": {
+      "codex_job": "factory_codex_job.json",
+      "codex_result": "factory_codex_result.json",
+      "claude_job": "factory_claude_job.json",
+      "claude_result": "factory_claude_result.json",
+      "peer_inbox": "factory_peer_inbox.json",
+      "put_paths": "factory_put_paths.json",
+      "grok_cli": "grok_cli.json"
+    },
+    "codex_job": "http://125.176.112.214:2421/factory_codex_job.json",
+    "codex_result": "http://125.176.112.214:2421/factory_codex_result.json",
+    "claude_job": "http://125.176.112.214:2421/factory_claude_job.json",
+    "claude_result": "http://125.176.112.214:2421/factory_claude_result.json",
+    "peer_inbox": "http://125.176.112.214:2421/factory_peer_inbox.json",
+    "put_paths": "http://125.176.112.214:2421/factory_put_paths.json",
+    "grok_cli": "http://125.176.112.214:2421/grok_cli.json"
+  }
 }
