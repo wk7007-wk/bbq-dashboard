@@ -28,5 +28,10 @@ assert(timer.includes('isGistOrPagesJson'), 'timer must not race gist with live 
 assert(timer.includes('first(live).catch'), 'timer gist GET only after factory miss');
 
 assert(posweb.includes('fallbackJsonUrls'), 'posweb factory down must read 2nd live_base');
+assert(posweb.includes('githubusercontent.com'), 'posweb JSON 2nd must be gist copies not github.io HTML');
+assert(posweb.includes('factoryOrigin = ""'), 'dead factory must not keep Magic as origin');
+assert(posweb.includes('if (factoryLive)'), 'factory down GET must skip hanging factory origins');
+assert(order.includes('AbortController'), 'OrderHelper factory probe must time out');
+assert(hynix.includes('AbortController'), 'hynix factory probe must time out');
 
 console.log('factory down github fallback: PASS');

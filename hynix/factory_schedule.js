@@ -16,10 +16,16 @@
   function probe(url) {
     if (!url) return Promise.resolve(false);
     if (isGithubPagesHost() && String(url).indexOf('https://') !== 0) return Promise.resolve(false);
-    return fetch(url, { cache: 'no-cache' }).then(function (r) {
+    var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    var t = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 4000);
+    return fetch(url, { cache: 'no-cache', signal: ctrl ? ctrl.signal : undefined }).then(function (r) {
+      clearTimeout(t);
       if (!r.ok) return false;
       return r.json().then(function (j) { return !!(j && (j.ok === true || j.status === 'ok')); });
-    }).catch(function () { return false; });
+    }).catch(function () {
+      clearTimeout(t);
+      return false;
+    });
   }
   function loadTable() {
     var i = 0;

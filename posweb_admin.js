@@ -72,16 +72,18 @@
     var out = [];
     var ep = addressBook;
     if (!ep || !ep.sets) return out;
+    function add(u) {
+      u = String(u || "").trim();
+      if (!u || u.indexOf("http") !== 0 || !canUseUrl(u)) return;
+      if (out.indexOf(u) < 0) out.push(u);
+    }
     ["primary", "fallback"].forEach(function (setname) {
       var s = ep.sets[setname] || {};
-      ["live_base", "pages_base"].forEach(function (k) {
-        var live = String(s[k] || "").replace(/\/$/, "");
-        if (!live || !canUseUrl(live)) return;
-        var u = live + "/" + name;
-        if (out.indexOf(u) < 0) out.push(u);
-      });
-      var direct = String(s[name] || "").trim();
-      if (direct.indexOf("http") === 0 && canUseUrl(direct) && out.indexOf(direct) < 0) out.push(direct);
+      add(s[name]);
+      add(s[name.replace(/\.json$/, "")]);
+      var live = String(s.live_base || "").replace(/\/$/, "");
+      // gist/raw is JSON copies. github.io pages_base is HTML, not kds_status.json.
+      if (live && live.indexOf("githubusercontent.com") >= 0) add(live + "/" + name);
     });
     return out;
   }
@@ -114,18 +116,27 @@
     var chain = Promise.reject(new Error("none"));
     list.forEach(function (base) {
       chain = chain.catch(function () {
-        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), { cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined }).then(function (r) {
+        var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+        var t = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 4000);
+        return fetch(String(base).replace(/\/$/, "") + "/health?t=" + Date.now(), {
+          cache: "no-store",
+          signal: ctrl ? ctrl.signal : undefined
+        }).then(function (r) {
+          clearTimeout(t);
           if (!r.ok) throw new Error(String(r.status));
           factoryOrigin = base;
           factoryLive = true;
           return base;
+        }).catch(function (err) {
+          clearTimeout(t);
+          throw err;
         });
       });
     });
     return chain.catch(function () {
       factoryLive = false;
-      factoryOrigin = factoryOriginList[0] || (canUseUrl(MAGIC) ? MAGIC : "");
-      return factoryOrigin;
+      factoryOrigin = "";
+      return "";
     });
   }
 
@@ -157,8 +168,8 @@
       return probeFactoryHealth(factoryOriginList);
     }).catch(function () {
       factoryLive = false;
-      factoryOriginList = canUseUrl(MAGIC) ? [MAGIC] : [];
-      factoryOrigin = factoryOriginList[0] || "";
+      factoryOriginList = [];
+      factoryOrigin = "";
       return factoryOrigin;
     }).then(function () {
       paintFactoryBanner();
@@ -340,17 +351,25 @@
   function getFactoryText(name) {
     return resolveFactoryOrigin().then(function () {
       var p = Promise.reject(new Error("none"));
-      factoryOrigins().forEach(function (base) {
-        var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + String(name || "").replace(/^\//, "");
-        p = p.catch(function () {
-          return fetch(url + "?t=" + Date.now(), { cache: "no-store" }).then(function (r) {
-            if (!r.ok) throw new Error(String(r.status));
-            factoryOrigin = base || factoryOrigin;
-            factoryLive = true;
-            return r.text();
+      if (factoryLive) {
+        factoryOrigins().forEach(function (base) {
+          var url = (base ? String(base).replace(/\/$/, "") + "/" : "/") + String(name || "").replace(/^\//, "");
+          p = p.catch(function () {
+            var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+            var t = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 4000);
+            return fetch(url + "?t=" + Date.now(), { cache: "no-store", signal: ctrl ? ctrl.signal : undefined }).then(function (r) {
+              clearTimeout(t);
+              if (!r.ok) throw new Error(String(r.status));
+              factoryOrigin = base || factoryOrigin;
+              factoryLive = true;
+              return r.text();
+            }).catch(function (err) {
+              clearTimeout(t);
+              throw err;
+            });
           });
         });
-      });
+      }
       fallbackJsonUrls(name).forEach(function (url) {
         p = p.catch(function () {
           return fetch(url + (url.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" }).then(function (r) {

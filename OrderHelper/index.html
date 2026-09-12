@@ -926,14 +926,17 @@ async function ensureFactoryHttpsPutReady() {
   };
   const probe = async (url) => {
     if (!url) return false;
+    const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    const t = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (e) {} }, 4000);
     try {
-      const r = await fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now(), { cache: 'no-cache' });
+      const r = await fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now(), { cache: 'no-cache', signal: ctrl ? ctrl.signal : undefined });
       if (!r.ok) return false;
       try {
         const j = await r.json();
         return !!(j && (j.ok === true || j.status === 'ok' || j.http));
       } catch (e) { return true; }
     } catch (e) { return false; }
+    finally { clearTimeout(t); }
   };
   const loadEp = async () => {
     const cands = isGithubPagesHost()
