@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-12T14:31:31+09:00",
+  "updated_at": "2026-09-12T14:32:24+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -39,7 +39,7 @@
     },
     "phone_coder": {
       "schema": "factory_phone_coder/v1",
-      "note": "개인폰은 Tailscale 없이 WAN. 시크릿·server-key 없음. 키는 grok_cli GET.",
+      "note": "개인폰은 Tailscale 없이 WAN. 비밀값은 이 JSON에 없음. 접속키는 grok_cli GET.",
       "prefer": [
         "wan_http",
         "wan_https",
@@ -112,7 +112,7 @@
       "site_lan_base": "http://192.168.219.42:2421",
       "phone_coder": {
         "schema": "factory_phone_coder/v1",
-        "note": "개인폰은 Tailscale 없이 WAN. 시크릿·server-key 없음. 키는 grok_cli GET.",
+        "note": "개인폰은 Tailscale 없이 WAN. 비밀값은 이 JSON에 없음. 접속키는 grok_cli GET.",
         "prefer": [
           "wan_http",
           "wan_https",
@@ -162,7 +162,7 @@
   "center_mode": "site",
   "phone_coder": {
     "schema": "factory_phone_coder/v1",
-    "note": "개인폰은 Tailscale 없이 WAN. 시크릿·server-key 없음. 키는 grok_cli GET.",
+    "note": "개인폰은 Tailscale 없이 WAN. 비밀값은 이 JSON에 없음. 접속키는 grok_cli GET.",
     "prefer": [
       "wan_http",
       "wan_https",
