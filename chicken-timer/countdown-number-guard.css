@@ -232,3 +232,148 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
     font-size: 0.58rem !important;
   }
 }
+
+/* Portrait: MM:SS on one row. V15 two-line stack clips digits and
+ * collides with side rails on 335x900 / phone cards. */
+@media (orientation: portrait) {
+  body[data-countdown-layout="v15-original-final"] .board
+    .timer-panel[data-layout-owner="v3"]
+    :is(.timer-readout, .split-timer-readout),
+  body[data-countdown-layout="v15-original-final"] .board
+    .zone-group[data-zone] .slot-card
+    .timer-panel[data-layout-owner="v3"]
+    :is(.readout-cluster, .split-readout-cluster)
+    > :is(.timer-readout, .split-timer-readout),
+  body[data-countdown-layout="v15-original-final"] .board
+    .zone-group[data-zone] .slot-card
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"]
+    .readout-cluster > .timer-readout {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    z-index: 4 !important;
+    gap: 0.06em !important;
+    font-size: clamp(
+      var(--countdown-min-font),
+      min(22cqh, 28cqw),
+      var(--countdown-max-font)
+    ) !important;
+    line-height: 1 !important;
+    place-self: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"] .board
+    .timer-panel[data-layout-owner="v3"]
+    :is(.timer-readout, .split-timer-readout)
+    .countdown-separator,
+  body[data-countdown-layout="v15-original-final"] .board
+    .zone-group[data-zone] .slot-card
+    .timer-panel[data-layout-owner="v3"]
+    :is(.timer-readout, .split-timer-readout)
+    .countdown-separator {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 0.02em !important;
+    font-size: 0.82em !important;
+    line-height: 1 !important;
+    opacity: 0.72 !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"] .board
+    .timer-panel[data-layout-owner="v3"]
+    :is(.timer-readout, .split-timer-readout)
+    :is(.countdown-minutes, .countdown-seconds),
+  body[data-countdown-layout="v15-original-final"] .board
+    .zone-group[data-zone] .slot-card
+    .timer-panel[data-layout-owner="v3"]
+    :is(.timer-readout, .split-timer-readout)
+    :is(.countdown-minutes, .countdown-seconds) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1em !important;
+    line-height: 1 !important;
+    overflow: visible !important;
+    max-width: none !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"] .board
+    .timer-panel[data-layout-owner="v3"]
+    :is(.readout-cluster, .split-readout-cluster) {
+    overflow: hidden !important;
+    z-index: 2 !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+    :is(.adjust-button, .timer-primary-actions > button) {
+    overflow: hidden !important;
+    z-index: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    padding: 0.06rem !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    :is(.adjust-button, .split-adjust-button)[data-delta-seconds] {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.08em !important;
+    overflow: hidden !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+    display: inline-block !important;
+    font-size: clamp(0.62rem, 3.2cqh, 0.92rem) !important;
+    max-width: none !important;
+    overflow: visible !important;
+    line-height: 1 !important;
+  }
+
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
+    .timer-primary-actions > button {
+    font-size: clamp(0.52rem, 2.2cqh, 0.78rem) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    letter-spacing: -0.03em !important;
+    padding: 0 !important;
+  }
+}

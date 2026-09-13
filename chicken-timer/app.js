@@ -68,6 +68,7 @@
     "wide-add": { fontPx: 56, lanePx: 72, mode: "one-line" },
     "wide-split": { fontPx: 56, lanePx: 72, mode: "two-line" },
     split: { fontPx: 30, lanePx: 40, mode: "one-line" },
+    "adaptive-primary": { fontPx: 36, lanePx: 44, mode: "one-line" },
   };
   // The operating gauge is deliberately normalized to the user's explicit
   // five-minute maximum.  This is independent of the preset list: a 7/10/13
@@ -2867,11 +2868,14 @@
       && !wideOvenLandscape
       && clusterBox
       && clusterBox.height / Math.max(1, clusterBox.width) >= 1.5;
-    const readoutMode = narrowAddMain || tallNarrowMain
+    // Portrait tall cards stay MM:SS on one line. Two-line is landscape only.
+    const readoutMode = narrowAddMain
       ? "two-line"
-      : profileName === "compact-primary" || profileName === "split"
-        ? mode
-        : profile ? profile.mode : mode;
+      : (tallNarrowMain
+        ? "one-line"
+        : profileName === "compact-primary" || profileName === "split"
+          ? mode
+          : profile ? profile.mode : mode);
     view.timerPanel.dataset.readoutProfile = profileName;
     view.readout.dataset.readoutProfile = profileName;
     if (view.readout.dataset.counterLayout !== readoutMode) {
