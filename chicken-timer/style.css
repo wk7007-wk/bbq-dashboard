@@ -8396,3 +8396,99 @@ body .zone-group[data-zone="oven"] .timer-panel[data-layout-owner="v3"][data-con
  body .zone-group[data-zone="oven"] .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-add-mode="false"][data-has-split="true"]>.timer-positive-rail { display:grid!important;grid-area:adjust!important; }
  body .zone-group[data-zone="oven"] .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-add-mode="false"][data-has-split="true"]>.timer-positive-rail>.adjust-row { display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:1fr!important;gap:3px!important;width:100%!important;height:100%!important; }
 }
+
+/*
+ * Portrait log overlay owner.
+ *
+ * In-flow history (top shelf on phones, 24-43% side lane on tablets) stole
+ * the countdown cluster. Keep the two visible action rows, but take them
+ * out of card geometry so the 3x3 counter/rails own the full slot.
+ */
+@media (orientation: portrait) {
+  body .zone-group[data-zone] .slot-card {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+  }
+
+  body .zone-group[data-zone] .slot-card > .slot-body {
+    flex: 1 1 auto !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  body .zone-group[data-zone] .slot-card > .slot-info,
+  body .zone-group[data-zone] .slot-card > .slot-info[data-layout-owner="v3"] {
+    position: absolute !important;
+    z-index: 7 !important;
+    inset: 0.08rem 22% auto 22% !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    padding: 0.04rem 0.1rem !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+  }
+
+  body .zone-group[data-zone] .slot-card[data-has-activity="false"] > .slot-info,
+  body .zone-group[data-zone] .slot-card[data-state="idle"][data-has-activity="false"] > .slot-info {
+    display: none !important;
+  }
+
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log,
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log[data-layout-owner="v3"] {
+    --v3-log-row-block: 0.78rem;
+    --v3-log-gap: 0.04rem;
+    --v3-log-viewport-block: auto;
+    width: 100% !important;
+    height: auto !important;
+    block-size: auto !important;
+    min-height: 0 !important;
+    min-block-size: 0 !important;
+    max-block-size: none !important;
+    display: grid !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    gap: 0.04rem !important;
+    overflow: hidden !important;
+  }
+
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log-row,
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log[data-layout-owner="v3"] .slot-info-log-row,
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log-row.is-current {
+    min-height: 0 !important;
+    min-block-size: 0 !important;
+    height: auto !important;
+    block-size: auto !important;
+    max-block-size: none !important;
+    padding: 0.02rem 0.16rem !important;
+    border-width: 1px !important;
+    border-radius: 0.28rem !important;
+    background: rgba(6, 10, 14, 0.58) !important;
+    font-size: clamp(0.52rem, 1.7vw, 0.66rem) !important;
+    line-height: 1.05 !important;
+    font-weight: 800 !important;
+  }
+
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log-row span,
+  body .zone-group[data-zone] .slot-card > .slot-info .slot-info-log-row.is-current span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}

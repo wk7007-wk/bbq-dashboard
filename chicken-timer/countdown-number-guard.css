@@ -236,8 +236,16 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
 }
 
 /* Portrait: MM:SS on one row. V15 two-line stack clips digits and
- * collides with side rails on 335x900 / phone cards. */
+ * collides with side rails on 335x900 / phone cards. History is an overlay,
+ * so the leftover cluster can take a larger readable size. */
 @media (orientation: portrait) {
+  body[data-countdown-layout="v15-original-final"],
+  body[data-countdown-layout="v15-original-final"][data-display-profile="primary-phone"],
+  body[data-countdown-layout="v15-original-final"][data-display-profile="fallback-responsive"] {
+    --countdown-min-font: 1.7rem;
+    --countdown-max-font: 3.1rem;
+  }
+
   body[data-countdown-layout="v15-original-final"] .board
     .timer-panel[data-layout-owner="v3"]
     :is(.timer-readout, .split-timer-readout),
@@ -275,7 +283,7 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
     gap: 0.06em !important;
     font-size: clamp(
       var(--countdown-min-font),
-      min(22cqh, 28cqw),
+      min(38cqh, 34cqw),
       var(--countdown-max-font)
     ) !important;
     line-height: 1 !important;
