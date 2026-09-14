@@ -9,8 +9,8 @@
   <meta http-equiv="Expires" content="0">
 </head>
 <body style="font-family:sans-serif;background:#111;color:#eee;padding:24px;max-width:40rem">
-  <p>공장 주소를 찾는 중…</p>
-  <p style="color:#888;font-size:14px">1차 공장, 실패하면 깃허브.</p>
+  <p>공장2로 이동 중…</p>
+  <p style="color:#888;font-size:14px">한 번만 이동합니다. 안 되면 http://125.176.112.214:2421/bookmarks.html 을 북마크하세요.</p>
   <p id="alt" style="display:none;margin-top:16px"></p>
   <script>
   (function () {
@@ -25,6 +25,7 @@
       hynix: "/hynix/",
       "chicken-timer": "/chicken-timer/",
       updates: "/updates/",
+      deliveryhelper: "/deliveryhelper/",
       banktotal: "/banktotal.html",
       kds: "/kds.html",
       index: "/bookmarks.html",
@@ -163,7 +164,7 @@
 
     function next(i) {
       if (i >= books.length) {
-        location.replace(withStay(join(GH, path)));
+        goDown();
         return;
       }
       fetch(books[i], { cache: "no-store" }).then(function (r) {
@@ -171,6 +172,7 @@
         return r.json();
       }).then(run).catch(function () { next(i + 1); });
     }
+    if (String(location.host || "").indexOf("125.176.112.214") >= 0) return;
     location.replace(WAN + path);
     return;
   })();

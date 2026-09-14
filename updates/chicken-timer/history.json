@@ -1,65 +1,18 @@
-{
-  "schemaVersion": 1,
-  "releases": [
-    {
-      "appVersionCode": 29788812,
-      "appVersionName": "0822.0112",
-      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788812",
-      "sha256": "d297b517027efc90f19838622c65d5d637f15c70607b759c513a8cd31005daa3",
-      "sizeBytes": 1580032,
-      "packageName": "com.chickentimer.board.v2",
-      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-      "enabled": true,
-      "releaseNotes": "가로 26px 레일이 56px를 이김",
-      "updatedAt": "2026-08-22T01:12:48+09:00"
-    },
-    {
-      "appVersionCode": 29788804,
-      "appVersionName": "0822.0104",
-      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788804",
-      "sha256": "6076e9b05987709acaccdc1a6dc7d3238ce5ee3017b398cda37d30c2947662f4",
-      "sizeBytes": 1579940,
-      "packageName": "com.chickentimer.board.v2",
-      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-      "enabled": true,
-      "releaseNotes": "노트9 가로 큰 숫자 복원(레일 26px), 앱-웹 같은 방",
-      "updatedAt": "2026-08-22T01:04:54+09:00"
-    },
-    {
-      "appVersionCode": 29788789,
-      "appVersionName": "0822.0049",
-      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788789",
-      "sha256": "194032c231cc1505046f979a50069525ed9dc081915f0eb55e3e6f143c4e8047",
-      "sizeBytes": 1579854,
-      "packageName": "com.chickentimer.board.v2",
-      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-      "enabled": true,
-      "releaseNotes": "숫자/레일 크기 복원(note9-rail-27), 앱-웹 같은 방, 10분 삭제 고스트 차단",
-      "updatedAt": "2026-08-22T00:50:05+09:00"
-    },
-    {
-      "appVersionCode": 29788778,
-      "appVersionName": "0822.0038",
-      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29788778",
-      "sha256": "d9d795c02de5e4db6feca88d104e6befe8032f1cc90bcf07baefa3966e11b70b",
-      "sizeBytes": 1581189,
-      "packageName": "com.chickentimer.board.v2",
-      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-      "enabled": true,
-      "releaseNotes": "공장 404 때 깃허브 웹으로 연동, 10분 시작 직후 삭제 고스트 차단",
-      "updatedAt": "2026-08-22T00:40:32+09:00"
-    },
-    {
-      "appVersionCode": 29787751,
-      "appVersionName": "0821.0751",
-      "apkUrl": "https://github.com/wk7007-wk/bbq-dashboard/releases/download/app-updates/ChickenTimer_latest.bin?v=29787751",
-      "sha256": "7529a2a22dd7171190f25d6789bd9764872265b89970f44b128054e426777755",
-      "sizeBytes": 1489194,
-      "packageName": "com.chickentimer.board.v2",
-      "certificateSha256": "b50366ca09e51a31ac88979f6ec1b34fabebe70bd218934e12afda5acd5b86cb",
-      "enabled": true,
-      "releaseNotes": "최신 웹 보드 보존 및 GitHub 자동업데이트 채널 전환",
-      "updatedAt": "2026-08-21T08:16:02+09:00"
-    }
-  ]
-}
+[
+  {
+    "versionName": "0914.2111",
+    "versionCode": 29823131,
+    "sha256": "57632d1c83babf85bdeef3bb4d879fc0c6acac76674acfdbf68334e6a68a8a45",
+    "sizeBytes": 1590297,
+    "updatedAt": "2026-09-14T21:11:01+09:00",
+    "releaseNotes": "공장2 WAN 껍데기. 디자인은 사이트 HTML. 가로전용. 접속로그는 apk_connect_status.json"
+  },
+  {
+    "versionName": "0907.1401",
+    "versionCode": 29811057,
+    "sha256": "4c0b7a4ba4ea0558de0e13a73c23946617b37025ad64429b64112ab95919514f",
+    "sizeBytes": 1501828,
+    "updatedAt": "2026-09-07T14:01:49+0900",
+    "releaseNotes": "앱은 번들 보드. 사이트 HTML/go.html 점프 없음. 같은 Firebase main+LAN 동기화."
+  }
+]

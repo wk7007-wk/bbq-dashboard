@@ -1,0 +1,10 @@
+[
+  {
+    "versionName": "0914.2111",
+    "versionCode": 29823131,
+    "sha256": "00f470d8cb9e52dc4e1c0d7642f204e78078c493704d88ebbc2a72998d64090e",
+    "sizeBytes": 14680,
+    "updatedAt": "2026-09-14T21:11:01+09:00",
+    "releaseNotes": "공장2 WAN 껍데기. 디자인은 사이트 HTML. 가로전용. 접속로그는 apk_connect_status.json"
+  }
+]

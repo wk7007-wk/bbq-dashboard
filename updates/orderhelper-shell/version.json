@@ -1,0 +1,17 @@
+{
+  "versionName": "0914.2111",
+  "versionCode": 29823131,
+  "appVersionName": "0914.2111",
+  "appVersionCode": 29823131,
+  "apkUrl": "/updates/orderhelper-shell/OrderHelperShell_latest.apk",
+  "artifactUrl": "/updates/orderhelper-shell/OrderHelperShell_latest.apk",
+  "sha256": "e0312d47bd87b02fd0ebac45102ef9f6270f234ba6266a41c4e87952eeb8605f",
+  "sizeBytes": 14669,
+  "packageName": "com.factory2.orderhelper",
+  "enabled": true,
+  "releaseNotes": "공장2 WAN 껍데기. 디자인은 사이트 HTML. 가로전용. 접속로그는 apk_connect_status.json",
+  "updatedAt": "2026-09-14T21:11:01+09:00",
+  "historyUrl": "/updates/orderhelper-shell/history.json",
+  "channel": "orderhelper-shell",
+  "label": "발주(껍데기)"
+}

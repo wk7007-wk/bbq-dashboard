@@ -1,65 +1,89 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-06T12:06:15+09:00",
+  "updatedAt": "2026-09-14T21:11:01+09:00",
   "notices": [
     {
-      "date": "2026-09-06",
+      "date": "2026-09-14",
       "title": "오늘 올린 것",
       "items": [
-        "치킨타이머 0906.1105 — 주소판 체인. 공장 IP 리터럴 없음",
-        "PosDelay 0906.0613 — 깃허브 주소판의 factory JSON을 봄. KDS/버스/임계값 파이어 아님",
-        "PosKDS 0906.0608 — 주소판 factory에 kds_status PUT. Gist는 2차",
-        "배달도우미 0906.0610 — KDS는 공장 파일 폴링. 파이어 SSE 제거",
-        "발주 사이트 — github.io 점프 후 공장에 저장. MagicDNS만으로는 PUT 안 함",
-        "사이트 북마크 — 이 화면 위에 go.html 주소. Tailscale 없이 북마크",
-        "스토어봇 0.118.8 — 주소판 factory 1차 PUT. 서버폰 재설치 필요(USB 미연결이면 센터에서 받기)"
+        "포스웹(껍데기) 0914.2111 14657B",
+        "발주(껍데기) 0914.2111 14669B",
+        "업데이트센터(껍데기) 0914.2111 14680B",
+        "배달도우미(껍데기) 0914.2111 14667B",
+        "치킨타이머 0914.2111 1590297B",
+        "주소 받기: 기존 깃허브 go.html 북마크 유지",
+        "공장2 원점 http://125.176.112.214:2421",
+        "껍데기 앱은 사이트 HTML만 바꾸면 됨. APK 재빌드 불필요"
       ]
     }
   ],
   "sites": [
     {
+      "id": "bookmarks",
+      "label": "북마크 센터(공장2)",
+      "bookmark": "http://125.176.112.214:2421/bookmarks.html"
+    },
+    {
       "id": "posweb",
-      "label": "포스웹",
+      "label": "포스웹 주소받기",
       "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=posweb"
     },
     {
       "id": "orderhelper",
-      "label": "발주",
+      "label": "발주 주소받기",
       "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=orderhelper"
     },
     {
       "id": "hynix",
-      "label": "하이닉스·근무표",
+      "label": "하이닉스 주소받기",
       "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=hynix"
     },
     {
       "id": "chicken_timer",
-      "label": "타이머 웹",
+      "label": "타이머 주소받기",
       "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer"
     },
     {
       "id": "updates",
-      "label": "업데이트 센터",
+      "label": "업데이트센터 주소받기",
       "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=updates"
+    },
+    {
+      "id": "deliveryhelper",
+      "label": "배달도우미 주소받기",
+      "bookmark": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=deliveryhelper"
     }
   ],
   "apps": [
     {
+      "id": "banktotal",
+      "label": "BankTotal",
+      "apkName": "BankTotal_latest.apk",
+      "versionName": "0802.1130",
+      "versionCode": 29760630,
+      "packageName": "com.banktotal.app",
+      "enabled": true,
+      "apkUrl": "/updates/banktotal/BankTotal_latest.apk",
+      "metadataUrl": "/updates/banktotal/version.json",
+      "sha256": "9b95ece9d54ce808b80fedf7f11be848e5ab8cda7a983ee71812e06aa82b6b94",
+      "sizeBytes": 7315167
+    },
+    {
       "id": "chicken-timer",
       "label": "치킨타이머",
       "apkName": "ChickenTimer_latest.apk",
-      "versionName": "0906.1105",
-      "versionCode": 29811056,
+      "versionName": "0914.2111",
+      "versionCode": 29823131,
       "packageName": "com.chickentimer.board.v2",
       "enabled": true,
       "apkUrl": "/updates/chicken-timer/ChickenTimer_latest.apk",
       "metadataUrl": "/updates/chicken-timer/version.json",
-      "sha256": "7a89809b53c4775561b0baeaa7a81e1cd0a3883c60c962a24352ca59ccee1c1e",
-      "sizeBytes": 1501468
+      "sha256": "57632d1c83babf85bdeef3bb4d879fc0c6acac76674acfdbf68334e6a68a8a45",
+      "sizeBytes": 1590297
     },
     {
       "id": "deliveryhelper",
-      "label": "배달도우미",
+      "label": "배달도우미(기존)",
       "apkName": "DeliveryHelper_latest.apk",
       "versionName": "0906.0610",
       "versionCode": 29810710,
@@ -67,8 +91,34 @@
       "enabled": true,
       "apkUrl": "/updates/deliveryhelper/DeliveryHelper_latest.apk",
       "metadataUrl": "/updates/deliveryhelper/version.json",
-      "sha256": "f8e4cd58387626a7c4ea91187f1a8b8f7185b82992ac1d57e9e760fc325f9454",
-      "sizeBytes": 32925901
+      "sha256": "e106cae8cacd2700c902574b09ba2feda2a0cb685a3533703d22d0a8600e16b1",
+      "sizeBytes": 32929997
+    },
+    {
+      "id": "deliveryhelper-shell",
+      "label": "배달도우미(껍데기)",
+      "apkName": "DeliveryHelperShell_latest.apk",
+      "versionName": "0914.2111",
+      "versionCode": 29823131,
+      "packageName": "com.factory2.deliveryhelper",
+      "enabled": true,
+      "apkUrl": "/updates/deliveryhelper-shell/DeliveryHelperShell_latest.apk",
+      "metadataUrl": "/updates/deliveryhelper-shell/version.json",
+      "sha256": "131ad6960ba22b5c24db62fa24fc3b22c781412c373f3b558cdb725e6d9caad8",
+      "sizeBytes": 14667
+    },
+    {
+      "id": "orderhelper-shell",
+      "label": "발주(껍데기)",
+      "apkName": "OrderHelperShell_latest.apk",
+      "versionName": "0914.2111",
+      "versionCode": 29823131,
+      "packageName": "com.factory2.orderhelper",
+      "enabled": true,
+      "apkUrl": "/updates/orderhelper-shell/OrderHelperShell_latest.apk",
+      "metadataUrl": "/updates/orderhelper-shell/version.json",
+      "sha256": "e0312d47bd87b02fd0ebac45102ef9f6270f234ba6266a41c4e87952eeb8605f",
+      "sizeBytes": 14669
     },
     {
       "id": "posdelay",
@@ -76,80 +126,12 @@
       "apkName": "PosDelay_latest.apk",
       "versionName": "0906.0613",
       "versionCode": 29810713,
-      "sha256": "ef36e6d929ca4d3537d6764fd84f4748b8273f412e99a89f7071c78b4ba49539",
-      "sizeBytes": 7750542,
       "packageName": "com.posdelay.app",
       "enabled": true,
       "apkUrl": "/updates/posdelay/PosDelay_latest.apk",
-      "metadataUrl": "/updates/posdelay/version.json"
-    },
-    {
-      "id": "storebot-termux",
-      "label": "StoreBotTermux",
-      "apkName": "StoreBotTermux_latest.bin",
-      "versionName": "0.118.8-storebot-kst0905.t1620",
-      "versionCode": 1086,
-      "packageName": "com.sbotux",
-      "enabled": true,
-      "apkUrl": "/updates/storebot-termux/StoreBotTermux_latest.apk",
-      "metadataUrl": "/updates/storebot-termux/version.json",
-      "sha256": "ef83bd7be36ccb84b13a972add9965dbb1f95dba13079ba981ff136841ec9aa0",
-      "sizeBytes": 38822086
-    },
-    {
-      "id": "wonmux",
-      "label": "Wonmux",
-      "apkName": "Wonmux_latest.bin",
-      "versionName": "0.118.3-wonmux.20260812.2",
-      "versionCode": 29780005,
-      "packageName": "com.wonmux",
-      "enabled": true,
-      "apkUrl": "/updates/wonmux/Wonmux_latest.apk",
-      "metadataUrl": "/updates/wonmux/version.json"
-    },
-    {
-      "id": "wonmux-browser",
-      "label": "Wonmux Browser",
-      "apkName": "WonmuxBrowser_latest.bin",
-      "versionName": "0726.1257",
-      "versionCode": 26072612,
-      "packageName": "com.wonmux.browser",
-      "enabled": true,
-      "apkUrl": "/updates/wonmux-browser/WonmuxBrowser_latest.apk",
-      "metadataUrl": "/updates/wonmux-browser/version.json"
-    },
-    {
-      "id": "solnote",
-      "label": "SolNote",
-      "apkName": "SolNote_latest.bin",
-      "versionName": "0801.1113",
-      "versionCode": 262131113,
-      "packageName": "com.wonmux.solnote.personal",
-      "enabled": true,
-      "apkUrl": "/updates/solnote/SolNote_latest.apk",
-      "metadataUrl": "/updates/solnote/version.json"
-    },
-    {
-      "id": "banktotal",
-      "label": "BankTotal",
-      "apkName": "BankTotal_latest.bin",
-      "versionName": "0802.1130",
-      "versionCode": 29760630,
-      "packageName": "com.banktotal.app",
-      "enabled": true,
-      "apkUrl": "/updates/banktotal/BankTotal_latest.apk",
-      "metadataUrl": "/updates/banktotal/version.json"
-    },
-    {
-      "id": "update-center",
-      "label": "업데이트 센터",
-      "apkName": "AppUpdateCenter_latest.bin",
-      "versionName": "0905.0026",
-      "versionCode": 29808926,
-      "packageName": "com.appupdatecenter.app",
-      "enabled": false,
-      "apkUrl": "/updates/update-center/AppUpdateCenter_latest.apk",
-      "metadataUrl": "/updates/update-center/version.json"
+      "metadataUrl": "/updates/posdelay/version.json",
+      "sha256": "ef36e6d929ca4d3537d6764fd84f4748b8273f412e99a89f7071c78b4ba49539",
+      "sizeBytes": 7750542
     },
     {
       "id": "poskds",
@@ -165,15 +147,108 @@
       "sizeBytes": 6222815
     },
     {
+      "id": "posweb-shell",
+      "label": "포스웹(껍데기)",
+      "apkName": "PoswebShell_latest.apk",
+      "versionName": "0914.2111",
+      "versionCode": 29823131,
+      "packageName": "com.factory2.posweb",
+      "enabled": true,
+      "apkUrl": "/updates/posweb-shell/PoswebShell_latest.apk",
+      "metadataUrl": "/updates/posweb-shell/version.json",
+      "sha256": "4ebf218869b3cc88edd41427f693969e289797f00e40bb89ca6e70c7775ac4cd",
+      "sizeBytes": 14657
+    },
+    {
+      "id": "solnote",
+      "label": "SolNote",
+      "apkName": "SolNote_latest.apk",
+      "versionName": "0801.1113",
+      "versionCode": 262131113,
+      "packageName": "com.wonmux.solnote.personal",
+      "enabled": true,
+      "apkUrl": "/updates/solnote/SolNote_latest.apk",
+      "metadataUrl": "/updates/solnote/version.json",
+      "sha256": "a78b1a3afae4ca8bcf1167c3a0285e98098dc81ebcacc353172aacab7c65b953",
+      "sizeBytes": 12235418
+    },
+    {
+      "id": "storebot-termux",
+      "label": "스토어봇",
+      "apkName": "StoreBotTermux_latest.apk",
+      "versionName": "0.118.8-storebot-kst0905.t1620",
+      "versionCode": 1086,
+      "packageName": "com.sbotux",
+      "enabled": true,
+      "apkUrl": "/updates/storebot-termux/StoreBotTermux_latest.apk",
+      "metadataUrl": "/updates/storebot-termux/version.json",
+      "sha256": "ded12cc8ebf709189b7377ea780560d889078bae4e54b2e2023239478969d635",
+      "sizeBytes": 38819395
+    },
+    {
+      "id": "update-center",
+      "label": "업데이트 센터(기존)",
+      "apkName": "AppUpdateCenter_latest.apk",
+      "versionName": "0905.0026",
+      "versionCode": 29808926,
+      "packageName": "com.appupdatecenter.app",
+      "enabled": true,
+      "apkUrl": "/updates/update-center/AppUpdateCenter_latest.apk",
+      "metadataUrl": "/updates/update-center/version.json",
+      "sha256": "f5191100d3323bb30d2e3e155f10ec6f0333006d67208504954ee523da026fbc",
+      "sizeBytes": 1559880
+    },
+    {
+      "id": "updatecenter-shell",
+      "label": "업데이트센터(껍데기)",
+      "apkName": "UpdateCenterShell_latest.apk",
+      "versionName": "0914.2111",
+      "versionCode": 29823131,
+      "packageName": "com.factory2.updatecenter",
+      "enabled": true,
+      "apkUrl": "/updates/updatecenter-shell/UpdateCenterShell_latest.apk",
+      "metadataUrl": "/updates/updatecenter-shell/version.json",
+      "sha256": "00f470d8cb9e52dc4e1c0d7642f204e78078c493704d88ebbc2a72998d64090e",
+      "sizeBytes": 14680
+    },
+    {
+      "id": "wonmux",
+      "label": "Wonmux",
+      "apkName": "Wonmux_latest.apk",
+      "versionName": "0.118.3-wonmux.20260812.2",
+      "versionCode": 29780005,
+      "packageName": "com.wonmux",
+      "enabled": true,
+      "apkUrl": "/updates/wonmux/Wonmux_latest.apk",
+      "metadataUrl": "/updates/wonmux/version.json",
+      "sha256": "668208315bdc251858e7585e13c70f9f187458c5a5bb78409528a42316086733",
+      "sizeBytes": 118233755
+    },
+    {
+      "id": "wonmux-browser",
+      "label": "Wonmux Browser",
+      "apkName": "WonmuxBrowser_latest.apk",
+      "versionName": "0726.1257",
+      "versionCode": 26072612,
+      "packageName": "com.wonmux.browser",
+      "enabled": true,
+      "apkUrl": "/updates/wonmux-browser/WonmuxBrowser_latest.apk",
+      "metadataUrl": "/updates/wonmux-browser/version.json",
+      "sha256": "5fdd4250b7213c1cd42a76ff124f8cd5f18934ffc5c501ea7c63bd32bdf95093",
+      "sizeBytes": 1295062
+    },
+    {
       "id": "workschedule",
-      "label": "WorkSchedule",
-      "apkName": "WorkSchedule_latest.bin",
+      "label": "근무표",
+      "apkName": "WorkSchedule_latest.apk",
       "versionName": "0702.1839",
       "versionCode": 1782985171,
       "packageName": "com.workschedule.app",
       "enabled": true,
-      "apkUrl": "/updates/workschedule/WorkSchedule_latest.bin",
-      "metadataUrl": "/updates/workschedule/version.json"
+      "apkUrl": "/updates/workschedule/WorkSchedule_latest.apk",
+      "metadataUrl": "/updates/workschedule/version.json",
+      "sha256": "711105c95898e995d1a70aa818a2e4806b5ca62063102ff3625e99c05e406779",
+      "sizeBytes": 5631281
     }
   ]
 }

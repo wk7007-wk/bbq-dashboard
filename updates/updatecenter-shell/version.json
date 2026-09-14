@@ -1,0 +1,17 @@
+{
+  "versionName": "0914.2111",
+  "versionCode": 29823131,
+  "appVersionName": "0914.2111",
+  "appVersionCode": 29823131,
+  "apkUrl": "/updates/updatecenter-shell/UpdateCenterShell_latest.apk",
+  "artifactUrl": "/updates/updatecenter-shell/UpdateCenterShell_latest.apk",
+  "sha256": "00f470d8cb9e52dc4e1c0d7642f204e78078c493704d88ebbc2a72998d64090e",
+  "sizeBytes": 14680,
+  "packageName": "com.factory2.updatecenter",
+  "enabled": true,
+  "releaseNotes": "공장2 WAN 껍데기. 디자인은 사이트 HTML. 가로전용. 접속로그는 apk_connect_status.json",
+  "updatedAt": "2026-09-14T21:11:01+09:00",
+  "historyUrl": "/updates/updatecenter-shell/history.json",
+  "channel": "updatecenter-shell",
+  "label": "업데이트센터(껍데기)"
+}
