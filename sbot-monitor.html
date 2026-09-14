@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>메신저봇 모니터</title>
+<style>
+body{margin:0;background:#121225;color:#f0f0fa;font-family:sans-serif;padding:14px}
+h1{font-size:1.2rem;margin:0 0 8px}
+.u,.note{color:#9aa0bc;font-size:.85rem;word-break:break-all}
+.row{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;margin:0 0 6px;border-radius:10px;background:#1c1c38;border:1px solid #2e2e52}
+.ok{border-left:6px solid #2ac1bc}
+.stale,.queued{border-left:6px solid #ffb020}
+.down,.none,.unauthorized,.empty,.no_adb,.other{border-left:6px solid #ff6b6b}
+.k{font-weight:800}
+.v{color:#9aa0bc;font-size:.82rem;text-align:right}
+</style>
+</head>
+<body>
+<h1>공장2 메신저봇 모니터</h1>
+<p class="u">http://125.176.112.214:2421/sbot-monitor.html</p>
+<p class="u">CLI: curl http://125.176.112.214:2421/storebot_monitor.json</p>
+<p class="note" id="head">불러오는 중…</p>
+<div id="list"></div>
+<script>
+function paint(d){
+  document.getElementById("head").textContent = (d.ts||"")+" · "+(d.ok?"전체 ok":"먹통 "+(d.down||[]).join(", "));
+  var box=document.getElementById("list");
+  box.innerHTML="";
+  function add(title, st, extra){
+    var div=document.createElement("div");
+    div.className="row "+(st||"down");
+    div.innerHTML='<span class="k">'+title+'</span><span class="v">'+(st||"")+" "+(extra||"")+"</span>";
+    box.appendChild(div);
+  }
+  var f=d.features||{};
+  Object.keys(f).forEach(function(k){
+    var v=f[k]||{};
+    add(k, v.status||v.state|| (v.ok?"ok":"down"), v.detail|| ("n="+v.n+" unsent="+v.unsent).replace(/n=undefined unsent=undefined/,"") );
+  });
+  var puts=d.puts||{};
+  Object.keys(puts).forEach(function(k){
+    var v=puts[k]||{};
+    add("PUT "+k, v.status, "age="+(v.age_sec==null?"none":v.age_sec));
+  });
+}
+function poll(){
+  fetch("/storebot_monitor.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(paint).catch(function(){
+    document.getElementById("head").textContent="모니터 JSON 없음";
+  });
+}
+poll(); setInterval(poll, 5000);
+</script>
+</body>
+</html>

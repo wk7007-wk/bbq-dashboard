@@ -5,6 +5,8 @@
 (function(){try{
   var host=String(location.hostname||"");
   if(host.indexOf("github.io")<0)return;
+  if(sessionStorage.getItem("f2jump")==="1")return;
+  sessionStorage.setItem("f2jump","1");
   location.replace("http://125.176.112.214:2421/bookmarks.html");
 }catch(e){}})();
 </script>
@@ -57,7 +59,12 @@ h1 { font-size:1.55rem; margin:0 0 6px; }
     ["KDS", WAN + "/kds.html", "주방 현황"]
   ];
   var TOOLS = [
+    ["메신저봇 모니터", WAN + "/sbot-monitor.html", "PUT·기능별 먹통"],
+    ["업데이트 직접받기", WAN + "/updates/get.html", "비밀번호 없음. 외출 설치용"],
     ["업데이트 센터", WAN + "/updates/", "앱·APK"],
+    ["폰 CLI 주소판", WAN + "/factory_phone_cli.json", "그록·코덱스·클로드 중 선택"],
+    ["클로드 잡(PUT)", WAN + "/factory_claude_job.json", "공장2 클로드"],
+    ["클로드 결과", WAN + "/factory_claude_result.json", "잡 결과"],
     ["통장모음", WAN + "/banktotal.html", "입출금"],
     ["통합 현황판", WAN + "/dashboard.html", "한 화면"],
     ["직원 안내", WAN + "/saaya.html", "안내문"]

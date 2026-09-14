@@ -312,9 +312,15 @@
     };
 
     async function getJson(url) {
-      const r = await fetch(url, { cache: "no-store" });
-      if (!r.ok) throw new Error(url);
-      return r.json();
+      const ac = new AbortController();
+      const t = setTimeout(function () { ac.abort(); }, 4000);
+      try {
+        const r = await fetch(url, { cache: "no-store", signal: ac.signal });
+        if (!r.ok) throw new Error(url);
+        return await r.json();
+      } finally {
+        clearTimeout(t);
+      }
     }
     const ADDRESS_BOOK = [
       "/endpoints.json",
@@ -349,11 +355,22 @@
       return out;
     }
     async function loadCatalogAndBook() {
-      const ep = await loadAddressBook();
-      const urls = catalogUrls(ep);
+      const direct = [
+        "/updates/catalog.json",
+        "catalog.json",
+        "http://125.176.112.214:2421/updates/catalog.json"
+      ];
       let cat = null;
-      for (const u of urls) {
+      for (const u of direct) {
         try { cat = await getJson(u); break; } catch (e) {}
+      }
+      let ep = null;
+      try { ep = await loadAddressBook(); } catch (e) { ep = null; }
+      if (!cat && ep) {
+        const urls = catalogUrls(ep);
+        for (const u of urls) {
+          try { cat = await getJson(u); break; } catch (e) {}
+        }
       }
       if (!cat) throw new Error("catalog");
       return { cat: cat, ep: ep };

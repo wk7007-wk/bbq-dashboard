@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0914.2010">
+<html lang="ko" data-web-v="0914.2150">
 <head>
 <script data-factory-jump="1">
 (function(){try{
   var host=String(location.hostname||"");
   if(host.indexOf("github.io")<0)return;
+  if(sessionStorage.getItem("f2jump")==="1")return;
+  sessionStorage.setItem("f2jump","1");
   var q=new URLSearchParams(location.search);
   q.delete("stay");
   var path=String(location.pathname||"");
@@ -27,7 +29,8 @@
     updates:"/updates/",
     banktotal:"/banktotal.html",
     kds:"/kds.html",
-    index:"/index.html",
+    index:"/bookmarks.html",
+    bookmarks:"/bookmarks.html",
     dashboard:"/dashboard.html"
   }[to]||"/posweb.html";
   q.set("to",to);
@@ -54,7 +57,6 @@
       return;
     }
   } catch (e) {}
-  window.addEventListener("pageshow", function (ev) { if (ev.persisted) location.reload(); });
   if (navigator.serviceWorker) {
     navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); });
   }
@@ -1026,7 +1028,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0910.0345"></script>
-<script src="posweb_admin.js?v=0914.2010"></script>
+<script src="posweb_admin.js?v=0914.2150"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};

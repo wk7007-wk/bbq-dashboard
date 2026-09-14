@@ -80,6 +80,35 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
   }
 }
 
+/* Note9 landscape CSS px is ~740x360, not 800+. Keep rails tap-able. */
+@media (orientation: landscape) and (min-width: 600px) and (max-width: 900px)
+  and (max-height: 430px) {
+  body[data-display-profile="primary-phone"] .board {
+    grid-template-rows: 50% minmax(0, 1fr) !important;
+  }
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    .slot-card[data-state="running"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
+    grid-template-columns: 48px minmax(0, 1fr) 48px !important;
+    grid-template-rows: repeat(3, minmax(40px, 1fr)) !important;
+  }
+}
+
+/* Galaxy Tab A 8.0 2019 (SM-T290/T295) landscape 1280x800.
+ * CSS may be 1280x800 (160dpi) or ~960x600 (213dpi). */
+@media (orientation: landscape) and (min-width: 900px) and (max-width: 1366px)
+  and (min-height: 560px) and (max-height: 900px) {
+  body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"]
+    .slot-card[data-state="running"]
+    .timer-panel[data-layout-owner="v3"][data-control-layout="perimeter-v1"][data-has-split="false"][data-add-mode="false"] {
+    grid-template-columns: 56px minmax(0, 1fr) 56px !important;
+    grid-template-rows: repeat(3, minmax(44px, 1fr)) !important;
+  }
+  body[data-display-profile="primary-tablet"] .board {
+    grid-template-rows: 52% minmax(0, 1fr) !important;
+  }
+}
+
 /* Note9 landscape keeps the same two side columns and three semantic rows,
  * but gives every existing action a usable 44px cell. Extra height comes
  * from proportional board tracks; no action, state or color owner changes. */

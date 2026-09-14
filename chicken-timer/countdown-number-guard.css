@@ -190,11 +190,12 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
     .timer-panel[data-layout-owner="v3"]
     :is(.timer-readout, .split-timer-readout) {
     position: relative !important;
-    z-index: 3 !important;
+    z-index: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: min(88%, 5.2rem) !important;
-    max-height: 92% !important;
+    height: min(70%, 3.2rem) !important;
+    max-height: 72% !important;
+    pointer-events: none !important;
   }
 
   body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]
@@ -203,8 +204,9 @@ body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"
   body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="fallback-responsive"]
     .slot-card[data-state="running"] .timer-panel[data-has-split="false"]
     :is(.adjust-button, .timer-primary-actions > button) {
-    overflow: hidden !important;
-    z-index: 1 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+    position: relative !important;
   }
 
   body[data-countdown-layout="v15-original-final"][data-controls-layout="v17-fast"][data-display-profile="primary-phone"]

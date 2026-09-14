@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>배달도우미</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#121225;color:#f0f0fa;font-family:-apple-system,"Noto Sans KR",sans-serif;overflow:hidden}
+#map{position:absolute;inset:0;width:100%;height:100%;border:0}
+#dock{position:absolute;left:0;right:0;bottom:0;max-height:42%;overflow:auto;background:rgba(18,18,37,.92);padding:8px 10px 12px}
+.card{padding:8px 10px;margin:0 0 6px;border:1px solid #2e2e52;border-radius:10px;background:#1c1c38}
+.addr{font-weight:800;font-size:1.05rem;word-break:break-all}
+.meta{color:#9aa0bc;font-size:.8rem;margin-top:2px}
+.row{display:flex;gap:8px;margin-top:8px}
+.row button,.row a{min-height:40px;flex:1;border:0;border-radius:8px;font-weight:800;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#081018;background:#2ac1bc}
+.empty{padding:16px;color:#9aa0bc}
+</style>
+</head>
+<body>
+<iframe id="map" title="map" src="about:blank"></iframe>
+<div id="dock"><div class="empty">공장2 엔진 대기</div></div>
+<script>
+(function(){
+  var ORIGIN = location.origin;
+  function putGps(lat, lng) {
+    fetch(ORIGIN + "/dh_gps.json", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "token storebot-bus",
+        "X-Write-Token": "storebot-bus"
+      },
+      body: JSON.stringify({lat: lat, lng: lng, ts: Date.now(), device: "shell"})
+    }).catch(function(){});
+  }
+  function wantReanalyze(id) {
+    fetch(ORIGIN + "/dh_reanalyze_request.json", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "token storebot-bus",
+        "X-Write-Token": "storebot-bus"
+      },
+      body: JSON.stringify({want: true, order_id: id, ts: Date.now()})
+    }).catch(function(){});
+  }
+  function mapUrl(o, gps) {
+    var lat = o.lat || (gps && gps.lat);
+    var lng = o.lng || (gps && gps.lng);
+    var q = encodeURIComponent(o.road_address || o.address || "이천");
+    if (lat && lng) q = lat + "," + lng;
+    return "https://map.naver.com/p/search/" + q;
+  }
+  function render(d) {
+    var dock = document.getElementById("dock");
+    var orders = (d && d.orders) || [];
+    if (!orders.length) {
+      dock.innerHTML = '<div class="empty">주문 없음 · 계산은 공장2</div>';
+      return;
+    }
+    var gps = d.rider_gps || {};
+    dock.innerHTML = "";
+    orders.forEach(function(o) {
+      var re = o.reanalyze || {};
+      var addr = (re.address && (re.address.building || "") + " " + (re.address.ho || "")) || o.road_address || o.address || "";
+      var el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = '<div class="addr">' + (addr || "주소 대기") + '</div>' +
+        '<div class="meta">' + [o.channel, o.order_no, o.customer_request].filter(Boolean).join(" · ") + '</div>' +
+        '<div class="row"><a target="_blank" rel="noreferrer" href="' + mapUrl(o, gps) + '">지도</a>' +
+        '<button type="button" data-id="' + (o.order_id || "") + '">재검토</button></div>';
+      dock.appendChild(el);
+      document.getElementById("map").src = mapUrl(o, gps);
+    });
+  }
+  document.getElementById("dock").addEventListener("click", function(ev) {
+    var b = ev.target.closest("button[data-id]");
+    if (b) wantReanalyze(b.getAttribute("data-id"));
+  });
+  function poll() {
+    fetch(ORIGIN + "/dh_engine.json?t=" + Date.now()).then(function(r){ return r.json(); }).then(render).catch(function(){});
+  }
+  poll();
+  setInterval(poll, 4000);
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(function(p) {
+      putGps(p.coords.latitude, p.coords.longitude);
+    }, function(){}, {enableHighAccuracy: true, maximumAge: 5000});
+  }
+})();
+</script>
+</body>
+</html>

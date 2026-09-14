@@ -1,7 +1,34 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-14T21:11:01+09:00",
+  "updatedAt": "2026-09-14T21:26:11+09:00",
   "notices": [
+    {
+      "date": "2026-09-14",
+      "title": "하이닉스 껍데기 등록 21:31",
+      "items": [
+        "하이닉스 껍데기 0914.2131 완료 2026-09-14T21:31:12+09:00",
+        "21:26 분 포스웹/발주/센터/배달/타이머는 그대로 유효",
+        "http://125.176.112.214:2421/updates/get.html"
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "title": "설치 완료 시각 2026-09-14 21:26 +09",
+      "items": [
+        "설치: 포스웹/발주/업데이트센터/배달도우미 껍데기 + 타이머 가로 0914.2126",
+        "이전 시각 APK는 설치하지 말 것",
+        "직접받기 http://125.176.112.214:2421/updates/get.html"
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "title": "앱이 최신 공장 주소를 스스로 잡음",
+      "items": [
+        "껍데기·타이머는 깃허브 endpoints.json 고정 URL만 내장",
+        "wan_base가 바뀌면 앱이 60초 내 따라감",
+        "사람 HTML 북마크 우회 없음"
+      ]
+    },
     {
       "date": "2026-09-14",
       "title": "오늘 올린 것",
@@ -72,14 +99,14 @@
       "id": "chicken-timer",
       "label": "치킨타이머",
       "apkName": "ChickenTimer_latest.apk",
-      "versionName": "0914.2111",
-      "versionCode": 29823131,
+      "versionName": "0914.2126",
+      "versionCode": 29823146,
       "packageName": "com.chickentimer.board.v2",
       "enabled": true,
       "apkUrl": "/updates/chicken-timer/ChickenTimer_latest.apk",
       "metadataUrl": "/updates/chicken-timer/version.json",
-      "sha256": "57632d1c83babf85bdeef3bb4d879fc0c6acac76674acfdbf68334e6a68a8a45",
-      "sizeBytes": 1590297
+      "sha256": "9abf1293d5cab15189e3c72ebc03f7029025ad33d6c4401cab297b1759a6f607",
+      "sizeBytes": 1583188
     },
     {
       "id": "deliveryhelper",
@@ -98,27 +125,27 @@
       "id": "deliveryhelper-shell",
       "label": "배달도우미(껍데기)",
       "apkName": "DeliveryHelperShell_latest.apk",
-      "versionName": "0914.2111",
-      "versionCode": 29823131,
+      "versionName": "0914.2126",
+      "versionCode": 29823146,
       "packageName": "com.factory2.deliveryhelper",
       "enabled": true,
       "apkUrl": "/updates/deliveryhelper-shell/DeliveryHelperShell_latest.apk",
       "metadataUrl": "/updates/deliveryhelper-shell/version.json",
-      "sha256": "131ad6960ba22b5c24db62fa24fc3b22c781412c373f3b558cdb725e6d9caad8",
-      "sizeBytes": 14667
+      "sha256": "9126bf7c3c309f05b09ab6f4275c14287a86eb495cf3713593a2b44c5684933d",
+      "sizeBytes": 15711
     },
     {
       "id": "orderhelper-shell",
       "label": "발주(껍데기)",
       "apkName": "OrderHelperShell_latest.apk",
-      "versionName": "0914.2111",
-      "versionCode": 29823131,
+      "versionName": "0914.2126",
+      "versionCode": 29823146,
       "packageName": "com.factory2.orderhelper",
       "enabled": true,
       "apkUrl": "/updates/orderhelper-shell/OrderHelperShell_latest.apk",
       "metadataUrl": "/updates/orderhelper-shell/version.json",
-      "sha256": "e0312d47bd87b02fd0ebac45102ef9f6270f234ba6266a41c4e87952eeb8605f",
-      "sizeBytes": 14669
+      "sha256": "a81e3b5b193d6f215448756e8d47c3bf1ac19de7f25d293398f39fbb46a3c0cc",
+      "sizeBytes": 15694
     },
     {
       "id": "posdelay",
@@ -150,14 +177,14 @@
       "id": "posweb-shell",
       "label": "포스웹(껍데기)",
       "apkName": "PoswebShell_latest.apk",
-      "versionName": "0914.2111",
-      "versionCode": 29823131,
+      "versionName": "0914.2126",
+      "versionCode": 29823146,
       "packageName": "com.factory2.posweb",
       "enabled": true,
       "apkUrl": "/updates/posweb-shell/PoswebShell_latest.apk",
       "metadataUrl": "/updates/posweb-shell/version.json",
-      "sha256": "4ebf218869b3cc88edd41427f693969e289797f00e40bb89ca6e70c7775ac4cd",
-      "sizeBytes": 14657
+      "sha256": "2ac7e63a3e2a839dafb4a6e636779241cfa12924959568e36b40d6a7f8579c4e",
+      "sizeBytes": 15709
     },
     {
       "id": "solnote",
@@ -202,14 +229,14 @@
       "id": "updatecenter-shell",
       "label": "업데이트센터(껍데기)",
       "apkName": "UpdateCenterShell_latest.apk",
-      "versionName": "0914.2111",
-      "versionCode": 29823131,
+      "versionName": "0914.2126",
+      "versionCode": 29823146,
       "packageName": "com.factory2.updatecenter",
       "enabled": true,
       "apkUrl": "/updates/updatecenter-shell/UpdateCenterShell_latest.apk",
       "metadataUrl": "/updates/updatecenter-shell/version.json",
-      "sha256": "00f470d8cb9e52dc4e1c0d7642f204e78078c493704d88ebbc2a72998d64090e",
-      "sizeBytes": 14680
+      "sha256": "04c26dd8b49429c01f470ba171be510516de704a10c735838d5ac7df798f8980",
+      "sizeBytes": 15723
     },
     {
       "id": "wonmux",
@@ -249,6 +276,32 @@
       "metadataUrl": "/updates/workschedule/version.json",
       "sha256": "711105c95898e995d1a70aa818a2e4806b5ca62063102ff3625e99c05e406779",
       "sizeBytes": 5631281
+    },
+    {
+      "id": "hynix-shell",
+      "label": "하이닉스(껍데기)",
+      "apkName": "HynixShell_latest.apk",
+      "versionName": "0914.2131",
+      "versionCode": 29823151,
+      "packageName": "com.factory2.hynix",
+      "enabled": true,
+      "apkUrl": "/updates/hynix-shell/HynixShell_latest.apk",
+      "metadataUrl": "/updates/hynix-shell/version.json",
+      "sha256": "1a7ebd0dac271fccf0dd92d05767fe7ddbd4e512648cb75e795855395cd0e119",
+      "sizeBytes": 15699
     }
+  ],
+  "install_complete_at": "2026-09-14T21:31:12+09:00",
+  "install_ready": [
+    "posweb-shell",
+    "orderhelper-shell",
+    "updatecenter-shell",
+    "deliveryhelper-shell",
+    "chicken-timer",
+    "hynix-shell"
+  ],
+  "do_not_install_as_this_wave": [
+    "deliveryhelper 기존 네이티브 — 공장2 엔진 아님",
+    "아스트라 리뷰는 통과 못 함. 사후 개선. 껍데기 설치는 21:26 완료분"
   ]
 }

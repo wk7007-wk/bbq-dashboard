@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>업데이트 직접받기</title>
+<style>
+body{margin:0;background:#0e141c;color:#f4f8fd;font-family:sans-serif;padding:16px 14px 32px}
+.when{background:#173a2a;border:1px solid #2ac1bc;border-radius:12px;padding:12px 14px;margin:0 0 16px;font-weight:800}
+.when small{display:block;font-weight:500;color:#9eb0c3;margin-top:6px}
+a{color:#04140c;background:#48d597;display:block;padding:14px;border-radius:12px;text-decoration:none;font-weight:800;margin:0 0 8px}
+.t{color:#9eb0c3;font-size:.82rem;margin:-4px 0 12px}
+.skip{opacity:.45;pointer-events:none}
+h1{font-size:1.25rem;margin:0 0 8px}
+.u{color:#9eb0c3;word-break:break-all;font-size:.85rem;margin:0 0 12px}
+</style>
+</head>
+<body>
+<h1>공장2 설치 목록</h1>
+<p class="u">http://125.176.112.214:2421/updates/get.html</p>
+<div class="when" id="when">
+  완료 시각: 2026-09-14 21:26 +09
+  <small>이 시각 이후 APK만 설치하세요. 더 이전이면 갱신하지 마세요.</small>
+</div>
+<p class="t">아래만 이번 완료분입니다. 기존 네이티브 배달도우미는 공장 엔진이 아니라서 안 올립니다.</p>
+<a href="/updates/posweb-shell/PoswebShell_latest.apk">포스웹 껍데기 · 0914.2126 · 21:26</a>
+<a href="/updates/orderhelper-shell/OrderHelperShell_latest.apk">발주 껍데기 · 0914.2126 · 21:26</a>
+<a href="/updates/updatecenter-shell/UpdateCenterShell_latest.apk">업데이트센터 껍데기 · 0914.2126 · 21:26</a>
+<a href="/updates/deliveryhelper-shell/DeliveryHelperShell_latest.apk">배달도우미 껍데기 · 0914.2126 · 21:26</a>
+<a href="/updates/chicken-timer/ChickenTimer_latest.apk">타이머 가로 · 0914.2126 · 21:26</a>
+<a href="/updates/hynix-shell/HynixShell_latest.apk">하이닉스 껍데기 · 0914.2131 · 21:31</a>
+<script>
+fetch("/updates/catalog.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(c){
+  var t = c.install_complete_at || c.updatedAt || "";
+  if (t) document.getElementById("when").innerHTML =
+    "완료 시각: " + t + '<small>catalog.updatedAt. 이 시각 이전 파일이면 설치하지 마세요.</small>';
+}).catch(function(){});
+</script>
+</body>
+</html>

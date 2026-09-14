@@ -1,0 +1,10 @@
+[
+  {
+    "versionName": "0914.2131",
+    "versionCode": 29823151,
+    "sha256": "1a7ebd0dac271fccf0dd92d05767fe7ddbd4e512648cb75e795855395cd0e119",
+    "sizeBytes": 15699,
+    "updatedAt": "2026-09-14T21:31:12+09:00",
+    "releaseNotes": "하이닉스 공장2 껍데기. 주소판 JSON으로 wan 따라감."
+  }
+]

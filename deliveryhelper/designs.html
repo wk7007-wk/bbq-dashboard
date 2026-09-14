@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>배달도우미 디자인 프로토타입</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d0d1a;
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    color: #e0e0e0;
+    overflow-x: hidden;
+  }
+
+  .page-header {
+    text-align: center;
+    padding: 48px 20px 24px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  .design-section {
+    padding: 24px 0 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .design-label {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 0 20px;
+  }
+  .design-label .num {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+  }
+  .design-label h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .design-label .desc {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+  }
+
+  /* Phone frame */
+  .phone-frame {
+    width: 360px;
+    height: 720px;
+    border: 3px solid #444;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    background: #1c1c2e;
+    box-shadow:
+      0 0 0 2px #222,
+      0 20px 60px rgba(0,0,0,0.6),
+      inset 0 0 30px rgba(0,0,0,0.2);
+  }
+
+  /* Notch */
+  .phone-frame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 24px;
+    background: #222;
+    border-radius: 0 0 16px 16px;
+    z-index: 50;
+  }
+
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ===== MAP BACKGROUNDS ===== */
+  .map-bg {
+    position: absolute;
+    inset: 0;
+    background: #1e2738;
+    overflow: hidden;
+  }
+  .map-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 48%, #2a3548 48%, #2a3548 52%, transparent 52%),
+      linear-gradient(0deg, transparent 48%, #2a3548 48%, #2a3548 52%, transparent 52%);
+    background-size: 80px 80px;
+    opacity: 0.4;
+  }
+
+  /* Road overlays */
+  .road {
+    position: absolute;
+    background: #384a64;
+    z-index: 1;
+  }
+  .road.h1 { top: 200px; left: 0; right: 0; height: 16px; }
+  .road.h2 { top: 420px; left: 0; right: 0; height: 12px; }
+  .road.h3 { top: 560px; left: 0; right: 0; height: 10px; }
+  .road.v1 { top: 0; bottom: 0; left: 80px; width: 14px; }
+  .road.v2 { top: 0; bottom: 0; left: 220px; width: 18px; }
+  .road.v3 { top: 0; bottom: 0; right: 50px; width: 12px; }
+
+  /* Buildings */
+  .building {
+    position: absolute;
+    background: #232f42;
+    border: 1px solid #2c3a50;
+    border-radius: 2px;
+    z-index: 1;
+  }
+  .b1 { top: 100px; left: 110px; width: 90px; height: 70px; }
+  .b2 { top: 120px; right: 70px; width: 60px; height: 55px; }
+  .b3 { top: 260px; left: 30px; width: 70px; height: 50px; }
+  .b4 { top: 300px; left: 140px; width: 65px; height: 80px; }
+  .b5 { top: 250px; right: 30px; width: 80px; height: 60px; }
+  .b6 { top: 460px; left: 60px; width: 100px; height: 55px; }
+  .b7 { top: 470px; right: 60px; width: 75px; height: 65px; }
+
+  /* ===== TOP BAR ===== */
+  .top-bar {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    height: 38px;
+    background: rgba(10, 10, 20, 0.88);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    z-index: 40;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #e0e0e0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .top-bar .app-name {
+    color: #ff8c42;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  .top-bar .status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4caf50;
+    margin: 0 3px;
+    box-shadow: 0 0 6px #4caf50;
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .top-bar .on-text {
+    color: #4caf50;
+    font-weight: 700;
+    margin-right: 12px;
+  }
+  .top-bar .info {
+    color: #aaa;
+    font-weight: 400;
+    font-size: 11.5px;
+  }
+
+  /* ===== PINS ===== */
+  .pin {
+    position: absolute;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .pin:hover { transform: scale(1.1); }
+
+  .pin-head {
+    width: 36px;
+    height: 36px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .pin-head .pin-icon {
+    transform: rotate(45deg);
+    font-size: 16px;
+  }
+  .pin-tail {
+    width: 2px;
+    height: 10px;
+    background: rgba(0,0,0,0.3);
+    margin-top: -2px;
+  }
+  .pin-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0,0,0,0.65);
+    padding: 2px 6px;
+    border-radius: 8px;
+    margin-top: 2px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+  }
+
+  .pin-red .pin-head { background: linear-gradient(135deg, #ff4444, #cc0000); }
+  .pin-orange .pin-head { background: linear-gradient(135deg, #ff9800, #e67e00); }
+  .pin-blue .pin-head { background: linear-gradient(135deg, #42a5f5, #1976d2); }
+  .pin-green .pin-head { background: linear-gradient(135deg, #4caf50, #2e7d32); }
+
+  /* Sub-caption badges under pin */
+  .pin-badges {
+    display: flex;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .pin-badge {
+    font-size: 8px;
+    padding: 1px 3px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.7);
+  }
+
+  /* Route line (SVG overlay) */
+  .route-svg {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .route-line {
+    fill: none;
+    stroke: #ff8c42;
+    stroke-width: 3;
+    stroke-dasharray: 8 4;
+    stroke-linecap: round;
+    opacity: 0.85;
+    animation: dash-flow 1.5s linear infinite;
+  }
+  .route-line-green {
+    stroke: #4caf50;
+    stroke-dasharray: 6 3;
+  }
+  @keyframes dash-flow {
+    to { stroke-dashoffset: -24; }
+  }
+
+  /* GPS dot */
+  .gps-dot {
+    position: absolute;
+    z-index: 25;
+    width: 18px;
+    height: 18px;
+  }
+  .gps-dot-inner {
+    width: 14px;
+    height: 14px;
+    background: #4285f4;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(66,133,244,0.6);
+    position: relative;
+  }
+  .gps-dot-inner::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(66,133,244,0.15);
+    animation: gps-pulse 2s ease-out infinite;
+  }
+  @keyframes gps-pulse {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+  }
+
+  /* Settings button */
+  .settings-btn {
+    position: absolute;
+    bottom: 24px;
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    background: rgba(30, 30, 50, 0.9);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 30;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+  }
+
+  /* ===== BOTTOM SHEET ===== */
+  .bottom-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, #1e2235 0%, #171a2c 100%);
+    border-radius: 20px 20px 0 0;
+    padding: 14px 18px 22px;
+    z-index: 35;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .bottom-sheet .handle {
+    width: 36px;
+    height: 4px;
+    background: #444;
+    border-radius: 2px;
+    margin: 0 auto 12px;
+  }
+  .bs-address {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .bs-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .bs-badge {
+    font-size: 11.5px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .bs-badge.red {
+    background: rgba(244, 67, 54, 0.18);
+    color: #ff6b6b;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+  }
+  .bs-badge.orange {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ffb74d;
+    border: 1px solid rgba(255, 152, 0, 0.25);
+  }
+  .bs-icons-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .bs-icon-item {
+    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(244, 67, 54, 0.12);
+    color: #ff6b6b;
+    border: 1px solid rgba(244, 67, 54, 0.2);
+  }
+  .bs-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .bs-btn {
+    flex: 1;
+    padding: 11px 0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+  }
+  .bs-btn.primary {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(255, 107, 53, 0.4);
+  }
+  .bs-btn.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* ===== NIGHT MODE ===== */
+  .map-bg.night {
+    background: #0f1520;
+  }
+  .map-bg.night::after {
+    background:
+      linear-gradient(90deg, transparent 48%, #1a2230 48%, #1a2230 52%, transparent 52%),
+      linear-gradient(0deg, transparent 48%, #1a2230 48%, #1a2230 52%, transparent 52%);
+    background-size: 80px 80px;
+    opacity: 0.35;
+  }
+  .map-bg.night .road { background: #1f2d40; }
+  .map-bg.night .building {
+    background: #141e2e;
+    border-color: #1c2840;
+  }
+  /* Glow windows on night buildings */
+  .night-window {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #ffeb3b;
+    opacity: 0.4;
+    border-radius: 1px;
+  }
+
+  /* ===== LEGEND SECTION ===== */
+  .legend-screen {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #1a1a2e 0%, #131324 100%);
+    padding: 40px 20px 20px;
+    overflow-y: auto;
+  }
+  .legend-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .legend-group {
+    margin-bottom: 18px;
+  }
+  .legend-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ff8c42;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.2);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .legend-icon {
+    font-size: 18px;
+    width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .legend-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .legend-badge.red { background: rgba(244,67,54,0.2); color: #ff6b6b; }
+  .legend-badge.orange { background: rgba(255,152,0,0.15); color: #ffb74d; }
+  .legend-badge.blue { background: rgba(33,150,243,0.15); color: #64b5f6; }
+  .legend-text {
+    font-size: 12.5px;
+    color: #bbb;
+  }
+  .legend-text strong {
+    color: #e0e0e0;
+    font-weight: 600;
+  }
+
+  .pin-colors {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .pin-color-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #aaa;
+    background: rgba(255,255,255,0.04);
+    padding: 4px 10px;
+    border-radius: 10px;
+  }
+  .pin-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .pin-dot.red { background: #ff4444; }
+  .pin-dot.orange { background: #ff9800; }
+  .pin-dot.blue { background: #42a5f5; }
+  .pin-dot.green { background: #4caf50; }
+
+  .arrow-flow {
+    color: #555;
+    font-size: 12px;
+  }
+
+  /* Divider */
+  .section-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ff8c42, transparent);
+    margin: 0 auto;
+  }
+
+  /* Responsive: on actual mobile, make phone frame fit screen */
+  @media (max-width: 400px) {
+    .phone-frame {
+      width: calc(100vw - 32px);
+      height: calc((100vw - 32px) * 2);
+      max-height: 720px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Page Header -->
+<div class="page-header">
+  <h1>배달도우미 디자인 프로토타입</h1>
+  <p>스크롤하여 각 화면 디자인을 확인하세요</p>
+</div>
+
+<div class="section-divider" style="margin-bottom: 24px;"></div>
+
+<!-- ================================================================ -->
+<!-- DESIGN 1: 현재 — Navi 모드 -->
+<!-- ================================================================ -->
+<div class="design-section">
+  <div class="design-label">
+    <span class="num">01</span>
+    <h2>현재 — Navi 모드</h2>
+    <p class="desc">기본 지도 화면 · 대기 주문 표시</p>
+  </div>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <!-- Map Background -->
+      <div class="map-bg">
+        <div class="road h1"></div>
+        <div class="road h2"></div>
+        <div class="road h3"></div>
+        <div class="road v1"></div>
+        <div class="road v2"></div>
+        <div class="road v3"></div>
+        <div class="building b1"></div>
+        <div class="building b2"></div>
+        <div class="building b3"></div>
+        <div class="building b4"></div>
+        <div class="building b5"></div>
+        <div class="building b6"></div>
+        <div class="building b7"></div>
+      </div>
+
+      <!-- Route SVG -->
+      <svg class="route-svg" viewBox="0 0 360 720" preserveAspectRatio="none">
+        <path class="route-line" d="M 170 580 C 170 500, 130 400, 130 340 C 130 280, 250 260, 260 200 C 270 160, 110 150, 100 140"/>
+      </svg>
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <span class="app-name">배달도우미</span>
+        <span class="status-dot"></span>
+        <span class="on-text">ON</span>
+        <span class="info">3건 대기 · 오늘 5건</span>
+      </div>
+
+      <!-- Pins -->
+      <div class="pin pin-red" style="top: 110px; left: 80px;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">12분 전</div>
+      </div>
+      <div class="pin pin-orange" style="top: 180px; left: 240px;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">5분 전</div>
+      </div>
+      <div class="pin pin-blue" style="top: 310px; left: 110px;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">1분 전</div>
+      </div>
+
+      <!-- GPS Dot -->
+      <div class="gps-dot" style="bottom: 120px; left: 160px;">
+        <div class="gps-dot-inner"></div>
+      </div>
+
+      <!-- Settings Button -->
+      <div class="settings-btn">⚙️</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ================================================================ -->
+<!-- DESIGN 2: 핀 탭 → 주문 상세 -->
+<!-- ================================================================ -->
+<div class="design-section">
+  <div class="design-label">
+    <span class="num">02</span>
+    <h2>핀 탭 → 주문 상세</h2>
+    <p class="desc">핀을 탭하면 하단 시트에 주문 정보 표시</p>
+  </div>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <!-- Map Background -->
+      <div class="map-bg">
+        <div class="road h1"></div>
+        <div class="road h2"></div>
+        <div class="road h3"></div>
+        <div class="road v1"></div>
+        <div class="road v2"></div>
+        <div class="road v3"></div>
+        <div class="building b1"></div>
+        <div class="building b2"></div>
+        <div class="building b3"></div>
+        <div class="building b4"></div>
+        <div class="building b5"></div>
+        <div class="building b6"></div>
+        <div class="building b7"></div>
+      </div>
+
+      <!-- Route SVG -->
+      <svg class="route-svg" viewBox="0 0 360 720" preserveAspectRatio="none">
+        <path class="route-line" d="M 170 440 C 170 380, 130 340, 130 280 C 130 240, 250 220, 260 170"/>
+      </svg>
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <span class="app-name">배달도우미</span>
+        <span class="status-dot"></span>
+        <span class="on-text">ON</span>
+        <span class="info">3건 대기 · 오늘 5건</span>
+      </div>
+
+      <!-- Pins — selected one glows -->
+      <div class="pin pin-red" style="top: 110px; left: 80px;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">12분 전</div>
+      </div>
+      <div class="pin pin-orange" style="top: 140px; left: 240px; transform: scale(1.2); filter: drop-shadow(0 0 12px rgba(255,152,0,0.7));">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label" style="background: rgba(255,152,0,0.4);">선택됨</div>
+      </div>
+      <div class="pin pin-blue" style="top: 260px; left: 110px;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">1분 전</div>
+      </div>
+
+      <!-- GPS Dot -->
+      <div class="gps-dot" style="bottom: 260px; left: 160px;">
+        <div class="gps-dot-inner"></div>
+      </div>
+
+      <!-- Bottom Sheet -->
+      <div class="bottom-sheet">
+        <div class="handle"></div>
+        <div class="bs-address">🏢 롯데캐슬 101동 803호</div>
+        <div class="bs-badges">
+          <span class="bs-badge red">💳 카드결제</span>
+          <span class="bs-badge orange">📦 대형: 콜라1.25L</span>
+        </div>
+        <div class="bs-icons-row">
+          <span class="bs-icon-item">🥢X 수저빼기</span>
+          <span class="bs-icon-item">🔔X 벨금지</span>
+        </div>
+        <div class="bs-buttons">
+          <div class="bs-btn primary">🚀 배달시작</div>
+          <div class="bs-btn secondary">🗺 길안내</div>
+          <div class="bs-btn secondary">📞 전화</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ================================================================ -->
+<!-- DESIGN 3: 배달 중 화면 -->
+<!-- ================================================================ -->
+<div class="design-section">
+  <div class="design-label">
+    <span class="num">03</span>
+    <h2>배달 중 화면</h2>
+    <p class="desc">현재 배달 목적지 강조 · 나머지 대기 표시</p>
+  </div>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <!-- Map Background -->
+      <div class="map-bg">
+        <div class="road h1"></div>
+        <div class="road h2"></div>
+        <div class="road h3"></div>
+        <div class="road v1"></div>
+        <div class="road v2"></div>
+        <div class="road v3"></div>
+        <div class="building b1"></div>
+        <div class="building b2"></div>
+        <div class="building b3"></div>
+        <div class="building b4"></div>
+        <div class="building b5"></div>
+        <div class="building b6"></div>
+        <div class="building b7"></div>
+      </div>
+
+      <!-- Route SVG — green route to delivering pin -->
+      <svg class="route-svg" viewBox="0 0 360 720" preserveAspectRatio="none">
+        <path class="route-line route-line-green" d="M 175 560 C 175 480, 210 380, 210 300 C 210 250, 150 220, 140 180"/>
+      </svg>
+
+      <!-- Top Bar — delivering state -->
+      <div class="top-bar" style="border-bottom: 2px solid rgba(76,175,80,0.5);">
+        <span class="app-name">배달도우미</span>
+        <span class="status-dot" style="background: #4caf50; box-shadow: 0 0 6px #4caf50;"></span>
+        <span class="on-text">ON</span>
+        <span class="info" style="color: #81c784;">배달 중 · 롯데캐슬</span>
+      </div>
+
+      <!-- Green pin (delivering) -->
+      <div class="pin pin-green" style="top: 140px; left: 120px; transform: scale(1.15);">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label" style="background: rgba(76,175,80,0.5); font-size: 10px;">배달 중</div>
+        <div class="pin-badges">
+          <span class="pin-badge" style="color: #ff6b6b;">💳</span>
+          <span class="pin-badge" style="color: #ff6b6b;">🥢X</span>
+          <span class="pin-badge" style="color: #ffb74d;">📦</span>
+        </div>
+      </div>
+
+      <!-- Blue pins (pending) -->
+      <div class="pin pin-blue" style="top: 280px; left: 240px; opacity: 0.7;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">대기 1</div>
+      </div>
+      <div class="pin pin-blue" style="top: 380px; left: 60px; opacity: 0.7;">
+        <div class="pin-head"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">대기 2</div>
+      </div>
+
+      <!-- GPS Dot -->
+      <div class="gps-dot" style="bottom: 140px; left: 165px;">
+        <div class="gps-dot-inner"></div>
+      </div>
+
+      <!-- ETA overlay -->
+      <div style="position: absolute; bottom: 80px; right: 16px; background: rgba(76,175,80,0.9); color: #fff; padding: 8px 14px; border-radius: 14px; font-size: 13px; font-weight: 700; z-index: 30; box-shadow: 0 3px 12px rgba(76,175,80,0.4);">
+        약 3분 후 도착
+      </div>
+
+      <!-- Settings Button -->
+      <div class="settings-btn">⚙️</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ================================================================ -->
+<!-- DESIGN 4: 야간 모드 -->
+<!-- ================================================================ -->
+<div class="design-section">
+  <div class="design-label">
+    <span class="num">04</span>
+    <h2>야간 모드</h2>
+    <p class="desc">어두운 환경에서 눈부심 감소 · 주황 강조</p>
+  </div>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <!-- Dark Map Background -->
+      <div class="map-bg night">
+        <div class="road h1" style="background: #1f2d40;"></div>
+        <div class="road h2" style="background: #1a2535;"></div>
+        <div class="road h3" style="background: #182230;"></div>
+        <div class="road v1" style="background: #1d2a3c;"></div>
+        <div class="road v2" style="background: #1f2d40;"></div>
+        <div class="road v3" style="background: #1a2535;"></div>
+        <div class="building b1" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 8px; left: 10px;"></div>
+          <div class="night-window" style="top: 8px; left: 30px; opacity: 0.6;"></div>
+          <div class="night-window" style="top: 25px; left: 50px; opacity: 0.3;"></div>
+          <div class="night-window" style="top: 40px; left: 15px; opacity: 0.5;"></div>
+          <div class="night-window" style="top: 40px; left: 65px; opacity: 0.2;"></div>
+        </div>
+        <div class="building b2" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 5px; left: 8px; opacity: 0.4;"></div>
+          <div class="night-window" style="top: 5px; left: 30px; opacity: 0.7;"></div>
+          <div class="night-window" style="top: 25px; left: 18px; opacity: 0.3;"></div>
+        </div>
+        <div class="building b3" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 10px; left: 12px; opacity: 0.5;"></div>
+          <div class="night-window" style="top: 10px; left: 40px; opacity: 0.2;"></div>
+          <div class="night-window" style="top: 28px; left: 25px; opacity: 0.6;"></div>
+        </div>
+        <div class="building b4" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 8px; left: 10px; opacity: 0.4;"></div>
+          <div class="night-window" style="top: 30px; left: 35px; opacity: 0.3;"></div>
+          <div class="night-window" style="top: 50px; left: 15px; opacity: 0.5;"></div>
+        </div>
+        <div class="building b5" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 5px; left: 15px; opacity: 0.6;"></div>
+          <div class="night-window" style="top: 5px; left: 50px; opacity: 0.3;"></div>
+          <div class="night-window" style="top: 30px; left: 30px; opacity: 0.4;"></div>
+        </div>
+        <div class="building b6" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 10px; left: 20px; opacity: 0.7;"></div>
+          <div class="night-window" style="top: 10px; left: 60px; opacity: 0.2;"></div>
+          <div class="night-window" style="top: 30px; left: 40px; opacity: 0.5;"></div>
+        </div>
+        <div class="building b7" style="background: #0e1722; border-color: #182640;">
+          <div class="night-window" style="top: 8px; left: 12px; opacity: 0.3;"></div>
+          <div class="night-window" style="top: 30px; left: 45px; opacity: 0.6;"></div>
+        </div>
+      </div>
+
+      <!-- Route SVG -->
+      <svg class="route-svg" viewBox="0 0 360 720" preserveAspectRatio="none">
+        <path class="route-line" d="M 170 580 C 170 500, 130 400, 130 340 C 130 280, 250 260, 260 200 C 270 160, 110 150, 100 140" style="stroke: #e65100; opacity: 0.7;"/>
+      </svg>
+
+      <!-- Top Bar (darker) -->
+      <div class="top-bar" style="background: rgba(5, 5, 12, 0.92); border-bottom-color: rgba(255,140,0,0.15);">
+        <span class="app-name" style="color: #e65100;">배달도우미</span>
+        <span class="status-dot" style="background: #ff6d00; box-shadow: 0 0 6px #ff6d00;"></span>
+        <span class="on-text" style="color: #ff6d00;">ON</span>
+        <span class="info" style="color: #666;">3건 대기 · 오늘 5건</span>
+      </div>
+
+      <!-- Pins (darker style) -->
+      <div class="pin pin-red" style="top: 110px; left: 80px;">
+        <div class="pin-head" style="background: linear-gradient(135deg, #c62828, #8e0000); box-shadow: 0 0 8px rgba(198,40,40,0.4);"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">12분 전</div>
+      </div>
+      <div class="pin pin-orange" style="top: 180px; left: 240px;">
+        <div class="pin-head" style="background: linear-gradient(135deg, #e65100, #bf360c); box-shadow: 0 0 8px rgba(230,81,0,0.4);"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">5분 전</div>
+      </div>
+      <div class="pin pin-blue" style="top: 310px; left: 110px;">
+        <div class="pin-head" style="background: linear-gradient(135deg, #1565c0, #0d47a1); box-shadow: 0 0 8px rgba(21,101,192,0.4);"><span class="pin-icon">🏠</span></div>
+        <div class="pin-tail"></div>
+        <div class="pin-label">1분 전</div>
+      </div>
+
+      <!-- GPS Dot (dimmer) -->
+      <div class="gps-dot" style="bottom: 120px; left: 160px;">
+        <div class="gps-dot-inner" style="background: #1565c0; box-shadow: 0 0 8px rgba(21,101,192,0.4);"></div>
+      </div>
+
+      <!-- Settings Button (darker) -->
+      <div class="settings-btn" style="background: rgba(10, 10, 18, 0.95); border-color: rgba(255,140,0,0.15);">⚙️</div>
+
+      <!-- Night mode indicator -->
+      <div style="position: absolute; top: 70px; right: 12px; background: rgba(255,140,0,0.12); border: 1px solid rgba(255,140,0,0.2); color: #e65100; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; z-index: 40;">
+        🌙 야간
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ================================================================ -->
+<!-- DESIGN 5: 아이콘 범례 -->
+<!-- ================================================================ -->
+<div class="design-section">
+  <div class="design-label">
+    <span class="num">05</span>
+    <h2>아이콘 범례</h2>
+    <p class="desc">모든 아이콘과 색상 의미 설명</p>
+  </div>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="legend-screen">
+        <div class="legend-title">아이콘 범례</div>
+
+        <!-- Payment -->
+        <div class="legend-group">
+          <div class="legend-group-title">결제 방식</div>
+          <div class="legend-item">
+            <span class="legend-icon">💳</span>
+            <span class="legend-badge red">빨강</span>
+            <span class="legend-text"><strong>카드결제</strong> — 단말기 필수</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-icon">💵</span>
+            <span class="legend-badge orange">주황</span>
+            <span class="legend-text"><strong>현금결제</strong> — 거스름돈 준비</span>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="legend-group">
+          <div class="legend-group-title">물품 정보</div>
+          <div class="legend-item">
+            <span class="legend-icon">📦</span>
+            <span class="legend-badge orange">주황</span>
+            <span class="legend-text"><strong>대형</strong> — 콜라1.25L, 2L 등</span>
+          </div>
+        </div>
+
+        <!-- Requests -->
+        <div class="legend-group">
+          <div class="legend-group-title">요청 사항</div>
+          <div class="legend-item">
+            <span class="legend-icon">🥢X</span>
+            <span class="legend-badge red">빨강</span>
+            <span class="legend-text"><strong>수저빼기</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-icon">🥢</span>
+            <span class="legend-badge blue">파랑</span>
+            <span class="legend-text"><strong>수저넣기</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-icon">🔔X</span>
+            <span class="legend-badge red">빨강</span>
+            <span class="legend-text"><strong>벨금지</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-icon">🍗X</span>
+            <span class="legend-badge red">빨강</span>
+            <span class="legend-text"><strong>치킨무빼기</strong></span>
+          </div>
+        </div>
+
+        <!-- Delivery method -->
+        <div class="legend-group">
+          <div class="legend-group-title">전달 방법</div>
+          <div class="legend-item">
+            <span class="legend-icon">🚪</span>
+            <span class="legend-badge blue">파랑</span>
+            <span class="legend-text"><strong>문앞</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-icon">🤝</span>
+            <span class="legend-badge blue">파랑</span>
+            <span class="legend-text"><strong>직접전달</strong></span>
+          </div>
+        </div>
+
+        <!-- Pin colors -->
+        <div class="legend-group">
+          <div class="legend-group-title">핀 색상 (주문 시간순)</div>
+          <div class="pin-colors">
+            <div class="pin-color-item">
+              <div class="pin-dot red"></div>
+              오래된 주문
+            </div>
+            <span class="arrow-flow">→</span>
+            <div class="pin-color-item">
+              <div class="pin-dot orange"></div>
+              중간
+            </div>
+            <span class="arrow-flow">→</span>
+            <div class="pin-color-item">
+              <div class="pin-dot blue"></div>
+              최신
+            </div>
+            <span class="arrow-flow">→</span>
+            <div class="pin-color-item">
+              <div class="pin-dot green"></div>
+              배달 중
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="text-align: center; padding: 32px 20px 48px; color: #444; font-size: 11px;">
+  배달도우미 v1.0 디자인 프로토타입<br>
+  2026-03-02
+</div>
+
+</body>
+</html>
