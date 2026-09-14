@@ -12,7 +12,9 @@
   (function () {
     var q = new URLSearchParams(location.search);
     q.set("to", "chicken-timer");
-    location.replace("/bbq-dashboard/go.html?" + q.toString());
+    var host = String(location.hostname || "");
+    var go = host.indexOf("github.io") >= 0 ? "/bbq-dashboard/go.html?" : "/go.html?";
+    location.replace(go + q.toString());
   })();
   </script>
 </body>

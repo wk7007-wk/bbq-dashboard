@@ -1,6 +1,31 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script data-factory-jump="1">
+(function(){try{
+  var host=String(location.hostname||"");
+  if(host.indexOf("github.io")<0)return;
+  var q=new URLSearchParams(location.search);
+  if(q.get("stay")==="1")return;
+  var path=String(location.pathname||"");
+  if(/\/go\.html$/i.test(path))return;
+  var to="posweb";
+  if(/OrderHelper|orderhelper/i.test(path))to="orderhelper";
+  else if(/chicken-timer/.test(path))to="chicken-timer";
+  else if(/hynix/.test(path))to="hynix";
+  else if(/\/updates(\/|$)/.test(path))to="updates";
+  else if(/banktotal/.test(path))to="banktotal";
+  else if(/posweb/.test(path))to="posweb";
+  else if(/kds\.html/.test(path))to="kds";
+  else if(/dashboard\.html/.test(path))to="dashboard";
+  else if(/index\.html$/.test(path)||/\/bbq-dashboard\/?$/.test(path))to="index";
+  q.set("to",to);
+  var goPath="/bbq-dashboard/go.html?"+q.toString();
+  if(path.indexOf("/bbq-dashboard")<0) goPath="https://wk7007-wk.github.io"+goPath;
+  location.replace(goPath);
+}catch(e){}})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>PosKDS</title>
