@@ -167,7 +167,7 @@
       if (pin) pin.textContent = "이 주소는 공장이 아닙니다.";
       if (bar) {
         bar.style.display = "block";
-        bar.textContent = "깃허브 사본입니다. 로그인하지 마세요. 공장: http://125.176.112.214:2421/bookmarks.html";
+        bar.textContent = "깃허브 사본입니다. 로그인하지 마세요. 공장2: http://125.176.112.214:2421/bookmarks.html";
       }
       return;
     }
