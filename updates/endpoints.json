@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-14T20:20:08+09:00",
+  "updated_at": "2026-09-14T20:22:31+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -19,7 +19,7 @@
       "fallback"
     ],
     "note": "사람은 공장 이름만 북마크. IP와 깃허브는 기계용. 프로그램 주소판=이 JSON. 실데이터 1차=factory, 먹통이면 2차=primary/fallback. 포트 열면 wan_ports와 URL을 같이 고친다. 사이트 경로도 sets.factory.sites.",
-    "note_viewers": "북마크는 공장 WAN :2421만. 깃허브 HTML은 공장 아님. 안 되면 안 된 것.",
+    "note_viewers": "북마크는 공장 WAN :2421만. 깃허브 HTML은 공장이 아니다. 안 되면 안 된 것이다. 깃허브 사본 PIN은 쓰지 마라. 타이머 노트북은 PackHelper Edge --app 335x900.",
     "bookmarks": {
       "center": "http://125.176.112.214:2421/bookmarks.html",
       "posweb": "http://125.176.112.214:2421/posweb.html",
