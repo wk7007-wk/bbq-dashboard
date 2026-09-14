@@ -45,8 +45,13 @@
     function canUse(u) {
       u = String(u || "").replace(/\/$/, "");
       if (!u || u.indexOf("http") !== 0) return false;
-      if (pageHttps() && u.indexOf("http://") === 0) return false;
       if (u.indexOf("github.io") >= 0) return false;
+      return true;
+    }
+    function canFetch(u) {
+      u = String(u || "").replace(/\/$/, "");
+      if (!canUse(u)) return false;
+      if (pageHttps() && u.indexOf("http://") === 0) return false;
       return true;
     }
     function withStay(url) {
@@ -111,7 +116,7 @@
       var factoryHttps = [];
       ["wan_https", "magic_base", "pages_base"].forEach(function (k) {
         var u = String(f[k] || "").replace(/\/$/, "");
-        if (canUse(u) && factoryHttps.indexOf(u) < 0) factoryHttps.push(u);
+        if (canFetch(u) && factoryHttps.indexOf(u) < 0) factoryHttps.push(u);
       });
       function goGithub() {
         location.replace(withStay(ghUrl));
@@ -127,15 +132,26 @@
       var prefer = "";
       if (via === "lan") prefer = lan;
       if (via === "wan") prefer = wan;
+      if (canUse(wan) && !canFetch(wan)) {
+        goFactory(wan);
+        return;
+      }
       var bases = [];
-      if (canUse(prefer)) bases.push(prefer);
-      if (canUse(wan) && bases.indexOf(wan) < 0) bases.push(wan);
+      if (canFetch(prefer)) bases.push(prefer);
+      if (canFetch(wan) && bases.indexOf(wan) < 0) bases.push(wan);
       factoryHttps.forEach(function (u) { if (bases.indexOf(u) < 0) bases.push(u); });
       if (!bases.length) {
+        if (canUse(wan)) {
+          goFactory(wan);
+          return;
+        }
         goGithub();
         return;
       }
-      firstFactory(bases).then(goFactory).catch(goGithub);
+      firstFactory(bases).then(goFactory).catch(function () {
+        if (canUse(wan)) goFactory(wan);
+        else goGithub();
+      });
     }
 
     function next(i) {

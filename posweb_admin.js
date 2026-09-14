@@ -145,13 +145,22 @@
     if (!doc || typeof doc.getElementById !== "function") return;
     var pin = doc.getElementById("pinFactoryHint");
     var bar = doc.getElementById("factoryDownBanner");
+    var wanJump = "";
+    try {
+      wanJump = String((((addressBook || {}).sets || {}).factory || {}).wan_base || "").replace(/\/$/, "");
+    } catch (e) {}
+    var stuckOnGithub = onGithubPages() && !factoryLive;
     var msg = factoryLive
       ? ("공장 " + (factoryOrigin || ""))
-      : ("공장 먹통 · 주소판 깃허브 · 읽기 2차");
+      : (stuckOnGithub
+        ? ("깃허브에서는 로그인·PUT이 안 됩니다. 공장 주소로 여세요" + (wanJump ? " · " + wanJump + "/posweb.html" : ""))
+        : ("공장 먹통 · 주소판 깃허브 · 읽기 2차"));
     if (pin) pin.textContent = msg;
     if (bar) {
       bar.style.display = factoryLive ? "none" : "block";
-      bar.textContent = "공장이 응답하지 않습니다. 주소판은 깃허브입니다. 읽기는 2차, 쓰기는 공장 복구 후.";
+      bar.textContent = stuckOnGithub
+        ? ("이 페이지는 깃허브 사본입니다. 인증은 HTTP 공장에서만 됩니다. " + (wanJump ? wanJump + "/posweb.html" : ""))
+        : "공장이 응답하지 않습니다. 주소판은 깃허브입니다. 읽기는 2차, 쓰기는 공장 복구 후.";
     }
     var ct = doc.getElementById("cT");
     var cd = doc.getElementById("cD");
