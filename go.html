@@ -14,8 +14,9 @@
   <p id="alt" style="display:none;margin-top:16px"></p>
   <script>
   (function () {
+    var WAN = "http://125.176.112.214:2421";
     var books = [
-      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      WAN + "/endpoints.json",
       "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
     ];
     var PATHS = {
@@ -170,7 +171,8 @@
         return r.json();
       }).then(run).catch(function () { next(i + 1); });
     }
-    next(0);
+    location.replace(WAN + path);
+    return;
   })();
   </script>
 </body>

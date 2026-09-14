@@ -1526,7 +1526,8 @@
 
   function factorySotCandidates() {
     return [
-      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "/endpoints.json",
+      "http://125.176.112.214:2421/endpoints.json",
       "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
     ];
   }
