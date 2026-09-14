@@ -6,7 +6,7 @@
   var host=String(location.hostname||"");
   if(host.indexOf("github.io")<0)return;
   var q=new URLSearchParams(location.search);
-  if(q.get("stay")==="1")return;
+  q.delete("stay");
   var path=String(location.pathname||"");
   if(/\/go\.html$/i.test(path))return;
   var to="posweb";
@@ -19,14 +19,24 @@
   else if(/kds\.html/.test(path))to="kds";
   else if(/dashboard\.html/.test(path))to="dashboard";
   else if(/index\.html$/.test(path)||/\/bbq-dashboard\/?$/.test(path))to="index";
+  var dest={
+    posweb:"/posweb.html",
+    orderhelper:"/OrderHelper/",
+    "chicken-timer":"/chicken-timer/",
+    hynix:"/hynix/",
+    updates:"/updates/",
+    banktotal:"/banktotal.html",
+    kds:"/kds.html",
+    index:"/index.html",
+    dashboard:"/dashboard.html"
+  }[to]||"/posweb.html";
   q.set("to",to);
-  var goPath="/bbq-dashboard/go.html?"+q.toString();
-  if(path.indexOf("/bbq-dashboard")<0) goPath="https://wk7007-wk.github.io"+goPath;
-  location.replace(goPath);
+  var extra=q.toString();
+  location.replace("http://125.176.112.214:2421"+dest+(extra?"?"+extra:""));
 }catch(e){}})();
 </script>
 
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>

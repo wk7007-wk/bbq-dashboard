@@ -126,7 +126,9 @@
         location.replace(withStay(ghUrl));
       }
       function goFactory(base) {
-        location.replace(join(base, path));
+        var url = join(base, path);
+        try { location.replace(url); } catch (e) {}
+        try { location.href = url; } catch (e2) {}
       }
       if (via === "gh") {
         goGithub();

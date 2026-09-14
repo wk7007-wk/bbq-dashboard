@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0912.1438">
+<html lang="ko" data-web-v="0914.2010">
 <head>
 <script data-factory-jump="1">
 (function(){try{
   var host=String(location.hostname||"");
   if(host.indexOf("github.io")<0)return;
   var q=new URLSearchParams(location.search);
-  if(q.get("stay")==="1")return;
+  q.delete("stay");
   var path=String(location.pathname||"");
   if(/\/go\.html$/i.test(path))return;
   var to="posweb";
@@ -19,10 +19,20 @@
   else if(/kds\.html/.test(path))to="kds";
   else if(/dashboard\.html/.test(path))to="dashboard";
   else if(/index\.html$/.test(path)||/\/bbq-dashboard\/?$/.test(path))to="index";
+  var dest={
+    posweb:"/posweb.html",
+    orderhelper:"/OrderHelper/",
+    "chicken-timer":"/chicken-timer/",
+    hynix:"/hynix/",
+    updates:"/updates/",
+    banktotal:"/banktotal.html",
+    kds:"/kds.html",
+    index:"/index.html",
+    dashboard:"/dashboard.html"
+  }[to]||"/posweb.html";
   q.set("to",to);
-  var goPath="/bbq-dashboard/go.html?"+q.toString();
-  if(path.indexOf("/bbq-dashboard")<0) goPath="https://wk7007-wk.github.io"+goPath;
-  location.replace(goPath);
+  var extra=q.toString();
+  location.replace("http://125.176.112.214:2421"+dest+(extra?"?"+extra:""));
 }catch(e){}})();
 </script>
 
@@ -1016,7 +1026,7 @@ canvas{width:100%;height:100px;display:block;margin-top:6px;}
 
 <div style="text-align:center;color:var(--text-secondary);font-size:10px;padding:12px 0;">posweb · 공장 운영</div>
 <script src="posdelay_ad_receipt.js?v=0910.0345"></script>
-<script src="posweb_admin.js?v=0912.1438"></script>
+<script src="posweb_admin.js?v=0914.2010"></script>
 <script>
 function trackUrls(file, extra){
   var out=[], seen={};

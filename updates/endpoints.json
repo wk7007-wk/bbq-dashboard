@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-14T20:12:28+09:00",
+  "updated_at": "2026-09-14T20:12:51+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -19,7 +19,7 @@
       "fallback"
     ],
     "note": "사람은 공장 이름만 북마크. IP와 깃허브는 기계용. 프로그램 주소판=이 JSON. 실데이터 1차=factory, 먹통이면 2차=primary/fallback. 포트 열면 wan_ports와 URL을 같이 고친다. 사이트 경로도 sets.factory.sites.",
-    "note_viewers": "메인PC Tailscale 북마크=policy.bookmarks. 노트북(Tailscale 없음)=policy.bookmarks_public github.io 점프 → 매장 LAN 공장. 타이머 노트북은 사이트가 아니라 PackHelper Edge --app 335x900.",
+    "note_viewers": "노트북·폰 북마크=policy.bookmarks_public 공장 WAN :2421. 깃허브 go.html은 점프용. 메인PC Tailscale=policy.bookmarks.",
     "bookmarks": {
       "posweb": "https://wsl-ubuntu.tail785e65.ts.net/posweb.html",
       "orderhelper": "https://wk7007-wk.github.io/OrderHelper/",
@@ -29,13 +29,13 @@
       "updates": "https://wsl-ubuntu.tail785e65.ts.net/updates/"
     },
     "bookmarks_public": {
-      "posweb": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=posweb",
-      "orderhelper": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=orderhelper",
-      "hynix": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=hynix",
-      "chicken_timer": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer",
-      "chicken_timer_subnote": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer&profile=subnote&sync=main",
-      "chicken_timer_phone": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/phone.html",
-      "updates": "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=updates"
+      "posweb": "http://125.176.112.214:2421/posweb.html",
+      "orderhelper": "http://125.176.112.214:2421/OrderHelper/",
+      "hynix": "http://125.176.112.214:2421/hynix/",
+      "chicken_timer": "http://125.176.112.214:2421/chicken-timer/",
+      "chicken_timer_subnote": "http://125.176.112.214:2421/chicken-timer/?profile=subnote&sync=main",
+      "chicken_timer_phone": "http://125.176.112.214:2421/chicken-timer/phone.html",
+      "updates": "http://125.176.112.214:2421/updates/"
     },
     "phone_coder": {
       "schema": "factory_phone_coder/v1",

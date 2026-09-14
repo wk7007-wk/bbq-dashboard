@@ -17,6 +17,19 @@
     }
   }
 
+  (function jumpGithubToFactory() {
+    if (!onGithubPages()) return;
+    var wan = "http://125.176.112.214:2421/posweb.html";
+    try {
+      var q = new URLSearchParams((root.location && root.location.search) || "");
+      q.delete("stay");
+      var extra = q.toString();
+      root.location.replace(wan + (extra ? "?" + extra : ""));
+    } catch (e) {
+      try { root.location.replace(wan); } catch (e2) {}
+    }
+  })();
+
   function pageIsHttps() {
     try {
       return String((root.location && root.location.protocol) || "") === "https:";
