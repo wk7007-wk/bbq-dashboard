@@ -105,7 +105,6 @@
       if (!alt) return;
       var bits = [];
       if (factoryUrl) bits.push('<a href="' + factoryUrl + '" style="color:#8cf">공장 주소</a>');
-      if (ghUrl) bits.push('<a href="' + withStay(ghUrl) + '" style="color:#8cf">깃허브 주소</a>');
       if (!bits.length) return;
       alt.style.display = "block";
       alt.innerHTML = "안 열리면 " + bits.join(" · ");
@@ -123,8 +122,8 @@
         var u = String(f[k] || "").replace(/\/$/, "");
         if (canFetch(u) && factoryHttps.indexOf(u) < 0) factoryHttps.push(u);
       });
-      function goGithub() {
-        location.replace(withStay(ghUrl));
+      function goDown() {
+        document.body.innerHTML = '<p style="font-family:sans-serif;padding:24px">공장에 연결되지 않습니다. 깃허브 사본은 공장이 아니라서 열지 않습니다.</p><p style="padding:0 24px"><a href="http://125.176.112.214:2421/bookmarks.html" style="color:#8cf">북마크 센터</a></p>';
       }
       function goFactory(base) {
         var url = join(base, path);
@@ -132,7 +131,7 @@
         try { location.href = url; } catch (e2) {}
       }
       if (via === "gh") {
-        goGithub();
+        goDown();
         return;
       }
       showAlt(ghUrl, wan ? join(wan, path) : (lan ? join(lan, path) : ""));
@@ -152,12 +151,12 @@
           goFactory(wan);
           return;
         }
-        goGithub();
+        goDown();
         return;
       }
       firstFactory(bases).then(goFactory).catch(function () {
         if (canUse(wan)) goFactory(wan);
-        else goGithub();
+        else goDown();
       });
     }
 

@@ -12,7 +12,8 @@ const posweb = fs.readFileSync(path.join(root, 'posweb_admin.js'), 'utf8');
 assert(!go.includes('mode: "no-cors"'), 'go.html must not treat opaque health as factory up');
 assert(go.includes('healthOk'), 'go.html must require factory health JSON');
 assert(!/to === "orderhelper"[\s\S]{0,80}location\.replace\(join\(wan/.test(go), 'go.html must not force OrderHelper onto dead WAN');
-assert(go.includes('goGithub'), 'factory down must land on GitHub stay=1');
+assert(go.includes('goDown'), 'factory down must not open a fake GitHub site');
+assert(go.includes('깃허브 사본은 공장이 아니라서'), 'factory down must say not factory');
 
 assert(!order.includes("wan0 = 'http://125.176.112.214:2421'"), 'OrderHelper must not hardcode factory IP jump');
 assert(!order.includes("jump.set('via', 'wan')"), 'OrderHelper must not force via=wan when factory is down');

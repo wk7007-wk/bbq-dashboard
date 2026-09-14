@@ -162,18 +162,22 @@
     try {
       wanJump = String((((addressBook || {}).sets || {}).factory || {}).wan_base || "").replace(/\/$/, "");
     } catch (e) {}
-    var stuckOnGithub = onGithubPages() && !factoryLive;
+    var stuckOnGithub = onGithubPages();
+    if (stuckOnGithub) {
+      if (pin) pin.textContent = "이 주소는 공장이 아닙니다.";
+      if (bar) {
+        bar.style.display = "block";
+        bar.textContent = "깃허브 사본입니다. 로그인하지 마세요. 공장: http://125.176.112.214:2421/bookmarks.html";
+      }
+      return;
+    }
     var msg = factoryLive
       ? ("공장 " + (factoryOrigin || ""))
-      : (stuckOnGithub
-        ? ("깃허브에서는 로그인·PUT이 안 됩니다. 공장 주소로 여세요" + (wanJump ? " · " + wanJump + "/posweb.html" : ""))
-        : ("공장 먹통 · 주소판 깃허브 · 읽기 2차"));
+      : ("공장 연결 안 됨");
     if (pin) pin.textContent = msg;
     if (bar) {
       bar.style.display = factoryLive ? "none" : "block";
-      bar.textContent = stuckOnGithub
-        ? ("이 페이지는 깃허브 사본입니다. 인증은 HTTP 공장에서만 됩니다. " + (wanJump ? wanJump + "/posweb.html" : ""))
-        : "공장이 응답하지 않습니다. 주소판은 깃허브입니다. 읽기는 2차, 쓰기는 공장 복구 후.";
+      bar.textContent = "공장에 연결되지 않습니다. 되는 척하는 다른 주소는 쓰지 마세요.";
     }
     var ct = doc.getElementById("cT");
     var cd = doc.getElementById("cD");
