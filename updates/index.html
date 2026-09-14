@@ -27,7 +27,8 @@
     updates:"/updates/",
     banktotal:"/banktotal.html",
     kds:"/kds.html",
-    index:"/index.html",
+    index:"/bookmarks.html",
+    bookmarks:"/bookmarks.html",
     dashboard:"/dashboard.html"
   }[to]||"/posweb.html";
   q.set("to",to);
@@ -215,6 +216,7 @@
     const sitesBox = document.getElementById("sites");
     const noticesBox = document.getElementById("notices");
     const SITE_ROWS = [
+      { key: "center", label: "북마크 센터" },
       { key: "posweb", label: "포스웹" },
       { key: "orderhelper", label: "발주" },
       { key: "hynix", label: "하이닉스·근무표" },
@@ -222,7 +224,8 @@
       { key: "updates", label: "업데이트 센터" }
     ];
     const SITE_FALLBACK = {
-      posweb: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=posweb",
+      center: "http://125.176.112.214:2421/bookmarks.html",
+      posweb: "http://125.176.112.214:2421/posweb.html",
       orderhelper: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=orderhelper",
       hynix: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=hynix",
       chicken_timer: "https://wk7007-wk.github.io/bbq-dashboard/go.html?to=chicken-timer",

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" data-web-v="0914.2020">
+<head>
+<script data-factory-jump="1">
+(function(){try{
+  var host=String(location.hostname||"");
+  if(host.indexOf("github.io")<0)return;
+  location.replace("http://125.176.112.214:2421/bookmarks.html");
+}catch(e){}})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>공장 북마크 센터</title>
+<style>
+:root { color-scheme: dark; --bg:#121225; --card:#1c1c38; --line:#2e2e52; --text:#f0f0fa; --muted:#9aa0bc; --accent:#2ac1bc; --tap:#173a3a; }
+* { box-sizing: border-box; }
+body { margin:0; font-family:-apple-system,"Noto Sans KR",sans-serif; background:var(--bg); color:var(--text); padding:20px 16px 40px; }
+.shell { width:min(100%, 720px); margin:0 auto; }
+h1 { font-size:1.55rem; margin:0 0 6px; }
+.lead { color:var(--muted); line-height:1.5; margin:0 0 18px; }
+.me { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 22px; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#16162e; }
+.me code { font-size:.82rem; word-break:break-all; color:var(--accent); }
+.me button, .row a, .row button { min-height:44px; border:0; border-radius:10px; padding:0 14px; font-weight:800; cursor:pointer; }
+.me button, .row button { background:#2a2a45; color:#fff; }
+.row a { display:inline-flex; align-items:center; background:var(--accent); color:#081018; text-decoration:none; }
+.sec { margin:22px 0 8px; color:var(--muted); font-size:.78rem; font-weight:800; letter-spacing:.08em; }
+.row { display:grid; gap:8px; margin:0 0 10px; padding:14px; border:1px solid var(--line); border-radius:14px; background:var(--card); }
+.name { font-weight:800; }
+.url { color:var(--muted); font-size:.82rem; word-break:break-all; }
+.acts { display:flex; gap:8px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<main class="shell">
+  <h1>공장 북마크 센터</h1>
+  <p class="lead">이 페이지만 북마크하세요. 각 사이트는 공장 주소로 바로 열립니다. 깃허브 사본에서 PIN을 넣지 마세요.</p>
+  <div class="me">
+    <code id="centerUrl">http://125.176.112.214:2421/bookmarks.html</code>
+    <button type="button" data-copy="http://125.176.112.214:2421/bookmarks.html">이 주소 복사</button>
+  </div>
+
+  <p class="sec">운영</p>
+  <div id="ops"></div>
+  <p class="sec">도구</p>
+  <div id="tools"></div>
+</main>
+<script>
+(function(){
+  var WAN = "http://125.176.112.214:2421";
+  var OPS = [
+    ["포스웹", WAN + "/posweb.html", "주문·게이트·광고"],
+    ["발주", WAN + "/OrderHelper/", "재고·발주"],
+    ["타이머", WAN + "/chicken-timer/", "치킨 타이머 보드"],
+    ["타이머 폰", WAN + "/chicken-timer/phone.html", "폰용 타이머"],
+    ["하이닉스", WAN + "/hynix/", "근무 포털"],
+    ["KDS", WAN + "/kds.html", "주방 현황"]
+  ];
+  var TOOLS = [
+    ["업데이트 센터", WAN + "/updates/", "앱·APK"],
+    ["통장모음", WAN + "/banktotal.html", "입출금"],
+    ["통합 현황판", WAN + "/dashboard.html", "한 화면"],
+    ["직원 안내", WAN + "/saaya.html", "안내문"]
+  ];
+  function card(row) {
+    var el = document.createElement("div");
+    el.className = "row";
+    el.innerHTML = '<div class="name">' + row[0] + '</div><div class="url">' + row[1] + '</div><div class="acts">' +
+      '<a href="' + row[1] + '">열기</a>' +
+      '<button type="button" data-copy="' + row[1] + '">주소 복사</button></div>';
+    return el;
+  }
+  OPS.forEach(function(r){ document.getElementById("ops").appendChild(card(r)); });
+  TOOLS.forEach(function(r){ document.getElementById("tools").appendChild(card(r)); });
+  document.addEventListener("click", function(ev){
+    var btn = ev.target.closest("button[data-copy]");
+    if (!btn) return;
+    var url = btn.getAttribute("data-copy") || "";
+    var done = function(){ btn.textContent = "복사됨"; setTimeout(function(){ btn.textContent = "주소 복사"; }, 1400); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(function(){ window.prompt("북마크", url); });
+    else window.prompt("북마크", url);
+  });
+})();
+</script>
+</body>
+</html>

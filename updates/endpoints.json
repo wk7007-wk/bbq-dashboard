@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-14T20:12:51+09:00",
+  "updated_at": "2026-09-14T20:16:30+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -26,7 +26,8 @@
       "hynix": "https://wsl-ubuntu.tail785e65.ts.net/hynix/",
       "chicken_timer": "https://wsl-ubuntu.tail785e65.ts.net/chicken-timer/",
       "chicken_timer_phone": "https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/phone.html",
-      "updates": "https://wsl-ubuntu.tail785e65.ts.net/updates/"
+      "updates": "https://wsl-ubuntu.tail785e65.ts.net/updates/",
+      "center": "https://wsl-ubuntu.tail785e65.ts.net/bookmarks.html"
     },
     "bookmarks_public": {
       "posweb": "http://125.176.112.214:2421/posweb.html",
@@ -35,7 +36,8 @@
       "chicken_timer": "http://125.176.112.214:2421/chicken-timer/",
       "chicken_timer_subnote": "http://125.176.112.214:2421/chicken-timer/?profile=subnote&sync=main",
       "chicken_timer_phone": "http://125.176.112.214:2421/chicken-timer/phone.html",
-      "updates": "http://125.176.112.214:2421/updates/"
+      "updates": "http://125.176.112.214:2421/updates/",
+      "center": "http://125.176.112.214:2421/bookmarks.html"
     },
     "phone_coder": {
       "schema": "factory_phone_coder/v1",
@@ -284,7 +286,8 @@
         "updates": "http://125.176.112.214:2421/updates/",
         "catalog": "http://125.176.112.214:2421/updates/catalog.json",
         "go": "http://125.176.112.214:2421/go.html",
-        "index": "http://125.176.112.214:2421/index.html"
+        "index": "http://125.176.112.214:2421/index.html",
+        "center": "http://125.176.112.214:2421/bookmarks.html"
       }
     },
     "primary": {
