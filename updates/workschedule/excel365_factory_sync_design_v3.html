@@ -1,0 +1,63 @@
+<!doctype html><html lang="ko"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Excel365↔공장 sync 설계 v3</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:840px;margin:24px auto;padding:0 16px;line-height:1.5}
+code,pre{background:#f4f4f5;padding:2px 6px;border-radius:4px}pre{padding:12px;overflow:auto}
+table{border-collapse:collapse;width:100%;margin:12px 0}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}
+.note{color:#555}.chg{background:#fff8e6;padding:10px 12px;border-radius:8px}
+</style>
+<body>
+<h1>Excel 365 ↔ 공장 SOT 양방향 동기화 설계 v3</h1>
+<p class="note">2026-09-20 · Astra · Luna/VBA/COM 금지 · Excel(OneDrive)↔공장 SOT · CLI=동등 쓰기 클라이언트 · 완전 자동</p>
+<div class="chg"><b>v2→v3:</b> 충돌 해결을 LWW에서 <b>서버 SOT 우선</b>으로 변경. 승인 없음·자동 리맵 유지.</div>
+
+<h2>1. 엔드포인트</h2>
+<table>
+<tr><th>용도</th><th>HTTP</th><th>path</th></tr>
+<tr><td>할인 읽기</td><td>GET</td><td><code>/schedule_promos.json</code></td></tr>
+<tr><td>근무 읽기</td><td>GET</td><td><code>/workschedule.json</code></td></tr>
+<tr><td>쓰기</td><td>PUT</td><td><code>/schedule_update</code></td></tr>
+<tr><td>매핑</td><td>GET/PUT</td><td><code>/schedule_excel_map.json</code></td></tr>
+<tr><td>로그</td><td>append</td><td><code>/schedule_sync_log.json</code></td></tr>
+</table>
+<p>WAN GET <code>http://125.176.112.214:2421</code>. 쓰기는 localhost + token.</p>
+
+<h2>2. 인증</h2>
+<ul>
+<li>GET: 무토큰(WAN)</li>
+<li>PUT: <code>Authorization: Bearer &lt;token&gt;</code> + <code>If-Match: &lt;ETag&gt;</code></li>
+<li>Excel 토큰=스크립트 파라미터/비밀저장소. git·채팅 하드코딩 금지</li>
+</ul>
+
+<h2>3. 충돌 해결</h2>
+<ol>
+<li>PUT + If-Match</li>
+<li>불일치(412) → <b>서버 값 유지</b>, 클라이언트는 GET으로 맞춤</li>
+<li>거절분·사유를 <code>schedule_sync_log.json</code>에 기록</li>
+<li>타임스탬프 LWW 사용 안 함</li>
+</ol>
+
+<h2>4. 자동 리매핑</h2>
+<ol>
+<li>schema_hash 불일치 감지</li>
+<li>휴리스틱 맵 즉시 생성·map PUT</li>
+<li>PQ/Script 핫리로드</li>
+<li>승인/제안 없음. sync_log만</li>
+</ol>
+
+<h2>5. Excel 연결</h2>
+<ul>
+<li><b>서버→Excel:</b> Power Query 웹 GET + 자동 새로고침</li>
+<li><b>Excel→서버:</b> Office Script <code>PushToFactory</code> (또는 웹요청 버튼). VBA/COM 불가</li>
+<li><b>CLI→서버→Excel:</b> CLI가 동일 PUT → Excel PQ가 따라감</li>
+</ul>
+
+<h2>6. PUT body</h2>
+<pre>{
+  "schema":"schedule_update/v1",
+  "base_etag":"W/\"…\"",
+  "actor":"excel|cli",
+  "ops":[{"op":"promos.upsert","date":"YYYY-MM-DD","items":[{"platform":"배민","discount":3000}]}]
+}</pre>
+</body></html>
