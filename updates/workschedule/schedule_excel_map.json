@@ -1,21 +1,31 @@
 {
-  "schema": "schedule_excel_map/v1",
-  "map_version": 3,
-  "schema_hash": "auto",
+  "schema": "schedule_excel_map/v4",
+  "map_version": 4,
+  "form": {
+    "workbook": "2026출근.xlsm",
+    "path_example": "C:/Users/wk700/OneDrive/Documents/2026출근.xlsm",
+    "sheet": "근무표",
+    "layout_lock": true,
+    "dimension": "A1:AX80",
+    "header_row": 5,
+    "cols": {
+      "date_banner": "A",
+      "name": "B",
+      "start": "C",
+      "end": "D",
+      "off": "E",
+      "id": "F",
+      "timeline": "G:AW",
+      "date_serial": "AX"
+    },
+    "hidden_cols": ["F"],
+    "merged_regions_sample": ["A1:AW1", "A2:AW2", "A3:AW3", "A4:AW4", "A6:AW6"],
+    "preserve": ["column_order", "widths", "fills", "fonts", "merges", "row_banner_pattern", "timeline_slots"]
+  },
   "auto_remap": true,
-  "hash_inputs": ["schedule_promos/v1", "workschedule_live_v1", "schedule_update/v1"],
-  "conflict": {
-    "strategy": "server_wins",
-    "on_412": "discard_client_reload_sot",
-    "log": "schedule_sync_log.json"
-  },
+  "remap_policy": "server_fields_to_form_cells_only",
+  "conflict": {"data": "server_wins", "layout": "excel_form_wins"},
   "poll_seconds": 60,
-  "sheets": {
-    "Promos": {"date": "A", "platform": "B", "discount": "C", "max": "D", "always": "E"},
-    "Shifts": {"date": "A", "emp_id": "B", "emp_name": "C", "action": "D", "start": "E", "end": "F"},
-    "_Meta": {"etag": "B1", "schema_hash": "B2", "last_sync": "B3", "map_version": "B4"}
-  },
-  "pq_columns": {"platform": "플랫폼", "discount": "할인액", "max": "최대", "always": "상시"},
-  "pending_remap": null,
-  "note": "v3 server_wins. 승인 없음."
+  "schema_hash": "auto",
+  "note": "v4 양식존중 최우선. 레이아웃 불변."
 }
