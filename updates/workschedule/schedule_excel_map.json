@@ -1,40 +1,23 @@
 {
   "schema": "schedule_excel_map/v1",
-  "map_version": 1,
-  "schema_hash": "pending-astra-lock",
+  "map_version": 2,
+  "schema_hash": "auto",
+  "auto_remap": true,
   "hash_inputs": [
     "schedule_promos/v1",
     "workschedule_live_v1",
     "schedule_update/v1"
   ],
+  "conflict": {
+    "strategy": "lww_updated_at",
+    "tie_break": ["cli", "excel"]
+  },
+  "poll_seconds": 45,
   "sheets": {
-    "Promos": {
-      "date": "A",
-      "platform": "B",
-      "discount": "C",
-      "max": "D",
-      "always": "E"
-    },
-    "Shifts": {
-      "date": "A",
-      "emp_id": "B",
-      "emp_name": "C",
-      "action": "D",
-      "start": "E",
-      "end": "F"
-    },
-    "Employees": {
-      "emp_id": "A",
-      "name": "B",
-      "active": "C",
-      "input_mode": "D"
-    },
-    "_Meta": {
-      "etag": "B1",
-      "schema_hash": "B2",
-      "last_sync": "B3",
-      "map_version": "B4"
-    }
+    "Promos": {"date": "A", "platform": "B", "discount": "C", "max": "D", "always": "E"},
+    "Shifts": {"date": "A", "emp_id": "B", "emp_name": "C", "action": "D", "start": "E", "end": "F"},
+    "Employees": {"emp_id": "A", "name": "B", "active": "C", "input_mode": "D"},
+    "_Meta": {"etag": "B1", "schema_hash": "B2", "last_sync": "B3", "map_version": "B4", "updated_at": "B5"}
   },
   "pq_columns": {
     "platform": "플랫폼",
@@ -48,5 +31,5 @@
     "end": "종료"
   },
   "pending_remap": null,
-  "note": "초안. Astra 확정·승인 후 schema_hash 고정"
+  "note": "v2 완전자동. 승인 없음."
 }
