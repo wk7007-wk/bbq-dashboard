@@ -1,35 +1,21 @@
 {
   "schema": "schedule_excel_map/v1",
-  "map_version": 2,
+  "map_version": 3,
   "schema_hash": "auto",
   "auto_remap": true,
-  "hash_inputs": [
-    "schedule_promos/v1",
-    "workschedule_live_v1",
-    "schedule_update/v1"
-  ],
+  "hash_inputs": ["schedule_promos/v1", "workschedule_live_v1", "schedule_update/v1"],
   "conflict": {
-    "strategy": "lww_updated_at",
-    "tie_break": ["cli", "excel"]
+    "strategy": "server_wins",
+    "on_412": "discard_client_reload_sot",
+    "log": "schedule_sync_log.json"
   },
-  "poll_seconds": 45,
+  "poll_seconds": 60,
   "sheets": {
     "Promos": {"date": "A", "platform": "B", "discount": "C", "max": "D", "always": "E"},
     "Shifts": {"date": "A", "emp_id": "B", "emp_name": "C", "action": "D", "start": "E", "end": "F"},
-    "Employees": {"emp_id": "A", "name": "B", "active": "C", "input_mode": "D"},
-    "_Meta": {"etag": "B1", "schema_hash": "B2", "last_sync": "B3", "map_version": "B4", "updated_at": "B5"}
+    "_Meta": {"etag": "B1", "schema_hash": "B2", "last_sync": "B3", "map_version": "B4"}
   },
-  "pq_columns": {
-    "platform": "플랫폼",
-    "discount": "할인액",
-    "max": "최대",
-    "always": "상시",
-    "emp_id": "직원ID",
-    "emp_name": "이름",
-    "action": "동작",
-    "start": "시작",
-    "end": "종료"
-  },
+  "pq_columns": {"platform": "플랫폼", "discount": "할인액", "max": "최대", "always": "상시"},
   "pending_remap": null,
-  "note": "v2 완전자동. 승인 없음."
+  "note": "v3 server_wins. 승인 없음."
 }
