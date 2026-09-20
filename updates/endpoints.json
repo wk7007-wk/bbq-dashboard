@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-15T00:49:30+09:00",
+  "updated_at": "2026-09-20T19:46:53+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -19,7 +19,7 @@
       "fallback"
     ],
     "note": "사람은 공장 이름만 북마크. IP와 깃허브는 기계용. 프로그램 주소판=이 JSON. 실데이터 1차=factory, 먹통이면 2차=primary/fallback. 포트 열면 wan_ports와 URL을 같이 고친다. 사이트 경로도 sets.factory.sites.",
-    "note_viewers": "북마크는 공장 WAN :2421만. 깃허브 HTML은 공장이 아니다. 안 되면 안 된 것이다. 깃허브 사본 PIN은 쓰지 마라. 타이머 노트북은 PackHelper Edge --app 335x900.",
+    "note_viewers": "북마크는 공장 WAN :2421만. 깃허브 HTML은 사본이다. 안 되면 안 된 것이다. 깃허브 사본 PIN은 쓰지 마라.",
     "bookmarks": {
       "center": "http://125.176.112.214:2421/bookmarks.html",
       "posweb": "http://125.176.112.214:2421/posweb.html",
@@ -72,14 +72,28 @@
       "sbot": "http://125.176.112.214:2425",
       "grok_cli_http": "http://125.176.112.214:2422",
       "banktotal": "http://125.176.112.214:2426"
+    },
+    "sot": {
+      "node": "factory2",
+      "live": "http://125.176.112.214:2421",
+      "disk_sites": "/home/wk7007/apps/bbq-dashboard",
+      "disk_engine": "/home/wk7007/factory_luna",
+      "copies": [
+        "github.io/bbq-dashboard",
+        "gist"
+      ],
+      "json": "http://125.176.112.214:2421/factory_sot.json",
+      "rule": "워커는 공장2 디스크만 고친다. Pages/gist 수정은 완료가 아님."
     }
   },
   "health": {
-    "factory": "http://100.65.192.68:2421/health",
+    "factory": "http://100.65.156.49:2421/health",
     "factory_lan": "http://127.0.0.1:2421/health",
     "factory_magic": "https://wsl-ubuntu.tail785e65.ts.net/health",
     "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
-    "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
+    "factory2_lan": "http://192.168.219.42:2421/health",
+    "mainpc_ts": "http://100.65.192.68:2421/health"
   },
   "sets": {
     "factory": {
@@ -90,8 +104,8 @@
       "baeksu_reports": "http://125.176.112.214:2421/baeksu_reports.json",
       "factory_put_paths": "http://125.176.112.214:2421/factory_put_paths.json",
       "chicken_timer_board": "http://125.176.112.214:2421/chicken-timer/",
-      "ts_base": "http://100.65.192.68:2421",
-      "pages_base_http": "http://100.65.192.68:2421",
+      "ts_base": "http://100.65.156.49:2421",
+      "pages_base_http": "http://100.65.156.49:2421",
       "orderhelper": "http://125.176.112.214:2421/OrderHelper/",
       "hynix": "http://125.176.112.214:2421/hynix/",
       "workschedule": "http://125.176.112.214:2421/workschedule.json",
@@ -99,11 +113,13 @@
       "factory_internal": {
         "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
         "magic_updates_base": "https://wsl-ubuntu.tail785e65.ts.net/updates",
-        "ts_base": "http://100.65.192.68:2421",
+        "ts_base": "http://100.65.156.49:2421",
         "lan_base": "http://127.0.0.1:2421",
         "chicken_timer_board_magic": "https://wsl-ubuntu.tail785e65.ts.net/chicken-timer/",
         "hynix_magic": "https://wsl-ubuntu.tail785e65.ts.net/hynix/",
-        "updates_base_magic": "https://wsl-ubuntu.tail785e65.ts.net/updates"
+        "updates_base_magic": "https://wsl-ubuntu.tail785e65.ts.net/updates",
+        "updates_base_ts": "http://100.65.156.49:2421/updates",
+        "lan_base_factory2": "http://192.168.219.42:2421"
       },
       "update.posdelay": "http://125.176.112.214:2421/updates/posdelay/version.json",
       "update.deliveryhelper": "http://125.176.112.214:2421/updates/deliveryhelper/version.json",
@@ -201,19 +217,21 @@
         },
         "2427": {
           "port": 2427,
-          "protocol": "tcp",
-          "service": "reserved",
+          "protocol": "http",
+          "service": "baedalweb_html",
           "url": "http://125.176.112.214:2427",
           "dnat": "192.168.219.44",
-          "wan_host": "125.176.112.214"
+          "wan_host": "125.176.112.214",
+          "note": "baedalweb HTML; SoT JSON still :2421"
         },
         "2428": {
           "port": 2428,
-          "protocol": "tcp",
-          "service": "reserved",
+          "protocol": "http",
+          "service": "baedalweb_address",
           "url": "http://125.176.112.214:2428",
           "dnat": "192.168.219.44",
-          "wan_host": "125.176.112.214"
+          "wan_host": "125.176.112.214",
+          "note": "baedalweb address; SoT JSON still :2421"
         },
         "2429": {
           "port": 2429,
@@ -278,7 +296,7 @@
       "origin_lan": "192.168.219.44",
       "origin_ts": "100.65.192.68",
       "sites": {
-        "note": "라이브 1차=WAN :2421 공장2. MagicHTTPS는 factory_internal / policy.bookmarks.",
+        "note": "라이브 1차=WAN :2421 공장2. MagicHTTPS는 factory_internal / policy.bookmarks. baedalweb HTML:2427 address:2428; JSON SoT remains :2421.",
         "posweb": "http://125.176.112.214:2421/posweb.html",
         "orderhelper": "http://125.176.112.214:2421/OrderHelper/",
         "hynix": "http://125.176.112.214:2421/hynix/",
@@ -288,7 +306,143 @@
         "catalog": "http://125.176.112.214:2421/updates/catalog.json",
         "go": "http://125.176.112.214:2421/go.html",
         "index": "http://125.176.112.214:2421/index.html",
-        "center": "http://125.176.112.214:2421/bookmarks.html"
+        "center": "http://125.176.112.214:2421/bookmarks.html",
+        "baedalweb_html": "http://125.176.112.214:2427",
+        "baedalweb_address": "http://125.176.112.214:2428",
+        "banktotal": "http://125.176.112.214:2421/banktotal.html"
+      },
+      "factory_host": "factory2-DESKTOP-DPIRNPL",
+      "factory_lan_ip": "192.168.219.42",
+      "factory_ts_ip": "100.65.156.49",
+      "mainpc_lan_ip": "192.168.219.44",
+      "mainpc_ts_ip": "100.65.192.68",
+      "wan_dnat_note": "공인 :2421 현재 mainpc(.44)로 DNAT됨. updates ans_* SoT 파일은 factory2(.42)에 있음. WAN updates 200 위해 공유기 DNAT를 .42로 바꾸거나 .44 updates 동기화 필요.",
+      "auto_follow": {
+        "updated_at": "2026-09-20T06:33:45+09:00",
+        "winner": "http://100.65.156.49:2421",
+        "ans": 200,
+        "phone": 404,
+        "map": 200,
+        "probes": [
+          {
+            "base": "http://127.0.0.1:2421",
+            "health": 200,
+            "phone": 404,
+            "ans": 200,
+            "updates_root": 404,
+            "map": 200,
+            "score": 13,
+            "serves_updates": true
+          },
+          {
+            "base": "http://192.168.219.42:2421",
+            "health": 200,
+            "phone": 404,
+            "ans": 200,
+            "updates_root": 404,
+            "map": 200,
+            "score": 13,
+            "serves_updates": true
+          },
+          {
+            "base": "http://192.168.219.44:2421",
+            "health": 200,
+            "phone": 200,
+            "ans": 404,
+            "updates_root": 404,
+            "map": 200,
+            "score": 5,
+            "serves_updates": false
+          },
+          {
+            "base": "http://125.176.112.214:2421",
+            "health": 200,
+            "phone": 200,
+            "ans": 404,
+            "updates_root": 404,
+            "map": 200,
+            "score": 5,
+            "serves_updates": false
+          },
+          {
+            "base": "http://100.65.192.68:2421",
+            "health": 200,
+            "phone": 200,
+            "ans": 404,
+            "updates_root": 404,
+            "map": 200,
+            "score": 5,
+            "serves_updates": false
+          },
+          {
+            "base": "http://100.85.69.33:2421",
+            "health": 0,
+            "phone": 0,
+            "ans": 0,
+            "updates_root": 0,
+            "map": 0,
+            "score": 0,
+            "serves_updates": false
+          },
+          {
+            "base": "http://100.117.182.14:2421",
+            "health": 200,
+            "phone": 404,
+            "ans": 200,
+            "updates_root": 404,
+            "map": 200,
+            "score": 13,
+            "serves_updates": true
+          },
+          {
+            "base": "http://100.124.115.118:2421",
+            "health": 0,
+            "phone": 0,
+            "ans": 0,
+            "updates_root": 0,
+            "map": 0,
+            "score": 0,
+            "serves_updates": false
+          },
+          {
+            "base": "http://100.122.253.89:2421",
+            "health": 0,
+            "phone": 0,
+            "ans": 0,
+            "updates_root": 0,
+            "map": 0,
+            "score": 0,
+            "serves_updates": false
+          },
+          {
+            "base": "http://100.85.62.30:2421",
+            "health": 0,
+            "phone": 0,
+            "ans": 0,
+            "updates_root": 0,
+            "map": 0,
+            "score": 0,
+            "serves_updates": false
+          },
+          {
+            "base": "http://100.65.156.49:2421",
+            "health": 200,
+            "phone": 404,
+            "ans": 200,
+            "updates_root": 404,
+            "map": 200,
+            "score": 13,
+            "serves_updates": true
+          }
+        ],
+        "sticky": true,
+        "note": "sticky factory2 when ans=200; wan_base=public bookmark; sync WAN face if possible"
+      },
+      "wan_gap": {
+        "status": "cleared",
+        "wan_updates_http": 200,
+        "updated_at": "2026-09-20T06:37:39+09:00",
+        "note": "Grok CLI SCP ans_20260920* to mainpc .44"
       }
     },
     "primary": {
@@ -297,19 +451,24 @@
       "updates_base": "https://wk7007-wk.github.io/bbq-dashboard/updates",
       "endpoints": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
       "hynix": "https://wk7007-wk.github.io/bbq-dashboard/hynix/",
-      "orderhelper": "https://wk7007-wk.github.io/OrderHelper/"
+      "orderhelper": "https://wk7007-wk.github.io/OrderHelper/",
+      "role": "copy",
+      "sot": false,
+      "note": "GitHub Pages 사본. SoT 아님. 여기 HTML을 고치고 끝내지 마라."
     },
     "fallback": {
       "live_base": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw",
       "endpoints": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
       "factory_put_paths": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/factory_put_paths.json",
-      "note": "2차 live_base는 이 칸에서 바꾼다. 공장 먹통이어도 깃허브 주소판만 고치면 됨.",
+      "note": "gist 사본. SoT는 공장2. 공장 먹통이면 공장2를 살린다. 사본만 고치지 마라.",
       "order_desk": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/order_desk.json",
-      "workschedule": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json"
+      "workschedule": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/workschedule.json",
+      "role": "copy",
+      "sot": false
     }
   },
   "public_ip": "125.176.112.214",
-  "host": "125.176.112.214",
+  "host": "factory-autofollow",
   "center_mode": "site",
   "phone_coder": {
     "schema": "factory_phone_coder/v1",
@@ -343,5 +502,155 @@
     "sbot": "http://125.176.112.214:2425",
     "grok_cli_http": "http://125.176.112.214:2422",
     "banktotal": "http://125.176.112.214:2426"
+  },
+  "auto_follow_last": {
+    "updated_at": "2026-09-20T06:33:45+09:00",
+    "winner": "http://100.65.156.49:2421",
+    "ans": 200,
+    "phone": 404,
+    "map": 200,
+    "probes": [
+      {
+        "base": "http://127.0.0.1:2421",
+        "health": 200,
+        "phone": 404,
+        "ans": 200,
+        "updates_root": 404,
+        "map": 200,
+        "score": 13,
+        "serves_updates": true
+      },
+      {
+        "base": "http://192.168.219.42:2421",
+        "health": 200,
+        "phone": 404,
+        "ans": 200,
+        "updates_root": 404,
+        "map": 200,
+        "score": 13,
+        "serves_updates": true
+      },
+      {
+        "base": "http://192.168.219.44:2421",
+        "health": 200,
+        "phone": 200,
+        "ans": 404,
+        "updates_root": 404,
+        "map": 200,
+        "score": 5,
+        "serves_updates": false
+      },
+      {
+        "base": "http://125.176.112.214:2421",
+        "health": 200,
+        "phone": 200,
+        "ans": 404,
+        "updates_root": 404,
+        "map": 200,
+        "score": 5,
+        "serves_updates": false
+      },
+      {
+        "base": "http://100.65.192.68:2421",
+        "health": 200,
+        "phone": 200,
+        "ans": 404,
+        "updates_root": 404,
+        "map": 200,
+        "score": 5,
+        "serves_updates": false
+      },
+      {
+        "base": "http://100.85.69.33:2421",
+        "health": 0,
+        "phone": 0,
+        "ans": 0,
+        "updates_root": 0,
+        "map": 0,
+        "score": 0,
+        "serves_updates": false
+      },
+      {
+        "base": "http://100.117.182.14:2421",
+        "health": 200,
+        "phone": 404,
+        "ans": 200,
+        "updates_root": 404,
+        "map": 200,
+        "score": 13,
+        "serves_updates": true
+      },
+      {
+        "base": "http://100.124.115.118:2421",
+        "health": 0,
+        "phone": 0,
+        "ans": 0,
+        "updates_root": 0,
+        "map": 0,
+        "score": 0,
+        "serves_updates": false
+      },
+      {
+        "base": "http://100.122.253.89:2421",
+        "health": 0,
+        "phone": 0,
+        "ans": 0,
+        "updates_root": 0,
+        "map": 0,
+        "score": 0,
+        "serves_updates": false
+      },
+      {
+        "base": "http://100.85.62.30:2421",
+        "health": 0,
+        "phone": 0,
+        "ans": 0,
+        "updates_root": 0,
+        "map": 0,
+        "score": 0,
+        "serves_updates": false
+      },
+      {
+        "base": "http://100.65.156.49:2421",
+        "health": 200,
+        "phone": 404,
+        "ans": 200,
+        "updates_root": 404,
+        "map": 200,
+        "score": 13,
+        "serves_updates": true
+      }
+    ],
+    "sticky": true,
+    "note": "sticky factory2 when ans=200; wan_base=public bookmark; sync WAN face if possible"
+  },
+  "live_chain": [
+    "factory",
+    "primary",
+    "fallback"
+  ],
+  "sites": {
+    "updates": {
+      "wan": "http://125.176.112.214:2421/updates",
+      "factory_live": "http://100.65.156.49:2421/updates",
+      "note": "Kakao/external use wan only; factory_live for TS/LAN clients"
+    }
+  },
+  "meta": {
+    "sot": "http://125.176.112.214:2421",
+    "sot_note": "SoT HTTP=:2421. baedalweb :2427/:2428 explicit split. BankTotal phone SoT=:2421."
+  },
+  "satellites": {
+    "baedalweb": {
+      "html": "http://125.176.112.214:2427",
+      "address": "http://125.176.112.214:2428",
+      "sot": "http://125.176.112.214:2421",
+      "mode": "explicit_split"
+    },
+    "banktotal": {
+      "sot": "http://125.176.112.214:2421",
+      "health_lane": 2426,
+      "api_loopback": "127.0.0.1:8766"
+    }
   }
 }
