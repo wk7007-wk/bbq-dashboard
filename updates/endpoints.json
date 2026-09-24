@@ -1,7 +1,7 @@
 {
   "schema": "hosting_move_endpoints/v2",
   "active": "auto",
-  "updated_at": "2026-09-20T19:46:53+09:00",
+  "updated_at": "2026-09-25T00:41:39+09:00",
   "policy": {
     "no_ip_literals_in_code": true,
     "address_book": [
@@ -50,7 +50,7 @@
       ],
       "wan_http": "http://125.176.112.214:2421",
       "wan_https": "https://125.176.112.214",
-      "magic_https": "https://wsl-ubuntu.tail785e65.ts.net",
+      "magic_https": "https://factory2.tail785e65.ts.net",
       "grok_ws": "ws://125.176.112.214:2419/ws",
       "files": {
         "codex_job": "factory_codex_job.json",
@@ -87,39 +87,39 @@
     }
   },
   "health": {
-    "factory": "http://100.65.156.49:2421/health",
+    "factory": "http://100.65.192.68:2421/health",
     "factory_lan": "http://127.0.0.1:2421/health",
-    "factory_magic": "https://wsl-ubuntu.tail785e65.ts.net/health",
+    "factory_magic": "https://factory2.tail785e65.ts.net/health",
     "primary": "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
     "fallback": "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json",
-    "factory2_lan": "http://192.168.219.42:2421/health",
+    "factory2_lan": "http://192.168.219.44:2421/health",
     "mainpc_ts": "http://100.65.192.68:2421/health"
   },
   "sets": {
     "factory": {
-      "pages_base": "https://wsl-ubuntu.tail785e65.ts.net",
+      "pages_base": "https://factory2.tail785e65.ts.net",
       "lan_base": "http://127.0.0.1:2421",
-      "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
+      "magic_base": "https://factory2.tail785e65.ts.net",
       "wan_base": "http://125.176.112.214:2421",
       "baeksu_reports": "http://125.176.112.214:2421/baeksu_reports.json",
       "factory_put_paths": "http://125.176.112.214:2421/factory_put_paths.json",
       "chicken_timer_board": "http://125.176.112.214:2421/chicken-timer/",
-      "ts_base": "http://100.65.156.49:2421",
-      "pages_base_http": "http://100.65.156.49:2421",
+      "ts_base": "http://100.65.192.68:2421",
+      "pages_base_http": "http://100.65.192.68:2421",
       "orderhelper": "http://125.176.112.214:2421/OrderHelper/",
       "hynix": "http://125.176.112.214:2421/hynix/",
       "workschedule": "http://125.176.112.214:2421/workschedule.json",
       "updates_base": "http://125.176.112.214:2421/updates",
       "factory_internal": {
-        "magic_base": "https://wsl-ubuntu.tail785e65.ts.net",
-        "magic_updates_base": "https://wsl-ubuntu.tail785e65.ts.net/updates",
-        "ts_base": "http://100.65.156.49:2421",
+        "magic_base": "https://factory2.tail785e65.ts.net",
+        "magic_updates_base": "https://factory2.tail785e65.ts.net/updates",
+        "ts_base": "http://100.65.192.68:2421",
         "lan_base": "http://127.0.0.1:2421",
-        "chicken_timer_board_magic": "https://wsl-ubuntu.tail785e65.ts.net/chicken-timer/",
-        "hynix_magic": "https://wsl-ubuntu.tail785e65.ts.net/hynix/",
-        "updates_base_magic": "https://wsl-ubuntu.tail785e65.ts.net/updates",
-        "updates_base_ts": "http://100.65.156.49:2421/updates",
-        "lan_base_factory2": "http://192.168.219.42:2421"
+        "chicken_timer_board_magic": "https://factory2.tail785e65.ts.net/chicken-timer/",
+        "hynix_magic": "https://factory2.tail785e65.ts.net/hynix/",
+        "updates_base_magic": "https://factory2.tail785e65.ts.net/updates",
+        "updates_base_ts": "http://100.65.192.68:2421/updates",
+        "lan_base_factory2": "http://192.168.219.44:2421"
       },
       "update.posdelay": "http://125.176.112.214:2421/updates/posdelay/version.json",
       "update.deliveryhelper": "http://125.176.112.214:2421/updates/deliveryhelper/version.json",
@@ -269,7 +269,7 @@
         ],
         "wan_http": "http://125.176.112.214:2421",
         "wan_https": "https://125.176.112.214",
-        "magic_https": "https://wsl-ubuntu.tail785e65.ts.net",
+        "magic_https": "https://factory2.tail785e65.ts.net",
         "grok_ws": "ws://125.176.112.214:2419/ws",
         "files": {
           "codex_job": "factory_codex_job.json",
@@ -312,14 +312,14 @@
         "banktotal": "http://125.176.112.214:2421/banktotal.html"
       },
       "factory_host": "factory2-DESKTOP-DPIRNPL",
-      "factory_lan_ip": "192.168.219.42",
-      "factory_ts_ip": "100.65.156.49",
+      "factory_lan_ip": "192.168.219.44",
+      "factory_ts_ip": "100.65.192.68",
       "mainpc_lan_ip": "192.168.219.44",
       "mainpc_ts_ip": "100.65.192.68",
       "wan_dnat_note": "공인 :2421 현재 mainpc(.44)로 DNAT됨. updates ans_* SoT 파일은 factory2(.42)에 있음. WAN updates 200 위해 공유기 DNAT를 .42로 바꾸거나 .44 updates 동기화 필요.",
       "auto_follow": {
         "updated_at": "2026-09-20T06:33:45+09:00",
-        "winner": "http://100.65.156.49:2421",
+        "winner": "http://100.65.192.68:2421",
         "ans": 200,
         "phone": 404,
         "map": 200,
@@ -335,7 +335,7 @@
             "serves_updates": true
           },
           {
-            "base": "http://192.168.219.42:2421",
+            "base": "http://192.168.219.44:2421",
             "health": 200,
             "phone": 404,
             "ans": 200,
@@ -425,7 +425,7 @@
             "serves_updates": false
           },
           {
-            "base": "http://100.65.156.49:2421",
+            "base": "http://100.65.192.68:2421",
             "health": 200,
             "phone": 404,
             "ans": 200,
@@ -480,7 +480,7 @@
     ],
     "wan_http": "http://125.176.112.214:2421",
     "wan_https": "https://125.176.112.214",
-    "magic_https": "https://wsl-ubuntu.tail785e65.ts.net",
+    "magic_https": "https://factory2.tail785e65.ts.net",
     "grok_ws": "ws://125.176.112.214:2419/ws",
     "files": {
       "codex_job": "factory_codex_job.json",
@@ -505,7 +505,7 @@
   },
   "auto_follow_last": {
     "updated_at": "2026-09-20T06:33:45+09:00",
-    "winner": "http://100.65.156.49:2421",
+    "winner": "http://100.65.192.68:2421",
     "ans": 200,
     "phone": 404,
     "map": 200,
@@ -521,7 +521,7 @@
         "serves_updates": true
       },
       {
-        "base": "http://192.168.219.42:2421",
+        "base": "http://192.168.219.44:2421",
         "health": 200,
         "phone": 404,
         "ans": 200,
@@ -611,7 +611,7 @@
         "serves_updates": false
       },
       {
-        "base": "http://100.65.156.49:2421",
+        "base": "http://100.65.192.68:2421",
         "health": 200,
         "phone": 404,
         "ans": 200,
@@ -632,7 +632,7 @@
   "sites": {
     "updates": {
       "wan": "http://125.176.112.214:2421/updates",
-      "factory_live": "http://100.65.156.49:2421/updates",
+      "factory_live": "http://100.65.192.68:2421/updates",
       "note": "Kakao/external use wan only; factory_live for TS/LAN clients"
     }
   },
