@@ -13,7 +13,16 @@
   if (host === "wk7007-wk.github.io") {
     jump.delete("stay");
     var extra = jump.toString();
-    location.replace("http://125.176.112.214:2421/chicken-timer/" + (extra ? "?" + extra : ""));
+    var book = "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json";
+    fetch(book, { cache: "no-store" }).then(function (r) {
+      if (!r || !r.ok) throw new Error("http");
+      return r.json();
+    }).then(function (ep) {
+      var factory = (ep && ep.sets && ep.sets.factory) || {};
+      var board = String(factory.chicken_timer_board || "").replace(/\/$/, "");
+      if (board.indexOf("https://") !== 0 || board.indexOf("/chicken-timer") < 0) return;
+      location.replace(board + "/" + (extra ? "?" + extra : ""));
+    }).catch(function () {});
     return;
   }
   var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";

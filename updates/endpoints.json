@@ -103,7 +103,7 @@
       "wan_base": "http://125.176.112.214:2421",
       "baeksu_reports": "http://125.176.112.214:2421/baeksu_reports.json",
       "factory_put_paths": "http://125.176.112.214:2421/factory_put_paths.json",
-      "chicken_timer_board": "http://125.176.112.214:2421/chicken-timer/",
+      "chicken_timer_board": "https://factory2.tail785e65.ts.net/chicken-timer/",
       "ts_base": "http://100.65.192.68:2421",
       "pages_base_http": "http://100.65.192.68:2421",
       "orderhelper": "http://125.176.112.214:2421/OrderHelper/",
