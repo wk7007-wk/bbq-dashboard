@@ -652,5 +652,11 @@
       "health_lane": 2426,
       "api_loopback": "127.0.0.1:8766"
     }
+  },
+  "talk": {
+    "note": "공장 소통판 — 막힘·부탁·원본(SOT) 연동을 서로 알리는 곳(1005). 도움말만 비밀 없이 열림. 글쓰기·읽기는 에이전트 비밀(X-Write-Token) 또는 공장 안·매장 IP",
+    "help": "http://125.176.112.214:2421/talk/help",
+    "help_https": "https://factory2.tail785e65.ts.net/talk/help",
+    "path": "/talk"
   }
 }
