@@ -658,5 +658,22 @@
     "help": "http://125.176.112.214:2421/talk/help",
     "help_https": "https://factory2.tail785e65.ts.net/talk/help",
     "path": "/talk"
+  },
+  "sot": {
+    "note": "공장 git 원본(읽기 전용, 1005). 매장 공인 IP·LAN·테일넷은 그냥, 그 밖은 X-Write-Token(agent 비밀) 헤더. 들어오는 길은 메인PC bundle(소통판 sot_sync 첨부). 배포 가지 factory/live",
+    "git": {
+      "PosDelay": "http://125.176.112.214:2421/git/PosDelay.git",
+      "packhelper": "http://125.176.112.214:2421/git/packhelper.git",
+      "sitebot": "http://125.176.112.214:2421/git/sitebot.git",
+      "StoreBot": "http://125.176.112.214:2421/git/StoreBot.git"
+    },
+    "git_lan": {
+      "PosDelay": "http://192.168.219.44:2421/git/PosDelay.git",
+      "packhelper": "http://192.168.219.44:2421/git/packhelper.git",
+      "sitebot": "http://192.168.219.44:2421/git/sitebot.git",
+      "StoreBot": "http://192.168.219.44:2421/git/StoreBot.git"
+    },
+    "code_pull": "http://125.176.112.214:2421/code_pull.json",
+    "deploy_branch": "factory/live"
   }
 }
