@@ -665,13 +665,15 @@
       "PosDelay": "http://125.176.112.214:2421/git/PosDelay.git",
       "packhelper": "http://125.176.112.214:2421/git/packhelper.git",
       "sitebot": "http://125.176.112.214:2421/git/sitebot.git",
-      "StoreBot": "http://125.176.112.214:2421/git/StoreBot.git"
+      "StoreBot": "http://125.176.112.214:2421/git/StoreBot.git",
+      "bbq_order_analysis": "http://125.176.112.214:2421/git/bbq_order_analysis.git"
     },
     "git_lan": {
       "PosDelay": "http://192.168.219.44:2421/git/PosDelay.git",
       "packhelper": "http://192.168.219.44:2421/git/packhelper.git",
       "sitebot": "http://192.168.219.44:2421/git/sitebot.git",
-      "StoreBot": "http://192.168.219.44:2421/git/StoreBot.git"
+      "StoreBot": "http://192.168.219.44:2421/git/StoreBot.git",
+      "bbq_order_analysis": "http://192.168.219.44:2421/git/bbq_order_analysis.git"
     },
     "code_pull": "http://125.176.112.214:2421/code_pull.json",
     "deploy_branch": "factory/live"
