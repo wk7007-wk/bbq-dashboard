@@ -17,6 +17,7 @@
     ? syncFactory.createChannel({
       location: global.location,
       profile,
+      syncKey: profile === "subnote" ? "main" : "",
       search: global.location.search || "",
       storage: global.localStorage,
     })
@@ -31,6 +32,26 @@
   const bridge = bridgeFactory.createBridge(global);
   const slotViews = new Map();
   const PRESS_GUARD_MS = 700;
+  // 1003 사용자 "버튼 연속 투터치 문제, 약간의 터치 먹통으로 보호": 한 칸에서 버튼이 눌리면 그 칸의 모든 버튼을
+  // 이 시간 동안 무시한다(같은 버튼 두 번, 첫 터치로 바뀐 화면의 새 버튼에 두 번째 터치가 들어가는 것 모두).
+  // 1016 사장님 "탭의 터치반응이나 cpu한계로 투터치 지속발생": 500ms 로는 느린 태블릿에서 모자랐다.
+  // PRESS_GUARD_MS(700) 와 맞춰 둔다 - 숫자를 늘리지 않고 이미 검증된 값 하나로 합친다.
+  const CARD_TOUCH_LOCK_MS = PRESS_GUARD_MS;
+  // 1016: 종료 화면을 넘기는 순간은 드문 전환이다(실측으로 칸 높이·자리는 안 밀리는 것을 확인했다 -
+  // 그래도 유령 터치·기기가 늦게 재생하는 터치가 남아 있을 수 있어 이 순간만 보드 전체를 짧게 얼린다,
+  // 칸 단위 잠금과 달리 다른 칸까지 보호). 보통 때 연속 터치(다른 칸 빠르게 시작하기)는 건드리지 않는다.
+  const DISMISS_BOARD_GUARD_MS = 700;
+  // 1016 사장님 "일반 터치도 방금 투터치가되는데": 위 보호들은 전부 Date.now() 로 재는데, 메인스레드가
+  // 바쁘면(렌더·동기화 중) 처리 시각이 밀려 실제로는 가까웠던 두 터치가 멀어 보여 보호를 피해 간다.
+  // event.timeStamp 는 브라우저가 입력을 받은 실제 순간이라 그 지연에 영향 안 받는다 - 이걸로 아주
+  // 짧게(사람이 서로 다른 버튼을 의도해서 누르기엔 너무 가까운 간격) 보드 전체 하드웨어 입력 자체를
+  // 거른다. 기존 보호를 대신하지 않고 앞에 하나 더 둔다(없애는 보호가 없으니 새 오탐 위험이 없다).
+  const HARDWARE_BOUNCE_MS = 160;
+  // 한 번 누름 = 한 번 실행. 느린 탭은 처리하는 동안 같은 누름의 click 이 늦게 와서
+  // 700ms 막이를 지나 두 번 시작됐다(1010 갤럭시탭 감사 기록 0.70~0.81초 간격).
+  // 그래서 막는 시간을 '처리 끝난 때'부터 센다. 시작·추가 같은 버튼은 1초, +/- 조정은 0.25초.
+  const SAME_BUTTON_REPEAT_MS = 1000;
+  const ADJUST_REPEAT_MS = 250;
   const RESTART_AFTER_CLEAR_GUARD_MS = 1200;
   // Preset start swaps the number grid for running rails in-place. A leftover
   // pointerup/touchend/click on the same coordinates must not pause or 삭제;
@@ -41,6 +62,8 @@
     "10": "ten",
     "13": "thirteen",
   };
+  // 1002 사용자: 칸 3모드(시작 화면 · 카운트다운 · 종료 빨강). 빨강은 칸 터치 또는 90초 뒤 시작 화면으로. 칸별로 넘긴 종료 시각.
+  const alertDismissed = new Map();
   const TIMER_FAMILY_BY_DURATION = {
     420: "seven",
     600: "ten",
@@ -49,12 +72,15 @@
   const ZONE_DEFS = [
     { id: "fryer-3", label: "튀김3", shortLabel: "F3", accent: "fryer-a", slotIds: ["slot-1", "slot-2", "slot-3"] },
     { id: "fryer-2", label: "튀김2", shortLabel: "F2", accent: "fryer-b", slotIds: ["slot-4", "slot-5"] },
-    { id: "oven", label: "오븐", shortLabel: "OV", accent: "oven", slotIds: ["slot-6"] },
+    // 오븐 zone id 는 "ov". 옛 넓은 오븐 칸 전용 규칙([data-zone="oven"])을 끊고 튀김과 같은 한 칸 규칙을 쓴다.
+    { id: "ov", label: "오븐", shortLabel: "OV", accent: "oven", slotIds: ["slot-6", "slot-7"] },
+    { id: "temp", label: "사이드", shortLabel: "사이드", accent: "temp", slotIds: ["slot-8"] },
   ];
   const DISPLAY_PROFILE_SPECS = [
-    { name: "primary-phone", targetLabel: "Samsung Galaxy Note9", shortSide: 393, longSide: 852, shortTolerance: 48, longTolerance: 130 },
-    { name: "primary-tablet", targetLabel: "Samsung Galaxy Tab A 8.0 (2019)", shortSide: 800, longSide: 1280, shortTolerance: 48, longTolerance: 64 },
-    { name: "primary-subnotebook", targetLabel: "서브 노트북 1085x1885", shortSide: 1085, longSide: 1885, shortTolerance: 48, longTolerance: 80 },
+    { name: "store-main", targetLabel: "메인 PC 848x572", width: 848, height: 572, tolerance: 28 },
+    { name: "store-note9", targetLabel: "노트9 798x387", width: 798, height: 387, tolerance: 28 },
+    { name: "store-taba", targetLabel: "탭 A 962x529", width: 962, height: 529, tolerance: 28 },
+    { name: "store-subnote", targetLabel: "서브노트북 321x751", width: 321, height: 751, tolerance: 28 },
   ];
   const READOUT_MIN_FONT_PX = 30;
   const READOUT_MAX_FONT_PX = 132;
@@ -94,6 +120,16 @@
   const VISUAL_REFRESH_INTERVAL_MS = 1000;
   let suppressClickUntil = 0;
   let suppressDragPressUntil = 0;
+  let lastAcceptedHardwareTs = -Infinity;   // 1016: event.timeStamp 기준 - Date.now() 지연에 안 흔들림
+
+  /** 1016: 방금 받아들인 하드웨어 입력과 너무 가까우면(디지타이저 바운스·유령 재생) 거른다.
+   * ts 가 숫자가 아니면(모양 이상) 거르지 않는다 - 기존 Date.now() 보호가 뒤에서 잡아 준다. */
+  function hardwareBounced(ts) {
+    if (typeof ts !== "number" || !isFinite(ts)) return false;
+    if (ts - lastAcceptedHardwareTs < HARDWARE_BOUNCE_MS) return true;
+    lastAcceptedHardwareTs = ts;
+    return false;
+  }
   let applyingRemoteSync = false;
   let wakeLock = null;
   let latestFinishRanks = new Map();
@@ -166,7 +202,10 @@
       return;
     }
     persistBoardRecovery(reason, nextBoardState);
-    if (!applyingRemoteSync) {
+    if (!applyingRemoteSync && reason === "dismiss") {
+      // 1003: 넘김은 보드 전체 게시가 아니라 공장 최신 보드에 조건부로 넘김만 표시(timer-sync publishDismiss)
+      publishDismissed(meta && Array.isArray(meta.slotIds) ? meta.slotIds : []);
+    } else if (!applyingRemoteSync) {
       publishBoardState(reason, {
         previous: summarizeBoardForAudit(previousBoardState),
         slotIds: meta && Array.isArray(meta.slotIds) ? meta.slotIds.slice() : [],
@@ -302,6 +341,7 @@
     getRecoveryInfo: readRecoveryEnvelope,
     getSyncStatus: () => Object.assign({}, latestSyncStatus),
     getClockState,
+    getNow,
     getRuntimeStats: () => Object.assign({}, runtimeStats),
     getDisplayProfile: () => Object.assign({}, latestDisplayProfile),
     getSplitCleanupDelayMs: () => SPLIT_COMPLETED_VISIBLE_MS,
@@ -349,17 +389,14 @@
     const visualViewport = global.visualViewport || null;
     appendCandidate(visualViewport && visualViewport.width, visualViewport && visualViewport.height);
     appendCandidate(global.innerWidth, global.innerHeight);
-    appendCandidate(global.screen && global.screen.width, global.screen && global.screen.height);
 
     let bestMatch = null;
     candidates.forEach((candidate) => {
-      const shortSide = Math.min(candidate.width, candidate.height);
-      const longSide = Math.max(candidate.width, candidate.height);
       DISPLAY_PROFILE_SPECS.forEach((spec) => {
-        const shortDelta = Math.abs(shortSide - spec.shortSide);
-        const longDelta = Math.abs(longSide - spec.longSide);
-        if (shortDelta > spec.shortTolerance || longDelta > spec.longTolerance) return;
-        const score = shortDelta / spec.shortTolerance + longDelta / spec.longTolerance;
+        const widthDelta = Math.abs(candidate.width - spec.width);
+        const heightDelta = Math.abs(candidate.height - spec.height);
+        if (widthDelta > spec.tolerance || heightDelta > spec.tolerance) return;
+        const score = widthDelta / spec.tolerance + heightDelta / spec.tolerance;
         if (!bestMatch || score < bestMatch.score) {
           bestMatch = { name: spec.name, candidate, score };
         }
@@ -480,6 +517,7 @@
     if (previousActive <= 0) return false;
     const changeReason = reason ? String(reason) : "";
     if (changeReason === "clear" && previousActive <= 1) return false;
+    if (!hasUnexplainedRemoval(candidate.board, nextBoardState)) return false;
     const emptyMarker = readIntentionalEmptyMarker();
     if (emptyMarker && previousActive <= 1) return false;
     if (emptyMarker && candidate.savedAt > 0 && emptyMarker.markedAt >= candidate.savedAt && previousActive <= 1) return false;
@@ -797,10 +835,38 @@
     }).filter(Boolean);
   }
 
+  // 0930: 사라진 칸마다 그 뒤 시각의 삭제·완료 기록이 있으면 사람이 한 정상 삭제다.
+  // 기록 없이 사라진 칸(서버 초기화·옛 상태 덮어쓰기)이 있을 때만 사고로 본다.
+  function lastSlotActivity(slot) {
+    const log = slot && Array.isArray(slot.activityLog) ? slot.activityLog : [];
+    return log.length ? log[log.length - 1] : null;
+  }
+
+  function hasUnexplainedRemoval(previousBoardState, nextBoardState) {
+    const previousSlots = previousBoardState && previousBoardState.main && Array.isArray(previousBoardState.main.slots)
+      ? previousBoardState.main.slots
+      : [];
+    const nextSlots = nextBoardState && nextBoardState.main && Array.isArray(nextBoardState.main.slots)
+      ? nextBoardState.main.slots
+      : [];
+    const nextById = new Map(nextSlots.map((slot) => [slot && slot.id, slot]));
+    return previousSlots.some((slot) => {
+      if (!slot || !slot.status || slot.status === "idle") return false;
+      const next = nextById.get(slot.id);
+      if (!next) return true;
+      if (next.status && next.status !== "idle") return false;
+      const remoteLast = lastSlotActivity(next);
+      if (!remoteLast || (remoteLast.action !== "clear" && remoteLast.action !== "completed")) return true;
+      const localLast = lastSlotActivity(slot);
+      return Boolean(localLast && Number(remoteLast.at) < Number(localLast.at));
+    });
+  }
+
   function isRemoteFullResetUnsafe(previousBoardState, nextBoardState, meta) {
     const previousActive = countActiveBoardItems(previousBoardState);
     const nextActive = countActiveBoardItems(nextBoardState);
     if (previousActive <= 0) return false;
+    if (!hasUnexplainedRemoval(previousBoardState, nextBoardState)) return false;
     const reason = meta && meta.reason ? String(meta.reason) : "";
     if (isBoardBlank(nextBoardState) && reason !== "clear") return true;
     if (isBoardBlank(nextBoardState) && previousActive > 1) return true;
@@ -928,6 +994,13 @@
     const completedRecords = candidates.map((slot) => getCompletedRecordForSlot(slot)).filter(Boolean);
     if (completedRecords.length > 0) {
       merged.lastCompleted = completedRecords.sort((left, right) => getCompletedAt(right) - getCompletedAt(left))[0];
+      // 1003: 같은 끝남 기록(같은 completedAt)을 어느 쪽이든 넘겼으면 넘긴 상태 유지(가장 늦은 시각). 안 넘긴 기기의
+      // 재게시·복구로 빨강이 되살아나지 않게. 다른 끝남 기록의 넘김 값은 옮기지 않는다.
+      const chosenAt = getCompletedAt(merged.lastCompleted);
+      const dismissedAt = completedRecords
+        .filter((record) => getCompletedAt(record) === chosenAt)
+        .reduce((max, record) => Math.max(max, Math.trunc(Number(record.dismissedAt) || 0)), 0);
+      merged.lastCompleted = Object.assign({}, merged.lastCompleted, { dismissedAt });
     }
     const logByKey = new Map();
     candidates.forEach((slot) => {
@@ -1161,6 +1234,17 @@
     return board;
   }
 
+  function publishDismissed(slotIds) {
+    if (!syncChannel || typeof syncChannel.publishDismiss !== "function") return;
+    const slots = store.getState().slots;
+    slotIds.forEach((slotId) => {
+      const slot = slots.find((item) => item && item.id === slotId);
+      const record = slot && slot.lastCompleted;
+      if (!record || !(Number(record.dismissedAt) > 0)) return;
+      syncChannel.publishDismiss(slotId, record.completedAt, record.dismissedAt).catch(() => {});
+    });
+  }
+
   function publishBoardState(reason, auditDetails) {
     if (!syncChannel || applyingRemoteSync) return;
     const board = buildBoardState();
@@ -1175,9 +1259,36 @@
     });
   }
 
+  // 옛 화면(칸 7개: 옛 캐시, APK 안 대체 보드)이 보낸 상태에는 slot-8(임시)이 아예 없다.
+  // 없는 칸은 "비었다"가 아니라 "모른다"이므로 이 기기의 값을 그대로 둔다. 그래야 임시 타이머가 지워지지 않는다.
+  function carryMissingSlots(previousBoardState, nextState) {
+    const nextSlots = nextState && nextState.main && Array.isArray(nextState.main.slots) ? nextState.main.slots : null;
+    if (!nextSlots || !nextSlots.length) return nextState;
+    const prevSlots = previousBoardState && previousBoardState.main && Array.isArray(previousBoardState.main.slots)
+      ? previousBoardState.main.slots
+      : [];
+    const ids = new Set(nextSlots.map((slot) => slot && slot.id));
+    const missing = prevSlots.filter((slot) => slot && slot.id && !ids.has(slot.id));
+    if (!missing.length) return nextState;
+    const prevSplit = (previousBoardState.split && previousBoardState.split.slots) || {};
+    const nextSplit = Object.assign({}, (nextState.split && nextState.split.slots) || {});
+    missing.forEach((slot) => {
+      if (prevSplit[slot.id] && !Object.prototype.hasOwnProperty.call(nextSplit, slot.id)) {
+        nextSplit[slot.id] = JSON.parse(JSON.stringify(prevSplit[slot.id]));
+      }
+    });
+    return Object.assign({}, nextState, {
+      main: Object.assign({}, nextState.main, {
+        slots: nextSlots.concat(missing.map((slot) => JSON.parse(JSON.stringify(slot)))),
+      }),
+      split: Object.assign({}, nextState.split || {}, { slots: nextSplit }),
+    });
+  }
+
   function applyRemoteBoardState(nextState, meta) {
     if (!nextState) return;
     const previousBoardState = buildBoardState();
+    nextState = carryMissingSlots(previousBoardState, nextState);
     const remoteReason = meta && meta.reason ? String(meta.reason) : "";
     if (isBoardBlank(nextState) && remoteReason !== "clear") {
       const candidate = getRecoveryCandidate();
@@ -1387,9 +1498,17 @@
 
   function getPhysicalSlotLabel(def) {
     const id = def && def.id ? String(def.id) : "";
-    const match = id.match(/^slot-([1-5])$/);
+    const match = id.match(/^slot-([1-8])$/);
     if (match) return match[1];
     return "OV";
+  }
+
+  // 칸 제목. 6·7은 오븐 위·아래.
+  function getSlotTitle(label) {
+    if (label === "6") return "ov상";
+    if (label === "7") return "ov하";
+    if (label === "8") return "사이드";
+    return label;
   }
 
   function getPhysicalSlotGroup(label) {
@@ -1409,6 +1528,36 @@
     card.dataset.hasActivity = "false";
     card.dataset.zoneLabel = getZoneLabel(def);
     card.dataset.physicalSlot = physicalSlotLabel;
+    const endScreen = document.createElement("div");   // 1002 종료 화면(전용) — data-recent-alert 일 때만 보인다
+    endScreen.className = "end-screen";
+    endScreen.innerHTML = '<span class="end-no"></span><span class="end-late"></span><span class="end-hint">완료 · 터치하면 시작 화면</span>';
+    card.appendChild(endScreen);
+    // 1002: 종료 빨강 모드에서 칸을 터치하면 바로 시작 화면(버튼 눌림으로 새지 않게 먼저 가로챈다)
+    const dismissAlert = (event) => {
+      if (card.dataset.recentAlert !== "true") return;
+      event.stopPropagation();
+      event.preventDefault();
+      alertDismissed.set(def.id, Number(card.dataset.alertAt) || 0);
+      // 1003: 다른 기기도 같이 넘어가게 끝남 기록에 남겨 동기화(이 기기는 위 표시로 바로 넘어감)
+      if (typeof store.dismissCompleted === "function") store.dismissCompleted(def.id, Number(card.dataset.alertAt) || 0);
+      card.dataset.recentAlert = "false";
+      card.dataset.recentAlertJustDismissed = "1";   // 넘기는 그 터치가 바로 드러난 시작 버튼을 누르지 않게
+      setTimeout(() => { card.dataset.recentAlertJustDismissed = ""; }, DISMISS_BOARD_GUARD_MS);
+      // 1016: 이 칸만이 아니라 보드 전체를 짧게 얼린다 - 넘긴 터치 바로 뒤가 다른 칸(주로 바로 옆·아래)
+      // 버튼에 닿는 사고를 막는다. bindPress 의 suppressDragPressUntil·suppressClickUntil 과 같은 변수라
+      // 모든 칸의 pointerup·touchend·click 이 이 시각까지 조용해진다.
+      const until = Date.now() + DISMISS_BOARD_GUARD_MS;
+      suppressDragPressUntil = Math.max(suppressDragPressUntil, until);
+      suppressClickUntil = Math.max(suppressClickUntil, until);
+    };
+    card.addEventListener("pointerdown", dismissAlert, true);
+    const swallow = (event) => {
+      if (card.dataset.recentAlertJustDismissed !== "1") return;
+      event.stopPropagation();
+      event.preventDefault();
+      if (event.type === "click") card.dataset.recentAlertJustDismissed = "";
+    };
+    ["pointerup", "click"].forEach((type) => card.addEventListener(type, swallow, true));
     bindSlotImmediateDrag(card, def.id);
 
     // The whole physical card is a water tank on one shared five-minute scale.
@@ -1448,11 +1597,11 @@
     physicalSlotBadge.type = "button";
     physicalSlotBadge.className = "physical-slot-badge";
     physicalSlotBadge.dataset.physicalGroup = physicalSlotGroup;
-    physicalSlotBadge.textContent = physicalSlotLabel;
+    physicalSlotBadge.textContent = getSlotTitle(physicalSlotLabel);
     if (typeof physicalSlotBadge.setAttribute === "function") {
-      physicalSlotBadge.setAttribute("aria-label", `${physicalSlotLabel} 물리 위치`);
+      physicalSlotBadge.setAttribute("aria-label", getSlotTitle(physicalSlotLabel));
     } else {
-      physicalSlotBadge.ariaLabel = `${physicalSlotLabel} 물리 위치`;
+      physicalSlotBadge.ariaLabel = getSlotTitle(physicalSlotLabel);
     }
     card.appendChild(physicalSlotBadge);
 
@@ -1491,7 +1640,7 @@
 
     const title = document.createElement("div");
     title.className = "slot-title";
-    title.textContent = def.title;
+    title.textContent = getSlotTitle(physicalSlotLabel) !== physicalSlotLabel ? getSlotTitle(physicalSlotLabel) : def.title;
     titleGroup.appendChild(title);
     const lastCompletedNote = document.createElement("div");
     lastCompletedNote.className = "last-completed-note";
@@ -1530,9 +1679,11 @@
 
     const presetButtons = new Map();
     let view;
-    const slotPresetKeys = def.id === "slot-6" && Array.isArray(core.OV_ALL_MINUTE_PRESETS)
+    const slotPresetKeys = def.accent === "oven" && Array.isArray(core.OV_ALL_MINUTE_PRESETS)
       ? core.OV_ALL_MINUTE_PRESETS
-      : core.MINUTE_PRESETS;
+      : def.accent === "temp" && Array.isArray(core.TEMP_MINUTE_PRESETS)
+        ? core.TEMP_MINUTE_PRESETS
+        : core.MINUTE_PRESETS;
     slotPresetKeys.forEach((presetKey) => {
       const button = createMinuteButton(presetKey);
       bindPress(button, () => startMainTimer(def.id, presetKey));
@@ -1629,7 +1780,7 @@
       button.dataset.adjustKey = control.key;
       button.dataset.deltaSeconds = String(control.deltaSeconds);
       button.textContent = control.label;
-      bindPress(button, () => handleAdjustTimer(view, def.id, control.deltaSeconds, control.label));
+      bindPress(button, () => handleAdjustTimer(view, def.id, control.deltaSeconds, control.label), ADJUST_REPEAT_MS);
       if (control.deltaSeconds > 0) {
         adjustTopRow.appendChild(button);
       } else {
@@ -1751,7 +1902,8 @@
     return button;
   }
 
-  function bindPress(button, handler) {
+  function bindPress(button, handler, repeatMs) {
+    const sameRepeatMs = typeof repeatMs === "number" ? repeatMs : SAME_BUTTON_REPEAT_MS;
     let lastPointerUpAt = 0;
     let lastTouchEndAt = 0;
 
@@ -1759,8 +1911,26 @@
       // The Android wrapper may need to replay a touch when an older WebView
       // swallows pointerup/touchend.  Publish the press before the handler so
       // the native delayed fallback can see that the web path already ran.
-      global.__chickenTimerLastPressAt = Date.now();
-      const result = handler();
+      const pressedAt = Date.now();
+      global.__chickenTimerLastPressAt = pressedAt;   // 막힌 눌림도 "처리됨"으로 알려 앱이 다시 보내지 않게
+      if (pressedAt < (button.__pressRepeatUntil || 0)) return false;
+      const lockHost = (button.closest && button.closest(".slot-card")) || null;
+      if (lockHost) {
+        if (pressedAt < (lockHost.__touchLockUntil || 0)) return false;
+        lockHost.__touchLockUntil = pressedAt + CARD_TOUCH_LOCK_MS;
+      }
+      button.__pressRepeatUntil = pressedAt + sameRepeatMs;
+      let result;
+      try {
+        result = handler();
+      } finally {
+        // 처리에 오래 걸린 탭: 막이를 끝난 때부터 다시 잡아 늦게 온 같은 누름을 버린다.
+        const doneAt = Date.now();
+        global.__chickenTimerLastPressAt = doneAt;
+        button.__pressRepeatUntil = doneAt + sameRepeatMs;
+        if (lockHost) lockHost.__touchLockUntil = Math.max(lockHost.__touchLockUntil || 0, doneAt + CARD_TOUCH_LOCK_MS);
+        suppressClickUntil = Math.max(suppressClickUntil, doneAt + PRESS_GUARD_MS);
+      }
       const cue = getTouchCue(button);
       if (result !== false && cue && bridge && typeof bridge.playTouchCue === "function") {
         bridge.playTouchCue(cue);
@@ -1771,6 +1941,7 @@
     if ("PointerEvent" in global) {
       button.addEventListener("pointerup", (event) => {
         if (typeof event.button === "number" && event.button !== 0) return;
+        if (hardwareBounced(event.timeStamp)) return;
         event.preventDefault();
         event.stopPropagation();
         lastPointerUpAt = Date.now();
@@ -1785,6 +1956,7 @@
     // a legacy touchend path, while the timestamp guard prevents a modern
     // WebView from invoking the same action twice.
     button.addEventListener("touchend", (event) => {
+      if (hardwareBounced(event.timeStamp)) return;
       const currentAt = Date.now();
       if (currentAt - lastPointerUpAt < PRESS_GUARD_MS) return;
       if (currentAt - lastTouchEndAt < PRESS_GUARD_MS) return;
@@ -1802,6 +1974,7 @@
       event.stopPropagation();
       if (currentAt - lastPointerUpAt < PRESS_GUARD_MS) return;
       if (currentAt < suppressClickUntil) return;
+      if (hardwareBounced(event.timeStamp)) return;
       invoke();
     });
 
@@ -1816,7 +1989,18 @@
   function getTouchCue(button) {
     if (!button) return "";
     const dataset = button.dataset || {};
-    if (dataset.minute) return `minute:${String(dataset.minute).slice(0, 8)}`;
+    if (dataset.minute) {
+      // 1010 시간 버튼: 그 시간에 맞을 메뉴가 하나뿐이면 시간 대신 메뉴명(앱은 모르는 글자를 그대로 읽음). 못 구하면 기존 시간 음성.
+      try {
+        if (typeof global.ChickenTimerVoiceName === "function" && typeof core !== "undefined" && core && typeof core.resolvePresetDurationSeconds === "function") {
+          let zone = "";
+          try { const z = button.closest && button.closest("[data-zone]"); zone = z && z.dataset ? z.dataset.zone : ""; } catch (_) {}
+          const voiceName = String(global.ChickenTimerVoiceName(core.resolvePresetDurationSeconds(dataset.minute), zone) || "").trim();
+          if (voiceName) return voiceName;
+        }
+      } catch (_) { /* 기존 시간 음성 */ }
+      return `minute:${String(dataset.minute).slice(0, 8)}`;
+    }
     const action = String(dataset.action || "");
     if (action === "clear") return "clear";
     if (action === "add") return "add";
@@ -2002,20 +2186,33 @@
   }
 
   function createSlotDragGhost(sourceCard, rect) {
-    if (!sourceCard || typeof sourceCard.cloneNode !== "function" || !document || !document.body) return null;
-    const ghost = sourceCard.cloneNode(true);
-    ghost.className = `${sourceCard.className || "slot-card"} slot-drag-ghost`;
+    if (!sourceCard || !document || !document.body) return null;
+    const ghost = document.createElement("div");
+    ghost.className = "slot-drag-ghost";
     ghost.dataset.dragGhost = "true";
     ghost.dataset.dragSourceSlotId = sourceCard.dataset ? String(sourceCard.dataset.slotId || "") : "";
-    if (typeof ghost.removeAttribute === "function") {
-      ghost.removeAttribute("data-slot-id");
-    } else if (ghost.dataset) {
-      delete ghost.dataset.slotId;
-    }
-    ghost.style.width = Math.max(1, Math.round(rect.width || 0)) + "px";
-    ghost.style.height = Math.max(1, Math.round(rect.height || 0)) + "px";
-    ghost.style.left = Math.round(rect.left || 0) + "px";
-    ghost.style.top = Math.round(rect.top || 0) + "px";
+    let label = "";
+    try {
+      const pick = (sel) => {
+        const el = sourceCard.querySelector(sel);
+        return el ? String(el.textContent || "").trim() : "";
+      };
+      const badge = pick(".physical-slot-badge");
+      const time = pick(".timer-readout");
+      label = [badge, time].filter(Boolean).join(" ");
+    } catch (_) {}
+    if (!label) label = String(sourceCard.textContent || "").trim().slice(0, 24);
+    ghost.textContent = label;
+    const w = Math.max(1, Math.round((rect.width || 0) * 0.7));
+    const h = Math.max(1, Math.round((rect.height || 0) * 0.7));
+    ghost.style.width = w + "px";
+    ghost.style.height = h + "px";
+    ghost.style.left = Math.round((rect.left || 0) + ((rect.width || 0) - w) / 2) + "px";
+    ghost.style.top = Math.round((rect.top || 0) + ((rect.height || 0) - h) / 2) + "px";
+    try {
+      const bg = window.getComputedStyle(sourceCard).backgroundColor;
+      if (bg) ghost.style.background = bg;
+    } catch (_) {}
     document.body.appendChild(ghost);
     return ghost;
   }
@@ -2037,7 +2234,7 @@
     if (!activeSlotDrag || !activeSlotDrag.ghost || !activeSlotDrag.sourceRect) return;
     const dx = clientX - activeSlotDrag.startX;
     const dy = clientY - activeSlotDrag.startY;
-    activeSlotDrag.ghost.style.transform = `translate3d(${Math.round(dx)}px, ${Math.round(dy)}px, 0) scale(1.045)`;
+    activeSlotDrag.ghost.style.transform = `translate3d(${Math.round(dx)}px, ${Math.round(dy)}px, 0)`;
   }
 
   function getSlotIdFromPoint(clientX, clientY) {
@@ -2063,25 +2260,15 @@
 
   function updateSlotDragPreview(targetSlotId) {
     if (!activeSlotDrag || !activeSlotDrag.hasDragged) return;
-    const previousTargetSlotId = activeSlotDrag.targetSlotId || "";
     const safeTarget = targetSlotId ? String(targetSlotId) : "";
     if (activeSlotDrag.targetSlotId === safeTarget) return;
-    activeSlotDrag.targetSlotId = safeTarget;
-    if (!safeTarget) {
-      activeSlotDrag.previewBoardState = null;
-      refreshSlotViews(getSlotDragAffectedIds(previousTargetSlotId, ""));
-      markSlotDragPreview();
-      return;
+    activeSlotDrag.previewBoardState = null;
+    let nextTarget = safeTarget;
+    if (nextTarget && !swapBoardSlots(cloneBoardState(buildBoardState()), activeSlotDrag.sourceSlotId, nextTarget)) {
+      nextTarget = "";
     }
-    const previewBoardState = cloneBoardState(buildBoardState());
-    if (!swapBoardSlots(previewBoardState, activeSlotDrag.sourceSlotId, safeTarget)) {
-      activeSlotDrag.previewBoardState = null;
-      refreshSlotViews(getSlotDragAffectedIds(previousTargetSlotId, ""));
-      markSlotDragPreview();
-      return;
-    }
-    activeSlotDrag.previewBoardState = previewBoardState;
-    refreshSlotViews(getSlotDragAffectedIds(previousTargetSlotId, safeTarget), previewBoardState);
+    if (activeSlotDrag.targetSlotId === nextTarget) return;
+    activeSlotDrag.targetSlotId = nextTarget;
     markSlotDragPreview();
   }
 
@@ -2130,9 +2317,6 @@
       delete document.body.dataset.slotDragging;
     }
     clearSlotDragMarkers();
-    if (drag.hasDragged && reason !== "commit") {
-      refreshAll();
-    }
     if (drag.hasDragged && event) {
       suppressDragPressUntil = Date.now() + PRESS_GUARD_MS;
       suppressClickUntil = suppressDragPressUntil;
@@ -2801,8 +2985,58 @@
     });
   }
 
+  function runningReadoutPx(view) {
+    const card = view && view.card;
+    const readout = view && view.readout;
+    if (!card || !readout) return 0;
+    if (card.dataset.zone === "oven") return 0;
+    if (card.dataset.state !== "running") return 0;
+    const box = readout.getBoundingClientRect();
+    if (box.width < 8 || box.height < 8) return 0;
+    const px = Number.parseFloat(global.getComputedStyle(readout).fontSize);
+    return Number.isFinite(px) && px >= 8 ? px : 0;
+  }
+
+  function sharedCountdownAnchorPx() {
+    const preferred = runningReadoutPx(slotViews.get("slot-1"));
+    if (preferred) return preferred;
+    let other = 0;
+    slotViews.forEach((view) => {
+      if (!other) other = runningReadoutPx(view);
+    });
+    if (other) return other;
+    const namedDigitPx = {
+      "store-main": 35.2,
+      "store-note9": 39.8,
+      "store-taba": 54.7,
+      "store-subnote": 29.9,
+    };
+    const profileName = document.body && document.body.dataset
+      ? String(document.body.dataset.displayProfile || "")
+      : "";
+    if (namedDigitPx[profileName]) return namedDigitPx[profileName];
+    const anchor = slotViews.get("slot-1");
+    const card = anchor && anchor.card;
+    if (!card) return 0;
+    const root = Number.parseFloat(global.getComputedStyle(document.documentElement).fontSize) || 16;
+    const contentW = Math.max(0, card.clientWidth - 80);
+    const contentH = Math.max(0, card.clientHeight - 4);
+    if (contentW < 8 || contentH < 8) return 0;
+    return Math.min(7.5 * root, Math.max(1.8 * root, Math.min(contentW * 0.68, contentH * 0.44)));
+  }
+
+  function syncSharedCountdownSize() {
+    if (!document.body) return;
+    const px = sharedCountdownAnchorPx();
+    if (!px) return;
+    const next = (Math.round(px * 10) / 10) + "px";
+    if (document.body.style.getPropertyValue("--board-digit").trim() === next) return;
+    document.body.style.setProperty("--board-digit", next);
+  }
+
   function refreshReadoutFits() {
     slotViews.forEach((view) => fitTimerReadout(view));
+    syncSharedCountdownSize();
   }
 
   function setReadoutLayoutMode(view) {
@@ -2818,19 +3052,16 @@
     // The narrower 640x320 profile remains two-line and gets its own 29px
     // child line boxes in the final V3 CSS contract.
     const compactWideLandscape = landscape && viewportWidth >= 700 && viewportHeight <= 360;
-    // OV is the physical counter that users read from across the work area.
-    // Reserve one centered horizontal lane for it in normal landscape widths;
-    // the compact 640x320 profile keeps its existing dedicated contract.
+    // Wide landscape used to give the oven its own one-line lane. Slot 1 and
+    // the oven now share one countdown scale, so the oven keeps the fryer mode.
     const ovenLandscape = landscape
       && view.card
       && view.card.dataset
       && view.card.dataset.zone === "oven";
     const wideOvenLandscape = ovenLandscape && viewportWidth >= 800;
-    const mode = wideOvenLandscape
-      ? "one-line"
-      : landscape
-        && !addMode
-        && !compactWideLandscape
+    const mode = landscape
+      && !addMode
+      && !compactWideLandscape
         ? "two-line"
         : "one-line";
     const wideOvenWorkArea = wideOvenLandscape && viewportWidth >= 1200 && viewportHeight >= 600;
@@ -3266,7 +3497,23 @@
     } else {
       delete view.completedBadge.dataset.timerFamily;
     }
-    const recent = Boolean(showRecentAlert && record && getNow() - getCompletedAt(record) < 90000);
+    const recent = Boolean(showRecentAlert && record && getNow() - getCompletedAt(record) < 90000
+      && alertDismissed.get(view.card.dataset.slotId) !== getCompletedAt(record)
+      && !(Number(record.dismissedAt) > 0));   // 1003: 다른 기기에서 넘긴 것도 반영
+    if (recent) {
+      // 1002 사용자: 빨강은 번호와 지연 시간도 — 큰 글자 = 기계 번호 + 끝난 지 얼마(+m:ss), 1초마다
+      const late = Math.max(0, Math.floor((getNow() - getCompletedAt(record)) / 1000));
+      const id = String(view.card.dataset.slotId || "");
+      const label = { "slot-6": "ov상", "slot-7": "ov하", "slot-8": "사이드" }[id] || id.replace("slot-", "");
+      view.card.dataset.alertAt = String(getCompletedAt(record));
+      // 1002 종료 화면(전용): 기계 번호 · 지연 시간 · 안내. 시작 화면과 겹치지 않는 따로 그린 화면.
+      const end = view.card.querySelector(":scope > .end-screen");
+      if (end) {
+        const m = Math.floor(late / 60), sec = late % 60;
+        end.querySelector(".end-no").textContent = label;
+        end.querySelector(".end-late").textContent = "+" + (m ? m + "분 " : "") + sec + "초 지남";
+      }
+    }
     view.lastCompletedNote.dataset.recent = recent ? "true" : "false";
     view.completedBadge.dataset.recent = recent ? "true" : "false";
     view.card.dataset.recentAlert = recent ? "true" : "false";
@@ -3593,6 +3840,7 @@
       const row = document.createElement("div");
       row.className = "slot-info-log-row";
       row.dataset.ageIndex = String(index);
+      row.dataset.at = String(visibleEntries[index].at || "");
       row.dataset.action = String(visibleEntries[index].action || "state");
       if (typeof row.setAttribute === "function") row.setAttribute("role", "listitem");
       const text = document.createElement("span");
@@ -3819,7 +4067,7 @@
       button.dataset.deltaSeconds = String(control.deltaSeconds);
       button.textContent = control.label;
       setAccessibleName(button, `보조 타이머 ${control.label}`);
-      bindPress(button, () => handleAdjustSplitTimer(view, slotId, entry.id, control.deltaSeconds));
+      bindPress(button, () => handleAdjustSplitTimer(view, slotId, entry.id, control.deltaSeconds), ADJUST_REPEAT_MS);
       if (control.deltaSeconds > 0) {
         positiveControls.appendChild(button);
       } else {
@@ -3991,7 +4239,7 @@
     void level;
     // Height/area communicates remaining time. Keep the surface line teal so
     // orange/red belong exclusively to the full-card urgency perimeter.
-    return [30, 178, 192];
+    return [0, 196, 230];
   }
 
   function setAccessibleName(element, label) {

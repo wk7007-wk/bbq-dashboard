@@ -20,11 +20,18 @@
     { key: "1", display: "1", unit: "", durationSeconds: 60 },
     { key: "4.2", display: "4.2", unit: "", durationSeconds: 260 },
     { key: "5.0", display: "5", unit: "", durationSeconds: 300 },
+    { key: "5.5", display: "5.5", unit: "", durationSeconds: 350 },   // 1003: 버튼에서 뺌, 옛 기록 해석용으로만 남김
+    { key: "5.3", display: "5.3", unit: "", durationSeconds: 330 },   // 1003 사용자 "5.5 → 5.3"(5분30초)
+    { key: "16", display: "16", unit: "", durationSeconds: 960 },
+    { key: "2.0", display: "2", unit: "", durationSeconds: 120 },
   ];
   const ALL_PRESET_DEFS = PRESET_DEFS.concat(OV_ONLY_PRESET_DEFS);
   const MINUTE_PRESETS = PRESET_DEFS.map((preset) => preset.key);
   const OV_MINUTE_PRESETS = ["1", "4", "4.2", "5", "5.0", "6", "7", "8", "13", "15"];
-  const OV_ALL_MINUTE_PRESETS = ["2", "3", "1", "4", "4.2", "5", "5.0", "6", "7", "8", "9", "10", "11", "13", "15"];
+  // 오븐 버튼 순서 (0930 사용자, 1003 5.5→5.3): 1 1.4 3 4 4.2 4.4 5 5.3 6 7 8 9 13 15 16. "2"=1.4, "5"=4.4, "5.0"=5 표시.
+  const OV_ALL_MINUTE_PRESETS = ["1", "2", "3", "4", "4.2", "5", "5.0", "5.3", "6", "7", "8", "9", "13", "15", "16"];
+  // 사이드 버튼 (0930 사용자, 1003 5.5→5.3): 1 1.4 2 3 4 4.4 5 5.3 7 9 10 13. "2.0"=2분 표시.
+  const TEMP_MINUTE_PRESETS = ["1", "2", "2.0", "3", "4", "5", "5.0", "5.3", "7", "9", "10", "13"];
   const MAX_SLOT_ACTIVITY_LOG = 40;
   const SLOT_DEFS = [
     { id: "slot-1", title: "튀김 3", kind: "", accent: "fryer-a", area: "slot1" },
@@ -33,6 +40,8 @@
     { id: "slot-4", title: "튀김 2", kind: "", accent: "fryer-b", area: "slot4" },
     { id: "slot-5", title: "튀김 2", kind: "", accent: "fryer-b", area: "slot5" },
     { id: "slot-6", title: "오븐", kind: "", accent: "oven", area: "slot6" },
+    { id: "slot-7", title: "오븐", kind: "", accent: "oven", area: "slot7" },
+    { id: "slot-8", title: "사이드", kind: "", accent: "temp", area: "slot8" },   // 1003 사용자: 임시 → 사이드
   ];
 
   function normalizeSignedSeconds(value) {
@@ -114,6 +123,8 @@
       adjustedDeltaSeconds,
       completedAt: completedAtServerMs,
       completedAtServerMs,
+      // 1003: 종료 화면을 터치로 넘긴 시각(그 끝남 기록에 묶임). 기록째 동기화되므로 다른 기기도 같이 넘어간다.
+      dismissedAt: Math.max(0, Math.trunc(Number(source.dismissedAt) || 0)),
     };
   }
   function createCompletedRecord(slot, completedAt) {
@@ -406,6 +417,19 @@
       return true;
     }
 
+    // 1003 사용자 "종료시 버튼으로 해제인데 앱간 동기화 안 됨": 넘긴 사실을 끝남 기록에 남기고 알림(→ 동기화 게시).
+    // 지금 칸의 끝남 기록이 그 시각(completedAt)일 때만 — 그 사이 새 타이머가 끝났으면 건드리지 않는다.
+    function dismissCompleted(slotId, completedAt) {
+      const slot = findSlot(slotId);
+      if (!slot || !slot.lastCompleted || slot.status !== "idle") return false;
+      if (Number(slot.lastCompleted.completedAt) !== Number(completedAt)) return false;
+      if (Number(slot.lastCompleted.dismissedAt) > 0) return false;
+      slot.lastCompleted = Object.assign({}, slot.lastCompleted, { dismissedAt: now() });
+      persist();
+      notify("dismiss", [slotId]);
+      return true;
+    }
+
     function recordActivity(slotId, entry, options) {
       const slot = findSlot(slotId);
       if (!slot) return false;
@@ -510,6 +534,7 @@
       adjust,
       addTime,
       clear,
+      dismissCompleted,
       recordActivity,
       swapSlots,
       tick,
@@ -599,6 +624,7 @@
     MINUTE_PRESETS,
     OV_MINUTE_PRESETS,
     OV_ALL_MINUTE_PRESETS,
+    TEMP_MINUTE_PRESETS,
     SLOT_DEFS,
     createStore,
     formatDuration,

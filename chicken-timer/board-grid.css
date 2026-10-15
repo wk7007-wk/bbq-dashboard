@@ -1,0 +1,1044 @@
+/* 보드 9칸. 두 줄, 한 줄 5칸.
+   윗줄 1 2 3 4 5 / 아랫줄 ov상 ov하 임시 + 레시피(두 칸 너비, 맨 아래 한 줄은 기록).
+   구역 묶음(zone-group)은 DOM에만 남기고 화면에서는 풀어 각 칸을 보드 격자에 바로 놓는다.
+   이 파일이 배치 소유자다. 다른 시트에서 .board 격자를 다시 정하지 말 것. */
+
+#board.board {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-areas:
+    "s1 s2 s3 s4 s5"
+    "s6 s7 temp recipe recipe" !important;
+  gap: 6px !important;
+}
+
+#board > .zone-group,
+#board > .zone-group > .zone-slot-grid {
+  display: contents !important;
+}
+
+#board > .zone-group > .zone-header {
+  display: none !important;
+}
+
+#board .slot-card {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+#board .slot-card[data-slot-id="slot-1"] { grid-area: s1 !important; }
+#board .slot-card[data-slot-id="slot-2"] { grid-area: s2 !important; }
+#board .slot-card[data-slot-id="slot-3"] { grid-area: s3 !important; }
+#board .slot-card[data-slot-id="slot-4"] { grid-area: s4 !important; }
+#board .slot-card[data-slot-id="slot-5"] { grid-area: s5 !important; }
+#board .slot-card[data-slot-id="slot-6"] { grid-area: s6 !important; }
+#board .slot-card[data-slot-id="slot-7"] { grid-area: s7 !important; }
+#board .slot-card[data-slot-id="slot-8"] { grid-area: temp !important; }
+
+/* 임시: 보라. 색 변수만 정하고 모양은 튀김 칸 규칙을 그대로 쓴다. */
+.slot-card[data-accent="temp"] {
+  --slot-strip-a: #d9c2ff;
+  --slot-strip-b: #6b3fb8;
+  --slot-wash: rgba(196, 160, 255, 0.18);
+  --zone-rgb: 196, 160, 255;
+  --zone-color: #cbb0ff;
+  --zone-dark: #3f2378;
+  --zone-soft: rgba(196, 160, 255, 0.2);
+}
+.slot-card[data-accent="temp"] .slot-title { color: #e6d8ff; }
+
+/* 칸 이름표(1~5, ov상, ov하, 임시)는 칸 맨 위 띠에 둔다. 버튼·숫자는 그 아래에서 시작해 가려지지 않는다. */
+#board .slot-card {
+  padding-top: 1.25rem !important;
+}
+#board .slot-card > .physical-slot-badge {
+  top: 0.14rem !important;
+  left: 0.3rem !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  min-width: 1.1rem !important;
+  height: 1rem !important;
+  min-height: 0 !important;
+  padding: 0 0.3rem !important;
+  border-radius: 999px !important;
+  font-size: 0.68rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  transform: none !important;
+}
+
+/* 오븐 버튼은 원래 순서 그대로 3열. */
+#board .slot-card[data-accent="oven"] .slot-body > .preset-grid:not(.split-add-grid) {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(5, minmax(0, 1fr)) !important;
+}
+
+/* 아랫줄 칸 공통: 임시 · 기록 · 레시피 */
+#board > .board-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: 5px 6px;
+  border: 1px solid rgba(236, 244, 246, 0.2);
+  border-radius: 10px;
+  background: #0d1215;
+  color: #f5f7f8;
+}
+
+#board > .recipe-strip { grid-area: recipe; }
+
+/* 1012: 기록은 레시피 아래 3~5줄. 펼쳐도 레시피 공간을 남긴다. */
+#board > .recipe-strip > .board-log {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 0;
+  margin-top: auto;
+  border-top: 1px solid rgba(236, 244, 246, 0.16);
+  padding-top: 3px;
+}
+
+#board > .board-cell h2 {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #f7f4ed;
+}
+
+#board .board-cell-head {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 1.5rem;
+  margin-bottom: 4px;
+}
+
+/* 복구 비상버튼: 기록 제목 옆. */
+#board .board-log .recovery-button {
+  position: static !important;
+  inset: auto !important;
+  z-index: 1 !important;
+  flex: 0 0 auto !important;
+  width: 1.28rem !important;
+  min-width: 1.28rem !important;
+  max-width: 1.28rem !important;
+  height: 1.28rem !important;
+  min-height: 1.28rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 2px solid #f5c518 !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 34% 30%, #ff8d8d 0 16%, #e10600 42%, #7a0000 78%) !important;
+  box-shadow:
+    0 0 0 2px #161616,
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45) !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  letter-spacing: 0 !important;
+  overflow: hidden !important;
+  pointer-events: auto !important;
+}
+
+#board .board-log .recovery-button[data-flash="ok"] {
+  border-color: #d8ffe6 !important;
+  background: radial-gradient(circle at 34% 30%, #d9ffe6 0 16%, #1f9d55 46%, #0c5a30 78%) !important;
+}
+
+#board .board-log .recovery-button[data-flash="empty"] {
+  border-color: #ffd0c4 !important;
+  background: radial-gradient(circle at 34% 30%, #ffe1d8 0 16%, #ff775b 46%, #8a2a16 78%) !important;
+}
+
+
+#board .board-log ol {
+  position: relative;
+  flex: 0 0 auto;
+  display: block;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+#board .recipe-strip > .board-log:not([data-open="true"]) ol { overflow-y: hidden; }
+
+#board .board-log li {
+  display: grid;
+  grid-template-columns: 2.1rem 1.9rem minmax(0, 1fr);
+  align-items: center;
+  gap: 2px;
+  padding: 2px 3px;
+  border-radius: 4px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* 1분 안: 음영만. 글자는 없다. */
+#board .board-log li[data-near="true"] { background: rgba(255, 224, 102, 0.16); }
+
+#board .board-log .log-title { color: #f7f4ed; }
+#board .board-log li[data-group="yellow"] .log-title { color: #ffd84d; }
+#board .board-log li[data-group="blue"] .log-title { color: #8cc8ff; }
+#board .board-log li[data-group="oven"] .log-title { color: #7fe3a0; }
+#board .board-log li[data-group="temp"] .log-title { color: #d2b8ff; }
+#board .board-log .log-status { color: rgba(247, 244, 237, 0.82); font-weight: 700; }
+/* 시간: 크고 굵게. 후 = 청록, 전 = 회색, 1분 안 = 노랑. */
+#board .board-log .log-time {
+  overflow: hidden;
+  text-align: right;
+  text-overflow: clip;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: #62e6ff;
+}
+#board .board-log li[data-when="past"] .log-time { color: #aeb8bf; font-weight: 800; }
+#board .board-log li[data-when="past"] :is(.log-title, .log-status) { opacity: 0.78; }
+#board .board-log li[data-near="true"] .log-time { color: #ffe066; }
+
+/* 동기화 상태: 기록 한 줄 안, 복구 버튼 앞. */
+#board .board-log .log-bar { gap: 4px; justify-content: flex-start; margin-bottom: 0; min-height: 1.35rem; }
+#board .board-log .log-bar h2 { flex: 0 0 auto; font-size: 0.68rem; }
+#board .board-log .log-bar .recovery-button { margin-left: 0 !important; }
+#board .board-log .log-peek {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+#board .board-log .log-peek[hidden] { display: none; }
+#board .board-log .log-peek .log-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#board .board-log .log-peek .log-status { flex: 0 0 auto; }
+#board .board-log .log-peek .log-time { flex: 0 0 auto; margin-left: auto; }
+#board .board-log .log-fold {
+  flex: 0 0 auto;
+  height: 1.35rem;
+  padding: 0 0.45rem;
+  border: 1px dashed rgba(236, 244, 246, 0.35);
+  border-radius: 6px;
+  background: rgba(236, 244, 246, 0.06);
+  color: rgba(247, 244, 237, 0.85);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+#board .board-log .log-fold[hidden] { display: none; }
+#board .board-log .sync-status {
+  position: static !important;
+  min-width: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.6rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgba(247, 244, 237, 0.62) !important;
+}
+
+/* 레시피 편집 버튼: 레시피 제목 오른쪽. */
+#board .recipe-strip .recipe-toggle {
+  position: static !important;
+  width: auto !important;
+  height: 1.3rem !important;
+  min-height: 0 !important;
+  padding: 0 0.45rem !important;
+  border: 1px solid rgba(236, 244, 246, 0.35) !important;
+  border-radius: 999px !important;
+  background: rgba(236, 244, 246, 0.08) !important;
+  font-size: 0.62rem !important;
+  font-weight: 800 !important;
+  color: #f5f7f8 !important;
+}
+
+/* 레시피: 왼쪽 치킨, 오른쪽 사이드. 각 열 세로 스크롤. 한 줄 = 이름 · 시간. */
+#board .recipe-columns {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 4px;
+  min-height: 0;
+}
+
+#board .recipe-column {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  border-radius: 6px;
+  background: rgba(236, 244, 246, 0.05);
+}
+
+#board .recipe-strip-list {
+  margin: 0;
+  padding: 2px 3px;
+  list-style: none;
+}
+
+#board .recipe-strip-list li {
+  /* 1010 사장님 "타이머만 위치 고정, 글씨는 상대성": 이름 뒤에 배지가 글처럼 이어 붙고, 시간 칸만 오른쪽 고정폭(세로 맞춤) */
+  display: flex;
+  align-items: baseline;
+  gap: 0 0.3em;
+  padding: 1px 2px 1px 3px;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid rgba(236, 244, 246, 0.06);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.25;
+  break-inside: avoid;
+}
+
+/* 옵션(날개·다리·순살)이 잘리면 안 되므로 줄바꿈한다. */
+#board .recipe-name {
+  min-width: 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  color: #f5f7f8;
+}
+
+#board .recipe-time {
+  margin-left: auto;
+  flex: 0 0 auto;
+  min-width: 2.2em;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #ffd84d;
+}
+
+/* 도구줄: 속한 것들이 기록·레시피 제목 옆으로 옮겨지면 비므로 숨긴다. 옮기기 전에는 레시피 칸 위에 겹친다. */
+#board > .board-utility-rail:empty { display: none !important; }
+#board > .board-utility-rail {
+  grid-area: recipe !important;
+  position: relative !important;
+  inset: auto !important;
+  z-index: 5 !important;
+  justify-self: end !important;
+  align-self: start !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 3px !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 4px 5px 0 0 !important;
+  pointer-events: none !important;
+}
+
+#board > .board-utility-rail > * {
+  position: static !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  max-width: 5.5rem !important;
+  height: 1.35rem !important;
+  padding: 0 0.3rem !important;
+  font-size: 0.62rem !important;
+}
+
+/* 보조 타이머가 있는 칸: 한 칸 폭이 좁아 위아래로 나눈다.
+   위 = 본 타이머 (▲ | 숫자 | 삭제·▼), 아래 = 보조 타이머 (▲ | 숫자 | ▼·삭제). */
+#board .slot-card .timer-panel[data-has-split="true"] {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) 34px !important;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) !important;
+  grid-template-areas:
+    "mup mread mact"
+    "split split split" !important;
+  gap: 3px !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+#board .slot-card .timer-panel[data-has-split="true"] > :is(.split-section, .timer-positive-rail, .adjust-controls, .timer-actions) {
+  position: relative !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+}
+
+#board .slot-card .timer-panel[data-has-split="true"] > .timer-positive-rail { grid-area: mup !important; display: flex !important; flex-direction: column !important; }
+#board .slot-card .timer-panel[data-has-split="true"] > .adjust-controls { grid-area: mread !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+#board .slot-card .timer-panel[data-has-split="true"] > .timer-actions { grid-area: mact !important; display: flex !important; flex-direction: column !important; gap: 3px !important; }
+#board .slot-card .timer-panel[data-has-split="true"] > .split-section:not([hidden]) { grid-area: split !important; display: flex !important; flex-direction: column !important; }
+
+#board .slot-card .timer-panel[data-has-split="true"] :is(.timer-positive-rail > .adjust-row, .timer-actions > .adjust-row, .timer-primary-actions) {
+  position: static !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0 !important;
+  gap: 3px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+#board .slot-card .timer-panel[data-has-split="true"] .timer-primary-actions { flex: 1 1 0 !important; }
+#board .slot-card .timer-panel[data-has-split="true"] .timer-actions > .adjust-row { flex: 2 1 0 !important; }
+
+#board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .action-button:not([hidden]), .split-adjust-button, .split-clear-button) {
+  position: relative !important;
+  inset: auto !important;
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 0.66rem !important;
+  line-height: 1 !important;
+  writing-mode: horizontal-tb !important;
+  white-space: nowrap !important;
+}
+
+#board .slot-card .timer-panel[data-has-split="true"] .readout-cluster {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#board .slot-card .timer-panel[data-has-split="true"] .split-list {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  gap: 3px !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-unit {
+  position: relative !important;
+  display: grid !important;
+  flex: 1 1 0 !important;
+  grid-template-columns: 34px minmax(0, 1fr) 34px !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  grid-template-areas: "sup sread sdown" !important;
+  gap: 3px !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 3px 0 0 !important;
+  border-top: 1px dashed rgba(236, 244, 246, 0.35) !important;
+}
+
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-unit > * {
+  align-self: stretch !important;
+  justify-self: stretch !important;
+  position: relative !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+#board .slot-card .timer-panel[data-has-split="true"] .split-positive-rail { grid-area: sup !important; display: flex !important; flex-direction: column !important; }
+#board .slot-card .timer-panel[data-has-split="true"] .split-negative-rail { grid-area: sdown !important; display: flex !important; flex-direction: column !important; gap: 3px !important; }
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-controls {
+  position: static !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 2 1 0 !important;
+  gap: 3px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+#board .slot-card .timer-panel[data-has-split="true"] .split-positive-rail > .split-timer-controls { flex: 1 1 0 !important; }
+#board .slot-card .timer-panel[data-has-split="true"] .split-readout-cluster {
+  grid-area: sread !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  border-radius: 6px !important;
+}
+
+/* 보조 숫자도 본 숫자처럼 두 줄(분 / 초). 좁은 칸에서 분·초 글자는 겹치므로 뺀다. */
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-readout {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  line-height: 0.95 !important;
+}
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-readout :is(.countdown-minutes, .countdown-seconds) {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  line-height: 0.95 !important;
+}
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-readout .countdown-separator { display: none !important; }
+#board .slot-card .timer-panel[data-has-split="true"] .split-timer-readout :is(.countdown-minutes, .countdown-seconds)::after { content: none !important; display: none !important; }
+
+/* 추가(보조 시간 고르기) 화면: 숫자판에 공간을 더 준다. */
+#board .slot-card .timer-panel[data-add-mode="true"] {
+  grid-template-rows: minmax(0, 0.62fr) minmax(0, 1.38fr) !important;
+}
+#board .slot-card[data-accent="oven"] .split-add-grid:not([hidden]) {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+}
+
+/* 낮은 화면(노트9 등): 보조 칸 버튼은 화살표와 숫자를 한 줄로, 보조 머리표는 숨긴다. */
+@media (max-height: 460px) {
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .action-button:not([hidden]), .split-adjust-button, .split-clear-button) {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1px !important;
+    font-size: 0.56rem !important;
+    line-height: 1 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds] {
+    font-size: 0 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+    position: static !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds$="60"]::before {
+    font-size: 8px !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.split-timer-head, .split-timer-total, .timer-total) {
+    display: none !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] .split-timer-readout :is(.countdown-minutes, .countdown-seconds) {
+    font-size: 24px !important;
+  }
+}
+
+#board .slot-card[data-accent="oven"] .split-add-grid:not([hidden]) .minute-value {
+  font-size: 0.74rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* 일시정지: 맨 위 "일시정지" 표시와 숫자가 겹치지 않게 숫자를 가운데로. 삭제 글자는 한 줄. */
+#board .slot-card[data-state="paused"] .timer-panel[data-has-split="false"] .readout-cluster > .timer-readout {
+  top: 50% !important;
+  bottom: auto !important;
+  translate: 0 -50% !important;
+}
+#board .slot-card[data-state="paused"] .timer-primary-actions > .action-button {
+  writing-mode: horizontal-tb !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+}
+
+/* 카운트다운 숫자 테두리: text-stroke 는 가변 글꼴의 겹친 윤곽선까지 그려 숫자 안에 둥근 선(잘린 듯한 모양)이 생긴다.
+   stroke 를 끄고 같은 두께의 8방향 그림자로 어두운 테두리를 만든다. */
+#board .slot-card:not(.is-expired) :is(.timer-readout, .split-timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator, .timer-total),
+#board .split-timer-unit:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator) {
+  -webkit-text-stroke: 0 !important;
+  /* 물(청록) 위 가독성: 진한 테두리 두 겹(안쪽 진하게, 바깥 조금 옅게) + 아래 약한 그림자. */
+  text-shadow:
+    0.055em 0.000em 0 #02080c,
+    0.051em 0.021em 0 #02080c,
+    0.039em 0.039em 0 #02080c,
+    0.021em 0.051em 0 #02080c,
+    0.000em 0.055em 0 #02080c,
+    -0.021em 0.051em 0 #02080c,
+    -0.039em 0.039em 0 #02080c,
+    -0.051em 0.021em 0 #02080c,
+    -0.055em 0.000em 0 #02080c,
+    -0.051em -0.021em 0 #02080c,
+    -0.039em -0.039em 0 #02080c,
+    -0.021em -0.051em 0 #02080c,
+    -0.000em -0.055em 0 #02080c,
+    0.021em -0.051em 0 #02080c,
+    0.039em -0.039em 0 #02080c,
+    0.051em -0.021em 0 #02080c,
+    0.095em 0.000em 0 rgba(2, 8, 12, 0.85),
+    0.088em 0.036em 0 rgba(2, 8, 12, 0.85),
+    0.067em 0.067em 0 rgba(2, 8, 12, 0.85),
+    0.036em 0.088em 0 rgba(2, 8, 12, 0.85),
+    0.000em 0.095em 0 rgba(2, 8, 12, 0.85),
+    -0.036em 0.088em 0 rgba(2, 8, 12, 0.85),
+    -0.067em 0.067em 0 rgba(2, 8, 12, 0.85),
+    -0.088em 0.036em 0 rgba(2, 8, 12, 0.85),
+    -0.095em 0.000em 0 rgba(2, 8, 12, 0.85),
+    -0.088em -0.036em 0 rgba(2, 8, 12, 0.85),
+    -0.067em -0.067em 0 rgba(2, 8, 12, 0.85),
+    -0.036em -0.088em 0 rgba(2, 8, 12, 0.85),
+    -0.000em -0.095em 0 rgba(2, 8, 12, 0.85),
+    0.036em -0.088em 0 rgba(2, 8, 12, 0.85),
+    0.067em -0.067em 0 rgba(2, 8, 12, 0.85),
+    0.088em -0.036em 0 rgba(2, 8, 12, 0.85),
+    0 0.05em 0.14em rgba(0, 0, 0, 0.55) !important;
+}
+
+/* 레시피 편집 표: 구분(치킨/사이드) 열과 삭제 버튼. */
+.recipe-drawer .recipe-grid { table-layout: fixed; width: 100%; min-width: 0 !important; }
+.recipe-drawer .recipe-col-group { width: 4.6rem; }
+.recipe-drawer .recipe-col-menu { width: 24%; }
+.recipe-drawer .recipe-col-option { width: 16%; }
+.recipe-drawer .recipe-col-time { width: 3.6rem; }
+.recipe-drawer .recipe-col-desc { width: auto; }
+.recipe-drawer .recipe-col-save { width: 4.4rem; }
+.recipe-drawer .recipe-grid-cell.is-group select {
+  width: 100%;
+  min-height: 2.1rem;
+  border: 1px solid rgba(246, 242, 233, 0.18);
+  border-radius: 0.44rem;
+  background: #11181c;
+  color: #f6f2e9;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+.recipe-drawer .recipe-grid-actions .recipe-row-save { display: block; }
+.recipe-drawer .recipe-row-delete {
+  display: block;
+  width: 100%;
+  margin-top: 3px;
+  min-height: 1.6rem;
+  border: 1px solid rgba(255, 120, 110, 0.45);
+  border-radius: 0.44rem;
+  background: rgba(255, 90, 80, 0.12);
+  color: #ffd6d2;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+/* 기록 더보기: 지난 줄 10개씩 더. */
+#board .board-log li.log-more {
+  display: block;
+  padding: 3px 0 1px;
+  background: transparent;
+}
+#board .board-log li.log-more button {
+  width: 100%;
+  height: 1.45rem;
+  border: 1px dashed rgba(236, 244, 246, 0.35);
+  border-radius: 6px;
+  background: rgba(236, 244, 246, 0.06);
+  color: rgba(247, 244, 237, 0.85);
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* 10분 카운트다운 숫자: 버튼과 같은 청록은 물(청록)에 묻히므로 같은 계열의 밝은 얼음색. */
+#board .slot-card[data-timer-family="ten"]:not(.is-expired) :is(.timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator),
+#board .split-timer-unit[data-timer-family="ten"]:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator) {
+  color: rgb(182, 247, 255) !important;
+}
+
+/* 카운트다운 숫자 잘림 방지: 숫자 사이 음수 간격(글자 겹침)을 없애고, 숫자 칸 밖 그림자·글자 끝이 보이게. */
+#board .slot-card :is(.timer-readout, .split-timer-readout) {
+  overflow: visible !important;
+}
+#board .slot-card :is(.timer-readout, .split-timer-readout) :is(.countdown-minutes, .countdown-seconds) {
+  letter-spacing: 0 !important;
+  overflow: visible !important;
+}
+
+/* 세로 화면(노트북 321×751 등, 높이가 너비보다 김): 1열 목록.
+   1 2 3 4 5 ov상 ov하 임시 기록 까지 한 화면 높이 안에. 레시피부터 스크롤.
+   타이머 칸은 한 줄형(번호표 왼쪽). 보조·추가가 열린 칸은 두 배 높이. */
+@media (orientation: portrait) and (max-width: 820px) {
+  .app-shell {
+    padding-top: 6px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  #board.board {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    /* 한 화면(기록까지) + 레시피 높이 */
+    height: calc(var(--app-vh, 100vh) - 12px + 5px + 330px) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  #board .slot-card,
+  #board > .board-cell {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  #board .slot-card[data-slot-id="slot-1"] { order: 1; }
+  #board .slot-card[data-slot-id="slot-2"] { order: 2; }
+  #board .slot-card[data-slot-id="slot-3"] { order: 3; }
+  #board .slot-card[data-slot-id="slot-4"] { order: 4; }
+  #board .slot-card[data-slot-id="slot-5"] { order: 5; }
+  #board .slot-card[data-slot-id="slot-6"] { order: 6; }
+  #board .slot-card[data-slot-id="slot-7"] { order: 7; }
+  #board .slot-card[data-slot-id="slot-8"] { order: 8; }
+  /* 기록+레시피 한 칸. 예전 기록(flex 1.8)과 레시피(330px)를 더한 칸이라 타이머 칸 크기는 그대로. */
+  #board > .recipe-strip { order: 9; flex: 1.8 1 330px !important; }
+  #board > .board-utility-rail { display: none !important; }
+  #board .slot-card:has(.timer-panel:is([data-has-split="true"], [data-add-mode="true"])) {
+    flex-grow: 2.2 !important;
+  }
+
+  /* 번호표: 칸 왼쪽 세로 가운데. 위쪽 띠는 없앤다. */
+  #board .slot-card {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 2.05rem !important;
+  }
+  #board .slot-card > .physical-slot-badge {
+    top: 50% !important;
+    left: 0.22rem !important;
+    translate: 0 -50% !important;
+    min-width: 1.6rem !important;
+    height: 1.15rem !important;
+    padding: 0 0.2rem !important;
+    font-size: 0.66rem !important;
+  }
+
+  /* 대기: 버튼 두 줄. 튀김·임시 6개씩, 오븐 8개씩(15개). */
+  #board .slot-card .slot-body > .preset-grid:not(.split-add-grid) {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+  #board .slot-card[data-accent="oven"] .slot-body > .preset-grid:not(.split-add-grid) {
+    grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #board .slot-card .preset-grid .minute-button {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  #board .slot-card .preset-grid .minute-value {
+    font-size: 0.86rem !important;
+    line-height: 1 !important;
+  }
+
+  /* 돌 때(보조·추가 없음): 한 줄 = ▼▼60 ▼10 | 남은 시간 | ▲10 ▲▲60 | 삭제·추가 */
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] {
+    display: grid !important;
+    grid-template-columns: 54px minmax(0, 1fr) 54px 38px !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    grid-template-areas: "down read up act" !important;
+    gap: 3px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions {
+    display: contents !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-positive-rail { grid-area: up !important; }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .adjust-controls { grid-area: read !important; }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions > .adjust-row { grid-area: down !important; }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions > .timer-primary-actions { grid-area: act !important; }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-positive-rail,
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .adjust-controls,
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions > .adjust-row,
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions > .timer-primary-actions {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
+    transform: none !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-positive-rail > .adjust-row,
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions > .adjust-row {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 3px !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: static !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] > .timer-actions > .timer-primary-actions {
+    flex-direction: column !important;
+    gap: 3px !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] :is(.adjust-button, .action-button:not([hidden])) {
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 1 0 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    font-size: 0.66rem !important;
+    line-height: 1 !important;
+    writing-mode: horizontal-tb !important;
+    white-space: nowrap !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .adjust-button[data-delta-seconds] {
+    font-size: 0 !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1px !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .adjust-button[data-delta-seconds]::before,
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .adjust-button[data-delta-seconds]::after {
+    position: static !important;
+    display: block !important;
+    margin: 0 !important;
+    transform: none !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster > .timer-readout {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    translate: none !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: auto !important;
+    font-size: 26px !important;
+    line-height: 1 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster > .timer-readout :is(.countdown-minutes, .countdown-seconds, .countdown-separator) {
+    flex: 0 0 auto !important;
+    font-size: 26px !important;
+    line-height: 1 !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster > .timer-readout .countdown-separator {
+    display: inline-block !important;
+    width: auto !important;
+    padding: 0 1px !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster > .timer-readout {
+    gap: 0 !important;
+    overflow: visible !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster > .timer-readout .countdown-minutes {
+    margin-right: 1px !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .readout-cluster > .timer-readout .countdown-seconds {
+    margin-left: 1px !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="false"][data-add-mode="false"] .timer-total {
+    display: none !important;
+  }
+  /* 일시정지 표시는 위 작은 글자. */
+  #board .slot-card[data-state="paused"] .timer-panel[data-has-split="false"] .readout-cluster::before {
+    top: 50% !important;
+    left: 4px !important;
+    right: auto !important;
+    translate: 0 -50% !important;
+    transform: none !important;
+    inset-inline-end: auto !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: 46px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    font-size: 0.55rem !important;
+    padding: 1px 0.25rem !important;
+  }
+  #board .slot-card[data-state="paused"] .timer-panel[data-has-split="false"] .readout-cluster > .timer-readout {
+    top: auto !important;
+    translate: none !important;
+    padding-left: 50px !important;
+  }
+  #board .slot-card[data-state="paused"] .timer-panel[data-has-split="false"] .readout-cluster > .timer-readout :is(.countdown-minutes, .countdown-seconds, .countdown-separator) {
+    font-size: 24px !important;
+  }
+  /* 일시정지는 ▲▼ 버튼이 없으니 가운데를 넓게. */
+  #board .slot-card[data-state="paused"] .timer-panel[data-has-split="false"][data-add-mode="false"] {
+    grid-template-columns: 0 minmax(0, 1fr) 0 48px !important;
+  }
+
+  /* 보조 타이머 칸 버튼: 숨은 글자 0, 화살표+숫자 한 줄. */
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds] {
+    font-size: 0 !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+    position: static !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.split-timer-head, .split-timer-total, .timer-total) {
+    display: none !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] .split-timer-readout,
+  #board .slot-card .timer-panel[data-has-split="true"] .readout-cluster > .timer-readout {
+    flex-direction: row !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.split-timer-readout, .readout-cluster > .timer-readout) :is(.countdown-minutes, .countdown-seconds, .countdown-separator) {
+    position: static !important;
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+  }
+  #board .slot-card .timer-panel[data-has-split="true"] :is(.split-timer-readout, .readout-cluster > .timer-readout) {
+    gap: 1px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* 추가 화면: 위 숫자판 크게, 아래 남은 시간 작게. */
+  #board .slot-card .timer-panel[data-add-mode="true"] {
+    grid-template-rows: minmax(0, 1.55fr) minmax(0, 0.75fr) !important;
+  }
+  #board .slot-card .split-add-grid:not([hidden]) {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: minmax(0, 1fr) !important;
+  }
+  #board .slot-card[data-accent="oven"] .split-add-grid:not([hidden]) {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+  #board .slot-card .split-add-grid:not([hidden]) .minute-value {
+    font-size: 0.74rem !important;
+    letter-spacing: -0.02em !important;
+  }
+}
+
+/* 1010 정렬은 한 목록(지금 → 최근 → 그 외). 1011 합친 칸은 그 목록을 2단으로 보여 스크롤을 줄인다.
+   칸이 10.5rem×2보다 좁으면 1단. 사이드 열 DOM은 비어 있고 화면에서 뺀다. 기록 줄은 이 목록에 넣지 않는다. */
+#board .recipe-columns { grid-template-columns: minmax(0, 1fr); }
+#board .recipe-column[data-group="side"] { display: none; }
+#board .recipe-column[data-group="main"] .recipe-strip-list {
+  columns: 2 10.5rem;
+  column-gap: 8px;
+  column-fill: balance;
+}
+#board .recipe-strip-list li .recipe-order-badge { flex: 0 0 auto; font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.88em; font-weight: 900; color: #fff; }
+#board .recipe-strip-list li .recipe-order-badge:empty { display: none; }
+/* 1010 사장님 "숫자는 고정": 주문 있는 줄(지금 묶음)만 순서·남은 분을 시간 앞 고정 칸에 — 줄끼리 숫자 세로 맞춤. 주문 없는 줄은 이름이 칸을 다 씀 */
+#board .recipe-strip-list li[data-order="cook"] .recipe-order-badge,
+#board .recipe-strip-list li[data-order="wait"] .recipe-order-badge { margin-left: auto; min-width: 4.4em; text-align: right; }
+#board .recipe-strip-list li[data-order="cook"] .recipe-time,
+#board .recipe-strip-list li[data-order="wait"] .recipe-time { margin-left: 0; }
+#board .recipe-strip-list li .recipe-name { flex: 0 1 auto; }
+#board .recipe-strip-list li[data-group="side"] .recipe-name { color: #cfe7ff; }
+/* 1010 주문이 타이머 매칭까지 가는 과정 = 같은 초록 계열 옅음 → 진함. 대기(점선·옅음) → 도는 중(막대, 남은 만큼 줄어듦) → 1분 안(연두) → 끝나면 '최근'. */
+#board .recipe-strip-list li[data-order="wait"] { background: rgba(0, 200, 120, 0.1); border-left-color: rgba(0, 200, 120, 0.55); border-left-style: dashed; }
+#board .recipe-strip-list li[data-order="wait"] .recipe-order-badge { color: #9be8c4; }
+#board .recipe-strip-list li[data-order="cook"] {
+  border-left-color: #00c878;
+  background: linear-gradient(90deg, rgba(0, 200, 120, 0.42) var(--p, 100%), rgba(0, 200, 120, 0.12) var(--p, 100%));
+}
+#board .recipe-strip-list li[data-order="cook"] .recipe-order-badge,
+#board .recipe-strip-list li[data-order="cook"] .recipe-name { color: #fff; }
+#board .recipe-strip-list li[data-order="cook"][data-soon="true"] {
+  border-left-color: #d8f55a;
+  background: linear-gradient(90deg, rgba(216, 245, 90, 0.45) var(--p, 100%), rgba(216, 245, 90, 0.14) var(--p, 100%));
+}
+#board .recipe-strip-list li[data-order="recent"] { border-left-color: rgba(236, 244, 246, 0.28); }
+#board .recipe-strip-list li[data-order="recent"] .recipe-name { color: rgba(245, 247, 248, 0.82); }
+#board .recipe-strip-list li.recipe-group-head {
+  display: block;
+  column-span: all;
+  padding: 3px 4px 1px;
+  border-bottom: none;
+  border-top: 1px solid rgba(236, 244, 246, 0.14);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(236, 244, 246, 0.5);
+}
+#board .recipe-strip-list li.recipe-group-head:first-child { border-top: none; }
+#board .recipe-strip-list li.recipe-group-head > span { grid-column: 1 / -1; }
+
+#board .slot-card > .slot-menu-tag { position:absolute; z-index:9; top:clamp(0.22rem,0.68cqw,0.38rem); left:clamp(2.08rem,min(16cqw,12.8cqh),2.72rem); right:clamp(0.28rem,0.78cqw,0.46rem); pointer-events:none; font-size:clamp(0.62rem,5cqw,1.05rem); font-weight:900; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.85); }
+#board .slot-card > .slot-menu-tag[hidden] { display:none; }
+#board .slot-card > .slot-menu-tag[data-conf="mid"] { color:#ffe27a; }
+#board .slot-card > .slot-menu-tag[data-conf="lo"] { color:#ffb08a; }
+#board .recipe-strip-list li .recipe-label { flex:0 1 auto; color:#ffc58a; font-weight:900; font-size:.92em; white-space:nowrap; }

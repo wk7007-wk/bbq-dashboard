@@ -170,6 +170,9 @@
     return {
       connect,
       publish,
+      publishDismiss() {
+        return Promise.resolve("local");
+      },
       audit() {},
       close,
       getNow() {
@@ -272,6 +275,7 @@
         syncLanFallback();
       });
       wakeDirtyRetry(DIRTY_RETRY_DELAYS_MS[0]);
+      flushPendingDismiss();   // 1003: 앱 다시 켤 때 남은 넘김 보냄
       if (typeof global.addEventListener === "function") {
         onlineListener = () => {
           notifyStatus();
@@ -280,6 +284,9 @@
           if (!isStreamHealthy()) scheduleFallbackPoll(0);
           wakeDirtyRetry(100);
           syncLanFallback();
+          dismissFailCount = 0;
+          cancelDismissFlush();
+          flushPendingDismiss();   // 1003: 연결 돌아오면 미전송 넘김 바로
         };
         offlineListener = () => {
           cancelFallbackPoll();
@@ -437,6 +444,8 @@
       if (!isInitial && envelope.meta.revision <= lastRevision) return false;
       lastRevision = Math.max(lastRevision, envelope.meta.revision);
       writeCachedEnvelope(storage, syncKey, envelope);
+      // 1016: 공장이 올린 새로고침 신호는 기기·칸 자료와 무관하게 늘 확인한다(이 기기가 방금 쓴 문서라도).
+      handleUiRefreshSignal({ nonce: envelope.meta.uiRefreshNonce, at: envelope.meta.updatedAt, actor: envelope.meta.actorId });
       if (!isInitial && envelope.meta.actorId === actorId) return true;
       if (applyRemoteState) {
         applyRemoteState(cloneJson(envelope.board), envelope.meta);
@@ -906,6 +915,7 @@
 
     function close() {
       closed = true;
+      stopDismiss();
       if (pullTimerId && typeof global.clearTimeout === "function") {
         global.clearTimeout(pullTimerId);
       }
@@ -982,11 +992,16 @@
     }
 
     function serverNowMs() {
+      const wallMs = Date.now() + offsetMs;
       if (clockSample && clockSample.sampledAtMonoMs >= 0) {
         const elapsedMs = Math.max(0, getMonotonicNow() - clockSample.sampledAtMonoMs);
-        return Math.max(0, clockSample.serverAtSampleMs + elapsedMs);
+        const monoMs = Math.max(0, clockSample.serverAtSampleMs + elapsedMs);
+        // 0930: 기기가 잠들면 monotonic 시계가 멈출 수 있다(공장 먹통으로 재보정도 없을 때 타이머가 늘어짐).
+        // 벽시계와 5초 넘게 어긋나면 벽시계(마지막 보정값 적용)를 쓴다.
+        if (Math.abs(monoMs - wallMs) > 5000) return wallMs;
+        return monoMs;
       }
-      return Date.now() + offsetMs;
+      return wallMs;
     }
 
     function isOffsetFresh() {
@@ -1109,9 +1124,196 @@
       return handleEnvelope(envelope, false);
     }
 
+    // 1003 사용자 "종료시 버튼으로 해제인데 앱간 동기화 안 됨": 넘김은 이 기기 보드 전체를 게시하지 않는다(낡은 보드가
+    // 다른 기기의 새 타이머를 덮을 수 있음). 공장의 최신 보드를 읽어 그 칸의 같은 끝남 기록에 넘김 시각만 넣고,
+    // 읽은 바이트의 sha256 을 X-If-Sha256 으로 붙여 조건부 저장 — 그 사이 누가 저장했으면 409 → 처음부터 다시.
+    // 미전송 넘김 대기열(pre3 보강): 기기 저장소에 (칸, 끝남 시각, 넘김 시각)을 남기고, 보낼 때까지 자동으로 다시 보낸다 —
+    // 실패하면 2·5·15·30·60초 간격, 연결 복구(online) 때 바로, 앱 다시 켤 때(connect) 바로. ok·already·superseded 면 지움.
+    // 빨강은 끝난 뒤 90초만 보이므로 끝난 지 120초 넘은 항목은 보낼 이유가 없어 지움(무한 재시도 없음).
+    const DISMISS_BACKOFF_MS = [2000, 5000, 15000, 30000, 60000];
+    const DISMISS_STALE_MS = 120000;
+    const pendingDismissKey = `chicken-timer:pending-dismiss:${syncKey}`;
+    let dismissFlushing = false;
+    let dismissTimerId = 0;
+    let dismissFailCount = 0;
+
+    function readPendingDismiss() {
+      const raw = safeParse(readStorage(storage, pendingDismissKey));
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .map((item) => ({
+          slotId: String((item && item.slotId) || ""),
+          completedAt: Math.trunc(Number(item && item.completedAt) || 0),
+          dismissedAt: Math.trunc(Number(item && item.dismissedAt) || 0),
+        }))
+        .filter((item) => item.slotId && item.completedAt > 0 && item.dismissedAt > 0);
+    }
+
+    function writePendingDismiss(list) {
+      if (list.length) writeStorage(storage, pendingDismissKey, JSON.stringify(list.slice(-16)));
+      else removeStorage(storage, pendingDismissKey);
+    }
+
+    function publishDismiss(slotId, completedAt, dismissedAt) {
+      const id = String(slotId || "");
+      const at = Math.trunc(Number(completedAt) || 0);
+      const when = Math.trunc(Number(dismissedAt) || 0);
+      if (!id || at <= 0 || when <= 0) return Promise.resolve("bad");
+      const list = readPendingDismiss().filter((item) => !(item.slotId === id && item.completedAt === at));
+      list.push({ slotId: id, completedAt: at, dismissedAt: when });
+      writePendingDismiss(list);
+      dismissFailCount = 0;
+      return flushPendingDismiss().then((results) => (results && results[`${id}@${at}`]) || "queued");   // 다른 순회가 돌고 있으면 그 끝에서 처리
+    }
+
+    // pre7 보강: 한 번 돌 때 대기열의 각 항목을 한 번씩 시도한다. behind·retry 는 남기고 **다음 항목으로 진행**(앞 칸이
+    // 기다리는 동안 다른 칸 넘김이 막히지 않게). 다 돈 뒤 남은 게 있으면 재시도 예약. 결과는 {"칸@끝남": 결과}.
+    function flushPendingDismiss() {
+      if (closed) return Promise.resolve({});
+      if (dismissFlushing) return Promise.resolve({});
+      cancelDismissFlush();   // pre8: 이번 순회가 지금 남은 것을 다 다루므로 예전 예약은 지우고, 끝난 뒤 실제 남은 것으로 다시 건다
+      const fresh = readPendingDismiss().filter((item) => getNow() - item.completedAt <= DISMISS_STALE_MS);
+      writePendingDismiss(fresh);
+      if (!fresh.length) return Promise.resolve({});
+      dismissFlushing = true;
+      const results = {};
+      const step = (index) => {
+        if (closed) return Promise.resolve("closed");
+        if (index >= fresh.length) return Promise.resolve("done");
+        const item = fresh[index];
+        const key = `${item.slotId}@${item.completedAt}`;
+        return dismissOnce(item.slotId, item.completedAt, item.dismissedAt)
+          .then((result) => result, () => "retry")
+          .then((result) => {
+            results[key] = result;
+            if (result === "closed" || closed) return "closed";       // 종료: 남은 항목은 저장소에 그대로
+            if (result !== "retry" && result !== "behind") {
+              writePendingDismiss(readPendingDismiss().filter((x) => !(x.slotId === item.slotId && x.completedAt === item.completedAt)));
+            }
+            return step(index + 1);
+          });
+      };
+      return step(0).then((how) => {
+        dismissFlushing = false;
+        if (how === "closed" || closed) return results;
+        // 도는 동안 새로 들어온 항목(이번 순회에 없던 것)은 바로 이어서 처리
+        const arrived = readPendingDismiss().some((x) => !Object.prototype.hasOwnProperty.call(results, `${x.slotId}@${x.completedAt}`));
+        if (arrived) return flushPendingDismiss().then((more) => Object.assign(results, more));
+        if (readPendingDismiss().length) scheduleDismissFlush();   // 실제 남은 대기열 기준
+        else dismissFailCount = 0;
+        return results;
+      });
+    }
+
+    function scheduleDismissFlush() {
+      if (closed || dismissTimerId || typeof global.setTimeout !== "function") return;
+      const delay = DISMISS_BACKOFF_MS[Math.min(dismissFailCount, DISMISS_BACKOFF_MS.length - 1)];
+      dismissFailCount += 1;
+      dismissTimerId = global.setTimeout(() => {
+        dismissTimerId = 0;
+        flushPendingDismiss();
+      }, delay);
+    }
+
+    function cancelDismissFlush() {
+      if (dismissTimerId && typeof global.clearTimeout === "function") global.clearTimeout(dismissTimerId);
+      dismissTimerId = 0;
+    }
+
+    // 요청마다 8초 시간제한 — 응답 헤더뿐 아니라 본문 읽기 끝까지(pre4 보강). 무응답이면 취소하고 실패로(대기열 유지).
+    // 진행 중 요청은 모아 두었다가 채널 종료(close) 때 모두 취소한다.
+    const DISMISS_REQUEST_TIMEOUT_MS = 8000;
+    const dismissInflight = new Set();
+    function fetchWithTimeout(url, options, readBody) {
+      const opts = Object.assign({}, options);
+      let controller = null;
+      if (typeof global.AbortController === "function") {
+        controller = new global.AbortController();
+        opts.signal = controller.signal;
+      }
+      return new Promise((resolve, reject) => {
+        let done = false;
+        const entry = { cancel: () => fail(new Error("closed")) };
+        const finish = () => {
+          done = true;
+          dismissInflight.delete(entry);
+          if (typeof global.clearTimeout === "function") global.clearTimeout(timer);
+        };
+        const fail = (err) => {
+          if (done) return;
+          finish();
+          if (controller) {
+            try { controller.abort(); } catch (_) {}
+          }
+          reject(err);
+        };
+        const timer = global.setTimeout(() => fail(new Error("timeout")), DISMISS_REQUEST_TIMEOUT_MS);
+        dismissInflight.add(entry);
+        global.fetch(url, opts)
+          .then((response) => {
+            if (!readBody || !response || !response.ok) return { response, text: "" };
+            return response.text().then((text) => ({ response, text }));
+          })
+          .then((value) => {
+            if (done) return;
+            finish();
+            resolve(value);
+          }, fail);
+      });
+    }
+
+    function stopDismiss() {
+      cancelDismissFlush();
+      Array.from(dismissInflight).forEach((entry) => entry.cancel());
+    }
+
+    function dismissOnce(slotId, completedAt, dismissedAt) {
+      const urls = writeUrls.filter(Boolean);
+      if (!urls.length || typeof global.fetch !== "function") return Promise.resolve("retry");
+      const tryUrl = (index) => {
+        if (index >= urls.length) return Promise.resolve("retry");
+        const url = urls[index];
+        return fetchWithTimeout(appendCacheBust(url), { cache: "no-store" }, true)
+          .then(({ response, text }) => {
+            if (!response || !response.ok) throw new Error("get");
+            if (closed) return "closed";                       // 종료됐으면 PUT 하지 않음(항목은 대기열에 남김)
+            const decision = planDismiss(text, slotId, completedAt, dismissedAt);
+            if (decision.result !== "write") return decision.result;
+            const envelope = createEnvelope({
+              actorId,
+              boardState: decision.board,
+              profile,
+              reason: "dismiss",
+              revision: nextRevision(Math.max(lastRevision, decision.remoteRevision), getNow()),
+              syncKey,
+              updatedAt: getNow(),
+            });
+            return fetchWithTimeout(appendCacheBust(url), {
+              method: "PUT",
+              cache: "no-store",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "token chicken-timer",
+                "X-If-Sha256": decision.sha256,
+              },
+              body: JSON.stringify(envelope),
+            }, false).then(({ response }) => {
+              if (response && response.status === 409) return "retry";   // 그 사이 다른 저장 → 다시 읽고 다시
+              if (!response || !response.ok) throw new Error("put");
+              lastRevision = Math.max(lastRevision, envelope.meta.revision);
+              writeCachedEnvelope(storage, syncKey, envelope);
+              return "ok";
+            });
+          })
+          .catch(() => (closed ? "closed" : tryUrl(index + 1)));
+      };
+      return tryUrl(0);
+    }
+
     return {
       connect,
       publish,
+      publishDismiss,
       audit,
       close,
       getNow,
@@ -1124,6 +1326,93 @@
         return pullRemote(true);
       },
     };
+  }
+
+  // 1003 조건부 넘김 게시의 결정(순수 함수 — 시험 가능). raw = 공장이 준 보드 바이트(문자열).
+  // write: 같은 끝남 기록이 아직 안 넘겨졌을 때만 그 칸 기록에 dismissedAt 을 넣은 보드. 공장이 아직 그 끝남을 모르면
+  // behind(대기열 유지), 더 새로운 실행·끝남이면 superseded(쓰지 않음), 이미 넘겨졌으면 already.
+  function planDismiss(raw, slotId, completedAt, dismissedAt) {
+    let parsed = null;
+    try {
+      parsed = JSON.parse(String(raw || ""));
+    } catch (_) {
+      return { result: "retry" };
+    }
+    const envelope = sanitizeEnvelope(parsed);
+    if (!envelope || !envelope.board || !envelope.board.main || !Array.isArray(envelope.board.main.slots)) {
+      return { result: "retry" };
+    }
+    const board = cloneJson(envelope.board);
+    const slot = board.main.slots.find((item) => item && String(item.id || "") === slotId);
+    const record = slot && slot.lastCompleted && typeof slot.lastCompleted === "object" ? slot.lastCompleted : null;
+    if (!slot) return { result: "behind" };
+    // pre4 보강: 공장이 아직 그 실행의 끝남을 모르면(같은 실행이 아직 돌거나, 끝남 기록이 없거나 더 옛것) 지우지 않고 기다린다.
+    // 더 새로운 실행·끝남이 확인될 때만 superseded.
+    if (slot.status !== "idle") {
+      // pre5·pre6 보강: 공장 칸이 돌고 있으면(같은 실행이 아직 안 끝난 것인지 새 실행인지 이력으로는 확정 못 함) 쓰지 않고
+      // 기다린다(behind). 새 실행은 그것이 끝나 더 늦은 끝남 기록이 생길 때만 확정(아래). 끝난 지 120초 지나면 대기열에서 만료.
+      return { result: "behind" };
+    }
+    const remoteAt = record ? Math.trunc(Number(record.completedAt) || 0) : 0;
+    if (remoteAt < completedAt) return { result: "behind" };
+    if (remoteAt > completedAt) return { result: "superseded" };
+    if (Math.trunc(Number(record.dismissedAt) || 0) > 0) return { result: "already" };
+    record.dismissedAt = dismissedAt;
+    return {
+      result: "write",
+      board,
+      sha256: sha256Hex(utf8Bytes(String(raw))),
+      remoteRevision: Math.max(0, Number(envelope.meta && envelope.meta.revision) || 0),
+    };
+  }
+
+  function utf8Bytes(text) {
+    if (typeof TextEncoder === "function") return new TextEncoder().encode(text);
+    const bin = unescape(encodeURIComponent(text));
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  // sha256 (FIPS 180-4). 공장 http 주소에서는 crypto.subtle 이 없을 수 있어 직접 계산.
+  const SHA256_K = new Uint32Array([
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+  ]);
+  function sha256Hex(bytes) {
+    const h = new Uint32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]);
+    const bitLen = bytes.length * 8;
+    const padded = new Uint8Array(((bytes.length + 9 + 63) >> 6) << 6);
+    padded.set(bytes);
+    padded[bytes.length] = 0x80;
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 8, Math.floor(bitLen / 0x100000000));
+    view.setUint32(padded.length - 4, bitLen >>> 0);
+    const w = new Uint32Array(64);
+    const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+    for (let off = 0; off < padded.length; off += 64) {
+      for (let i = 0; i < 16; i += 1) w[i] = view.getUint32(off + i * 4);
+      for (let i = 16; i < 64; i += 1) {
+        const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+        const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+        w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+      }
+      let a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], k = h[7];
+      for (let i = 0; i < 64; i += 1) {
+        const t1 = (k + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + SHA256_K[i] + w[i]) >>> 0;
+        const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) >>> 0;
+        k = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+      }
+      h[0] = (h[0] + a) >>> 0; h[1] = (h[1] + b) >>> 0; h[2] = (h[2] + c) >>> 0; h[3] = (h[3] + d) >>> 0;
+      h[4] = (h[4] + e) >>> 0; h[5] = (h[5] + f) >>> 0; h[6] = (h[6] + g) >>> 0; h[7] = (h[7] + k) >>> 0;
+    }
+    return Array.from(h, (x) => x.toString(16).padStart(8, "0")).join("");
   }
 
   function createEnvelope(options) {
@@ -1162,6 +1451,9 @@
         syncKey: normalizeSyncKey(meta.syncKey || DEFAULT_SYNC_KEY),
         updatedAt: Math.max(0, Number(meta.updatedAt) || 0),
         version: Math.max(1, Number(meta.version) || 1),
+        // 1016: 공장이 "지금 화면을 새로고침해라" 신호를 보낼 때 쓰는 값일 뿐, 칸 자료가 아니다.
+        // 숫자가 바뀔 때만 의미가 있으므로 그대로 문자열로 통과시킨다(가공하지 않는다).
+        uiRefreshNonce: meta.uiRefreshNonce ? String(meta.uiRefreshNonce).slice(0, 64) : "",
       },
       board: cloneJson(rawEnvelope.board) || {
         main: { slots: [] },

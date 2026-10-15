@@ -219,18 +219,12 @@ button {
 
 @media (orientation: landscape) {
   .board {
-    --landscape-zone-border-size: clamp(0.36rem, 0.82vw, 0.64rem);
-    --landscape-zone-padding-size: clamp(0.16rem, 0.42vw, 0.28rem);
-    --landscape-slot-gap: clamp(0.24rem, 0.58vw, 0.42rem);
-    --landscape-slot-half-gap: clamp(0.12rem, 0.29vw, 0.21rem);
-    --card-equalize-shift: calc(
-      var(--landscape-zone-border-size) + var(--landscape-zone-padding-size)
-      - var(--landscape-slot-half-gap)
-    );
-    grid-template-columns:
-      minmax(0, calc(50% - var(--board-gap) - var(--card-equalize-shift)))
-      minmax(0, calc(33.333333% - var(--board-gap-third) - var(--board-gap-third)))
-      minmax(0, calc(16.666667% - var(--board-gap-third) + var(--card-equalize-shift)));
+    --landscape-zone-border-size: 3px;
+    --landscape-zone-padding-size: 2px;
+    --landscape-slot-gap: 4px;
+    --landscape-slot-half-gap: 2px;
+    --board-gap: 10px;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr);
     grid-template-rows: minmax(0, 1fr);
     grid-template-areas: "fryer3 fryer2 oven";
   }
@@ -249,21 +243,12 @@ button {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(0.18rem, 0.48vw, 0.3rem);
-  padding: clamp(0.18rem, 0.5vw, 0.34rem);
-  border-radius: 0.98rem;
-  border: clamp(0.4rem, 0.95vw, 0.72rem) solid var(--zone-border);
-  background:
-    radial-gradient(circle at 8% 10%, rgba(var(--zone-rgb), 0.28), transparent 30%),
-    linear-gradient(90deg, rgba(var(--zone-rgb), 0.32), rgba(var(--zone-rgb), 0.13) 42%, rgba(10, 13, 18, 0.28)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
-    rgba(10, 13, 18, 0.34);
-  box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
-    inset 0 0 42px rgba(var(--zone-rgb), 0.13),
-    0 0 0 2px rgba(var(--zone-rgb), 0.28),
-    0 18px 38px rgba(0, 0, 0, 0.3),
-    0 0 40px rgba(var(--zone-rgb), 0.2);
+  gap: 4px;
+  padding: 3px;
+  border-radius: 0.7rem;
+  border: 3px solid var(--zone-border);
+  background: transparent;
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -866,9 +851,7 @@ body[data-slot-dragging="true"] .slot-card {
 }
 
 .slot-card[data-drag-origin="true"] {
-  opacity: 0.54;
-  transform: scale(0.985);
-  filter: saturate(0.82) brightness(0.82);
+  opacity: 0.5;
 }
 
 .slot-card[data-drag-preview="true"] {
@@ -877,53 +860,48 @@ body[data-slot-dragging="true"] .slot-card {
 }
 
 .slot-card[data-drag-preview-role="target"] {
-  transform: scale(1.028);
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.18),
-    0 0 34px rgba(255, 255, 255, 0.22),
-    0 18px 34px rgba(0, 0, 0, 0.34);
+  transform: none;
+  box-shadow: none;
+  outline: 4px solid rgba(126, 231, 151, 0.95);
+  outline-offset: -4px;
 }
 
 .slot-card[data-drag-preview-role="source"] {
-  box-shadow:
-    inset 0 0 0 3px rgba(255, 255, 255, 0.1),
-    0 8px 18px rgba(0, 0, 0, 0.22);
+  box-shadow: none;
 }
 
 .slot-card[data-swap-confirmed="true"] {
   border-color: rgba(126, 231, 151, 0.98);
   outline: 4px solid rgba(126, 231, 151, 0.82);
   outline-offset: -4px;
-  box-shadow:
-    0 0 0 3px rgba(126, 231, 151, 0.34),
-    0 0 30px rgba(126, 231, 151, 0.52),
-    0 18px 34px rgba(0, 0, 0, 0.34);
-  animation: swap-confirm-settle 0.48s cubic-bezier(0.18, 0.86, 0.22, 1.12) both;
+  box-shadow: none;
+  animation: none;
 }
 
 .slot-card[data-swap-confirmed="true"]::after {
-  box-shadow:
-    inset 0 0 0 4px rgba(217, 255, 220, 0.78),
-    inset 0 0 0 9px rgba(126, 231, 151, 0.24),
-    0 0 28px rgba(126, 231, 151, 0.5);
-  animation: swap-confirm-ring 0.82s ease-out both;
+  box-shadow: inset 0 0 0 4px rgba(126, 231, 151, 0.8);
+  animation: none;
 }
 
 .slot-drag-ghost {
   position: fixed;
   z-index: 105;
   margin: 0;
-  contain: layout paint style;
-  will-change: transform;
   pointer-events: none;
-  opacity: 0.76;
-  transform-origin: center center;
-  filter: saturate(1.1) brightness(1.06);
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.2),
-    0 24px 52px rgba(0, 0, 0, 0.52),
-    0 0 34px rgba(255, 255, 255, 0.16);
+  will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  color: #fff;
+  font-weight: 800;
+  font-size: 2rem;
+  opacity: 1;
+  filter: none;
+  box-shadow: none;
   transition: none;
+  contain: layout paint style;
 }
 
 body[data-slot-dragging="true"] .slot-card[data-drag-origin="true"] {
@@ -931,17 +909,15 @@ body[data-slot-dragging="true"] .slot-card[data-drag-origin="true"] {
 }
 
 body[data-slot-dragging="true"] .slot-card[data-drag-preview-role="target"] {
-  transform: scale(1.012);
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.18),
-    0 8px 18px rgba(0, 0, 0, 0.24);
+  transform: none;
+  box-shadow: none;
+  outline: 4px solid rgba(126, 231, 151, 0.95);
+  outline-offset: -4px;
 }
 
 body[data-slot-dragging="true"] .slot-drag-ghost {
   filter: none;
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.18),
-    0 12px 24px rgba(0, 0, 0, 0.42);
+  box-shadow: none;
 }
 
 body[data-slot-dragging="true"] .slot-card.is-expired .physical-slot-badge,
@@ -1170,35 +1146,7 @@ body[data-slot-dragging="true"] .timer-state[data-state="running"][data-urgency=
   box-shadow: inset 0 0 0 1px rgba(255, 106, 88, 0.18);
 }
 
-.slot-card[data-urgency="steady"] .timer-readout {
-  color: #f3eee6;
-}
-
-.slot-card[data-urgency="red-1"] .timer-readout {
-  color: #f2deda;
-}
-
-.slot-card[data-urgency="red-2"] .timer-readout {
-  color: #f6d3cd;
-}
-
-.slot-card[data-urgency="red-3"] .timer-readout {
-  color: #fbc6be;
-}
-
-.slot-card[data-urgency="red-4"] .timer-readout {
-  color: #ffb8ae;
-}
-
-.slot-card[data-urgency="red-5"] .timer-readout {
-  color: #ffaaa0;
-}
-
-.slot-card[data-urgency="red-6"] .timer-readout {
-  color: #ffd7cf;
-  text-shadow: 0 0 22px rgba(255, 107, 87, 0.24), 0 10px 24px rgba(0, 0, 0, 0.32);
-  animation: critical-readout-blink 0.95s steps(2, end) infinite;
-}
+/* Imminent does not recolor the digits. Water height is the distance signal. */
 
 @keyframes critical-readout-blink {
   0%, 48% {
@@ -1877,11 +1825,11 @@ body[data-slot-dragging="true"] .timer-state[data-state="running"][data-urgency=
 
 .timer-hourglass {
   --sand-level: 0%;
-  --water-rgb: 30, 178, 192;
-  --water-fill-top-rgb: 30, 178, 192;
-  --water-fill-top-alpha: 0.72;
-  --water-fill-bottom-rgb: 6, 128, 148;
-  --water-fill-bottom-alpha: 0.9;
+  --water-rgb: 0, 196, 230;
+  --water-fill-top-rgb: 64, 230, 255;
+  --water-fill-top-alpha: 0.97;
+  --water-fill-bottom-rgb: 0, 150, 198;
+  --water-fill-bottom-alpha: 1;
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -1907,7 +1855,7 @@ body[data-slot-dragging="true"] .timer-state[data-state="running"][data-urgency=
  * continuous across the physical card but stays below all operational text. */
 .card-water-surface {
   --sand-level: 0%;
-  --water-rgb: 30, 178, 192;
+  --water-rgb: 0, 196, 230;
   position: absolute;
   z-index: 3;
   inset: 0 0 0 var(--zone-rail-width, 0.5rem);
@@ -1921,10 +1869,11 @@ body[data-slot-dragging="true"] .timer-state[data-state="running"][data-urgency=
   content: "";
   position: absolute;
   inset: 0;
-  border-top: 1px solid rgba(var(--water-rgb), 0.58);
+  border-top: 3px solid rgba(236, 253, 255, 0.96);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 -1px 5px rgba(var(--water-rgb), 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 -2px 0 rgba(var(--water-rgb), 1),
+    0 -8px 16px rgba(var(--water-rgb), 0.9);
   transform: translate3d(0, calc(100% - var(--sand-level) - 2px), 0);
   transition: none;
 }
@@ -2010,8 +1959,8 @@ body[data-slot-dragging="true"] .timer-state[data-state="running"][data-urgency=
     );
   background-color: rgba(var(--water-fill-bottom-rgb), var(--water-fill-bottom-alpha));
   box-shadow:
-    inset 0 2px 0 rgba(178, 235, 242, 0.46),
-    0 -4px 12px rgba(var(--water-rgb), 0.18);
+    inset 0 3px 0 rgba(230, 252, 255, 0.92),
+    0 -6px 14px rgba(var(--water-rgb), 0.8);
   transition: none;
 }
 
@@ -3495,10 +3444,13 @@ body[data-display-profile="primary-subnotebook"]
 .minute-button[data-minute="10"] .minute-value,
 .minute-button[data-minute="13"] .minute-value {
   color: var(--timer-family-color);
+  -webkit-text-stroke: 0.06em #061016;
+  paint-order: stroke fill;
   text-shadow:
-    0 2px 2px rgba(0, 0, 0, 0.96),
-    0 0 5px rgba(0, 0, 0, 0.88),
-    0 0 14px rgba(var(--timer-family-rgb), 0.42);
+    -1px 0 0 #061016,
+    1px 0 0 #061016,
+    0 -1px 0 #061016,
+    0 1px 0 #061016;
 }
 
 .slot-card[data-timer-family]:not(.is-expired) {
@@ -3614,15 +3566,9 @@ body[data-display-profile="primary-subnotebook"]
 }
 
 .slot-card[data-timer-family][data-urgency^="red"]:not(.is-expired) .timer-panel {
-  border-color: rgba(255, 255, 255, 0.14);
-  background:
-    linear-gradient(90deg, rgba(255, 70, 52, var(--urgent-side-alpha)), transparent 18%, transparent 82%, rgba(255, 70, 52, var(--urgent-side-alpha))),
-    linear-gradient(180deg, rgba(5, 8, 12, 0.9), rgba(5, 8, 12, 0.82)),
-    rgba(6, 9, 13, 0.88);
-  box-shadow:
-    inset 0 0 0 2px rgba(3, 6, 10, 0.5),
-    inset 0 0 34px rgba(0, 0, 0, 0.38),
-    0 0 18px rgba(255, 70, 52, var(--urgent-glow-alpha));
+  border-color: transparent;
+  background: rgba(4, 9, 13, 0.08);
+  box-shadow: inset 0 0 0 3px rgba(255, 70, 52, 0.92);
 }
 
 .slot-card[data-timer-family][data-urgency^="red"]:not(.is-expired) .timer-readout {
@@ -3800,7 +3746,7 @@ body[data-display-profile="primary-subnotebook"]
     0 0 0 3px rgba(126, 231, 151, 0.16),
     0 16px 34px rgba(0, 0, 0, 0.38),
     0 0 28px rgba(126, 231, 151, 0.3);
-  animation: swap-confirm-toast 0.92s ease-out both;
+  animation: none;
 }
 
 @keyframes swap-confirm-toast {
@@ -4481,7 +4427,7 @@ body[data-source^="android"] .slot-card[data-state="running"] .timer-panel,
 body[data-source^="android"] .slot-card[data-state="running"][data-timer-family]:not(.is-expired) .timer-panel {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.004)),
-    rgba(4, 9, 13, 0.26);
+    rgba(4, 9, 13, 0.1);
 }
 
 .zone-group .minute-button,
@@ -4525,7 +4471,7 @@ body[data-source^="android"] .zone-group .minute-button,
   z-index: -1;
   /* Protect the glyphs only.  A full readout-sized shield hides the water
      surface on the short Note9 landscape card. */
-  inset: 22% 18%;
+  inset: 34% 28%;
   border-radius: 38% / 30%;
   background:
     radial-gradient(
@@ -5686,7 +5632,7 @@ body[data-source^="android"] .slot-card[data-state="running"][data-urgency^="red
   border-color: rgba(var(--warning-rgb), 0.34);
   background:
     linear-gradient(180deg, rgba(var(--warning-rgb), 0.045), rgba(255, 255, 255, 0.004)),
-    rgba(4, 9, 13, 0.26);
+    rgba(4, 9, 13, 0.1);
   box-shadow:
     inset 0 0 0 1px rgba(var(--warning-rgb), 0.1),
     inset 0 0 18px rgba(0, 0, 0, 0.12);
@@ -8491,4 +8437,405 @@ body .zone-group[data-zone="oven"] .timer-panel[data-layout-owner="v3"][data-con
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
+}
+
+/* Color and space contract.
+   7/10/13 text never changes. Water height is the far signal.
+   Red is a rim on the dry card, not a new digit color.
+   Countdown buttons are one glass so the waterline stays visible.
+   Landscape groups: 3 slots, 2 slots, oven as a two-cell-wide separate zone. */
+.slot-card[data-timer-family="seven"]:not(.is-expired) :is(.timer-readout, .split-timer-readout),
+.slot-card[data-timer-family="seven"]:not(.is-expired) :is(.countdown-minutes, .countdown-seconds),
+.split-timer-unit[data-timer-family="seven"]:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds) {
+  color: rgb(var(--family-seven-rgb));
+  -webkit-text-stroke: 0.045em #061016;
+  paint-order: stroke fill;
+  animation: none;
+  opacity: 1;
+}
+.slot-card[data-timer-family="ten"]:not(.is-expired) :is(.timer-readout, .split-timer-readout),
+.slot-card[data-timer-family="ten"]:not(.is-expired) :is(.countdown-minutes, .countdown-seconds),
+.split-timer-unit[data-timer-family="ten"]:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds) {
+  color: rgb(var(--family-ten-rgb));
+  -webkit-text-stroke: 0.045em #061016;
+  paint-order: stroke fill;
+  animation: none;
+  opacity: 1;
+}
+.slot-card[data-timer-family="thirteen"]:not(.is-expired) :is(.timer-readout, .split-timer-readout),
+.slot-card[data-timer-family="thirteen"]:not(.is-expired) :is(.countdown-minutes, .countdown-seconds),
+.split-timer-unit[data-timer-family="thirteen"]:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds) {
+  color: rgb(var(--family-thirteen-rgb));
+  -webkit-text-stroke: 0.045em #061016;
+  paint-order: stroke fill;
+  animation: none;
+  opacity: 1;
+}
+@media (orientation: landscape) {
+  body .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"] {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    grid-template-areas: "split main" !important;
+    gap: 4px !important;
+  }
+  body .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"] > .split-section {
+    grid-area: split !important;
+    position: relative !important;
+    width: auto !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    display: flex !important;
+  }
+  body .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"] > .split-section > .split-list {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+  body .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"] > .adjust-controls {
+    grid-area: main !important;
+    width: auto !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+}
+/* Open-window profiles, 2026-09-29.
+   Landscape windows keep five fryer slots on top and only a small gap
+   between the 3-group and the 2-group. The oven is the bottom row, two cells.
+   A log is one short line at the top of its card. */
+body[data-display-profile="store-main"] .board,
+body[data-display-profile="store-note9"] .board,
+body[data-display-profile="store-taba"] .board {
+  position: relative !important;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) !important;
+  grid-template-rows: minmax(0, 2fr) minmax(0, 1fr) !important;
+  grid-template-areas:
+    "fryer3 fryer2"
+    "oven oven" !important;
+  gap: 6px !important;
+}
+
+body[data-profile="subnote"] .board {
+  position: relative !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr) !important;
+  grid-template-areas:
+    "fryer3"
+    "fryer2"
+    "oven" !important;
+  gap: 6px !important;
+}
+
+body[data-display-profile="store-main"] .zone-group,
+body[data-display-profile="store-note9"] .zone-group,
+body[data-display-profile="store-taba"] .zone-group,
+body[data-profile="subnote"] .zone-group {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  gap: 4px !important;
+  padding: 2px !important;
+  border: 2px solid var(--zone-border) !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body[data-display-profile="store-main"] .board-utility-rail,
+body[data-display-profile="store-note9"] .board-utility-rail,
+body[data-display-profile="store-taba"] .board-utility-rail,
+body[data-profile="subnote"] .board-utility-rail {
+  position: absolute !important;
+  z-index: 20 !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  grid-area: auto !important;
+  pointer-events: none !important;
+}
+
+body[data-display-profile="store-main"] .board-utility-rail > *,
+body[data-display-profile="store-note9"] .board-utility-rail > *,
+body[data-display-profile="store-taba"] .board-utility-rail > *,
+body[data-profile="subnote"] .board-utility-rail > * {
+  position: static !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  max-width: 4.2rem !important;
+  height: 1.35rem !important;
+  padding: 0 0.28rem !important;
+  font-size: 0.66rem !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-slot-count="3"] .zone-slot-grid,
+body[data-display-profile="store-note9"] .zone-group[data-slot-count="3"] .zone-slot-grid,
+body[data-display-profile="store-taba"] .zone-group[data-slot-count="3"] .zone-slot-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-slot-count="2"] .zone-slot-grid,
+body[data-display-profile="store-note9"] .zone-group[data-slot-count="2"] .zone-slot-grid,
+body[data-display-profile="store-taba"] .zone-group[data-slot-count="2"] .zone-slot-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-slot-count="1"] .zone-slot-grid,
+body[data-display-profile="store-note9"] .zone-group[data-slot-count="1"] .zone-slot-grid,
+body[data-display-profile="store-taba"] .zone-group[data-slot-count="1"] .zone-slot-grid,
+body[data-profile="subnote"] .zone-group[data-slot-count="1"] .zone-slot-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+
+body[data-profile="subnote"] .zone-header,
+body[data-profile="subnote"] .zone-group-mark {
+  display: none !important;
+}
+
+body[data-profile="subnote"] .zone-group[data-slot-count="3"] .zone-slot-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body[data-profile="subnote"] .zone-group[data-slot-count="2"] .zone-slot-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+}
+
+body[data-display-profile="store-main"] .slot-card,
+body[data-display-profile="store-note9"] .slot-card,
+body[data-display-profile="store-taba"] .slot-card,
+body[data-profile="subnote"] .slot-card {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+body[data-display-profile="store-main"] .slot-card > .slot-body,
+body[data-display-profile="store-note9"] .slot-card > .slot-body,
+body[data-display-profile="store-taba"] .slot-card > .slot-body,
+body[data-profile="subnote"] .slot-card > .slot-body {
+  flex: 1 1 auto !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+body[data-display-profile="store-main"] .slot-card > .slot-info,
+body[data-display-profile="store-note9"] .slot-card > .slot-info,
+body[data-display-profile="store-taba"] .slot-card > .slot-info,
+body[data-profile="subnote"] .slot-card > .slot-info {
+  position: absolute !important;
+  z-index: 7 !important;
+  top: 3px !important;
+  left: 20% !important;
+  right: 20% !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 1.3rem !important;
+  margin: 0 !important;
+  padding: 0 0.28rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  border: 0 !important;
+  border-radius: 0.35rem !important;
+  background: rgba(6, 10, 14, 0.62) !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+body[data-display-profile="store-main"] .slot-card[data-has-activity="false"] > .slot-info,
+body[data-display-profile="store-note9"] .slot-card[data-has-activity="false"] > .slot-info,
+body[data-display-profile="store-taba"] .slot-card[data-has-activity="false"] > .slot-info,
+body[data-profile="subnote"] .slot-card[data-has-activity="false"] > .slot-info {
+  display: none !important;
+}
+
+body[data-display-profile="store-main"] .slot-info-log,
+body[data-display-profile="store-note9"] .slot-info-log,
+body[data-display-profile="store-taba"] .slot-info-log,
+body[data-profile="subnote"] .slot-info-log {
+  width: 100% !important;
+  min-height: 0 !important;
+  gap: 0 !important;
+}
+
+body[data-display-profile="store-main"] .slot-info-log-row,
+body[data-display-profile="store-note9"] .slot-info-log-row,
+body[data-display-profile="store-taba"] .slot-info-log-row,
+body[data-profile="subnote"] .slot-info-log-row {
+  display: none !important;
+  min-height: 0 !important;
+  height: 1.15rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.62rem !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
+}
+
+body[data-display-profile="store-main"] .slot-info-log-row[data-age-index="0"],
+body[data-display-profile="store-note9"] .slot-info-log-row[data-age-index="0"],
+body[data-display-profile="store-taba"] .slot-info-log-row[data-age-index="0"],
+body[data-profile="subnote"] .slot-info-log-row[data-age-index="0"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  opacity: 1 !important;
+  color: #f7f4ed !important;
+}
+
+body[data-display-profile="store-main"] .slot-info-log-row span,
+body[data-display-profile="store-note9"] .slot-info-log-row span,
+body[data-display-profile="store-taba"] .slot-info-log-row span,
+body[data-profile="subnote"] .slot-info-log-row span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  grid-template-areas: "main split" !important;
+  gap: 6px !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel::after,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel::after,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel::after,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel::after {
+  content: "";
+  grid-area: split;
+  border: 2px solid var(--zone-border);
+  border-radius: 0.45rem;
+  pointer-events: none;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"]::after,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"]::after,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"]::after,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel[data-has-split="true"]::after {
+  content: none;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel > .adjust-controls,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel > .adjust-controls,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel > .adjust-controls,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel > .adjust-controls {
+  grid-area: main !important;
+  position: relative !important;
+  inset: auto !important;
+  width: auto !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding-left: 42px !important;
+  padding-right: 42px !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel > .split-section,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel > .split-section,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel > .split-section,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel > .split-section {
+  grid-area: split !important;
+  position: relative !important;
+  inset: auto !important;
+  width: auto !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel > :is(.timer-positive-rail, .timer-actions),
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel > :is(.timer-positive-rail, .timer-actions),
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel > :is(.timer-positive-rail, .timer-actions),
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel > :is(.timer-positive-rail, .timer-actions) {
+  position: absolute !important;
+  z-index: 5 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: stretch !important;
+  gap: 3px !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  height: auto !important;
+  width: 40px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel > .timer-actions,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel > .timer-actions,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel > .timer-actions,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel > .timer-actions {
+  left: 0 !important;
+  right: auto !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel > .timer-positive-rail,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel > .timer-positive-rail,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel > .timer-positive-rail,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel > .timer-positive-rail {
+  left: calc(50% - 46px) !important;
+  right: auto !important;
+}
+
+body[data-display-profile="store-main"] .zone-group[data-zone="oven"] .timer-panel > .timer-state,
+body[data-display-profile="store-note9"] .zone-group[data-zone="oven"] .timer-panel > .timer-state,
+body[data-display-profile="store-taba"] .zone-group[data-zone="oven"] .timer-panel > .timer-state,
+body[data-profile="subnote"] .zone-group[data-zone="oven"] .timer-panel > .timer-state {
+  position: absolute !important;
+  z-index: 6 !important;
+  top: 1.35rem !important;
+  left: 44px !important;
+  right: calc(50% + 8px) !important;
+  width: auto !important;
+  height: auto !important;
+  pointer-events: none !important;
+}
+
+/* Countdown digits have no blur halo and no dark plate. */
+.slot-card:not(.is-expired) :is(.timer-readout, .split-timer-readout, .countdown-minutes, .countdown-seconds),
+.split-timer-unit:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds) {
+  text-shadow: none !important;
+}
+
+.timer-readout::before,
+.split-timer-readout::before {
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
 }

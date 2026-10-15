@@ -1,0 +1,431 @@
+/* 보드 테마 (0930) — 고급 주방가전 조작 패널.
+   무광 그래파이트, 1px 헤어라인, 광택·네온·굵은 외곽선 없음. 강조는 큰 카운트다운 숫자 하나.
+   색·질감만 바꾼다. 배치는 board-grid.css, 동작은 JS. 이 파일을 빼면 이전 모습으로 돌아간다. */
+
+:root {
+  --t-bg: #111417;
+  --t-card: #191d21;
+  --t-card-raise: #1f2429;
+  --t-line: rgba(236, 230, 218, 0.1);
+  --t-line-strong: rgba(236, 230, 218, 0.18);
+  --t-text: #ece6da;
+  --t-muted: rgba(236, 230, 218, 0.58);
+  --t-water-deep: 20, 62, 66;
+  --t-water: 34, 92, 96;
+  --t-surface: 140, 201, 198;
+
+  --bg-base: var(--t-bg);
+  --text: var(--t-text);
+  --muted: var(--t-muted);
+  --family-seven-rgb: 248, 214, 96;
+  --family-ten-rgb: 120, 226, 240;
+  --family-thirteen-rgb: 212, 192, 255;
+  --control-border-rgb: 236, 230, 218;
+  --control-border-alpha: 0.14;
+}
+
+body {
+  background: var(--t-bg) !important;
+}
+
+/* 칸: 무광 판 + 헤어라인. 구역 색은 왼쪽 얇은 띠로만. */
+#board .slot-card {
+  border: 1px solid var(--t-line) !important;
+  outline: none !important;
+  border-radius: 12px !important;
+  background: var(--t-card) !important;
+  box-shadow: inset 3px 0 0 rgba(var(--zone-rgb, 236, 230, 218), 0.75) !important;
+}
+#board .slot-card[data-accent="fryer-a"] { --zone-rgb: 226, 192, 104 !important; }
+#board .slot-card[data-accent="fryer-b"] { --zone-rgb: 142, 184, 226 !important; }
+#board .slot-card[data-accent="oven"] { --zone-rgb: 146, 200, 158 !important; }
+#board .slot-card[data-accent="temp"] { --zone-rgb: 196, 179, 230 !important; }
+#board .slot-card::before,
+#board .slot-card::after {
+  box-shadow: none !important;
+  filter: none !important;
+}
+#board .slot-card :is(.zone-rail, .slot-info) {
+  display: none !important;
+}
+
+/* 물 색은 원래 밝은 청록 그대로(사용자 0930). */
+
+/* 버튼: 광택·볼록 없음. 얇은 선의 무광 판. */
+#board :is(.minute-button, .adjust-button, .action-button, .split-adjust-button, .split-clear-button) {
+  border: 1px solid rgba(236, 230, 218, 0.2) !important;
+  border-radius: 8px !important;
+  background: rgba(9, 14, 18, 0.62) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  color: var(--t-text) !important;
+}
+#board :is(.minute-button, .adjust-button, .action-button, .split-adjust-button, .split-clear-button):active {
+  background: rgba(9, 14, 18, 0.85) !important;
+}
+/* ±버튼의 본문 글자(+10)는 화면 낭독용이라 보이지 않게. 화살표·숫자는 ::before/::after. */
+#board :is(.adjust-button, .split-adjust-button)[data-delta-seconds] {
+  color: transparent !important;
+}
+#board :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::before,
+#board :is(.adjust-button, .split-adjust-button)[data-delta-seconds]::after {
+  color: var(--t-text) !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  font-weight: 600 !important;
+}
+#board .minute-button .minute-value {
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  font-weight: 600 !important;
+}
+#board .minute-button:not([data-timer-family]) .minute-value { color: var(--t-text) !important; }
+#board .minute-button[data-timer-family="seven"] .minute-value { color: rgb(var(--family-seven-rgb)) !important; }
+#board .minute-button[data-timer-family="ten"] .minute-value { color: rgb(var(--family-ten-rgb)) !important; }
+#board .minute-button[data-timer-family="thirteen"] .minute-value { color: rgb(var(--family-thirteen-rgb)) !important; }
+
+/* 번호표: 광택 알약 대신 구역색 글자의 얇은 테두리. */
+#board .slot-card > .physical-slot-badge {
+  border: 1px solid rgba(var(--zone-rgb, 236, 230, 218), 0.7) !important;
+  background: var(--t-bg) !important;
+  box-shadow: none !important;
+  color: rgb(var(--zone-rgb, 236, 230, 218)) !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+/* 카운트다운 숫자: 유일한 강조. 테두리 대신 가라앉은 그림자, 숫자 폭 고정. */
+#board .slot-card:not(.is-expired) :is(.timer-readout, .split-timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator),
+#board .split-timer-unit:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator) {
+  -webkit-text-stroke: 0 !important;
+  /* 밝은 물 위 선명도: 번짐 없는 어두운 윤곽 한 겹 + 아래 약한 그림자. */
+  text-shadow:
+    0.060em 0.000em 0 #03090d,
+    0.052em 0.030em 0 #03090d,
+    0.030em 0.052em 0 #03090d,
+    0.000em 0.060em 0 #03090d,
+    -0.030em 0.052em 0 #03090d,
+    -0.052em 0.030em 0 #03090d,
+    -0.060em 0.000em 0 #03090d,
+    -0.052em -0.030em 0 #03090d,
+    -0.030em -0.052em 0 #03090d,
+    -0.000em -0.060em 0 #03090d,
+    0.030em -0.052em 0 #03090d,
+    0.052em -0.030em 0 #03090d,
+    0 0.06em 0.1em rgba(0, 0, 0, 0.5) !important;
+  font-family: "Roboto", "SUIT Variable", "Pretendard", "Noto Sans KR", system-ui, sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+  font-weight: 700 !important;
+}
+#board .slot-card[data-timer-family="ten"]:not(.is-expired) :is(.timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator),
+#board .split-timer-unit[data-timer-family="ten"]:not([data-state="expired"]) :is(.split-timer-readout, .countdown-minutes, .countdown-seconds, .countdown-separator) {
+  color: rgb(196, 250, 255) !important;
+}
+#board .slot-card :is(.timer-total, .split-timer-total) {
+  color: rgba(236, 230, 218, 0.85) !important;
+  text-shadow: 0 0 2px #03090d, 0 0 2px #03090d !important;
+  -webkit-text-stroke: 0 !important;
+  font-weight: 500 !important;
+}
+
+/* 일시정지: 사선 줄무늬 대신 옅은 판과 점선 없는 가는 선. */
+#board .slot-card[data-state="paused"] .readout-cluster {
+  background: rgba(236, 230, 218, 0.03) !important;
+  background-image: none !important;
+  border: 1px solid var(--t-line) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+#board .slot-card[data-state="paused"] .readout-cluster::before {
+  border: 1px solid var(--t-line-strong) !important;
+  background: var(--t-card-raise) !important;
+  color: var(--t-muted) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* 아랫줄 칸(기록·레시피) */
+#board > .board-cell {
+  border: 1px solid var(--t-line) !important;
+  border-radius: 12px !important;
+  background: var(--t-card) !important;
+}
+#board > .board-cell h2 {
+  color: var(--t-text) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+#board .board-log :is(li, .log-peek)[data-near="true"] { background: rgba(226, 192, 104, 0.1) !important; }
+/* 1001 사용자: 기록은 파랑·빨강 두 색만. 앞으로(예정·후) = 파랑, 지난 것(전) = 빨강. 1분 안 음영은 그대로. */
+#board .board-log :is(li, .log-peek) :is(.log-title, .log-status, .log-time) { color: rgb(120, 176, 255) !important; }
+#board .board-log :is(li, .log-peek)[data-when="past"] :is(.log-title, .log-status, .log-time) { color: rgb(255, 112, 112) !important; }
+#board .recipe-column { background: rgba(236, 230, 218, 0.03) !important; }
+#board .recipe-time { color: rgb(var(--family-seven-rgb)) !important; }
+#board .recipe-strip .recipe-toggle,
+#board .board-log li.log-more button,
+#board .board-log .log-fold {
+  border: 1px solid var(--t-line-strong) !important;
+  background: transparent !important;
+  color: var(--t-muted) !important;
+}
+
+/* 복구 비상버튼: 원 모양 유지, 광택 대신 무광 깊은 빨강 + 가는 링. */
+#board .board-log .recovery-button {
+  border: 1px solid rgba(236, 230, 218, 0.35) !important;
+  background: #9b2a22 !important;
+  box-shadow: 0 0 0 2px var(--t-card), 0 0 0 3px rgba(155, 42, 34, 0.55) !important;
+}
+#board .board-log .recovery-button[data-flash="ok"] { background: #2f7a52 !important; }
+#board .board-log .recovery-button[data-flash="empty"] { background: #a8612f !important; }
+
+/* 임박·이동 경고 테두리는 원래 색 그대로 둔다(주방에서 바로 보여야 함). */
+
+
+/* 카운트다운 숫자: 수면선 기준 두 색 (board-waterline.js 가 숫자 칸에 분·콜론·초별 잠긴 비율 --wl-m/-c/-s, 글자는 --wl 로 물려받음).
+   물 안 = 짙은 가족색, 물 밖(검정 바탕) = 밝은 가족색. 각 영역 위쪽이 살짝 밝은 세로 그라데이션으로 볼륨. */
+#board .slot-card,
+#board .split-timer-unit {
+  --lt-top: #ffffff;
+  --lt: #efe9dd;
+  --dk-top: #16232a;
+  --dk: #0b1216;
+}
+#board .slot-card[data-timer-family="seven"],
+#board .split-timer-unit[data-timer-family="seven"] {
+  --lt-top: #ffe9a6;
+  --lt: #f5cf55;
+  --dk-top: #ffe9a6;
+  --dk: #f5cf55;  /* 1001 사용자: 7·10·13은 밝기 색으로 구분 — 잠겨도 밝은 가족색, 대신 어두운 윤곽 */
+}
+#board .slot-card[data-timer-family="ten"],
+#board .split-timer-unit[data-timer-family="ten"] {
+  --lt-top: #f0fdff;
+  --lt: #b4f3fb;
+  --dk-top: #f0fdff;
+  --dk: #b4f3fb;  /* 1001 사용자: 7·10·13은 밝기 색으로 구분 — 잠겨도 밝은 가족색, 대신 어두운 윤곽 */
+}
+#board .slot-card[data-timer-family="thirteen"],
+#board .split-timer-unit[data-timer-family="thirteen"] {
+  --lt-top: #efe6ff;
+  --lt: #cdb9ff;
+  --dk-top: #efe6ff;
+  --dk: #cdb9ff;  /* 1001 사용자: 7·10·13은 밝기 색으로 구분 — 잠겨도 밝은 가족색, 대신 어두운 윤곽 */
+}
+#board .slot-card:not(.is-expired) .readout-cluster > .timer-readout :is(.countdown-minutes, .countdown-seconds, .countdown-separator),
+#board .split-timer-unit:not([data-state="expired"]) .split-timer-readout :is(.countdown-minutes, .countdown-seconds, .countdown-separator) {
+  color: transparent !important;
+  background-image: linear-gradient(
+    to top,
+    var(--dk) 0%,
+    var(--dk-top) var(--wl, 0%),
+    var(--lt) var(--wl, 0%),
+    var(--lt-top) 100%
+  ) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35)) !important;
+}
+#board .slot-card .countdown-minutes { --wl: var(--wl-m, 0%); }
+#board .slot-card .countdown-separator { --wl: var(--wl-c, 0%); }
+#board .slot-card .countdown-seconds { --wl: var(--wl-s, 0%); }
+/* 물에 잠긴 글자: 얇은 밝은 얼음색 테두리로 중간 밝기 청록에서 떼어 낸다(APCA 42 → 약 99). */
+#board .slot-card:not(.is-expired) .readout-cluster > .timer-readout[data-sub-m="1"] .countdown-minutes,
+#board .slot-card:not(.is-expired) .readout-cluster > .timer-readout[data-sub-c="1"] .countdown-separator,
+#board .slot-card:not(.is-expired) .readout-cluster > .timer-readout[data-sub-s="1"] .countdown-seconds,
+#board .split-timer-unit:not([data-state="expired"]) .split-timer-readout[data-sub-m="1"] .countdown-minutes,
+#board .split-timer-unit:not([data-state="expired"]) .split-timer-readout[data-sub-c="1"] .countdown-separator,
+#board .split-timer-unit:not([data-state="expired"]) .split-timer-readout[data-sub-s="1"] .countdown-seconds {
+  filter:
+    drop-shadow(0 0 0.5px rgba(230, 251, 255, 0.95))
+    drop-shadow(0 0 0.5px rgba(230, 251, 255, 0.95))
+    drop-shadow(0 0 1.5px rgba(230, 251, 255, 0.55)) !important;
+}
+
+/* 1001: 가족(7·10·13) 숫자는 늘 밝은 색이라 물에 잠긴 글자는 밝은 테두리 대신 어두운 윤곽으로 물에서 떼어 낸다. */
+#board .slot-card[data-timer-family]:not(.is-expired) .readout-cluster > .timer-readout[data-sub-m="1"] .countdown-minutes,
+#board .slot-card[data-timer-family]:not(.is-expired) .readout-cluster > .timer-readout[data-sub-c="1"] .countdown-separator,
+#board .slot-card[data-timer-family]:not(.is-expired) .readout-cluster > .timer-readout[data-sub-s="1"] .countdown-seconds,
+#board .split-timer-unit[data-timer-family]:not([data-state="expired"]) .split-timer-readout[data-sub-m="1"] .countdown-minutes,
+#board .split-timer-unit[data-timer-family]:not([data-state="expired"]) .split-timer-readout[data-sub-c="1"] .countdown-separator,
+#board .split-timer-unit[data-timer-family]:not([data-state="expired"]) .split-timer-readout[data-sub-s="1"] .countdown-seconds {
+  filter:
+    drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7)) !important;
+}
+
+/* 1001 사용자: "색상이 제대로 안 나니 물색을 7·10·13 별로 조정, 글자색 조합 고려, 밸런스 유지".
+   물 = 어두운 가족색, 숫자 = 밝은 가족색(같은 계열·밝기 차이로 대비). 가족 없는 타이머는 원래 청록 그대로. */
+#board .slot-card[data-timer-family="seven"] .timer-hourglass,
+#board .split-timer-unit[data-timer-family="seven"] .timer-hourglass {
+  --water-rgb: 90, 210, 120;   /* 1001 물 색 종류 구분: 7 = 초록(오븐 갈색과 안 겹치게) */
+  --water-fill-top-rgb: 30, 122, 62;
+  --water-fill-bottom-rgb: 12, 70, 32;
+}
+#board .slot-card[data-timer-family="ten"] .timer-hourglass,
+#board .split-timer-unit[data-timer-family="ten"] .timer-hourglass {
+  --water-rgb: 100, 150, 255;   /* 10 = 파랑(기본 밝은 청록과 안 겹치게) */
+  --water-fill-top-rgb: 26, 64, 170;
+  --water-fill-bottom-rgb: 12, 34, 108;
+}
+#board .slot-card[data-timer-family="thirteen"] .timer-hourglass,
+#board .split-timer-unit[data-timer-family="thirteen"] .timer-hourglass {
+  --water-rgb: 220, 110, 240;   /* 13 = 자주(파랑과 안 겹치게 붉은 쪽으로) */
+  --water-fill-top-rgb: 120, 36, 140;
+  --water-fill-bottom-rgb: 74, 16, 92;
+}
+#board .slot-card[data-timer-family] .hourglass-sand { box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), 0 -6px 14px rgba(var(--water-rgb), 0.45) !important; }
+
+/* 1001 사용자: "ov 는 시간 상관없이 약간 어두운 느낌, 검정 배경과는 구분되게".
+   오븐(ov상·ov하)은 7·10·13 가족과 상관없이 어두운 회청 물 + 밝은 숫자(물 안·밖 같게, 잠긴 글자는 어두운 윤곽). 이 블록이 가족 규칙보다 뒤라 이긴다. */
+#board .slot-card[data-zone="ov"] .timer-hourglass {
+  --water-rgb: 176, 134, 100;   /* 1001 사용자: ov 갈색 계열 — 7분 금빛과 겹치지 않게 채도 낮춘 코코아 */
+  --water-fill-top-rgb: 98, 72, 54;
+  --water-fill-bottom-rgb: 62, 44, 32;
+}
+#board .slot-card[data-zone="ov"] {
+  --lt-top: #fffaf2;
+  --lt: #f3e7d8;
+  --dk-top: #fffaf2;
+  --dk: #f3e7d8;
+}
+#board .slot-card[data-zone="ov"] .hourglass-sand { box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 -6px 14px rgba(var(--water-rgb), 0.3) !important; }
+#board .slot-card[data-zone="ov"]:not(.is-expired) .readout-cluster > .timer-readout[data-sub-m="1"] .countdown-minutes,
+#board .slot-card[data-zone="ov"]:not(.is-expired) .readout-cluster > .timer-readout[data-sub-c="1"] .countdown-separator,
+#board .slot-card[data-zone="ov"]:not(.is-expired) .readout-cluster > .timer-readout[data-sub-s="1"] .countdown-seconds {
+  filter: drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.95)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7)) !important;
+}
+
+/* 1001 사용자: "끝난 건 빨강 깜빡이. 검정 배경이 있어 잘 안 보임. 검정을 빼고 빨강만".
+   끝난 칸 = 칸 전체 빨강, 밝은 빨강 ↔ 진한 빨강 두 단계로만 깜빡(밝기·투명도 깜빡 없앰 → 검정이 비치지 않음). 숫자는 흰색 + 어두운 윤곽. */
+@keyframes ct-expired-red {
+  0%, 49% { background-color: #ff3526; }
+  50%, 100% { background-color: #b3150b; }
+}
+#board .slot-card.is-expired,
+#board .split-timer-unit[data-state="expired"] {
+  background: #ff3526 !important;
+  filter: none !important;
+  animation: ct-expired-red 0.62s steps(1, end) 97 !important;   /* 1001 사용자 "1분간 유지": 약 1분(0.62초×97) 깜빡인 뒤 밝은 빨강으로 멈춤(지울 때까지 남음) */
+}
+#board .slot-card.is-expired :is(.slot-head, .slot-body, .timer-panel, .readout-cluster, .timer-hourglass, .timer-actions, .card-water-gauge),
+#board .split-timer-unit[data-state="expired"] :is(.timer-hourglass, .split-timer-readout) {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+#board .slot-card.is-expired::after { animation: none !important; opacity: 1 !important; }
+#board .slot-card.is-expired .hourglass-sand,
+#board .split-timer-unit[data-state="expired"] .hourglass-sand { display: none !important; }
+#board .slot-card.is-expired .timer-readout,
+#board .slot-card.is-expired .timer-readout :is(.countdown-minutes, .countdown-seconds, .countdown-separator),
+#board .split-timer-unit[data-state="expired"] .split-timer-readout {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  text-shadow: 0 0 2px #000, 0 0 2px #000, 0 2px 5px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 1001 사용자: "검정 배경 비중이 있어서 방해돼". 끝나면 칸을 덮는 다시 시작 분 버튼·조정 버튼 바탕(검정 반투명)이 빨강을 가렸다.
+   끝난 칸 안 버튼 = 거의 투명한 붉은빛 + 흰 테두리·흰 글자. 빨강이 칸 대부분으로 보이게. */
+#board .slot-card.is-expired :is(.preset-grid, .minute-button, .adjust-button, .action-button, .split-adjust-button, .split-clear-button),
+#board .split-timer-unit[data-state="expired"] :is(.split-adjust-button, .split-clear-button) {
+  background: rgba(110, 0, 0, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+#board .slot-card.is-expired .preset-grid { background: transparent !important; }
+#board .slot-card.is-expired .minute-button .minute-value,
+#board .slot-card.is-expired .minute-button * { color: #ffffff !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55) !important; }
+
+/* 1001 사용자: "1분 동안에는 검정 버튼 배경도 빨강 깜빡임으로". 끝난 칸 안 모든 버튼(다시 시작 분·조정·지우기·분할)도
+   칸과 같은 박자로 1분(0.62초×97) 빨강 깜빡 → 그 뒤 밝은 빨강. 흰 테두리로만 구분. */
+#board .slot-card.is-expired :is(.minute-button, .adjust-button, .action-button, .split-adjust-button, .split-clear-button),
+#board .split-timer-unit[data-state="expired"] :is(.split-adjust-button, .split-clear-button) {
+  background: #ff3526 !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55) !important;
+  animation: ct-expired-red 0.62s steps(1, end) 97 !important;
+}
+
+/* 1001 사용자: "종료 시 조정 버튼이 아니라 12345 처럼 스타트 버튼이 뜨는데 그 버튼이 검정 배경, 틈새로 빨강이라 거의 안 보임".
+   끝나면 timer-core 가 칸을 처음 화면(idle)으로 되돌리고 app.js 가 90초 동안 data-recent-alert="true" 를 붙인다(is-expired 아님).
+   그 상태에도 똑같이: 칸 전체 빨강 + 시작 버튼 바탕까지 1분 빨강 깜빡(0.62초×97) → 밝은 빨강, 흰 테두리·흰 숫자. */
+#board .slot-card[data-recent-alert="true"] {
+  background: #ff3526 !important;
+  filter: none !important;
+  animation: ct-expired-red 0.62s steps(1, end) 97 !important;
+}
+#board .slot-card[data-recent-alert="true"] :is(.slot-head, .slot-body, .timer-panel, .readout-cluster, .timer-hourglass, .timer-actions, .card-water-gauge, .preset-grid) {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+#board .slot-card[data-recent-alert="true"] .preset-grid::before,
+#board .slot-card[data-recent-alert="true"] .preset-grid::after,
+#board .slot-card.is-expired .preset-grid::before,
+#board .slot-card.is-expired .preset-grid::after { content: none !important; animation: none !important; }
+#board .slot-card[data-recent-alert="true"] .hourglass-sand { display: none !important; }
+#board .slot-card[data-recent-alert="true"] :is(.minute-button, .adjust-button, .action-button, .split-adjust-button, .split-clear-button) {
+  background: #ff3526 !important;
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55) !important;
+  animation: ct-expired-red 0.62s steps(1, end) 97 !important;
+}
+#board .slot-card[data-recent-alert="true"] .minute-button :is(.minute-value, *) { color: #ffffff !important; }
+#board .slot-card[data-recent-alert="true"] .completed-timer-badge { animation: none !important; }
+
+/* 1002 사용자: 3모드 — 종료 빨강 모드에서는 칸 안 내용(시작 버튼 등)을 숨기고 큰 기계 번호만. 터치하면 시작 화면, 90초 뒤 자동. */
+#board .slot-card[data-recent-alert="true"] { cursor: pointer !important; }
+
+/* ================= 1002 종료 화면 다시 설계 (사용자: "깔끔하게 다시, 반짝이는 경고 형태, 시작 화면과 중첩 없으니 새로 그리면") =================
+   칸이 '방금 끝남'(data-recent-alert)이면 칸의 다른 것은 모두 숨기고 전용 .end-screen 만:
+   큰 기계 번호 / 지연 시간(+m분 s초 지남, 1초마다) / 작은 안내. 처음 1분 빨강 깜빡 + 흰 테두리 번쩍, 그 뒤 밝은 빨강.
+   터치하면 바로 시작 화면(app.js), 90초 뒤 자동. 앞의 ::before 큰 글자 방식은 끈다. */
+#board .slot-card > .end-screen { display: none; }
+#board .slot-card[data-recent-alert="true"] > :not(.end-screen) { visibility: hidden !important; }
+#board .slot-card[data-recent-alert="true"] > .end-screen { visibility: visible !important; }
+#board .slot-card[data-recent-alert="true"]::before { content: none !important; }
+@keyframes ct-end-ring {
+  0%, 49% { box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.95), 0 0 26px rgba(255, 60, 40, 0.85); }
+  50%, 100% { box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.15), 0 0 8px rgba(255, 60, 40, 0.35); }
+}
+#board .slot-card[data-recent-alert="true"] > .end-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+  border-radius: inherit;
+  pointer-events: none;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  animation: ct-end-ring 0.62s steps(1, end) 97;
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.9);
+}
+#board .slot-card[data-recent-alert="true"] > .end-screen .end-no { font-weight: 900; font-size: min(46cqh, 34cqw); line-height: 1; }
+#board .slot-card[data-recent-alert="true"] > .end-screen .end-late { font-weight: 800; font-size: min(15cqh, 9cqw); font-variant-numeric: tabular-nums; }
+#board .slot-card[data-recent-alert="true"] > .end-screen .end-hint { font-weight: 600; font-size: min(8cqh, 5cqw); opacity: 0.85; }

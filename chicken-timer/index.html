@@ -1,5 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko" data-web-v="0915-portrait-log">
+<!--
+[공장] 서버는 평문 HTTP 다. 브라우저 crypto.subtle / geolocation / serviceWorker 가 동작하지 않는다.
+      해시가 필요하면 순수 JS SHA-256 폴백을 쓴다. 폴백 상수를 손으로 옮기지 마라(한 글자만 틀려도 조용히 깨진다).
+[배포] HTML 은 서버에 업로드할 수 없다(PUT 404). 공장 디스크에 직접 써야 한다.
+[편집] 인라인 script 를 고친 뒤 반드시 전 블록 문법 검사. if 만 지우고 else 를 남겨 화면이 죽은 사고가 있었다.
+[중복] 같은 이름을 두 곳에 정의하지 마라. 나중에 로드되는 쪽이 원본을 덮어쓴다. 수정 전 그 이름을 먼저 grep 하라.
+[구조] 이 프로젝트가 분할 모범이다. HTML 은 화면 뼈대만, 로직은 외부 js 9개로 나뉘어 있다 (compat / timer-core / timer-bridge / timer-split-assist / timer-sync / timer-auth 등). 다른 사이트를 정리할 때 이 구조를 본으로 삼는다. 이름 하나는 파일 하나가 소유한다.
+[주의] 사용자가 잠근 레이아웃(0829.0715)이 있다. 임의로 바꾸지 마라.
+-->
+<html lang="ko" data-web-v="0916.0032">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -10,19 +19,43 @@
 (function(){
   var host = location.hostname || "";
   var jump = new URLSearchParams(location.search);
-  if (host === "wk7007-wk.github.io") {
+  // 앱 대체 모드(source=android-fallback)는 기기에 저장된 화면이므로 공장으로 이동하지 않는다.
+  if (host === "wk7007-wk.github.io" && jump.get("source") !== "android-fallback") {
     jump.delete("stay");
     var extra = jump.toString();
-    var book = "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json";
-    fetch(book, { cache: "no-store" }).then(function (r) {
-      if (!r || !r.ok) throw new Error("http");
-      return r.json();
-    }).then(function (ep) {
-      var factory = (ep && ep.sets && ep.sets.factory) || {};
-      var board = String(factory.chicken_timer_board || "").replace(/\/$/, "");
-      if (board.indexOf("https://") !== 0 || board.indexOf("/chicken-timer") < 0) return;
-      location.replace(board + "/" + (extra ? "?" + extra : ""));
-    }).catch(function () {});
+    var lastWan = "http://125.176.112.214:2421";
+    var books = [
+      "https://wk7007-wk.github.io/bbq-dashboard/updates/endpoints.json",
+      "https://gist.githubusercontent.com/wk7007-wk/a67e5de3271d6d0716b276dc6a8391cb/raw/endpoints.json"
+    ];
+    function wanFrom(ep) {
+      var f = (ep && ep.sets && ep.sets.factory) || {};
+      var wan = String(f.wan_base || f.wan_base_lock_value || "").replace(/\/$/, "");
+      if (!wan || wan.indexOf("github.io") >= 0) return "";
+      return wan;
+    }
+    function go(base) {
+      location.replace(String(base || lastWan).replace(/\/$/, "") + "/chicken-timer/" + (extra ? "?" + extra : ""));
+    }
+    function next(i) {
+      if (i >= books.length) { go(lastWan); return; }
+      fetch(books[i], { cache: "no-store" }).then(function (r) {
+        if (!r || !r.ok) throw new Error("http");
+        return r.json();
+      }).then(function (ep) {
+        var wan = wanFrom(ep);
+        if (wan) go(wan); else next(i + 1);
+      }).catch(function () { next(i + 1); });
+    }
+    next(0);
+    return;
+  }
+  var profileNow = new URLSearchParams(location.search);
+  if (profileNow.get("profile") === "subnote" && profileNow.get("sync") !== "main") {
+    var locked = new URL(location.href);
+    locked.searchParams.set("profile", "subnote");
+    locked.searchParams.set("sync", "main");
+    location.replace(locked.toString());
     return;
   }
   var v = (typeof APP_VERSION === "string" && APP_VERSION) || document.documentElement.getAttribute("data-web-v") || "";
@@ -46,24 +79,28 @@
 })();
   </script>
   <title>Chicken Timer</title>
-  <link rel="stylesheet" href="./style.css?v=ecc371d20138">
+  <link rel="stylesheet" href="./style.css?v=c062336e2738">
   <link rel="stylesheet" href="./auth.css?v=2b74d591629c">
-  <link rel="stylesheet" href="./countdown-layout-v15.css?v=13be102cef2f">
-  <link rel="stylesheet" href="./countdown-controls-v17.css?v=13841fcd71a5">
-  <link rel="stylesheet" href="./countdown-number-guard.css?v=acebac38d41d">
+  <link rel="stylesheet" href="./countdown-distance.css?v=edab8b403ed3">
+  <link rel="stylesheet" href="./board-grid.css?v=1012lines">
+  <link rel="stylesheet" href="./board-theme.css?v=1011merge">
 </head>
 <body data-countdown-layout="v15-original-final" data-controls-layout="v17-fast">
   <main class="app-shell">
     <section id="board" class="board" aria-label="치킨 타이머 보드"></section>
   </main>
   <script src="./compat.js?v=a4900de30f04"></script>
-  <script src="./timer-core.js?v=934992dc8aa5"></script>
+  <script src="./timer-core.js?v=796ef4d32782"></script>
   <script src="./timer-bridge.js?v=2e312ed9c073"></script>
   <script src="./timer-split-assist.js?v=0731299f4936"></script>
-  <script src="./timer-sync.js?v=0907.1412"></script>
+  <script src="./timer-sync.js?v=93f657020f42"></script>
   <script src="./timer-auth.js?v=63236fff3407"></script>
-  <script src="./app.js?v=334ca6e6cec6"></script>
+  <script src="./app.js?v=37dca95496a4"></script>
   <script src="./physical-evidence.js?v=b053bac7aff0"></script>
-  <script src="./recipe-panel.js?v=0905-sites"></script>
-</body>
+  <script src="./recipe-panel.js?v=1013.near"></script>
+<script src="./presence.js?v=0929.detect"></script>
+  <script src="./board-log.js?v=1012lines"></script>
+  <script src="./board-waterline.js?v=b81b7df98b5f"></script>
+<script src="./kitchen-voice.js?v=5e0c1f943486"></script>
+<script src="/live.js"></script></body>
 </html>
