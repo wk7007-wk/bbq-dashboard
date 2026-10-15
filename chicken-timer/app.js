@@ -43,9 +43,10 @@
   const DISMISS_BOARD_GUARD_MS = 700;
   // 1016 사장님 "일반 터치도 방금 투터치가되는데": 위 보호들은 전부 Date.now() 로 재는데, 메인스레드가
   // 바쁘면(렌더·동기화 중) 처리 시각이 밀려 실제로는 가까웠던 두 터치가 멀어 보여 보호를 피해 간다.
-  // event.timeStamp 는 브라우저가 입력을 받은 실제 순간이라 그 지연에 영향 안 받는다 - 이걸로 아주
-  // 짧게(사람이 서로 다른 버튼을 의도해서 누르기엔 너무 가까운 간격) 보드 전체 하드웨어 입력 자체를
-  // 거른다. 기존 보호를 대신하지 않고 앞에 하나 더 둔다(없애는 보호가 없으니 새 오탐 위험이 없다).
+  // event.timeStamp 는 브라우저가 입력을 받은 실제 순간이라 그 지연에 영향 안 받는다.
+  // 1016 아스트라 보강: 전역(보드 전체)으로 걸면 다른 칸을 빠르게 누르는 정상 조작까지 막는다(실제
+  // 오탐 사례) - 그래서 이 버튼 하나로만 좁힌다(button.__lastHardwareTs, invoke() 안에서 다른 보호를
+  // 다 통과한 뒤 handler() 바로 전에만 확정 - 거절된 입력이 다음 정상 입력의 기준을 어지럽히지 않는다).
   const HARDWARE_BOUNCE_MS = 160;
   // 한 번 누름 = 한 번 실행. 느린 탭은 처리하는 동안 같은 누름의 click 이 늦게 와서
   // 700ms 막이를 지나 두 번 시작됐다(1010 갤럭시탭 감사 기록 0.70~0.81초 간격).
@@ -120,16 +121,6 @@
   const VISUAL_REFRESH_INTERVAL_MS = 1000;
   let suppressClickUntil = 0;
   let suppressDragPressUntil = 0;
-  let lastAcceptedHardwareTs = -Infinity;   // 1016: event.timeStamp 기준 - Date.now() 지연에 안 흔들림
-
-  /** 1016: 방금 받아들인 하드웨어 입력과 너무 가까우면(디지타이저 바운스·유령 재생) 거른다.
-   * ts 가 숫자가 아니면(모양 이상) 거르지 않는다 - 기존 Date.now() 보호가 뒤에서 잡아 준다. */
-  function hardwareBounced(ts) {
-    if (typeof ts !== "number" || !isFinite(ts)) return false;
-    if (ts - lastAcceptedHardwareTs < HARDWARE_BOUNCE_MS) return true;
-    lastAcceptedHardwareTs = ts;
-    return false;
-  }
   let applyingRemoteSync = false;
   let wakeLock = null;
   let latestFinishRanks = new Map();
@@ -1907,18 +1898,27 @@
     let lastPointerUpAt = 0;
     let lastTouchEndAt = 0;
 
-    const invoke = () => {
+    const invoke = (hwTs) => {
       // The Android wrapper may need to replay a touch when an older WebView
       // swallows pointerup/touchend.  Publish the press before the handler so
       // the native delayed fallback can see that the web path already ran.
       const pressedAt = Date.now();
       global.__chickenTimerLastPressAt = pressedAt;   // 막힌 눌림도 "처리됨"으로 알려 앱이 다시 보내지 않게
       if (pressedAt < (button.__pressRepeatUntil || 0)) return false;
+      // 1016 아스트라 보강: 이 버튼만(전역 아님 - 다른 칸을 빠르게 누르는 정상 조작을 막지 않는다) 그리고
+      // 다른 보호를 다 통과한 뒤에만(먼저 거르면 "거절됐지만 기준 시각은 갱신됨"이 생겨 다음 정상 입력을
+      // 잘못 막을 수 있다) event.timeStamp(메인스레드 지연에 안 흔들리는, 입력을 받은 실제 순간)로 한 번 더
+      // 본다 - Date.now() 처리 시각이 밀려 실제로는 가까웠던 두 터치가 멀어 보이는 경우를 잡는다.
+      if (typeof hwTs === "number" && isFinite(hwTs) && hwTs - (button.__lastHardwareTs ?? -Infinity) < HARDWARE_BOUNCE_MS) {
+        return false;
+      }
       const lockHost = (button.closest && button.closest(".slot-card")) || null;
       if (lockHost) {
         if (pressedAt < (lockHost.__touchLockUntil || 0)) return false;
         lockHost.__touchLockUntil = pressedAt + CARD_TOUCH_LOCK_MS;
       }
+      // 여기까지 왔다 = 실제로 handler() 를 부른다 - 이 시점에만 하드웨어 시각을 확정한다.
+      if (typeof hwTs === "number" && isFinite(hwTs)) button.__lastHardwareTs = hwTs;
       button.__pressRepeatUntil = pressedAt + sameRepeatMs;
       let result;
       try {
@@ -1941,13 +1941,12 @@
     if ("PointerEvent" in global) {
       button.addEventListener("pointerup", (event) => {
         if (typeof event.button === "number" && event.button !== 0) return;
-        if (hardwareBounced(event.timeStamp)) return;
         event.preventDefault();
         event.stopPropagation();
         lastPointerUpAt = Date.now();
         if (lastPointerUpAt < suppressDragPressUntil) return;
         suppressClickUntil = lastPointerUpAt + PRESS_GUARD_MS;
-        invoke();
+        invoke(event.timeStamp);
       });
     }
 
@@ -1956,7 +1955,6 @@
     // a legacy touchend path, while the timestamp guard prevents a modern
     // WebView from invoking the same action twice.
     button.addEventListener("touchend", (event) => {
-      if (hardwareBounced(event.timeStamp)) return;
       const currentAt = Date.now();
       if (currentAt - lastPointerUpAt < PRESS_GUARD_MS) return;
       if (currentAt - lastTouchEndAt < PRESS_GUARD_MS) return;
@@ -1965,7 +1963,7 @@
       event.stopPropagation();
       lastTouchEndAt = currentAt;
       suppressClickUntil = currentAt + PRESS_GUARD_MS;
-      invoke();
+      invoke(event.timeStamp);
     }, false);
 
     button.addEventListener("click", (event) => {
@@ -1974,8 +1972,7 @@
       event.stopPropagation();
       if (currentAt - lastPointerUpAt < PRESS_GUARD_MS) return;
       if (currentAt < suppressClickUntil) return;
-      if (hardwareBounced(event.timeStamp)) return;
-      invoke();
+      invoke(event.timeStamp);
     });
 
     button.addEventListener("keydown", (event) => {
