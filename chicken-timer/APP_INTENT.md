@@ -23,7 +23,7 @@
 - 실행 중인 메인 카운트다운 영역은 터치 한 번으로 즉시 일시중지/재개되어야 하며, 카드 드래그와 충돌하면 안 된다.
 - 레시피는 타이머 조작 배열을 바꾸지 않는 보조 화면이며, 명시적 `뒤로`로 닫는다. 기본은 출력 우선이고 목록은 이름순 자동정렬이며, 기존 DB와 사용자가 입력 중인 현재 input을 보존한다. 이 요구는 전용 recipe contract로 검증하며 timer-layout contract에 섞지 않는다.
 - 근무스케줄 공식 주소는 `OrderHelper/`와 일관성 있는 `https://wk7007-wk.github.io/WorkSchedule/`가 기준이다. 타이머 앱에는 합치지 않고, 구주소 `chicken-timer/dashboard.html`은 공식 주소로 쓰지 않는다.
-- 타이머 웹 기준 주소는 `https://wk7007-ops-static-2026.web.app/chicken-timer/`, 서브노트북 고정 진입 주소는 `https://wk7007-ops-static-2026.web.app/chicken-timer/?profile=subnote`다. GitHub Pages `/updates/chicken-timer/`는 APK 업데이트 메타데이터 화면이지 타이머 보드 주소가 아니다.
+- 타이머 live 화면은 공장 `updates/endpoints.json`의 현재 원점 아래 `/chicken-timer/`다. 서브노트북 자동실행 북마크는 `https://wk7007-wk.github.io/bbq-dashboard/chicken-timer/?profile=subnote&sync=main`이며 현재 북마크는 endpoints를 읽어 공장 화면으로 이동한다. 옛 `wk7007-ops-static-2026.web.app`은 퇴역 주소다. GitHub Pages `/updates/chicken-timer/`는 APK 업데이트 메타데이터 화면이지 타이머 보드 주소가 아니다. 현재 실제 열린 창은 별도 관측하며 문서 주소만으로 확인했다고 하지 않는다.
 - `profile=subnote`는 화면 밀도만 고정하며 동기화 room은 기본 주소와 같은 `main`이다. 호스트가 바뀌면 브라우저 localStorage origin도 바뀌므로 기존 PIN 인증값은 자동 승계되지 않고 새 주소에서 최초 1회 인증이 필요하지만, 원격 타이머 상태를 별도 room으로 분기하지 않는다.
 - 서브노트북 프로필은 같은 보드를 다른 밀도로 보여줄 뿐 같은 `main` room을 공유한다. 1024×600과 1366×768에서 진행 카운터의 숫자/그림자 overflow를 숨기지 않고 화면 안에 표시해야 한다.
 - 6칸은 `튀김3`×3, `튀김2`×2, `OV`×1의 물리 순서다. 세로폰은 이를 6행 1열로 두고 세로 스크롤을 기본 동선으로 만들지 않는다.
