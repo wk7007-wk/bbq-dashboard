@@ -272,12 +272,17 @@
   let lineComposing = false;
   $('line').addEventListener('compositionstart', () => { lineComposing = true; });
   $('line').addEventListener('compositionend', () => { lineComposing = false; });
+  let lineEnterPending = false;
+  const addLine = () => { const text = $('line').value.trim(); if (!text) return; newMemo('', text, true, 'line', undefined, false); $('line').value = ''; };
+  const isLineEnter = (event) => event.key === 'Enter' || event.code === 'Enter' || event.code === 'NumpadEnter';
   $('line').addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' || event.isComposing || lineComposing || event.keyCode === 229) return;
-    event.preventDefault();
-    const text = $('line').value.trim(); if (!text) return;
-    newMemo('', text, true, 'line', undefined, false);
-    $('line').value = '';
+    if (!isLineEnter(event)) return;
+    if (event.isComposing || lineComposing || event.keyCode === 229) { lineEnterPending = true; return; }
+    event.preventDefault(); lineEnterPending = false; addLine();
+  });
+  $('line').addEventListener('keyup', (event) => {
+    if (!isLineEnter(event) || !lineEnterPending) return;
+    lineEnterPending = false; addLine();
   });
   $('save').addEventListener('click', () => { if (!current || !db || !capture()) return; try { if (kind === 'fixed') { current = db.save(current); db.saveDraft(current); } draw(); rememberView(); report('저장했습니다'); } catch (_) { report('저장하지 못했습니다. 편집 내용을 보존합니다.'); } });
   $('pin').addEventListener('click', () => { if (kind !== 'temporary' || !current || !capture()) return; try { db.pinTemporary(current.id, current.revision); report('새 고정 메모로 복사 저장했습니다. 임시는 그대로 보관합니다.'); } catch (_) { report('고정 저장을 확인하지 못했습니다. 임시 원문을 보존합니다.'); } });
@@ -314,10 +319,10 @@
       // No PIN/token is read from storage, placed in a URL, or issued here.
       const probe = await fetch(endpoint, {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
       if (probe.status === 401) {
-        note('매장 연결 상태를 확인한 뒤 다시 검색해 주세요');
+        note('주소검색 허용 밖 (401) — 매장 인터넷이나 탭넷으로 열어 주세요');
         throw new Error('address access denied');
       }
-      if (!probe.ok) throw new Error('address unavailable');
+      if (!probe.ok) { note('주소검색 서버 응답 ' + probe.status + ' — 공장 화면 주소로 열렸는지 확인해 주세요'); throw new Error('address access denied'); }
       const capability = await probe.json();
       if (capability.ok !== true || capability.address_search !== true) throw new Error('invalid capability');
       const response = await fetch(endpoint + '?' + new URLSearchParams({q: query, lane: 'db'}),
@@ -327,7 +332,7 @@
         throw new Error('address access denied');
       }
       if (response.status === 502) throw new Error('address lookup unresolved');
-      if (!response.ok) throw new Error('address lookup failed');
+      if (!response.ok) { note('주소검색 응답 ' + response.status + ' — 잠시 뒤 다시 찾아 주세요'); throw new Error('address access denied'); }
       const body = await response.json();
       if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid address result');
       const results = body.results.map((item) => {
@@ -339,7 +344,7 @@
       return results;
     } catch (error) {
       if (error.message === 'address lookup unresolved') note('못 찾았어요 — 이름 일부(예: 삼익)나 도로명으로 다시 찾아 보세요');
-      else if (error.message !== 'address access denied') note('주소검색 연결을 확인한 뒤 다시 시도해 주세요');
+      else if (error.message !== 'address access denied') note('주소검색 서버에 닿지 않아요 (' + (error && error.name || '연결') + ') — 공장 연결을 확인해 주세요');
       throw error;
     }
   });
@@ -475,9 +480,18 @@
   let queryComposing = false;
   $('query').addEventListener('compositionstart', () => { queryComposing = true; });
   $('query').addEventListener('compositionend', () => { queryComposing = false; });
+  // 윈도 한글 입력: 조합 중 누른 Enter(keyCode 229)는 글자만 확정한다 → 그 Enter 를 기억해 두었다가 키를 뗄 때 검색 한 번
+  const isEnterKey = (event) => event.key === 'Enter' || event.code === 'Enter' || event.code === 'NumpadEnter';
+  let queryEnterPending = false;
   $('query').addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' || event.isComposing || queryComposing || event.keyCode === 229) return;
-    event.preventDefault();
+    if (!isEnterKey(event)) return;
+    if (event.isComposing || queryComposing || event.keyCode === 229) { queryEnterPending = true; return; }
+    event.preventDefault(); queryEnterPending = false;
+    $('search').click();
+  });
+  $('query').addEventListener('keyup', (event) => {
+    if (!isEnterKey(event) || !queryEnterPending) return;
+    queryEnterPending = false;
     $('search').click();
   });
   $('search').addEventListener('click', () => {
