@@ -38,6 +38,36 @@
   try { db = window.NotebookWorkMemos.store(window.localStorage); db.list(); db.drafts(); }
   catch (_) { $('status').textContent = '저장 자료를 읽을 수 없습니다. 기존 자료를 보존합니다.'; }
   function report(text) { $('status').textContent = text; }
+  async function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      try { await navigator.clipboard.writeText(text); return; } catch (_) {}
+    }
+    // The live factory origin is HTTP. Copy only this explicit button's plain
+    // text, during its user gesture; never include staff notes or the DOM.
+    const active = document.activeElement;
+    const selection = window.getSelection && window.getSelection();
+    const ranges = [];
+    if (selection) for (let i = 0; i < selection.rangeCount; i++) ranges.push(selection.getRangeAt(i).cloneRange());
+    const start = active && active.selectionStart, end = active && active.selectionEnd;
+    const field = document.createElement('textarea');
+    field.value = text; field.readOnly = true; field.tabIndex = -1;
+    field.setAttribute('aria-hidden', 'true');
+    field.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+    document.body.appendChild(field);
+    try {
+      field.focus({preventScroll: true}); field.select();
+      if (typeof document.execCommand !== 'function' || document.execCommand('copy') !== true) throw new Error('copy failed');
+    } finally {
+      field.remove();
+      try {
+        if (active && active.isConnected) {
+          active.focus({preventScroll: true});
+          if (typeof start === 'number' && typeof active.setSelectionRange === 'function') active.setSelectionRange(start, end);
+        }
+        if (selection) { selection.removeAllRanges(); ranges.forEach((range) => selection.addRange(range)); }
+      } catch (_) {}
+    }
+  }
   function draw() {
     if (!db) return;
     let list, drafts;
@@ -81,11 +111,11 @@
   ['title','customer','ko','vi','ja'].forEach((name) => $(name).addEventListener('input', () => capture(name)));
   $('new').addEventListener('click', () => { if (!db) return; current = {id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), revision: 0, title: '', customer_ko: '', staff_notes: {}}; fill(); capture(); draw(); });
   $('save').addEventListener('click', () => { if (!current || !db) return; capture(); try { current = db.save(current); db.saveDraft(current); draw(); report('저장했습니다'); } catch (_) { report('저장하지 못했습니다. 편집 내용을 보존합니다.'); } });
-  $('copy').addEventListener('click', async () => { if (!current) return; capture(); if (current.customer_ko.length === 0) { report('복사할 고객 한국어 문구가 없습니다.'); return; } try { await navigator.clipboard.writeText(current.customer_ko); report('한국어 문구를 복사했습니다'); } catch (_) { $('customer').focus(); $('customer').select(); report('복사하지 못했습니다. 선택된 문구를 직접 복사해 주세요.'); } });
+  $('copy').addEventListener('click', async () => { if (!current) return; capture(); if (current.customer_ko.length === 0) { report('복사할 고객 한국어 문구가 없습니다.'); return; } try { await copyText(current.customer_ko); report('한국어 문구를 복사했습니다'); } catch (_) { $('customer').focus(); $('customer').select(); report('복사하지 못했습니다. 선택된 문구를 직접 복사해 주세요.'); } });
   async function copyStaff(languages) {
     if (!current || !languages.every(ready)) { report('현재 원문의 직원 설명을 확인해 주세요.'); return; }
     const text = languages.map((lang) => current.staff_notes[lang]).join('\n\n');
-    try { await navigator.clipboard.writeText(text); report('직원 설명을 복사했습니다'); }
+    try { await copyText(text); report('직원 설명을 복사했습니다'); }
     catch (_) { report('직원 설명을 복사하지 못했습니다. 내용을 보존합니다.'); }
   }
   ['ko','vi','ja'].forEach((lang) => $('copy-' + lang).addEventListener('click', () => copyStaff([lang])));
@@ -142,7 +172,7 @@
   $('query').addEventListener('input', () => { if (searcher) searcher.invalidate($('query').value); selected = null; $('selected-actions').hidden = true; });
   $('copy-selection').addEventListener('click', async () => {
     if (!selected || !$('selected-customer').value) return;
-    try { await navigator.clipboard.writeText($('selected-customer').value); $('feedback-status').textContent = '고객 한국어 주소를 복사했습니다'; }
+    try { await copyText($('selected-customer').value); $('feedback-status').textContent = '고객 한국어 주소를 복사했습니다'; }
     catch (_) { $('selected-customer').focus(); $('selected-customer').select(); $('feedback-status').textContent = '복사하지 못했습니다. 선택된 주소를 직접 복사해 주세요.'; }
   });
   async function sendFeedback(intent) {
