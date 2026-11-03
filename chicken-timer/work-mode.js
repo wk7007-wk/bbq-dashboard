@@ -328,7 +328,7 @@
       if (!probe.ok) throw new Error('address unavailable');
       const capability = await probe.json();
       if (capability.ok !== true || capability.address_search !== true) throw new Error('invalid capability');
-      const response = await fetch(endpoint + '?' + new URLSearchParams({q: query}),
+      const response = await fetch(endpoint + '?' + new URLSearchParams({q: query, lane: 'db'}),
         {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
       if (response.status === 401) {
         note('매장 연결 상태를 확인한 뒤 다시 검색해 주세요');
@@ -351,16 +351,42 @@
       throw error;
     }
   });
+  const externalSearch = searchAdapters.externalSearch || (async (query) => {
+    const response = await fetch('/chicken-timer/search?' + new URLSearchParams({q: query, lane: 'naver'}),
+      {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
+    if (!response.ok) throw new Error('map lookup failed');
+    const body = await response.json();
+    if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid map result');
+    return body.results.filter((item) => item && typeof item.name === 'string' && typeof item.address === 'string')
+      .map((item) => ({name: item.name, address: item.address, source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true}));
+  });
+  const safeExternal = searchAdapters.safeExternal || ((query) => query);
+  // 두 갈래가 같은 곳을 두 번 보이지 않게: 도로명+번지(없으면 공백 뺀 주소)가 같고 이름도 같거나 한쪽 이름이 비었을 때만 같은 곳
+  const addrKey = (text) => { const m = String(text || '').match(/([가-힣0-9]+(?:로|길))\s*(\d+(?:-\d+)?)/); return m ? m[1] + ' ' + m[2] : String(text || '').replace(/\s+/g, ''); };
+  const placeOf = (candidate) => ({road: addrKey(candidate.address), name: String(candidate.name || '').replace(/\s+/g, '')});
+  const samePlace = (a, b) => a.road === b.road && (a.name === b.name || !a.name || !b.name);
+  const laneSeen = {}, laneDone = {};
+  function settleEmpty(query) {
+    const done = laneDone[query] || {};
+    const finished = (lane) => done[lane] && (done[lane].state === 'ready' || done[lane].state === 'error');
+    const old = panel.querySelector('[data-cache-results] > .wk-empty');
+    const none = finished('cache') && finished('external') && !(done.cache.n || 0) && !(done.external.n || 0) && $('query').value.trim() === query;
+    if (none && !old) {
+      const empty = document.createElement('div'); empty.className = 'wk-empty';
+      const head = document.createElement('strong'); head.textContent = '찾는 주소가 없어요';
+      const tip = document.createElement('span'); tip.textContent = '‘삼익’처럼 이름 일부만 넣거나 도로명으로 찾아 보세요.';
+      empty.appendChild(head); empty.appendChild(tip); $('cache-results').appendChild(empty);
+    } else if (!none && old) old.remove();
+  }
   const renderedQuery = {}, laneStatus = {};
   const searcher = window.NotebookWorkSearch && window.NotebookWorkSearch.create({
     cacheSearch,
-    externalSearch: searchAdapters.externalSearch, safeExternal: searchAdapters.safeExternal,
+    externalSearch, safeExternal,
     onChange(update) {
       const target = $(update.lane + '-results');
-      if (update.lane === 'external' && typeof searchAdapters.externalSearch !== 'function') { target.replaceChildren(); return; }
       const statusText = update.lane === 'cache'
         ? ({pending:'찾는 중…', ready:''}[update.state] || '')
-        : '외부 보완 · ' + ({pending:'확인 중', ready:'결과', error:'연결 미확인'}[update.state] || '미확인');
+        : ({pending:'지도에서도 찾는 중…'}[update.state] || '');
       if (update.state !== 'ready' && renderedQuery[update.lane] === update.query && laneStatus[update.lane]) {
         laneStatus[update.lane].textContent = statusText;
         return;
@@ -369,18 +395,20 @@
       const title = document.createElement('p'); title.className = 'wk-lane-status' + (update.state === 'error' ? ' wk-err' : '');
       title.textContent = statusText; laneStatus[update.lane] = title;
       target.appendChild(title);
-      if (update.state !== 'ready' || !Array.isArray(update.result)) return;
+      const mark = (n) => { (laneDone[update.query] = laneDone[update.query] || {})[update.lane] = {state: update.state, n}; settleEmpty(update.query); };
+      if (update.state !== 'ready' || !Array.isArray(update.result)) { mark(0); return; }
       renderedQuery[update.lane] = update.query;
       if (update.lane === 'cache' && Number.isFinite(update.result.backupFileMtime)) {
         $('search-status').textContent = '';
       }
-      const shown = update.result.slice(0, 3).filter((candidate) => candidate && typeof candidate.name === 'string' && typeof candidate.address === 'string');
-      if (update.lane === 'cache' && !shown.length) {
-        const empty = document.createElement('div'); empty.className = 'wk-empty';
-        const head = document.createElement('strong'); head.textContent = '찾는 주소가 없어요';
-        const tip = document.createElement('span'); tip.textContent = '‘삼익’처럼 이름 일부만 넣거나 도로명으로 찾아 보세요.';
-        empty.appendChild(head); empty.appendChild(tip); target.appendChild(empty); return;
-      }
+      const other = (laneSeen[update.query] || {})[update.lane === 'cache' ? 'external' : 'cache'] || [];
+      const mine = [];
+      const shown = update.result.filter((candidate) => candidate && typeof candidate.name === 'string' && typeof candidate.address === 'string')
+        .filter((candidate) => { const k = placeOf(candidate); if (other.some((x) => samePlace(x, k)) || mine.some((x) => samePlace(x, k))) return false; mine.push(k); return true; })
+        .slice(0, update.lane === 'cache' ? 5 : 3);
+      (laneSeen[update.query] = laneSeen[update.query] || {})[update.lane] = mine;
+      mark(shown.length);
+      if (!shown.length) { if (!title.textContent) target.replaceChildren(); return; }
       const marked = (text) => {
         const frag = document.createDocumentFragment(), q = String(update.query || '').trim();
         const at = q ? text.indexOf(q) : -1;
@@ -405,6 +433,7 @@
         row.appendChild(label); row.appendChild(add); target.appendChild(row);
       });
       if (update.lane === 'cache') { const foot = document.createElement('p'); foot.className = 'wk-foot'; foot.textContent = '줄을 누르면 메모에 담겨요'; target.appendChild(foot); }
+      settleEmpty(update.query);
     }
   });
   $('query').addEventListener('input', () => { if (searcher) searcher.invalidate($('query').value); selected = null; $('selected-actions').hidden = true; });

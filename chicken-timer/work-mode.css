@@ -85,7 +85,9 @@
 [data-search-status] { margin-top: 6px !important; font-size: 12.5px; color: var(--wk-text-2); }
 
 .wk-results:not(:empty), [data-cache-results]:not(:empty) { margin-top: 6px; background: var(--wk-surface-2); border: 1px solid var(--wk-hair-2); border-radius: 10px; overflow: hidden; }
-[data-cache-results]:empty, [data-external-results] { display: none; }
+[data-cache-results]:empty, [data-external-results]:empty { display: none; }
+/* 지도(네이버) 갈래 — DB 결과 바로 아래에 이어 붙는다 */
+[data-external-results]:not(:empty) { margin-top: 6px; background: var(--wk-surface-2); border: 1px solid var(--wk-hair-2); border-radius: 10px; overflow: hidden; }
 .wk-lane-status { padding: 9px 12px; font-size: 12.5px; color: var(--wk-text-2); }
 .wk-lane-status:empty { display: none; }
 .wk-lane-status.wk-err { color: #ffb4aa; }
