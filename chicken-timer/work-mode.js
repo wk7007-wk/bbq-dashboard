@@ -1,31 +1,34 @@
 (function () {
   'use strict';
   if (new URLSearchParams(location.search).get('profile') !== 'subnote') return;
+  // The existing PIN gate reloads after unlock. Never mount a higher-layer
+  // memo page while its locked shell has no timer application.
+  if (document.body && document.body.dataset && document.body.dataset.authState === 'locked') return;
   const shell = document.querySelector('.app-shell');
   const board = document.querySelector('#board');
   if (!shell || !board || !window.NotebookWorkMemos || window.__notebookWorkMounted) return;
   window.__notebookWorkMounted = true;
   const button = document.createElement('button');
-  button.type = 'button'; button.className = 'work-mode-open'; button.textContent = '배달 업무';
-  button.setAttribute('aria-label', '배달 업무 열기');
+  button.type = 'button'; button.className = 'work-mode-open'; button.textContent = '메모로';
+  button.setAttribute('aria-label', '메모로 돌아가기');
   function attachButton() {
     const head = document.querySelector('#recipe-strip > .board-cell-head');
     if (head && button.parentNode !== head) head.appendChild(button);
   }
   attachButton();
-  new MutationObserver(attachButton).observe(board, {childList: true, subtree: true});
+  new MutationObserver(() => { attachButton(); refreshHistorySource(); }).observe(board, {childList: true, subtree: true});
   const panel = document.createElement('section');
-  panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '배달 업무');
-  panel.innerHTML = '<header class="work-header"><button type="button" data-back>타이머</button><strong>배달 업무</strong><span data-timer-status aria-live="polite"></span></header>' +
-    '<div class="work-columns"><section class="work-search"><h2>주소 검색</h2><label>주소 또는 건물명<input data-query autocomplete="off"></label><button type="button" data-search>검색</button><p data-search-status>검색 연결 준비 중</p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><button type="button" data-copy-selection>고객 한국어 복사</button><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section>' +
-    '<section class="work-memos"><h2>메모</h2><button type="button" data-new>새 메모</button><div data-list class="work-list"></div><div data-editor hidden>' +
-    '<label>제목<input data-title></label><label>고객 문구 · 한국어<textarea data-customer></textarea></label>' +
+  panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '메모');
+  panel.innerHTML = '<header class="work-header"><button type="button" data-back>기록 · 타이머</button><strong>메모</strong><span data-timer-status aria-live="polite"></span></header>' +
+    '<div class="work-columns"><section class="work-search"><div class="work-search-line"><label>주소 또는 건물명<input data-query autocomplete="off"></label><div class="work-actions"><button type="button" data-search>검색</button><button type="button" data-stage-query>임시 담기</button></div></div><p data-search-status>주소검색 미연결</p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><h2>최근 기록</h2><p>누르면 타이머로 이동합니다</p><div data-history class="work-history-list"></div></aside>' +
+    '<section class="work-memos"><h2>메모</h2><div class="work-actions" role="group" aria-label="메모 종류" style="margin-block:8px"><button type="button" data-fixed aria-pressed="true" style="flex:1">고정 메모</button><button type="button" data-temporary aria-pressed="false" style="flex:1">임시 메모</button></div><button type="button" data-new>새 고정 메모</button><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 현재 미연결입니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ hiện chưa được kết nối.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は現在未接続です。</p></section></div></details><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
+    '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>고객 문구 · 한국어<textarea data-customer></textarea></label>' +
     '<section class="work-staff"><h3>직원 설명</h3><div class="work-languages">' +
     '<div><label>한국어<textarea data-ko></textarea></label><button type="button" data-copy-ko>직원 한국어 복사</button></div>' +
     '<div><label>베트남어<textarea data-vi></textarea></label><button type="button" data-copy-vi>직원 베트남어 복사</button></div>' +
     '<div><label>일본어<textarea data-ja></textarea></label><button type="button" data-copy-ja>직원 일본어 복사</button></div></div>' +
-    '<button type="button" data-copy-all>직원 세 언어 복사</button></section>' +
-    '<div class="work-actions"><button type="button" data-save>저장</button><button type="button" data-copy>고객 한국어 복사</button></div></div><p data-status role="status"></p></section></div>';
+    '<button type="button" data-copy-all>직원 세 언어 복사</button><div data-manual hidden><label>직원 설명 · 수동 복사<textarea data-manual-text readonly></textarea></label><button type="button" data-manual-select>직원 문구 전체 선택</button></div></section>' +
+    '<div class="work-actions"><button type="button" data-save>저장</button><button type="button" data-copy>고객 한국어 복사</button><button type="button" data-pin hidden>고정으로 복사 저장</button><button type="button" data-clear hidden>이 임시 항목 비우기</button></div><div data-clear-confirm hidden><p>선택한 임시 항목만 비웁니다. 고정 메모와 다른 임시는 유지됩니다.</p><div class="work-actions"><button type="button" data-clear-now>비우기</button><button type="button" data-clear-cancel>취소</button></div></div></div><p data-status role="status"></p></section></div></div>';
   shell.appendChild(panel);
   const $ = (name) => panel.querySelector('[data-' + name + ']');
   function showTimerStatus() {
@@ -34,16 +37,22 @@
   }
   new MutationObserver(showTimerStatus).observe(board, {attributes: true, subtree: true, attributeFilter: ['data-state']});
   showTimerStatus();
-  let db, current = null;
+  let db, current = null, kind = 'fixed', clearTarget = null;
+  let displayed = {};
+  function rememberFields() { ['title','name','customer','ko','vi','ja'].forEach((name) => { displayed[name] = $(name).value; }); }
+  const viewKey = 'notebook-work:view:subnote:v1';
   try { db = window.NotebookWorkMemos.store(window.localStorage); db.list(); db.drafts(); }
   catch (_) { $('status').textContent = '저장 자료를 읽을 수 없습니다. 기존 자료를 보존합니다.'; }
   function report(text) { $('status').textContent = text; }
+  function rememberView() {
+    try { window.localStorage.setItem(viewKey, JSON.stringify({kind, id: current && current.id})); } catch (_) {}
+  }
   async function copyText(text) {
     if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
       try { await navigator.clipboard.writeText(text); return; } catch (_) {}
     }
     // The live factory origin is HTTP. Copy only this explicit button's plain
-    // text, during its user gesture; never include staff notes or the DOM.
+    // text during its user gesture. Customer buttons never include staff/DOM.
     const active = document.activeElement;
     const selection = window.getSelection && window.getSelection();
     const ranges = [];
@@ -68,23 +77,127 @@
       } catch (_) {}
     }
   }
+  // Selection belongs only to explicit temporary fields, never to the fixed
+  // store, staff notes, search DOM, or an entire search-result object.
+  const picks = new Map();
+  function selectionStatus() {
+    let count = 0; picks.forEach((pick) => { count += pick.fields.size; });
+    $('copy-batch').disabled = count === 0;
+    $('copy-batch').textContent = '선택값 복사 (' + count + ')';
+  }
+  function invalidatePick(id) {
+    picks.delete(id); selectionStatus(); $('list-manual').hidden = true;
+  }
+  async function copyListText(text) {
+    if (!text.length) { report('복사할 한국어 값이 없습니다.'); return; }
+    try { await copyText(text); $('list-manual').hidden = true; report('선택한 한국어 값을 복사했습니다'); }
+    catch (_) {
+      $('list-manual-text').value = text; $('list-manual').hidden = false;
+      $('list-manual-text').focus(); $('list-manual-text').select();
+      report('복사하지 못했습니다. 선택된 한국어 값을 직접 복사해 주세요.');
+    }
+  }
   function draw() {
     if (!db) return;
     let list, drafts;
-    try { list = db.list(); drafts = db.drafts(); } catch (_) { report('저장 자료를 읽을 수 없습니다.'); return; }
+    try { list = kind === 'temporary' ? db.temporaries() : db.list(); drafts = kind === 'temporary' ? [] : db.drafts(); }
+    catch (_) { $('list').replaceChildren(); report('저장 자료를 읽을 수 없습니다. 기존 자료를 보존합니다.'); return; }
     const known = new Set(list.map((x) => x.id));
     list = list.concat(drafts.filter((x) => x && !known.has(x.id)));
+    $('batch').hidden = kind !== 'temporary';
+    if (kind === 'temporary') {
+      picks.forEach((pick, id) => {
+        const entry = list.find((x) => x.id === id);
+        if (!entry || entry.revision !== pick.revision) invalidatePick(id);
+      });
+    }
     $('list').replaceChildren();
     list.forEach((entry) => {
-      const node = document.createElement('button'); node.type = 'button'; node.textContent = entry.title || '제목 없는 메모';
-      node.addEventListener('click', () => { current = drafts.find((x) => x.id === entry.id) || entry; fill(); }); $('list').appendChild(node);
+      function edit() {
+        if (!capture()) return;
+        try { current = kind === 'temporary' ? db.temporary(entry.id) : db.drafts().find((x) => x.id === entry.id) || db.list().find((x) => x.id === entry.id); fill(); rememberView(); }
+        catch (_) { report('항목을 읽지 못했습니다. 편집 내용을 보존합니다.'); }
+      }
+      if (kind !== 'temporary') {
+        const node = document.createElement('button'); node.type = 'button';
+        node.textContent = (entry.title || '제목 없는 메모') + (entry.customer_ko ? '\n' + entry.customer_ko : '');
+        node.setAttribute('style', 'max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left');
+        node.addEventListener('click', edit); $('list').appendChild(node); return;
+      }
+      const card = document.createElement('article');
+      card.setAttribute('data-temp-card', entry.id);
+      card.setAttribute('style', 'width:100%;min-width:0;padding:8px;border:1px solid #8b9ba9;border-radius:8px;overflow-wrap:anywhere');
+      const heading = document.createElement('strong'); heading.textContent = entry.title || '임시 메모'; card.appendChild(heading);
+      const actions = document.createElement('div'); actions.className = 'work-actions';
+      actions.setAttribute('style', 'margin-top:8px');
+      function valueRow(field, label) {
+        const text = typeof entry[field] === 'string' ? entry[field] : '';
+        if (!text.length) return;
+        const row = document.createElement('label');
+        row.setAttribute('style', 'display:flex;align-items:center;gap:8px;min-height:44px;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere');
+        const check = document.createElement('input'); check.type = 'checkbox';
+        check.setAttribute('data-pick', field);
+        check.setAttribute('style', 'width:44px;height:44px;flex:0 0 44px;margin:0');
+        check.setAttribute('aria-label', label + ' 선택');
+        check.checked = !!(picks.get(entry.id) && picks.get(entry.id).fields.has(field));
+        check.addEventListener('change', () => {
+          const pick = picks.get(entry.id) || {revision: entry.revision, fields: new Set()};
+          if (check.checked) pick.fields.add(field); else pick.fields.delete(field);
+          if (pick.fields.size) picks.set(entry.id, pick); else picks.delete(entry.id);
+          $('list-manual').hidden = true; selectionStatus();
+        });
+        const preview = document.createElement('span'); preview.textContent = label + '\n' + text;
+        row.appendChild(check); row.appendChild(preview); card.appendChild(row);
+        const copy = document.createElement('button'); copy.type = 'button'; copy.textContent = label + ' 복사';
+        copy.setAttribute('data-copy-field', field);
+        copy.addEventListener('click', async () => {
+          try {
+            const latest = db.temporary(entry.id);
+            if (!latest || latest.revision !== entry.revision) { draw(); report('항목이 바뀌었습니다. 현재 값을 확인한 뒤 다시 복사해 주세요.'); return; }
+            await copyListText(text);
+          } catch (_) { report('항목을 읽지 못했습니다. 기존 원문을 보존합니다.'); }
+        });
+        actions.appendChild(copy);
+      }
+      valueRow('name_ko', '이름 / 건물명');
+      valueRow('customer_ko', '주소 / 문구');
+      const open = document.createElement('button'); open.type = 'button'; open.textContent = '편집';
+      open.setAttribute('data-edit-temp', entry.id); open.addEventListener('click', edit); actions.appendChild(open);
+      card.appendChild(actions); $('list').appendChild(card);
     });
+    selectionStatus();
   }
+  $('copy-batch').addEventListener('click', async () => {
+    try {
+      const rows = db.temporaries(), texts = [];
+      for (const [id, pick] of picks) {
+        const row = rows.find((x) => x.id === id);
+        if (!row || row.revision !== pick.revision) { draw(); report('선택한 항목이 바뀌었습니다. 현재 값을 확인한 뒤 다시 선택해 주세요.'); return; }
+      }
+      rows.forEach((row) => {
+        const pick = picks.get(row.id); if (!pick) return;
+        ['name_ko','customer_ko'].forEach((field) => { if (pick.fields.has(field) && typeof row[field] === 'string' && row[field].length) texts.push(row[field]); });
+      });
+      await copyListText(texts.join('\n'));
+    } catch (_) { report('선택한 항목을 읽지 못했습니다. 기존 원문을 보존합니다.'); }
+  });
+  $('unselect').addEventListener('click', () => { picks.clear(); $('list-manual').hidden = true; draw(); });
+  $('list-manual-select').addEventListener('click', () => { $('list-manual-text').focus(); $('list-manual-text').select(); });
   function fill() {
+    ['fixed','temporary'].forEach((name) => {
+      $(name).setAttribute('aria-pressed', String(kind === name));
+      $(name).setAttribute('style', 'flex:1;' + (kind === name ? 'background:#176b83;color:#fff;font-weight:700;outline:2px solid currentColor;outline-offset:-2px' : ''));
+    });
+    $('new').textContent = kind === 'temporary' ? '새 임시 메모' : '새 고정 메모';
+    $('pin').hidden = $('clear').hidden = kind !== 'temporary';
+    $('batch').hidden = $('name-label').hidden = kind !== 'temporary';
+    $('current-kind').textContent = kind === 'temporary' ? '임시 메모 · 이 기기에 자동 보관' : '고정 메모';
+    $('clear-confirm').hidden = true; clearTarget = null; $('manual').hidden = true;
     $('editor').hidden = !current; if (!current) return;
+    $('name').value = current.name_ko || '';
     $('title').value = current.title || ''; $('customer').value = current.customer_ko || '';
     const notes = current.staff_notes || {}; ['ko','vi','ja'].forEach((lang) => { $(lang).value = notes[lang] || ''; });
-    updateStaffButtons();
+    rememberFields(); updateStaffButtons();
   }
   function sourceKey(item) { return JSON.stringify([item.customer_ko || '', (item.staff_notes || {}).ko || '']); }
   function ready(lang) {
@@ -96,30 +209,65 @@
     $('copy-all').disabled = !['ko','vi','ja'].every(ready);
   }
   function capture(changed) {
-    if (!current) return;
+    if (!current) return true;
+    if (changed) { $('manual').hidden = true; $('clear-confirm').hidden = true; clearTarget = null; }
     const oldKey = sourceKey(current);
     const meta = Object.assign({}, current.staff_meta || {});
-    current = Object.assign({}, current, {title: $('title').value, customer_ko: $('customer').value,
-      staff_notes: {ko: $('ko').value, vi: $('vi').value, ja: $('ja').value}});
+    // Textareas normalize CRLF for display. An unrelated action must not
+    // rewrite the saved snapshot's line endings or any untouched value.
+    const value = (name, old) => changed === name || $(name).value !== displayed[name] ? $(name).value : old;
+    current = Object.assign({}, current, {title: value('title', current.title || ''), customer_ko: value('customer', current.customer_ko || ''),
+      staff_notes: Object.assign({}, current.staff_notes, {ko:value('ko', (current.staff_notes || {}).ko || ''), vi:value('vi', (current.staff_notes || {}).vi || ''), ja:value('ja', (current.staff_notes || {}).ja || '')})});
     const key = sourceKey(current);
     if (key !== oldKey) current.source_revision = (current.source_revision || 0) + 1;
     if (['ko','vi','ja'].includes(changed)) meta[changed] = {source_key: key, source_revision: current.source_revision || 0, provenance: 'user'};
     current.staff_meta = meta;
+    if (kind === 'temporary' && ($('name').value || Object.prototype.hasOwnProperty.call(current, 'name_ko'))) current.name_ko = value('name', current.name_ko || '');
     updateStaffButtons();
-    try { db.saveDraft(current); report('편집 중'); } catch (_) { report('초안을 저장하지 못했습니다. 화면의 내용을 보존합니다.'); }
+    try {
+      if (kind === 'temporary') current = db.saveTemporary(current); else db.saveDraft(current);
+      rememberFields();
+      if (kind === 'temporary' && changed) { invalidatePick(current.id); draw(); }
+      report(kind === 'temporary' ? '임시 보관했습니다' : '편집 중'); return true;
+    } catch (_) { report('저장하지 못했습니다. 다른 화면의 변경과 현재 편집 내용을 보존합니다.'); return false; }
   }
-  ['title','customer','ko','vi','ja'].forEach((name) => $(name).addEventListener('input', () => capture(name)));
-  $('new').addEventListener('click', () => { if (!db) return; current = {id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), revision: 0, title: '', customer_ko: '', staff_notes: {}}; fill(); capture(); draw(); });
-  $('save').addEventListener('click', () => { if (!current || !db) return; capture(); try { current = db.save(current); db.saveDraft(current); draw(); report('저장했습니다'); } catch (_) { report('저장하지 못했습니다. 편집 내용을 보존합니다.'); } });
-  $('copy').addEventListener('click', async () => { if (!current) return; capture(); if (current.customer_ko.length === 0) { report('복사할 고객 한국어 문구가 없습니다.'); return; } try { await copyText(current.customer_ko); report('한국어 문구를 복사했습니다'); } catch (_) { $('customer').focus(); $('customer').select(); report('복사하지 못했습니다. 선택된 문구를 직접 복사해 주세요.'); } });
+  ['title','name','customer','ko','vi','ja'].forEach((name) => $(name).addEventListener('input', () => capture(name)));
+  ['fixed','temporary'].forEach((next) => $(next).addEventListener('click', () => {
+    if (next === kind || !capture()) return;
+    kind = next; current = null; fill(); draw(); rememberView();
+  }));
+  function newMemo(title, text, temporary, sourceKind, name) {
+    if (!db || !capture()) return;
+    const next = {id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), revision: 0, title, customer_ko: text, staff_notes: {ko:'',vi:'',ja:''}, staff_meta: {}, created_at: Date.now()};
+    if (sourceKind) next.source_kind = sourceKind;
+    if (typeof name === 'string') next.name_ko = name;
+    try {
+      if (temporary) { next.created_order = db.temporaries().reduce((order, item) => Math.max(order, item.created_order || 0), 0) + 1; const saved = db.saveTemporary(next); kind = 'temporary'; current = saved; }
+      else { db.saveDraft(next); current = next; }
+      fill(); draw(); rememberView(); report(temporary ? '새 임시 항목에 담았습니다' : '새 고정 메모를 편집합니다');
+    } catch (_) { report('새 항목을 저장하지 못했습니다. 기존 항목과 입력값을 보존합니다.'); }
+  }
+  $('new').addEventListener('click', () => newMemo('', '', kind === 'temporary'));
+  $('save').addEventListener('click', () => { if (!current || !db || !capture()) return; try { if (kind === 'fixed') { current = db.save(current); db.saveDraft(current); } draw(); rememberView(); report('저장했습니다'); } catch (_) { report('저장하지 못했습니다. 편집 내용을 보존합니다.'); } });
+  $('pin').addEventListener('click', () => { if (kind !== 'temporary' || !current || !capture()) return; try { db.pinTemporary(current.id, current.revision); report('새 고정 메모로 복사 저장했습니다. 임시는 그대로 보관합니다.'); } catch (_) { report('고정 저장을 확인하지 못했습니다. 임시 원문을 보존합니다.'); } });
+  $('clear').addEventListener('click', () => { if (kind !== 'temporary' || !current) return; clearTarget = {id: current.id, revision: current.revision}; $('clear-confirm').hidden = false; });
+  $('clear-cancel').addEventListener('click', () => { clearTarget = null; $('clear-confirm').hidden = true; });
+  $('clear-now').addEventListener('click', () => {
+    if (!clearTarget || kind !== 'temporary' || !current || current.id !== clearTarget.id || current.revision !== clearTarget.revision) { report('현재 임시 항목을 다시 선택해 주세요.'); return; }
+    try { db.clearTemporary(clearTarget.id, clearTarget.revision); current = null; fill(); draw(); rememberView(); report('선택한 임시 항목만 비웠습니다'); }
+    catch (_) { report('다른 화면의 변경 또는 비우기 결과를 확인해 주세요. 현재 원문을 보존합니다.'); }
+  });
+  $('copy').addEventListener('click', async () => { if (!current) return; if (!capture() && kind === 'temporary') return; if (current.customer_ko.length === 0) { report('복사할 고객 한국어 문구가 없습니다.'); return; } try { await copyText(current.customer_ko); report('한국어 문구를 복사했습니다'); } catch (_) { $('customer').focus(); $('customer').select(); report('복사하지 못했습니다. 선택된 문구를 직접 복사해 주세요.'); } });
   async function copyStaff(languages) {
+    if (kind === 'temporary' && !capture()) return;
     if (!current || !languages.every(ready)) { report('현재 원문의 직원 설명을 확인해 주세요.'); return; }
     const text = languages.map((lang) => current.staff_notes[lang]).join('\n\n');
     try { await copyText(text); report('직원 설명을 복사했습니다'); }
-    catch (_) { report('직원 설명을 복사하지 못했습니다. 내용을 보존합니다.'); }
+    catch (_) { $('manual-text').value = text; $('manual').hidden = false; $('manual-text').focus(); $('manual-text').select(); report('직원 설명을 복사하지 못했습니다. 선택된 직원 문구를 직접 복사해 주세요.'); }
   }
   ['ko','vi','ja'].forEach((lang) => $('copy-' + lang).addEventListener('click', () => copyStaff([lang])));
   $('copy-all').addEventListener('click', () => copyStaff(['ko','vi','ja']));
+  $('manual-select').addEventListener('click', () => { $('manual-text').focus(); $('manual-text').select(); });
   const searchAdapters = window.NotebookWorkSearchAdapters || {};
   let selected = null, searchGeneration = null, pendingFeedback = null;
   async function privateRequest(path, payload) {
@@ -170,6 +318,12 @@
     }
   });
   $('query').addEventListener('input', () => { if (searcher) searcher.invalidate($('query').value); selected = null; $('selected-actions').hidden = true; });
+  $('stage-query').addEventListener('click', () => {
+    const text = $('query').value;
+    if (!text.trim()) { $('search-status').textContent = '임시로 담을 주소를 입력해 주세요'; return; }
+    newMemo('입력 주소', text, true, 'address_input');
+  });
+  $('stage-selection').addEventListener('click', () => { if (selected) newMemo(selected.candidate.name, selected.candidate.address, true, 'selected_result', selected.candidate.name); });
   $('copy-selection').addEventListener('click', async () => {
     if (!selected || !$('selected-customer').value) return;
     try { await copyText($('selected-customer').value); $('feedback-status').textContent = '고객 한국어 주소를 복사했습니다'; }
@@ -207,6 +361,67 @@
     searchGeneration = typeof searchAdapters.generation === 'function' ? searchAdapters.generation() : null;
     searcher.search($('query').value, searchGeneration);
   });
-  button.addEventListener('click', () => { board.hidden = true; panel.hidden = false; draw(); });
-  $('back').addEventListener('click', () => { panel.hidden = true; board.hidden = false; });
+  try {
+    const view = JSON.parse(window.localStorage.getItem(viewKey));
+    if (view && ['fixed','temporary'].includes(view.kind)) {
+      kind = view.kind;
+      if (view.id && db) current = kind === 'temporary' ? db.temporary(view.id) : db.drafts().find((x) => x.id === view.id) || db.list().find((x) => x.id === view.id);
+    }
+  } catch (_) { report('마지막 선택을 복원하지 못했습니다. 기존 자료를 보존합니다.'); }
+  fill();
+  if (typeof window.addEventListener === 'function') window.addEventListener('storage', (event) => { if (event.key && event.key.startsWith('notebook-work:')) draw(); });
+  let memoScroll = 0;
+  function showTimer() {
+    memoScroll = panel.scrollTop || 0;
+    panel.hidden = true; board.hidden = false;
+    // Reuse the application's existing resize renderer after un-hiding its
+    // original DOM; no start/restore/clear/store method is invoked here.
+    if (typeof window.dispatchEvent === 'function' && typeof Event === 'function') window.dispatchEvent(new Event('resize'));
+  }
+  function showMemo() {
+    board.hidden = true; panel.hidden = false; draw(); refreshHistorySource();
+    panel.scrollTop = memoScroll;
+  }
+  let historySource = null, historyObserver = null, historyText = null, historyRows = [];
+  function renderHistory() {
+    if (!historySource) { $('history').textContent = '기록 확인 중 · 타이머에서 보기'; return; }
+    // Copy only known text cells from the existing log list. Recovery/sync
+    // controls and source nodes stay in their original board unchanged.
+    const sourceRows = Array.from(historySource.children).filter((row) => row.tagName === 'LI');
+    const rows = sourceRows.map((row) =>
+      ['.log-title','.log-status','.log-time'].map((name) => {
+        const cell = row.querySelector(name); return cell ? cell.textContent : '';
+      }).filter(Boolean).join(' · '));
+    const text = JSON.stringify(rows);
+    if (text === historyText) return;
+    historyText = text;
+    if (rows.length && sourceRows.length === historyRows.length && sourceRows.every((row, i) => row === historyRows[i])
+        && $('history').children.length === rows.length) {
+      // Keep the focused/clicked projection node through the log's time ticks.
+      rows.forEach((text, i) => { $('history').children[i].textContent = text; });
+      return;
+    }
+    historyRows = sourceRows; $('history').replaceChildren();
+    if (!rows.length) { $('history').textContent = '현재 기록이 없습니다'; return; }
+    rows.forEach((text) => {
+      const item = document.createElement('button'); item.type = 'button';
+      item.className = 'work-history-item'; item.textContent = text;
+      item.addEventListener('click', showTimer); $('history').appendChild(item);
+    });
+  }
+  function refreshHistorySource() {
+    const source = board.querySelector('#board-log > ol');
+    if (source !== historySource) {
+      if (historyObserver) historyObserver.disconnect();
+      historySource = source; historyText = null;
+      if (source) {
+        historyObserver = new MutationObserver(renderHistory);
+        historyObserver.observe(source, {childList:true, characterData:true, subtree:true});
+      }
+      renderHistory();
+    }
+  }
+  button.addEventListener('click', showMemo);
+  $('back').addEventListener('click', showTimer);
+  showMemo();
 })();

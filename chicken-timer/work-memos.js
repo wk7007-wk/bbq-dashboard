@@ -2,6 +2,7 @@
   'use strict';
   const key = 'notebook-work:memos:subnote:v1';
   const draftsKey = 'notebook-work:drafts:subnote:v1';
+  const temporaryPrefix = 'notebook-work:temporary:subnote:v1:';
   function read(storage, name, fallback) {
     const raw = storage.getItem(name);
     if (raw === null) return fallback;
@@ -14,7 +15,13 @@
     return parsed;
   }
   function store(storage) {
-    return {
+    function temporary(id) {
+      const rows = read(storage, temporaryPrefix + encodeURIComponent(id), []);
+      if (!rows.length) return null;
+      if (rows.length !== 1 || rows[0].id !== id) throw new Error('임시 항목을 확인해 주세요');
+      return rows[0];
+    }
+    const api = {
       list: () => read(storage, key, []),
       drafts: () => read(storage, draftsKey, []),
       saveDraft(draft) {
@@ -31,8 +38,45 @@
         const next = list.filter((x) => x && x.id !== draft.id); next.push(saved);
         storage.setItem(key, JSON.stringify(next));
         return saved;
+      },
+      temporaries() {
+        const list = [];
+        for (let i = 0; i < storage.length; i++) {
+          const name = storage.key(i);
+          if (typeof name !== 'string' || !name.startsWith(temporaryPrefix)) continue;
+          const entry = temporary(decodeURIComponent(name.slice(temporaryPrefix.length)));
+          if (entry) list.push(entry);
+        }
+        return list.sort((a, b) => (a.created_order || 0) - (b.created_order || 0) || (a.created_at || 0) - (b.created_at || 0) || a.id.localeCompare(b.id));
+      },
+      temporary,
+      saveTemporary(draft) {
+        if (!draft || typeof draft.id !== 'string' || !draft.id || !Number.isInteger(draft.revision) || draft.revision < 0) throw new Error('임시 항목을 확인해 주세요');
+        const old = temporary(draft.id);
+        if ((old && old.revision !== draft.revision) || (!old && draft.revision !== 0)) throw new Error('다른 화면에서 임시 항목이 바뀌었습니다');
+        if (old && JSON.stringify(old) === JSON.stringify(draft)) return old;
+        const saved = Object.assign({}, draft, {revision: draft.revision + 1});
+        storage.setItem(temporaryPrefix + encodeURIComponent(draft.id), JSON.stringify([saved]));
+        return saved;
+      },
+      clearTemporary(id, revision) {
+        const old = temporary(id);
+        if (!old || old.revision !== revision) throw new Error('다른 화면에서 임시 항목이 바뀌었습니다');
+        storage.removeItem(temporaryPrefix + encodeURIComponent(id));
+      },
+      pinTemporary(id, revision) {
+        const entry = temporary(id);
+        if (!entry || entry.revision !== revision) throw new Error('다른 화면에서 임시 항목이 바뀌었습니다');
+        const list = api.list();
+        const existing = list.find((item) => item.temporary_source && item.temporary_source.id === id && item.temporary_source.revision === revision);
+        if (existing) return existing;
+        const fixedId = 'fixed-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+        if (list.some((item) => item.id === fixedId)) throw new Error('저장 식별자를 다시 확인해 주세요');
+        // One fixed-store write; the temporary stays intact even if saving fails.
+        return api.save(Object.assign({}, entry, {id: fixedId, revision: 0, temporary_source: {id, revision}}));
       }
     };
+    return api;
   }
   function translatorCoordinator({read, write, digest, translate, isPublicNote}) {
     const inflight = new Map();
