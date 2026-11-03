@@ -39,6 +39,18 @@
         storage.setItem(key, JSON.stringify(next));
         return saved;
       },
+      remove(id, revision) {
+        // 1104 사장님 "삭제는 x표시로 쉽게": 고정 메모 한 줄 지우기(다른 화면에서 바뀌었으면 거절), 그 초안도 함께
+        const list = read(storage, key, []);
+        const old = list.find((x) => x && x.id === id);
+        if (!old || old.revision !== revision) throw new Error('다른 화면에서 수정됐습니다');
+        storage.setItem(key, JSON.stringify(list.filter((x) => x && x.id !== id)));
+        try {
+          const drafts = read(storage, draftsKey, []);
+          if (drafts.some((x) => x.id === id)) storage.setItem(draftsKey, JSON.stringify(drafts.filter((x) => x.id !== id)));
+        } catch (_) {}
+        return old;
+      },
       temporaries() {
         const list = [];
         for (let i = 0; i < storage.length; i++) {

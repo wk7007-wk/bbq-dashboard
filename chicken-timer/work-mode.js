@@ -28,7 +28,7 @@
   panel.innerHTML = '<div class="wk-seg" role="tablist" aria-label="화면 전환"><button type="button" role="tab" aria-selected="true" class="wk-seg-on" tabindex="-1">메모</button><button type="button" role="tab" aria-selected="false" data-back>타이머<span class="wk-badge" data-seg-badge hidden></span></button></div>' +
     '<button type="button" class="wk-urgent" data-urgent hidden></button><span data-timer-status role="status" aria-live="polite" hidden></span>' +
     '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
-    '<section class="work-memos wk-card-box"><h2 class="wk-card-title">메모</h2><div class="wk-memo-head"><div class="wk-kind" role="group" aria-label="메모 종류"><button type="button" data-temporary aria-pressed="false">임시 메모</button><button type="button" data-fixed aria-pressed="true">자주 쓰는 문구</button></div><button type="button" class="wk-new" data-new>+ 새 메모</button></div><label class="wk-line-field"><span class="work-sr-only">메모 한 줄</span><input data-line autocomplete="off" enterkeyhint="done" placeholder="메모 한 줄 쓰고 Enter"></label><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
+    '<section class="work-memos wk-card-box"><h2 class="wk-card-title">메모</h2><div class="wk-memo-head"><div class="wk-kind" role="group" aria-label="메모 종류"><button type="button" data-temporary aria-pressed="false">임시 메모</button><button type="button" data-fixed aria-pressed="true">자주 쓰는 문구</button></div><button type="button" class="wk-new" data-new>+ 새 메모</button></div><label class="wk-line-field"><span class="work-sr-only">메모 한 줄</span><input data-line autocomplete="off" enterkeyhint="done" placeholder="메모 한 줄 쓰고 Enter"></label><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div class="wk-undo" data-undo hidden><span data-undo-text></span><button type="button" data-undo-btn>되돌리기</button></div><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
     '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>메모<textarea data-customer rows="2"></textarea></label>' +
     '<details class="work-staff"><summary>직원 설명 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-languages">' +
     '<div><label>한국어<textarea data-ko></textarea></label><button type="button" data-copy-ko>직원 한국어 복사</button></div>' +
@@ -151,7 +151,9 @@
         text.textContent = entry.name_ko + ' · ' + entry.customer_ko;
       } else text.textContent = value || '빈 메모';
       const state = document.createElement('span'); state.className = 'wk-row-state';
-      primary.appendChild(lead); primary.appendChild(text); primary.appendChild(state);
+      const head = document.createElement('span'); head.className = 'wk-row-head';
+      head.appendChild(lead); head.appendChild(state);
+      primary.appendChild(head); primary.appendChild(text);
       primary.addEventListener('click', async () => {
         try {
           const latest = rowKind === 'temporary' ? db.temporary(entry.id) : db.list().find((x) => x.id === entry.id);
@@ -178,15 +180,41 @@
         });
         row.appendChild(primary); row.appendChild(pin);
       }
-      const more = document.createElement('button'); more.type = 'button'; more.className = 'wk-more'; more.textContent = '⋯';
-      more.setAttribute('aria-label', '편집'); more.title = rowKind === 'temporary' ? '편집·고정·지우기' : '편집';
+      const more = document.createElement('button'); more.type = 'button'; more.className = 'wk-more'; more.textContent = '수정';
+      more.setAttribute('aria-label', '수정'); more.title = '수정';
       if (rowKind === 'temporary') more.setAttribute('data-edit-temp', entry.id);
       more.addEventListener('click', edit);
       if (rowKind !== 'temporary') row.appendChild(primary);
-      row.appendChild(more); $('list').appendChild(row);
+      const del = document.createElement('button'); del.type = 'button'; del.className = 'wk-del'; del.textContent = '×';
+      del.setAttribute('aria-label', '지우기'); del.title = '지우기';
+      del.addEventListener('click', () => removeRow(rowKind, entry));
+      row.appendChild(more); row.appendChild(del); $('list').appendChild(row);
     });
     selectionStatus();
   }
+  // 1104 사장님 "삭제는 x표시로 쉽게. 게시판 답변처럼": × 한 번에 지우고, 6초 동안 되돌리기
+  let undoTimer = null, lastRemoved = null;
+  function removeRow(rowKind, entry) {
+    if (!capture()) return;
+    try {
+      if (rowKind === 'temporary') db.clearTemporary(entry.id, entry.revision); else db.remove(entry.id, entry.revision);
+      if (current && current.id === entry.id) { current = null; editing = false; fill(); }
+      lastRemoved = {rowKind, entry};
+      $('undo-text').textContent = '지웠어요';
+      $('undo').hidden = false;
+      clearTimeout(undoTimer); undoTimer = setTimeout(() => { $('undo').hidden = true; lastRemoved = null; }, 6000);
+      draw();
+    } catch (_) { draw(); report('지우지 못했습니다. 다른 화면에서 바뀌었는지 확인해 주세요.'); }
+  }
+  $('undo-btn').addEventListener('click', () => {
+    if (!lastRemoved) return;
+    const {rowKind, entry} = lastRemoved; lastRemoved = null;
+    try {
+      const back = Object.assign({}, entry, {revision: 0});
+      if (rowKind === 'temporary') db.saveTemporary(back); else db.save(back);
+    } catch (_) { report('되돌리지 못했습니다.'); }
+    $('undo').hidden = true; clearTimeout(undoTimer); draw();
+  });
   $('copy-batch').addEventListener('click', async () => {
     try {
       const rows = db.temporaries(), texts = [];
@@ -435,7 +463,13 @@
           newMemo(candidate.name, candidate.address, true, 'selected_result', candidate.name, false);
           add.textContent = '✓'; row.classList.add('wk-copied'); setTimeout(() => { add.textContent = '메모로'; row.classList.remove('wk-copied'); }, 1200);
         });
-        row.appendChild(label); row.appendChild(add); target.appendChild(row);
+        const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'wk-copy'; copy.textContent = '복사';
+        copy.setAttribute('aria-label', (candidate.name || candidate.address) + ' 주소 복사'); copy.title = '주소 복사';
+        copy.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          if (await copyListText(candidate.address)) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
+        });
+        row.appendChild(label); row.appendChild(copy); row.appendChild(add); target.appendChild(row);
       });
       if (update.lane === 'cache') { const foot = document.createElement('p'); foot.className = 'wk-foot'; foot.textContent = '줄을 누르면 메모로 옮겨져요'; target.appendChild(foot); }
       settleEmpty(update.query);

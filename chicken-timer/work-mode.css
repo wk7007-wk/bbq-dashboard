@@ -241,3 +241,31 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .work-panel .wk-row > button.wk-pin { flex: none; min-height: 28px; height: 28px; padding: 0 9px; margin-right: 2px; border: 1px solid var(--wk-hair-2); border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--wk-text-2); }
 .work-panel .wk-row > button.wk-pin:hover { color: var(--wk-accent); border-color: rgba(88, 166, 255, .5); }
 .work-panel .work-search-result button.wk-add { color: var(--wk-accent); border-color: rgba(88, 166, 255, .35); }
+
+/* 검색 결과: '복사'와 '메모로' 둘 다(줄을 누르면 메모로, 복사는 따로) */
+.work-panel .work-search-result button.wk-copy { position: relative; z-index: 2; flex: none; min-height: 28px; height: 28px; padding: 0 9px; border-radius: 7px; font-size: 12.5px; color: var(--wk-text-2); }
+.work-panel .work-search-result button.wk-copy:hover { color: var(--wk-text); }
+.work-search-result { gap: 6px; }
+
+/* 메모 줄: 원문이 잘리지 않게 두 단 — 윗단 시각/고정·버튼, 아랫단 원문 전체(줄바꿈 그대로, 폭 끝까지) */
+.wk-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: start; gap: 0; }
+.work-panel .wk-row > button.wk-row-copy { grid-column: 1 / -1; grid-row: 1; display: flex; flex-direction: column; align-items: stretch; gap: 3px;
+  min-height: 0; padding: 7px 12px 10px; border-radius: 10px; white-space: normal; text-align: left; }
+.wk-row-head { display: flex; align-items: center; gap: 8px; min-height: 28px; padding-right: 96px; }
+.wk-row-fixed .wk-row-head { padding-right: 44px; }
+.wk-row-lead { min-width: 0; }
+.wk-row-text { display: block; white-space: pre-wrap; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; word-break: keep-all; line-height: 1.5; font-size: 14.5px; }
+.wk-row-text b { display: inline; }
+.work-panel .wk-row > button.wk-pin { grid-column: 2; grid-row: 1; position: relative; z-index: 1; margin: 7px 2px 0 0; }
+.work-panel .wk-row > button.wk-more { grid-column: 3; grid-row: 1; position: relative; z-index: 1; margin: 5px 4px 0 0; }
+
+/* 줄 오른쪽 위: 고정 · 수정 · ×(게시판 댓글처럼), 지운 뒤 6초 되돌리기 */
+.wk-row { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.wk-row-head { padding-right: 124px; }
+.wk-row-fixed .wk-row-head { padding-right: 78px; }
+.work-panel .wk-row > button.wk-more { grid-column: 3; width: auto; padding: 0 8px; font-size: 12px; font-weight: 600; color: var(--wk-text-3); margin: 7px 0 0 0; height: 28px; min-height: 28px; }
+.work-panel .wk-row > button.wk-del { grid-column: 4; grid-row: 1; position: relative; z-index: 1; width: 30px; height: 28px; min-height: 28px; margin: 7px 4px 0 0; padding: 0; border: 0; border-radius: 7px; font-size: 18px; line-height: 1; color: var(--wk-text-3); }
+.work-panel .wk-row > button.wk-del:hover { color: var(--wk-danger); background: rgba(240, 90, 75, .1); }
+.wk-undo { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 6px 12px; border-radius: 10px; background: var(--wk-raise); font-size: 13px; color: var(--wk-text-2); }
+.wk-undo[hidden] { display: none; }
+.work-panel .wk-undo button { min-height: 28px; height: 28px; padding: 0 10px; border-color: rgba(88, 166, 255, .45); color: var(--wk-accent); font-size: 12.5px; font-weight: 600; }
