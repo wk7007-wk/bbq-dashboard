@@ -8,36 +8,42 @@
   const board = document.querySelector('#board');
   if (!shell || !board || !window.NotebookWorkMemos || window.__notebookWorkMounted) return;
   window.__notebookWorkMounted = true;
+  const timerBar = document.createElement('header'); timerBar.className = 'work-timer-bar';
+  const timerLabel = document.createElement('strong'); timerLabel.textContent = '타이머';
   const button = document.createElement('button');
   button.type = 'button'; button.className = 'work-mode-open'; button.textContent = '메모로';
   button.setAttribute('aria-label', '메모로 돌아가기');
-  function attachButton() {
-    const head = document.querySelector('#recipe-strip > .board-cell-head');
-    if (head && button.parentNode !== head) head.appendChild(button);
-  }
-  attachButton();
-  new MutationObserver(() => { attachButton(); refreshHistorySource(); }).observe(board, {childList: true, subtree: true});
+  const timerAlert = document.createElement('button');
+  timerAlert.type = 'button'; timerAlert.className = 'work-timer-alert'; timerAlert.hidden = true;
+  timerAlert.addEventListener('click', () => {
+    const target = board.querySelector('.slot-card[data-state="expired"], .split-timer-unit[data-state="expired"]');
+    if (target && typeof target.scrollIntoView === 'function') target.scrollIntoView({block:'center'});
+  });
+  timerBar.appendChild(timerLabel); timerBar.appendChild(timerAlert); timerBar.appendChild(button);
+  shell.insertBefore(timerBar, board);
+  shell.classList.add('work-timer-shell');
+  new MutationObserver(() => { refreshHistorySource(); }).observe(board, {childList: true, subtree: true});
   const panel = document.createElement('section');
   panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '메모');
-  panel.innerHTML = '<header class="work-header"><button type="button" data-back>기록 · 타이머</button><strong>메모</strong><span data-timer-status aria-live="polite"></span></header>' +
-    '<div class="work-columns"><section class="work-search"><div class="work-search-line"><label>주소 또는 건물명<input data-query autocomplete="off"></label><div class="work-actions"><button type="button" data-search>검색</button><button type="button" data-stage-query>임시 담기</button></div></div><p data-search-status>주소검색 미연결</p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><h2>최근 기록</h2><p>누르면 타이머로 이동합니다</p><div data-history class="work-history-list"></div></aside>' +
-    '<section class="work-memos"><h2>메모</h2><div class="work-actions" role="group" aria-label="메모 종류" style="margin-block:8px"><button type="button" data-fixed aria-pressed="true" style="flex:1">고정 메모</button><button type="button" data-temporary aria-pressed="false" style="flex:1">임시 메모</button></div><button type="button" data-new>새 고정 메모</button><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 현재 미연결입니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ hiện chưa được kết nối.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は現在未接続です。</p></section></div></details><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
+  panel.innerHTML = '<span data-timer-status role="status" aria-live="polite" hidden></span>' +
+    '<div class="work-columns"><section class="work-search"><div class="work-search-line"><label><span class="work-sr-only">주소 또는 건물명</span><input data-query autocomplete="off" placeholder="주소 또는 건물명"></label><button type="button" data-back>타이머</button></div><div class="work-actions work-search-actions"><button type="button" data-search>검색</button><button type="button" data-stage-query>입력 담기</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
+    '<section class="work-memos"><div class="work-actions" role="group" aria-label="메모 종류" style="margin-block:8px"><button type="button" data-fixed aria-pressed="true" style="flex:1">고정 메모</button><button type="button" data-temporary aria-pressed="false" style="flex:1">임시 메모</button></div><button type="button" data-new>새 고정 메모</button><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
     '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>고객 문구 · 한국어<textarea data-customer></textarea></label>' +
-    '<section class="work-staff"><h3>직원 설명</h3><div class="work-languages">' +
+    '<details class="work-staff"><summary>직원 설명 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-languages">' +
     '<div><label>한국어<textarea data-ko></textarea></label><button type="button" data-copy-ko>직원 한국어 복사</button></div>' +
     '<div><label>베트남어<textarea data-vi></textarea></label><button type="button" data-copy-vi>직원 베트남어 복사</button></div>' +
     '<div><label>일본어<textarea data-ja></textarea></label><button type="button" data-copy-ja>직원 일본어 복사</button></div></div>' +
-    '<button type="button" data-copy-all>직원 세 언어 복사</button><div data-manual hidden><label>직원 설명 · 수동 복사<textarea data-manual-text readonly></textarea></label><button type="button" data-manual-select>직원 문구 전체 선택</button></div></section>' +
+    '<button type="button" data-copy-all>직원 세 언어 복사</button><div data-manual hidden><label>직원 설명 · 수동 복사<textarea data-manual-text readonly></textarea></label><button type="button" data-manual-select>직원 문구 전체 선택</button></div></details>' +
     '<div class="work-actions"><button type="button" data-save>저장</button><button type="button" data-copy>고객 한국어 복사</button><button type="button" data-pin hidden>고정으로 복사 저장</button><button type="button" data-clear hidden>이 임시 항목 비우기</button></div><div data-clear-confirm hidden><p>선택한 임시 항목만 비웁니다. 고정 메모와 다른 임시는 유지됩니다.</p><div class="work-actions"><button type="button" data-clear-now>비우기</button><button type="button" data-clear-cancel>취소</button></div></div></div><p data-status role="status"></p></section></div></div>';
   shell.appendChild(panel);
   const $ = (name) => panel.querySelector('[data-' + name + ']');
   function showTimerStatus() {
     const done = board.querySelectorAll('.slot-card[data-state="expired"], .split-timer-unit[data-state="expired"]').length;
-    $('timer-status').textContent = done ? '완료 알림 ' + done + '건' : '';
+    $('timer-status').textContent = done ? '완료 알림 ' + done + '건' : ''; $('timer-status').hidden = !done; timerAlert.hidden = !done; timerAlert.textContent = done ? '완료 알림 ' + done : '';
   }
   new MutationObserver(showTimerStatus).observe(board, {attributes: true, subtree: true, attributeFilter: ['data-state']});
   showTimerStatus();
-  let db, current = null, kind = 'fixed', clearTarget = null;
+  let db, current = null, kind = 'temporary', clearTarget = null, editing = false;
   let displayed = {};
   function rememberFields() { ['title','name','customer','ko','vi','ja'].forEach((name) => { displayed[name] = $(name).value; }); }
   const viewKey = 'notebook-work:view:subnote:v1';
@@ -90,11 +96,11 @@
   }
   async function copyListText(text) {
     if (!text.length) { report('복사할 한국어 값이 없습니다.'); return; }
-    try { await copyText(text); $('list-manual').hidden = true; report('선택한 한국어 값을 복사했습니다'); }
+    try { await copyText(text); $('list-manual').hidden = true; report('선택한 한국어 값을 복사했습니다'); return true; }
     catch (_) {
       $('list-manual-text').value = text; $('list-manual').hidden = false;
       $('list-manual-text').focus(); $('list-manual-text').select();
-      report('복사하지 못했습니다. 선택된 한국어 값을 직접 복사해 주세요.');
+      report('복사하지 못했습니다. 선택된 한국어 값을 직접 복사해 주세요.'); return false;
     }
   }
   function draw() {
@@ -102,6 +108,16 @@
     let list, drafts;
     try { list = kind === 'temporary' ? db.temporaries() : db.list(); drafts = kind === 'temporary' ? [] : db.drafts(); }
     catch (_) { $('list').replaceChildren(); report('저장 자료를 읽을 수 없습니다. 기존 자료를 보존합니다.'); return; }
+    $('fixed-chips').replaceChildren();
+    try { db.list().forEach((item) => {
+      const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'work-fixed-chip';
+      chip.textContent = item.title || item.customer_ko || '고정 메모';
+      chip.addEventListener('click', () => {
+        if (!capture()) return;
+        try { kind = 'fixed'; current = db.drafts().find((x) => x.id === item.id) || db.list().find((x) => x.id === item.id); editing = true; fill(); draw(); rememberView(); }
+        catch (_) { report('항목을 읽지 못했습니다. 기존 원문을 보존합니다.'); }
+      }); $('fixed-chips').appendChild(chip);
+    }); } catch (_) { report('고정 메모를 읽지 못했습니다. 기존 자료를 보존합니다.'); }
     const known = new Set(list.map((x) => x.id));
     list = list.concat(drafts.filter((x) => x && !known.has(x.id)));
     $('batch').hidden = kind !== 'temporary';
@@ -115,7 +131,7 @@
     list.forEach((entry) => {
       function edit() {
         if (!capture()) return;
-        try { current = kind === 'temporary' ? db.temporary(entry.id) : db.drafts().find((x) => x.id === entry.id) || db.list().find((x) => x.id === entry.id); fill(); rememberView(); }
+        try { current = kind === 'temporary' ? db.temporary(entry.id) : db.drafts().find((x) => x.id === entry.id) || db.list().find((x) => x.id === entry.id); editing = true; fill(); rememberView(); }
         catch (_) { report('항목을 읽지 못했습니다. 편집 내용을 보존합니다.'); }
       }
       if (kind !== 'temporary') {
@@ -127,7 +143,20 @@
       const card = document.createElement('article');
       card.setAttribute('data-temp-card', entry.id);
       card.setAttribute('style', 'width:100%;min-width:0;padding:8px;border:1px solid #8b9ba9;border-radius:8px;overflow-wrap:anywhere');
-      const heading = document.createElement('strong'); heading.textContent = entry.title || '임시 메모'; card.appendChild(heading);
+      const primary = document.createElement('button'); primary.type = 'button'; primary.className = 'work-card-copy';
+      primary.setAttribute('data-copy-address', entry.id);
+      const heading = document.createElement('strong'); heading.className='work-card-name'; heading.textContent = entry.name_ko || entry.title || '임시 메모'; primary.appendChild(heading);
+      const address = document.createElement('span'); address.className='work-card-address'; address.textContent=entry.customer_ko || ''; primary.appendChild(address);
+      const copyState = document.createElement('span'); copyState.className='work-card-state'; primary.appendChild(copyState);
+      primary.addEventListener('click', async () => {
+        try {
+          const latest = db.temporary(entry.id);
+          if (!latest || latest.revision !== entry.revision) { draw(); report('항목이 바뀌었습니다. 현재 값을 확인한 뒤 다시 복사해 주세요.'); return; }
+          if (await copyListText(entry.customer_ko || '')) copyState.textContent='복사됨';
+        } catch (_) { report('항목을 읽지 못했습니다. 기존 원문을 보존합니다.'); }
+      }); card.appendChild(primary);
+      const options = document.createElement('details'); options.className='work-card-options';
+      const summary = document.createElement('summary'); summary.textContent='선택·복사'; options.appendChild(summary);
       const actions = document.createElement('div'); actions.className = 'work-actions';
       actions.setAttribute('style', 'margin-top:8px');
       function valueRow(field, label) {
@@ -147,7 +176,7 @@
           $('list-manual').hidden = true; selectionStatus();
         });
         const preview = document.createElement('span'); preview.textContent = label + '\n' + text;
-        row.appendChild(check); row.appendChild(preview); card.appendChild(row);
+        row.appendChild(check); row.appendChild(preview); options.appendChild(row);
         const copy = document.createElement('button'); copy.type = 'button'; copy.textContent = label + ' 복사';
         copy.setAttribute('data-copy-field', field);
         copy.addEventListener('click', async () => {
@@ -161,9 +190,10 @@
       }
       valueRow('name_ko', '이름 / 건물명');
       valueRow('customer_ko', '주소 / 문구');
+      options.appendChild(actions); card.appendChild(options);
       const open = document.createElement('button'); open.type = 'button'; open.textContent = '편집';
       open.setAttribute('data-edit-temp', entry.id); open.addEventListener('click', edit); actions.appendChild(open);
-      card.appendChild(actions); $('list').appendChild(card);
+      card.appendChild(open); $('list').appendChild(card);
     });
     selectionStatus();
   }
@@ -193,7 +223,7 @@
     $('batch').hidden = $('name-label').hidden = kind !== 'temporary';
     $('current-kind').textContent = kind === 'temporary' ? '임시 메모 · 이 기기에 자동 보관' : '고정 메모';
     $('clear-confirm').hidden = true; clearTarget = null; $('manual').hidden = true;
-    $('editor').hidden = !current; if (!current) return;
+    $('editor').hidden = !current || !editing; if (!current) return;
     $('name').value = current.name_ko || '';
     $('title').value = current.title || ''; $('customer').value = current.customer_ko || '';
     const notes = current.staff_notes || {}; ['ko','vi','ja'].forEach((lang) => { $(lang).value = notes[lang] || ''; });
@@ -234,9 +264,9 @@
   ['title','name','customer','ko','vi','ja'].forEach((name) => $(name).addEventListener('input', () => capture(name)));
   ['fixed','temporary'].forEach((next) => $(next).addEventListener('click', () => {
     if (next === kind || !capture()) return;
-    kind = next; current = null; fill(); draw(); rememberView();
+    kind = next; current = null; editing = false; fill(); draw(); rememberView();
   }));
-  function newMemo(title, text, temporary, sourceKind, name) {
+  function newMemo(title, text, temporary, sourceKind, name, openEditor = true) {
     if (!db || !capture()) return;
     const next = {id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), revision: 0, title, customer_ko: text, staff_notes: {ko:'',vi:'',ja:''}, staff_meta: {}, created_at: Date.now()};
     if (sourceKind) next.source_kind = sourceKind;
@@ -244,7 +274,7 @@
     try {
       if (temporary) { next.created_order = db.temporaries().reduce((order, item) => Math.max(order, item.created_order || 0), 0) + 1; const saved = db.saveTemporary(next); kind = 'temporary'; current = saved; }
       else { db.saveDraft(next); current = next; }
-      fill(); draw(); rememberView(); report(temporary ? '새 임시 항목에 담았습니다' : '새 고정 메모를 편집합니다');
+      editing = openEditor; fill(); draw(); rememberView(); report(temporary ? '새 임시 항목에 담았습니다' : '새 고정 메모를 편집합니다');
     } catch (_) { report('새 항목을 저장하지 못했습니다. 기존 항목과 입력값을 보존합니다.'); }
   }
   $('new').addEventListener('click', () => newMemo('', '', kind === 'temporary'));
@@ -276,10 +306,41 @@
     throw new Error('private API not connected');
   }
   const cacheSearch = searchAdapters.cacheSearch || (async (query) => {
-    const result = await privateRequest('/notebook-work/local-search', {query});
-    if (!Array.isArray(result.results)) throw new Error('invalid source');
-    result.results.backupFileMtime = result.backup_file_mtime;
-    return result.results;
+    const endpoint = '/chicken-timer/search';
+    const note = (text) => { if ($('query').value.trim() === String(query).trim()) $('search-status').textContent = text; };
+    try {
+      // Verify the existing permitted source before sending an address.
+      // No PIN/token is read from storage, placed in a URL, or issued here.
+      const probe = await fetch(endpoint, {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
+      if (probe.status === 401) {
+        note('매장 연결 상태를 확인한 뒤 다시 검색해 주세요');
+        throw new Error('address access denied');
+      }
+      if (!probe.ok) throw new Error('address unavailable');
+      const capability = await probe.json();
+      if (capability.ok !== true || capability.address_search !== true) throw new Error('invalid capability');
+      const response = await fetch(endpoint + '?' + new URLSearchParams({q: query}),
+        {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
+      if (response.status === 401) {
+        note('매장 연결 상태를 확인한 뒤 다시 검색해 주세요');
+        throw new Error('address access denied');
+      }
+      if (response.status === 502) throw new Error('address lookup unresolved');
+      if (!response.ok) throw new Error('address lookup failed');
+      const body = await response.json();
+      if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid address result');
+      const results = body.results.map((item) => {
+        if (!item || typeof item.name !== 'string' || typeof item.address !== 'string' ||
+            !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
+        return {name: item.name, address: item.address, source: item.source, confirmed: item.confirmed};
+      });
+      note(results.length ? '주소검색 결과 ' + results.length + '개' : '검색 결과가 없습니다');
+      return results;
+    } catch (error) {
+      if (error.message === 'address lookup unresolved') note('주소를 찾지 못했거나 조회를 확인하지 못했습니다');
+      else if (error.message !== 'address access denied') note('주소검색 연결을 확인한 뒤 다시 시도해 주세요');
+      throw error;
+    }
   });
   const renderedQuery = {}, laneStatus = {};
   const searcher = window.NotebookWorkSearch && window.NotebookWorkSearch.create({
@@ -287,6 +348,7 @@
     externalSearch: searchAdapters.externalSearch, safeExternal: searchAdapters.safeExternal,
     onChange(update) {
       const target = $(update.lane + '-results');
+      if (update.lane === 'external' && typeof searchAdapters.externalSearch !== 'function') { target.replaceChildren(); return; }
       const statusText = (update.lane === 'cache' ? '기존 자료' : '외부 보완') + ' · ' +
         ({pending:'확인 중', ready:'결과', error:'연결 미확인'}[update.state] || '미확인');
       if (update.state !== 'ready' && renderedQuery[update.lane] === update.query && laneStatus[update.lane]) {
@@ -302,18 +364,16 @@
       if (update.lane === 'cache' && Number.isFinite(update.result.backupFileMtime)) {
         $('search-status').textContent = '기존 백업 파일 시각 · ' + new Date(update.result.backupFileMtime * 1000).toLocaleString('ko-KR');
       }
-      update.result.forEach((candidate) => {
+      update.result.slice(0, 3).forEach((candidate) => {
         if (!candidate || typeof candidate.name !== 'string' || typeof candidate.address !== 'string') return;
-        const row = document.createElement('button'); row.type = 'button';
-        row.textContent = candidate.name + ' · ' + candidate.address;
-        row.addEventListener('click', () => {
-          $('selection').textContent = row.textContent;
-          selected = {candidate, query:update.query, generation:searchGeneration};
-          $('selected-customer').value = candidate.address;
-          $('selected-actions').hidden = false; $('retry-feedback').hidden = !pendingFeedback;
-          $('feedback-status').textContent = pendingFeedback ? '이전 확인의 저장 결과를 확인해 주세요' : ''; $('correction').value = '';
-        });
-        target.appendChild(row);
+        const row = document.createElement('div'); row.className = 'work-search-result';
+        const label = document.createElement('span'); label.className = 'work-result-label';
+        const name = document.createElement('strong'); name.textContent = candidate.name;
+        const address = document.createElement('span'); address.textContent = candidate.address;
+        label.appendChild(name); label.appendChild(address);
+        const add = document.createElement('button'); add.type = 'button'; add.textContent = '담기';
+        add.addEventListener('click', () => newMemo(candidate.name, candidate.address, true, 'selected_result', candidate.name, false));
+        row.appendChild(label); row.appendChild(add); target.appendChild(row);
       });
     }
   });
@@ -321,7 +381,7 @@
   $('stage-query').addEventListener('click', () => {
     const text = $('query').value;
     if (!text.trim()) { $('search-status').textContent = '임시로 담을 주소를 입력해 주세요'; return; }
-    newMemo('입력 주소', text, true, 'address_input');
+    newMemo('입력 주소', text, true, 'address_input', undefined, false);
   });
   $('stage-selection').addEventListener('click', () => { if (selected) newMemo(selected.candidate.name, selected.candidate.address, true, 'selected_result', selected.candidate.name); });
   $('copy-selection').addEventListener('click', async () => {
@@ -353,6 +413,14 @@
   }
   ['confirm','reject','undo','correct'].forEach((action) => $(action).addEventListener('click', () => feedback(action)));
   $('retry-feedback').addEventListener('click', () => { if (pendingFeedback) sendFeedback(pendingFeedback); });
+  let queryComposing = false;
+  $('query').addEventListener('compositionstart', () => { queryComposing = true; });
+  $('query').addEventListener('compositionend', () => { queryComposing = false; });
+  $('query').addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.isComposing || queryComposing || event.keyCode === 229) return;
+    event.preventDefault();
+    $('search').click();
+  });
   $('search').addEventListener('click', () => {
     if (!searcher || !$('query').value.trim()) { $('search-status').textContent = '검색어를 입력해 주세요'; return; }
     $('selection').textContent = '';
@@ -373,21 +441,21 @@
   let memoScroll = 0;
   function showTimer() {
     memoScroll = panel.scrollTop || 0;
-    panel.hidden = true; board.hidden = false;
+    panel.hidden = true; timerBar.hidden = false; board.hidden = false;
     // Reuse the application's existing resize renderer after un-hiding its
     // original DOM; no start/restore/clear/store method is invoked here.
     if (typeof window.dispatchEvent === 'function' && typeof Event === 'function') window.dispatchEvent(new Event('resize'));
   }
   function showMemo() {
-    board.hidden = true; panel.hidden = false; draw(); refreshHistorySource();
+    board.hidden = true; timerBar.hidden = true; panel.hidden = false; draw(); refreshHistorySource();
     panel.scrollTop = memoScroll;
   }
   let historySource = null, historyObserver = null, historyText = null, historyRows = [];
   function renderHistory() {
-    if (!historySource) { $('history').textContent = '기록 확인 중 · 타이머에서 보기'; return; }
+    if (!historySource) { $('history').textContent = ''; if ($('history').parentNode) $('history').parentNode.hidden = true; return; }
     // Copy only known text cells from the existing log list. Recovery/sync
     // controls and source nodes stay in their original board unchanged.
-    const sourceRows = Array.from(historySource.children).filter((row) => row.tagName === 'LI');
+    const sourceRows = Array.from(historySource.children).filter((row) => row.tagName === 'LI').slice(0, 1); if ($('history').parentNode) $('history').parentNode.hidden = !sourceRows.length;
     const rows = sourceRows.map((row) =>
       ['.log-title','.log-status','.log-time'].map((name) => {
         const cell = row.querySelector(name); return cell ? cell.textContent : '';
@@ -402,7 +470,7 @@
       return;
     }
     historyRows = sourceRows; $('history').replaceChildren();
-    if (!rows.length) { $('history').textContent = '현재 기록이 없습니다'; return; }
+    if (!rows.length) { $('history').textContent = ''; return; }
     rows.forEach((text) => {
       const item = document.createElement('button'); item.type = 'button';
       item.className = 'work-history-item'; item.textContent = text;
