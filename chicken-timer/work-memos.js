@@ -51,6 +51,19 @@
         } catch (_) {}
         return old;
       },
+      // 1104 공장 SOT 공유: 공장 메모 저장소가 원본, 이 기기 저장소는 캐시 — 통째 읽기·바꾸기(초안은 이 기기에만)
+      snapshot() { return {fixed: api.list(), temps: api.temporaries()}; },
+      replaceAll(data) {
+        const fixed = Array.isArray(data && data.fixed) ? data.fixed : null;
+        const temps = Array.isArray(data && data.temps) ? data.temps : null;
+        const ok = (x) => x && typeof x === 'object' && typeof x.id === 'string' && x.id && Number.isInteger(x.revision) && x.revision >= 0;
+        if (!fixed || !temps || !fixed.every(ok) || !temps.every(ok)) throw new Error('공유 자료를 확인해 주세요');
+        storage.setItem(key, JSON.stringify(fixed));
+        const old = [];
+        for (let i = 0; i < storage.length; i++) { const name = storage.key(i); if (typeof name === 'string' && name.startsWith(temporaryPrefix)) old.push(name); }
+        old.forEach((name) => storage.removeItem(name));
+        temps.forEach((t) => storage.setItem(temporaryPrefix + encodeURIComponent(t.id), JSON.stringify([t])));
+      },
       temporaries() {
         const list = [];
         for (let i = 0; i < storage.length; i++) {

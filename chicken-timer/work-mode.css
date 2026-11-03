@@ -269,3 +269,9 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .wk-undo { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 6px 12px; border-radius: 10px; background: var(--wk-raise); font-size: 13px; color: var(--wk-text-2); }
 .wk-undo[hidden] { display: none; }
 .work-panel .wk-undo button { min-height: 28px; height: 28px; padding: 0 10px; border-color: rgba(88, 166, 255, .45); color: var(--wk-accent); font-size: 12.5px; font-weight: 600; }
+
+/* 공장 공유 상태(메모 카드 제목 옆) */
+.wk-share { margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--wk-text-3); }
+.wk-share:empty { display: none; }
+.wk-share.wk-share-on { color: var(--wk-ok); }
+.wk-share.wk-share-on::before { content: "● "; }
