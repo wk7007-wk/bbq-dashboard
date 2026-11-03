@@ -1,0 +1,19 @@
+.work-panel[hidden], #board[hidden] { display: none !important; }
+body[data-profile="subnote"] #board #recipe-strip > .board-cell-head > .work-mode-open { box-sizing: border-box; min-height: 44px !important; min-width: 44px !important; font-size: 14px !important; }
+.work-panel { box-sizing: border-box; position: fixed; inset: 0; z-index: 100; overflow: auto; background: #111820; color: #f7f7f7; padding: 12px 16px; font: 16px/1.5 sans-serif; }
+.work-panel *, .work-panel *::before, .work-panel *::after { box-sizing: border-box; }
+.work-header { display: flex; align-items: center; gap: 16px; min-height: 48px; }
+.work-columns { display: grid; grid-template-columns: minmax(0, clamp(0px, calc(70.175vw - 158.6px), 800px)) minmax(0, 1fr); gap: 16px; min-height: calc(100vh - 72px); }
+.work-search, .work-memos { min-width: 0; padding: 12px; background: #202c37; border-radius: 8px; }
+.work-panel button, .work-panel input, .work-panel textarea, .work-panel summary { min-height: 44px; font: inherit; }
+.work-panel button { padding: 8px 12px; cursor: pointer; }
+.work-panel input, .work-panel textarea { display: block; width: 100%; margin: 4px 0 12px; padding: 8px; color: #111; background: white; }
+.work-panel textarea { min-height: 100px; resize: vertical; white-space: pre-wrap; overflow-wrap: anywhere; }
+.work-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.work-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.work-languages { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.work-languages > div { min-width: 0; }
+.work-panel button:disabled { opacity: .5; cursor: default; }
+.work-search .work-languages { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.work-panel h2 { font-size: 20px; margin: 0 0 8px; }
+@media (max-width: 600px) { .work-panel { padding: 12px; } .work-columns { display: block; } .work-memos { margin-top: 12px; } .work-search .work-languages { grid-template-columns: minmax(0, 1fr); } }
