@@ -11,7 +11,7 @@
   const timerBar = document.createElement('header'); timerBar.className = 'work-timer-bar';
   const timerLabel = document.createElement('strong'); timerLabel.textContent = '타이머';
   const button = document.createElement('button');
-  button.type = 'button'; button.className = 'work-mode-open'; button.textContent = '메모로';
+  button.type = 'button'; button.className = 'work-mode-open'; button.textContent = '메모';
   button.setAttribute('aria-label', '메모로 돌아가기');
   const timerAlert = document.createElement('button');
   timerAlert.type = 'button'; timerAlert.className = 'work-timer-alert'; timerAlert.hidden = true;
@@ -25,21 +25,25 @@
   new MutationObserver(() => { refreshHistorySource(); }).observe(board, {childList: true, subtree: true});
   const panel = document.createElement('section');
   panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '메모');
-  panel.innerHTML = '<span data-timer-status role="status" aria-live="polite" hidden></span>' +
-    '<div class="work-columns"><section class="work-search"><div class="work-search-line"><label><span class="work-sr-only">주소 또는 건물명</span><input data-query autocomplete="off" placeholder="주소 또는 건물명"></label><button type="button" data-back>타이머</button></div><div class="work-actions work-search-actions"><button type="button" data-search>검색</button><button type="button" data-stage-query>입력 담기</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
-    '<section class="work-memos"><div class="work-actions" role="group" aria-label="메모 종류" style="margin-block:8px"><button type="button" data-fixed aria-pressed="true" style="flex:1">고정 메모</button><button type="button" data-temporary aria-pressed="false" style="flex:1">임시 메모</button></div><button type="button" data-new>새 고정 메모</button><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
-    '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>고객 문구 · 한국어<textarea data-customer></textarea></label>' +
+  panel.innerHTML = '<div class="wk-seg" role="tablist" aria-label="화면 전환"><button type="button" role="tab" aria-selected="true" class="wk-seg-on" tabindex="-1">메모</button><button type="button" role="tab" aria-selected="false" data-back>타이머<span class="wk-badge" data-seg-badge hidden></span></button></div>' +
+    '<button type="button" class="wk-urgent" data-urgent hidden></button><span data-timer-status role="status" aria-live="polite" hidden></span>' +
+    '<div class="work-columns"><section class="work-search"><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
+    '<section class="work-memos"><div class="wk-memo-head"><div class="wk-kind" role="group" aria-label="메모 종류"><button type="button" data-temporary aria-pressed="false">임시 메모</button><button type="button" data-fixed aria-pressed="true">자주 쓰는 문구</button></div><button type="button" class="wk-new" data-new>+ 새 메모</button></div><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
+    '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>주소·문구<textarea data-customer></textarea></label>' +
     '<details class="work-staff"><summary>직원 설명 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-languages">' +
     '<div><label>한국어<textarea data-ko></textarea></label><button type="button" data-copy-ko>직원 한국어 복사</button></div>' +
     '<div><label>베트남어<textarea data-vi></textarea></label><button type="button" data-copy-vi>직원 베트남어 복사</button></div>' +
     '<div><label>일본어<textarea data-ja></textarea></label><button type="button" data-copy-ja>직원 일본어 복사</button></div></div>' +
     '<button type="button" data-copy-all>직원 세 언어 복사</button><div data-manual hidden><label>직원 설명 · 수동 복사<textarea data-manual-text readonly></textarea></label><button type="button" data-manual-select>직원 문구 전체 선택</button></div></details>' +
-    '<div class="work-actions"><button type="button" data-save>저장</button><button type="button" data-copy>고객 한국어 복사</button><button type="button" data-pin hidden>고정으로 복사 저장</button><button type="button" data-clear hidden>이 임시 항목 비우기</button></div><div data-clear-confirm hidden><p>선택한 임시 항목만 비웁니다. 고정 메모와 다른 임시는 유지됩니다.</p><div class="work-actions"><button type="button" data-clear-now>비우기</button><button type="button" data-clear-cancel>취소</button></div></div></div><p data-status role="status"></p></section></div></div>';
+    '<div class="work-actions"><button type="button" class="wk-primary" data-save>저장</button><button type="button" data-copy>복사</button><button type="button" data-pin hidden>자주 쓰는 문구로</button><button type="button" data-clear hidden>지우기</button></div><div data-clear-confirm hidden><p>이 임시 메모만 지웁니다.</p><div class="work-actions"><button type="button" class="wk-danger" data-clear-now>지우기</button><button type="button" data-clear-cancel>취소</button></div></div></div><p data-status role="status"></p></section></div></div>';
   shell.appendChild(panel);
   const $ = (name) => panel.querySelector('[data-' + name + ']');
   function showTimerStatus() {
     const done = board.querySelectorAll('.slot-card[data-state="expired"], .split-timer-unit[data-state="expired"]').length;
-    $('timer-status').textContent = done ? '완료 알림 ' + done + '건' : ''; $('timer-status').hidden = !done; timerAlert.hidden = !done; timerAlert.textContent = done ? '완료 알림 ' + done : '';
+    $('timer-status').textContent = done ? '완료 알림 ' + done + '건' : ''; $('timer-status').hidden = !done; timerAlert.hidden = !done; timerAlert.textContent = done ? '완료 ' + done : '';
+    timerAlert.setAttribute('aria-label', done ? '완료 알림 ' + done + '건 보기' : '완료 알림');
+    $('seg-badge').textContent = done ? String(done) : ''; $('seg-badge').hidden = !done;
+    $('urgent').textContent = done ? '완료된 타이머 ' + done + '개 — 눌러서 확인' : ''; $('urgent').hidden = !done;
   }
   new MutationObserver(showTimerStatus).observe(board, {attributes: true, subtree: true, attributeFilter: ['data-state']});
   showTimerStatus();
@@ -112,7 +116,12 @@
     try { db.list().forEach((item) => {
       const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'work-fixed-chip';
       chip.textContent = item.title || item.customer_ko || '고정 메모';
-      chip.addEventListener('click', () => {
+      chip.title = '누르면 복사';
+      chip.addEventListener('click', async () => {
+        if (typeof item.customer_ko === 'string' && item.customer_ko.length) {
+          if (await copyListText(item.customer_ko)) { chip.classList.add('wk-copied'); setTimeout(() => chip.classList.remove('wk-copied'), 1400); }
+          return;
+        }
         if (!capture()) return;
         try { kind = 'fixed'; current = db.drafts().find((x) => x.id === item.id) || db.list().find((x) => x.id === item.id); editing = true; fill(); draw(); rememberView(); }
         catch (_) { report('항목을 읽지 못했습니다. 기존 원문을 보존합니다.'); }
@@ -137,12 +146,12 @@
       if (kind !== 'temporary') {
         const node = document.createElement('button'); node.type = 'button';
         node.textContent = (entry.title || '제목 없는 메모') + (entry.customer_ko ? '\n' + entry.customer_ko : '');
-        node.setAttribute('style', 'max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left');
+        node.className = 'wk-fixed-row';
         node.addEventListener('click', edit); $('list').appendChild(node); return;
       }
       const card = document.createElement('article');
       card.setAttribute('data-temp-card', entry.id);
-      card.setAttribute('style', 'width:100%;min-width:0;padding:8px;border:1px solid #8b9ba9;border-radius:8px;overflow-wrap:anywhere');
+      card.className = 'wk-card';
       const primary = document.createElement('button'); primary.type = 'button'; primary.className = 'work-card-copy';
       primary.setAttribute('data-copy-address', entry.id);
       const heading = document.createElement('strong'); heading.className='work-card-name'; heading.textContent = entry.name_ko || entry.title || '임시 메모'; primary.appendChild(heading);
@@ -152,7 +161,7 @@
         try {
           const latest = db.temporary(entry.id);
           if (!latest || latest.revision !== entry.revision) { draw(); report('항목이 바뀌었습니다. 현재 값을 확인한 뒤 다시 복사해 주세요.'); return; }
-          if (await copyListText(entry.customer_ko || '')) copyState.textContent='복사됨';
+          if (await copyListText(entry.customer_ko || '')) { copyState.textContent = '✓ 복사됨'; card.classList.add('wk-copied'); setTimeout(() => { card.classList.remove('wk-copied'); copyState.textContent = ''; }, 1600); }
         } catch (_) { report('항목을 읽지 못했습니다. 기존 원문을 보존합니다.'); }
       }); card.appendChild(primary);
       const options = document.createElement('details'); options.className='work-card-options';
@@ -191,7 +200,7 @@
       valueRow('name_ko', '이름 / 건물명');
       valueRow('customer_ko', '주소 / 문구');
       options.appendChild(actions); card.appendChild(options);
-      const open = document.createElement('button'); open.type = 'button'; open.textContent = '편집';
+      const open = document.createElement('button'); open.type = 'button'; open.className = 'wk-more'; open.textContent = '⋯'; open.setAttribute('aria-label', '편집·지우기'); open.title = '편집·지우기';
       open.setAttribute('data-edit-temp', entry.id); open.addEventListener('click', edit); actions.appendChild(open);
       card.appendChild(open); $('list').appendChild(card);
     });
@@ -216,12 +225,12 @@
   function fill() {
     ['fixed','temporary'].forEach((name) => {
       $(name).setAttribute('aria-pressed', String(kind === name));
-      $(name).setAttribute('style', 'flex:1;' + (kind === name ? 'background:#176b83;color:#fff;font-weight:700;outline:2px solid currentColor;outline-offset:-2px' : ''));
+      $(name).removeAttribute('style');
     });
-    $('new').textContent = kind === 'temporary' ? '새 임시 메모' : '새 고정 메모';
+    $('new').textContent = kind === 'temporary' ? '+ 새 메모' : '+ 새 문구';
     $('pin').hidden = $('clear').hidden = kind !== 'temporary';
     $('batch').hidden = $('name-label').hidden = kind !== 'temporary';
-    $('current-kind').textContent = kind === 'temporary' ? '임시 메모 · 이 기기에 자동 보관' : '고정 메모';
+    $('current-kind').textContent = kind === 'temporary' ? '임시 메모 · 이 기기에 자동 보관' : '자주 쓰는 문구';
     $('clear-confirm').hidden = true; clearTarget = null; $('manual').hidden = true;
     $('editor').hidden = !current || !editing; if (!current) return;
     $('name').value = current.name_ko || '';
@@ -334,10 +343,10 @@
             !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
         return {name: item.name, address: item.address, source: item.source, confirmed: item.confirmed};
       });
-      note(results.length ? '주소검색 결과 ' + results.length + '개' : '검색 결과가 없습니다');
+      note('');
       return results;
     } catch (error) {
-      if (error.message === 'address lookup unresolved') note('주소를 찾지 못했거나 조회를 확인하지 못했습니다');
+      if (error.message === 'address lookup unresolved') note('못 찾았어요 — 이름 일부(예: 삼익)나 도로명으로 다시 찾아 보세요');
       else if (error.message !== 'address access denied') note('주소검색 연결을 확인한 뒤 다시 시도해 주세요');
       throw error;
     }
@@ -349,32 +358,53 @@
     onChange(update) {
       const target = $(update.lane + '-results');
       if (update.lane === 'external' && typeof searchAdapters.externalSearch !== 'function') { target.replaceChildren(); return; }
-      const statusText = (update.lane === 'cache' ? '기존 자료' : '외부 보완') + ' · ' +
-        ({pending:'확인 중', ready:'결과', error:'연결 미확인'}[update.state] || '미확인');
+      const statusText = update.lane === 'cache'
+        ? ({pending:'찾는 중…', ready:''}[update.state] || '')
+        : '외부 보완 · ' + ({pending:'확인 중', ready:'결과', error:'연결 미확인'}[update.state] || '미확인');
       if (update.state !== 'ready' && renderedQuery[update.lane] === update.query && laneStatus[update.lane]) {
         laneStatus[update.lane].textContent = statusText;
         return;
       }
       target.replaceChildren();
-      const title = document.createElement('p');
+      const title = document.createElement('p'); title.className = 'wk-lane-status' + (update.state === 'error' ? ' wk-err' : '');
       title.textContent = statusText; laneStatus[update.lane] = title;
       target.appendChild(title);
       if (update.state !== 'ready' || !Array.isArray(update.result)) return;
       renderedQuery[update.lane] = update.query;
       if (update.lane === 'cache' && Number.isFinite(update.result.backupFileMtime)) {
-        $('search-status').textContent = '기존 백업 파일 시각 · ' + new Date(update.result.backupFileMtime * 1000).toLocaleString('ko-KR');
+        $('search-status').textContent = '';
       }
-      update.result.slice(0, 3).forEach((candidate) => {
-        if (!candidate || typeof candidate.name !== 'string' || typeof candidate.address !== 'string') return;
+      const shown = update.result.slice(0, 3).filter((candidate) => candidate && typeof candidate.name === 'string' && typeof candidate.address === 'string');
+      if (update.lane === 'cache' && !shown.length) {
+        const empty = document.createElement('div'); empty.className = 'wk-empty';
+        const head = document.createElement('strong'); head.textContent = '찾는 주소가 없어요';
+        const tip = document.createElement('span'); tip.textContent = '‘삼익’처럼 이름 일부만 넣거나 도로명으로 찾아 보세요.';
+        empty.appendChild(head); empty.appendChild(tip); target.appendChild(empty); return;
+      }
+      const marked = (text) => {
+        const frag = document.createDocumentFragment(), q = String(update.query || '').trim();
+        const at = q ? text.indexOf(q) : -1;
+        if (at < 0) { frag.appendChild(document.createTextNode(text)); return frag; }
+        frag.appendChild(document.createTextNode(text.slice(0, at)));
+        const hit = document.createElement('mark'); hit.textContent = text.slice(at, at + q.length); frag.appendChild(hit);
+        frag.appendChild(document.createTextNode(text.slice(at + q.length))); return frag;
+      };
+      shown.forEach((candidate) => {
         const row = document.createElement('div'); row.className = 'work-search-result';
         const label = document.createElement('span'); label.className = 'work-result-label';
-        const name = document.createElement('strong'); name.textContent = candidate.name;
+        const name = document.createElement('strong'); name.appendChild(marked(candidate.name || candidate.address));
+        if (candidate.source === 'db' || candidate.source === 'naver') {
+          const src = document.createElement('span'); src.className = 'wk-src' + (candidate.source === 'naver' ? ' wk-src-map' : '');
+          src.textContent = candidate.source === 'db' ? 'DB' : '지도'; name.appendChild(src);
+        }
         const address = document.createElement('span'); address.textContent = candidate.address;
         label.appendChild(name); label.appendChild(address);
-        const add = document.createElement('button'); add.type = 'button'; add.textContent = '담기';
+        const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '+';
+        add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모에 담기'); add.title = '메모에 담기';
         add.addEventListener('click', () => newMemo(candidate.name, candidate.address, true, 'selected_result', candidate.name, false));
         row.appendChild(label); row.appendChild(add); target.appendChild(row);
       });
+      if (update.lane === 'cache') { const foot = document.createElement('p'); foot.className = 'wk-foot'; foot.textContent = '줄을 누르면 메모에 담겨요'; target.appendChild(foot); }
     }
   });
   $('query').addEventListener('input', () => { if (searcher) searcher.invalidate($('query').value); selected = null; $('selected-actions').hidden = true; });
@@ -425,7 +455,7 @@
     if (!searcher || !$('query').value.trim()) { $('search-status').textContent = '검색어를 입력해 주세요'; return; }
     $('selection').textContent = '';
     selected = null; $('selected-actions').hidden = true;
-    $('search-status').textContent = '출처별 검색';
+    $('search-status').textContent = '';
     searchGeneration = typeof searchAdapters.generation === 'function' ? searchAdapters.generation() : null;
     searcher.search($('query').value, searchGeneration);
   });
@@ -491,5 +521,6 @@
   }
   button.addEventListener('click', showMemo);
   $('back').addEventListener('click', showTimer);
+  $('urgent').addEventListener('click', () => { showTimer(); timerAlert.click(); });
   showMemo();
 })();
