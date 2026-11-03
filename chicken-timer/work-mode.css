@@ -99,7 +99,10 @@
 .work-result-label strong mark { background: none; color: var(--wk-accent); }
 .work-result-label > span { font-size: 12.5px; line-height: 1.35; color: var(--wk-text-2); overflow-wrap: anywhere; }
 .wk-src { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; font: 600 10px/1 var(--wk-font); color: var(--wk-text-3); vertical-align: 1px; }
-.wk-src::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--wk-ok); }
+.wk-src::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--wk-text-3); }
+.wk-src.wk-src-hi { color: var(--wk-ok); }
+.wk-src.wk-src-hi::before { background: var(--wk-ok); }
+.wk-src.wk-src-map { color: #c9a640; }
 .wk-src.wk-src-map::before { background: var(--wk-warn); }
 /* 줄 아무 데나 눌러도 담기 — 담기 버튼이 줄 전체를 덮는다 */
 .work-panel .work-search-result button.wk-add { flex: none; width: 28px; height: 28px; min-height: 28px; padding: 0; display: grid; place-items: center; font-size: 17px; line-height: 1; color: var(--wk-text-2); position: static; }

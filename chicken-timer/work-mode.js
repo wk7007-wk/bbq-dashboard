@@ -341,7 +341,7 @@
       const results = body.results.map((item) => {
         if (!item || typeof item.name !== 'string' || typeof item.address !== 'string' ||
             !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
-        return {name: item.name, address: item.address, source: item.source, confirmed: item.confirmed};
+        return {name: item.name, address: item.address, source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null};
       });
       note('');
       return results;
@@ -358,7 +358,7 @@
     const body = await response.json();
     if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid map result');
     return body.results.filter((item) => item && typeof item.name === 'string' && typeof item.address === 'string')
-      .map((item) => ({name: item.name, address: item.address, source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true}));
+      .map((item) => ({name: item.name, address: item.address, source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true, uses: Number.isFinite(item.uses) ? item.uses : null}));
   });
   const safeExternal = searchAdapters.safeExternal || ((query) => query);
   // 두 갈래가 같은 곳을 두 번 보이지 않게: 도로명+번지(없으면 공백 뺀 주소)가 같고 이름도 같거나 한쪽 이름이 비었을 때만 같은 곳
@@ -422,8 +422,13 @@
         const label = document.createElement('span'); label.className = 'work-result-label';
         const name = document.createElement('strong'); name.appendChild(marked(candidate.name || candidate.address));
         if (candidate.source === 'db' || candidate.source === 'naver') {
-          const src = document.createElement('span'); src.className = 'wk-src' + (candidate.source === 'naver' ? ' wk-src-map' : '');
-          src.textContent = candidate.source === 'db' ? 'DB' : '지도'; name.appendChild(src);
+          // 출처 신뢰: 실제 배달에 쓰인 횟수가 많을수록 믿을 만함, 지도(네이버)는 배달 기록이 없는 추정
+          const src = document.createElement('span'); let cls = 'wk-src', label, tip;
+          if (candidate.source === 'naver') { cls += ' wk-src-map'; label = '지도 · 미확인'; tip = '네이버 지도 추정 — 배달 기록 없음'; }
+          else if (Number.isFinite(candidate.uses) && candidate.uses >= 3) { cls += ' wk-src-hi'; label = '배달 ' + candidate.uses + '회'; tip = '우리 가게 배달 기록 ' + candidate.uses + '회'; }
+          else if (Number.isFinite(candidate.uses) && candidate.uses > 0) { label = '배달 ' + candidate.uses + '회'; tip = '배달 기록이 적음'; }
+          else { if (candidate.confirmed) cls += ' wk-src-hi'; label = candidate.confirmed ? '확인됨' : 'DB'; tip = candidate.confirmed ? '배달 기록으로 확인된 주소' : '배달 DB 기록'; }
+          src.className = cls; src.textContent = label; src.title = tip; name.appendChild(src);
         }
         const address = document.createElement('span'); address.textContent = candidate.address;
         label.appendChild(name); label.appendChild(address);
