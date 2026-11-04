@@ -439,7 +439,7 @@
       const results = body.results.map((item) => {
         if (!item || typeof item.name !== 'string' || typeof item.address !== 'string' ||
             !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
-        return {name: item.name, address: item.address, source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null};
+        return {name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null};
       });
       note('');
       return results;
@@ -456,7 +456,7 @@
     const body = await response.json();
     if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid map result');
     return body.results.filter((item) => item && typeof item.name === 'string' && typeof item.address === 'string')
-      .map((item) => ({name: item.name, address: item.address, source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true, uses: Number.isFinite(item.uses) ? item.uses : null}));
+      .map((item) => ({name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true, uses: Number.isFinite(item.uses) ? item.uses : null}));
   });
   const safeExternal = searchAdapters.safeExternal || ((query) => query);
   // 두 갈래가 같은 곳을 두 번 보이지 않게: 도로명+번지(없으면 공백 뺀 주소)가 같고 이름도 같거나 한쪽 이름이 비었을 때만 같은 곳
@@ -507,6 +507,14 @@
       (laneSeen[update.query] = laneSeen[update.query] || {})[update.lane] = mine;
       mark(shown.length);
       if (!shown.length) { if (!title.textContent) target.replaceChildren(); return; }
+      // 1104 사장님 "주소는 구주소 신주소모두뜨게": 지번은 도로명과 같은 시·군 앞부분을 빼고 짧게 붙인다
+      const shortJibun = (road, jibun) => {
+        let j = String(jibun || '').trim(); if (!j || j === road) return '';
+        const parts = j.split(/\s+/), roadParts = String(road || '').split(/\s+/);
+        let i = 0; while (i < parts.length - 1 && i < 2 && (parts[i] === roadParts[i] || parts[i].replace(/도$/, '') === roadParts[i].replace(/도$/, ''))) i += 1;
+        return parts.slice(i).join(' ');
+      };
+      const fullAddress = (c) => { const j = shortJibun(c.address, c.jibun); return j ? c.address + ' (' + j + ')' : c.address; };
       const marked = (text) => {
         const frag = document.createDocumentFragment(), q = String(update.query || '').trim();
         const at = q ? text.indexOf(q) : -1;
@@ -530,17 +538,19 @@
         }
         const address = document.createElement('span'); address.textContent = candidate.address;
         label.appendChild(name); label.appendChild(address);
+        const jibunText = shortJibun(candidate.address, candidate.jibun);
+        if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.textContent = '지번 ' + jibunText; label.appendChild(j); }
         const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '메모로';
         add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모로 옮기기'); add.title = '메모로 옮기기';
         add.addEventListener('click', () => {
-          newMemo(candidate.name, candidate.address, true, 'selected_result', candidate.name, false);
+          newMemo(candidate.name, fullAddress(candidate), true, 'selected_result', candidate.name, false);
           add.textContent = '✓'; row.classList.add('wk-copied'); setTimeout(() => { add.textContent = '메모로'; row.classList.remove('wk-copied'); }, 1200);
         });
         const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'wk-copy'; copy.textContent = '복사';
         copy.setAttribute('aria-label', (candidate.name || candidate.address) + ' 주소 복사'); copy.title = '주소 복사';
         copy.addEventListener('click', async (event) => {
           event.stopPropagation();
-          if (await copyListText(candidate.address)) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
+          if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
         });
         row.appendChild(label); row.appendChild(copy); row.appendChild(add); target.appendChild(row);
       });

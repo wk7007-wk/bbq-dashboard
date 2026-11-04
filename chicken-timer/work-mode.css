@@ -275,3 +275,6 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .wk-share:empty { display: none; }
 .wk-share.wk-share-on { color: var(--wk-ok); }
 .wk-share.wk-share-on::before { content: "● "; }
+
+/* 구주소(지번) 한 줄 — 도로명 아래 작게 */
+.work-result-label > span.wk-jibun { font-size: 12px; line-height: 1.35; color: var(--wk-text-3); }
