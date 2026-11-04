@@ -27,7 +27,7 @@
   panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '메모');
   panel.innerHTML = '<div class="wk-seg" role="tablist" aria-label="화면 전환"><button type="button" role="tab" aria-selected="true" class="wk-seg-on" tabindex="-1">메모</button><button type="button" role="tab" aria-selected="false" data-back>타이머<span class="wk-badge" data-seg-badge hidden></span></button></div>' +
     '<button type="button" class="wk-urgent" data-urgent hidden></button><span data-timer-status role="status" aria-live="polite" hidden></span>' +
-    '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><div data-ai-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
+    '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-memo-results></div><div data-external-results></div><div data-ai-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
     '<section class="work-memos wk-card-box"><h2 class="wk-card-title">메모<span class="wk-share" data-share></span></h2><div class="wk-memo-head"><div class="wk-kind" role="group" aria-label="메모 종류"><button type="button" data-temporary aria-pressed="false">임시 메모</button><button type="button" data-fixed aria-pressed="true">자주 쓰는 문구</button></div><button type="button" class="wk-new" data-new>+ 새 메모</button></div><label class="wk-line-field"><span class="work-sr-only">메모 한 줄</span><input data-line autocomplete="off" enterkeyhint="done" placeholder="메모 한 줄 쓰고 Enter"></label><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div class="wk-undo" data-undo hidden><span data-undo-text></span><button type="button" data-undo-btn>되돌리기</button></div><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
     '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>메모<textarea data-customer rows="2"></textarea></label>' +
     '<details class="work-staff"><summary>직원 설명 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-languages">' +
@@ -476,7 +476,10 @@
           phones: strs(item.phones, 5), raw_line: typeof item.raw_line === 'string' ? item.raw_line : '',
           last_delivery_at: typeof item.last_delivery_at === 'string' ? item.last_delivery_at : '',
           matched_tokens: strs(item.matched_tokens, 8), matched_alias: typeof item.matched_alias === 'string' ? item.matched_alias : '',
-          match_kind: item.match_kind === 'partial' ? 'partial' : item.match_kind === 'all' ? 'all' : ''};
+          match_kind: ['all', 'partial', 'similar'].includes(item.match_kind) ? item.match_kind : '',
+          matched_query: typeof item.matched_query === 'string' ? item.matched_query : '',
+          dong: typeof item.dong === 'string' ? item.dong : '', ho: typeof item.ho === 'string' ? item.ho : '',
+          last_seen_at: typeof item.last_seen_at === 'string' ? item.last_seen_at : ''};
   };
   const cacheSearch = searchAdapters.cacheSearch || (async (query) => {
     const endpoint = '/chicken-timer/search';
@@ -520,7 +523,8 @@
     if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid map result');
     return body.results.filter((item) => item && typeof item.name === 'string' && typeof item.address === 'string')
       .map((item) => ({name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true, uses: Number.isFinite(item.uses) ? item.uses : null,
-        provider: item.provider === 'kakao' || item.provider === 'ncp' ? item.provider : ''}));
+        provider: item.provider === 'kakao' || item.provider === 'ncp' ? item.provider : '',
+        match_kind: item.match_kind === 'similar' ? 'similar' : '', matched_query: typeof item.matched_query === 'string' ? item.matched_query : ''}));
   });
   const safeExternal = searchAdapters.safeExternal || ((query) => query);
   // 두 갈래가 같은 곳을 두 번 보이지 않게: 도로명+번지(없으면 공백 뺀 주소)가 같고 이름도 같거나 한쪽 이름이 비었을 때만 같은 곳
@@ -562,8 +566,24 @@
       if (!items.length) return;                                                    // AI 가 더 찾은 곳이 없으면 칸을 비워 둔다
       const tokens = query.split(/\s+/).filter(Boolean);
       items.slice(0, 3).forEach((x) => box.appendChild(resultRow({name: x.name, address: x.address, jibun: typeof x.jibun === 'string' ? x.jibun : '', source: 'ai',
-        confirmed: false, provider: x.provider, phones: [], matched_tokens: [], matched_alias: '', ai_note: typeof x.interpreted === 'string' ? x.interpreted : ''}, tokens)));
+        confirmed: false, provider: x.provider, phones: [], matched_tokens: [], matched_alias: '', ai_note: typeof x.interpreted_query === 'string' ? x.interpreted_query : typeof x.interpreted === 'string' ? x.interpreted : ''}, tokens)));
     }
+  }
+  // #5620 메모 갈래: 메모(고정·임시)에 적어 둔 말도 검색 — 빈칸 뺀 글에 조각이 모두 들어 있으면(최근 것 먼저 3개)
+  function memoLane(query) {
+    const box = $('memo-results'); if (!box) return;
+    box.replaceChildren();
+    if (!db || !query) return;
+    const norm = (t) => String(t || '').replace(/\s+/g, '');
+    const toks = query.split(/\s+/).map(norm).filter(Boolean);
+    let rows = [];
+    try { rows = db.list().concat(db.temporaries()); } catch (_) { return; }
+    const hits = rows.filter((m) => { const t = norm([m.title, m.name_ko, m.customer_ko].join(' ')); return toks.length && toks.every((k) => t.indexOf(k) > -1); })
+      .sort((a, b) => (Number(b.created_at) || 0) - (Number(a.created_at) || 0)).slice(0, 3);
+    if (!hits.length) return;
+    const tokens = query.split(/\s+/).filter(Boolean);
+    hits.forEach((m) => box.appendChild(resultRow({name: m.title || m.name_ko || String(m.customer_ko || '').slice(0, 24), address: String(m.customer_ko || ''), jibun: '',
+      source: 'memo', confirmed: false, phones: [], matched_tokens: [], matched_alias: ''}, tokens)));
   }
   function settleEmpty(query) {
     const done = laneDone[query] || {};
@@ -620,6 +640,7 @@
     const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(markTokens(candidate.name || candidate.address, tokens));
     const src = document.createElement('span'); let cls = 'wk-src', label, tip;
     if (candidate.source === 'ai') { cls += ' wk-src-ai'; label = 'AI 추정'; tip = 'AI 가 말을 풀어 지도로 다시 찾은 곳 — 배달 기록 없음'; }
+    else if (candidate.source === 'memo') { cls += ' wk-src-memo'; label = '메모'; tip = '메모에 적어 둔 것'; }
     else if (candidate.source === 'naver') {
       cls += ' wk-src-map';
       label = candidate.provider === 'ncp' ? '네이버 지도' : candidate.provider === 'kakao' ? '카카오 지도' : '지도';
@@ -646,16 +667,19 @@
       event.stopPropagation();
       if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
     });
-    acts.appendChild(copy); acts.appendChild(add);
+    acts.appendChild(copy); if (candidate.source !== 'memo') acts.appendChild(add);   // 메모 결과는 이미 메모라 '메모로' 없음
     top.appendChild(name); top.appendChild(acts);
+    const dongHo = [candidate.dong && !/동$/.test(candidate.dong) ? candidate.dong + '동' : candidate.dong, candidate.ho && !/호$/.test(candidate.ho) ? candidate.ho + '호' : candidate.ho].filter(Boolean).join(' ');
+    if (dongHo && String(candidate.address || '').indexOf(dongHo) < 0) address.appendChild(document.createTextNode(' · ' + dongHo));
     row.appendChild(top); row.appendChild(address);
     if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.appendChild(markTokens('지번 ' + jibunText, tokens)); row.appendChild(j); }
     const phones = candidate.phones || [];
-    if (phones.length || candidate.last_delivery_at) {   // 1104 사장님 "번호도 원문베이스로": 전화(맞은 숫자 강조)·최근 배달
+    if (phones.length || candidate.last_delivery_at || candidate.last_seen_at) {   // 1104 사장님 "번호도 원문베이스로": 전화(맞은 숫자 강조)·최근 배달
       const ph = document.createElement('span'); ph.className = 'wk-phone';
       if (phones.length) { ph.appendChild(document.createTextNode('☎ ')); ph.appendChild(markPhone(phones[0], tokens)); if (phones.length > 1) ph.appendChild(document.createTextNode(' 외 ' + (phones.length - 1))); }
-      const md = monthDay(candidate.last_delivery_at);
+      const md = monthDay(candidate.last_delivery_at), ms = md ? '' : monthDay(candidate.last_seen_at);
       if (md) ph.appendChild(document.createTextNode((phones.length ? ' · ' : '') + '최근 배달 ' + md));
+      else if (ms) ph.appendChild(document.createTextNode((phones.length ? ' · ' : '') + '최근 기록 ' + ms));
       row.appendChild(ph);
     }
     if (candidate.raw_line) {   // 원문 한 줄 펼쳐 보기(줄을 눌러 메모로 옮기는 것과 따로)
@@ -717,10 +741,14 @@
       }
       seen[update.lane] = [];
       const qTokens = String(update.query || '').trim().split(/\s+/).filter(Boolean);
-      let partialShown = false;
+      let partialShown = false, similarShown = false;
       shown.forEach((candidate) => {
         if (isDb && candidate.match_kind === 'partial' && !partialShown) {   // 여러 조각 중 일부만 맞은 기록은 아래로
           partialShown = true; const ph = document.createElement('p'); ph.className = 'wk-partial'; ph.textContent = '일부만 맞음'; target.appendChild(ph);
+        }
+        if (candidate.match_kind === 'similar' && !similarShown) {             // 0건 → 서버가 말을 나눠 찾은 비슷한 곳
+          similarShown = true; const sh = document.createElement('p'); sh.className = 'wk-partial';
+          sh.textContent = candidate.matched_query ? '‘' + candidate.matched_query + '’(으)로 찾은 비슷한 곳' : '비슷한 곳'; target.appendChild(sh);
         }
         const row = resultRow(candidate, candidate.matched_tokens && candidate.matched_tokens.length ? candidate.matched_tokens : qTokens);
         target.appendChild(row);
@@ -809,6 +837,7 @@
     searchGeneration = typeof searchAdapters.generation === 'function' ? searchAdapters.generation() : null;
     searcher.search($('query').value, searchGeneration);
     aiLane($('query').value.trim());   // 1104 사장님 "ai는 비동기로 동시 돌려": DB·지도와 같이 바로(기다리지 않음)
+    memoLane($('query').value.trim());   // #5620: 메모에 적어 둔 장소·별명도 다음 검색에서 찾힌다
   });
   try {
     const view = JSON.parse(window.localStorage.getItem(viewKey));

@@ -305,3 +305,7 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 [data-ai-results]:empty { display: none; }
 [data-ai-results]:not(:empty) { margin-top: 6px; background: var(--wk-bg); border: 1px dashed rgba(224, 180, 74, .45); border-radius: 10px; overflow: hidden; }
 .wk-alias.wk-ai-note { color: #e0b44a; background: rgba(224, 180, 74, .12); }
+[data-memo-results]:empty { display: none; }
+[data-memo-results]:not(:empty) { margin-top: 6px; background: var(--wk-bg); border: 1px solid rgba(127, 211, 199, .35); border-radius: 10px; overflow: hidden; }
+.wk-src.wk-src-memo { color: #7fd3c7; }
+.wk-src.wk-src-memo::before { background: #7fd3c7; }
