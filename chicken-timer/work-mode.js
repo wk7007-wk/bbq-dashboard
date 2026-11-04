@@ -474,12 +474,13 @@
         return {name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null,
           // 1104 #5604 통합 검색 계약: 전화·원문·최근 배달·맞은 조각·별명·일치 종류(없으면 빈 값 — 예전 서버도 그대로)
           phones: strs(item.phones, 5), raw_line: typeof item.raw_line === 'string' ? item.raw_line : '',
-          last_delivery_at: typeof item.last_delivery_at === 'string' ? item.last_delivery_at : '',
+          // #5628: 서버 날짜는 epoch 초(number|null) — 숫자도 보존(옛 글자 ISO 도 받음), 모르면 빈 값
+          last_delivery_at: Number.isFinite(item.last_delivery_at) || typeof item.last_delivery_at === 'string' ? item.last_delivery_at : '',
           matched_tokens: strs(item.matched_tokens, 8), matched_alias: typeof item.matched_alias === 'string' ? item.matched_alias : '',
           match_kind: ['all', 'partial', 'similar'].includes(item.match_kind) ? item.match_kind : '',
           matched_query: typeof item.matched_query === 'string' ? item.matched_query : '',
           dong: typeof item.dong === 'string' ? item.dong : '', ho: typeof item.ho === 'string' ? item.ho : '',
-          last_seen_at: typeof item.last_seen_at === 'string' ? item.last_seen_at : ''};
+          last_seen_at: Number.isFinite(item.last_seen_at) || typeof item.last_seen_at === 'string' ? item.last_seen_at : ''};
   };
   const cacheSearch = searchAdapters.cacheSearch || (async (query) => {
     const endpoint = '/chicken-timer/search';
@@ -552,7 +553,7 @@
       const st = document.createElement('p'); st.className = 'wk-lane-status'; st.textContent = 'AI 도 같이 찾는 중…'; box.replaceChildren(st);
       try {
         const r = await fetch('/chicken-timer/search?' + new URLSearchParams({q: query, lane: 'ai'}), {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
-        if (r.status === 400) { aiUnsupported = true; box.replaceChildren(); return; }   // 서버에 AI 갈래가 아직 없음
+        if (r.status === 400) { aiAsked.set(query, []); box.replaceChildren(); return; }   // #5628: 400 은 이 검색어만 건너뜀(다른 검색은 계속 AI)
         const body = r.ok ? await r.json() : null;
         items = body && body.ok === true && Array.isArray(body.results) ? body.results.filter((x) => x && typeof x.name === 'string' && typeof x.address === 'string') : [];
         aiAsked.set(query, items);
@@ -632,7 +633,10 @@
     for (let k = 0; k < s.length; k++) { const h = hit[k] || (!/\d/.test(s[k]) && !!hit[k - 1] && !!hit[k + 1]); if (h !== on) { flush(); on = h; } buf += s[k]; }
     flush(); return frag;
   }
-  const monthDay = (iso) => { const m = String(iso || '').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[2] + '-' + m[3] : ''; };
+  const monthDay = (v) => {   // epoch 초(숫자) 또는 ISO 글자 → 'MM-DD'(기기 시간대)
+    if (Number.isFinite(v) && v > 0) { const d = new Date(v * 1000); return String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    const m = String(v || '').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[2] + '-' + m[3] : '';
+  };
   // 결과 한 줄(DB·지도·AI 같은 모양) — 1104 사장님 "주소가 메인 … 버튼은 작게" + 통합 검색(별명·전화·원문)
   function resultRow(candidate, tokens) {
     const row = document.createElement('div'); row.className = 'work-search-result';
