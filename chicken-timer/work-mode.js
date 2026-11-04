@@ -62,10 +62,10 @@
     const api = '/chicken-timer/memos';
     const shared = ['title', 'name_ko', 'customer_ko', 'source_kind', 'created_at', 'created_order'];
     let rev = -1, on = false, queue = Promise.resolve(), retry = null, pending = 0, deferred = false, first = true;
-    const failedIds = new Set();
+    const failedIds = new Set(), retryIds = new Set();   // failed=공장이 받지 않는 모양(400·413, 이번 접속 동안 다시 안 보냄), retry=잠깐 끊김(다시 보냄)
     const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const mark = (text, live) => { const el = $('share'); if (el) { el.textContent = text; el.classList.toggle('wk-share-on', !!live); } };
-    const showLive = () => mark(failedIds.size ? '공장 공유 · ' + failedIds.size + '개는 이 기기에만' : '공장 공유', true);
+    const showLive = () => { const n = failedIds.size + retryIds.size; mark(n ? '공장 공유 · ' + n + '개는 아직 이 기기에만' : '공장 공유', true); };
     const same = (a, b) => shared.every((k) => (a[k] === undefined ? null : a[k]) === (b[k] === undefined ? null : b[k])) &&
       JSON.stringify(a.temporary_source || null) === JSON.stringify(b.temporary_source || null);
     const keepHere = (x) => { const o = {}; ['staff_notes', 'staff_meta', 'source_revision'].forEach((k) => { if (x[k] !== undefined) o[k] = x[k]; }); return o; };
@@ -80,18 +80,33 @@
       queue = queue.then(async () => {
         try {
           const r = await call('POST', body);
-          if (r.status === 200) { if (body.op === 'put') failedIds.delete(body.item.id); }
+          if (r.status === 200) { if (body.op === 'put') { failedIds.delete(body.item.id); retryIds.delete(body.item.id); } }
           else if (r.status === 409) { deferred = true; if (body.base > 0) report('다른 기기에서 바뀌어 새로 불러왔어요'); }
-          else { if (body.op === 'put') failedIds.add(body.item.id); mark('공장 저장 안 됨(' + r.status + ') — 이 기기에는 그대로 있어요', false); }
-        } catch (_) { mark('공장 연결 끊김 — 이 기기에는 그대로 있어요', false); }
+          else if (r.status === 400 || r.status === 413) { if (body.op === 'put') failedIds.add(body.item.id); mark('공장 저장 안 됨(' + r.status + ') — 이 기기에는 그대로 있어요', false); }
+          else { if (body.op === 'put') retryIds.add(body.item.id); mark('공장 저장 안 됨(' + r.status + ') — 이 기기에는 그대로, 곧 다시 올려요', false); }
+        } catch (_) { if (body.op === 'put') retryIds.add(body.item.id); mark('공장 연결 끊김 — 이 기기에는 그대로, 곧 다시 올려요', false); }
         pending -= 1;
         if (pending === 0 && deferred) { deferred = false; await refresh(); }
       });
     }
     function apply(data) {
       if (!db || !data || data.ok !== true || !Number.isInteger(data.rev) || !Array.isArray(data.fixed) || !Array.isArray(data.temps)) return;
-      if (data.rev === rev && !first) return;
       if (pending > 0) { deferred = true; return; }   // 내가 올리는 중이면 다 올린 뒤 새로 받는다
+      if (data.rev === rev && !first) {
+        // 공장은 그대로인데 잠깐 끊겨 못 올린 메모가 있으면 화면은 건드리지 않고 다시 올리기만 한다(긴 대기 한 바퀴마다)
+        if (!retryIds.size) return;
+        let mine; try { mine = db.snapshot(); } catch (_) { return; }
+        const remote = new Map();
+        data.fixed.forEach((r) => r && remote.set('fixed:' + r.id, r)); data.temps.forEach((r) => r && remote.set('temps:' + r.id, r));
+        [['fixed', 'fixed', mine.fixed], ['temps', 'temporary', mine.temps]].forEach(([col, kind, rows]) => rows.forEach((l) => {
+          if (!retryIds.has(l.id)) return;
+          const r = remote.get(col + ':' + l.id);
+          if (!r) send({op: 'put', kind, item: Object.assign({}, l, {revision: Math.max(1, l.revision)}), base: 0});
+          else if (l.revision > r.revision && !same(l, r)) send({op: 'put', kind, item: l, base: r.revision});
+          else retryIds.delete(l.id);
+        }));
+        return;
+      }
       let local;
       try { local = db.snapshot(); } catch (_) { return; }
       const gone = new Map();
