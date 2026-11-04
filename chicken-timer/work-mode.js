@@ -54,74 +54,114 @@
   try { db = window.NotebookWorkMemos.store(window.localStorage); db.list(); db.drafts(); }
   catch (_) { $('status').textContent = '저장 자료를 읽을 수 없습니다. 기존 자료를 보존합니다.'; }
   function report(text) { $('status').textContent = text; }
-  // ---- 1104 사장님 "공장sot로 메모 공유되게": /chicken-timer/memos 가 원본, 이 기기 저장소는 캐시 ----
+  // ---- 1104 사장님 "공장sot로 메모 공유되게": /chicken-timer/memos 가 공유 원본, 이 기기 저장소는 사본 ----
+  // 1104 사고("새로고침 하니깐 메모다 지워졌어"): 공장 저장이 거절됐는데 빈 공장 내용으로 이 기기 메모를 덮어 지웠다.
+  // 지금 규칙: 이 기기 메모는 공장이 '지웠다'고 적은 것(deleted)만 지운다. 공장에 없는 메모는 공장에 올리고,
+  // 못 올리면 이 기기에 그대로 둔다. 직원 메모(staff_notes)는 공장에 안 올리고 이 기기에만 둔다(서버가 받지 않음).
   const share = (() => {
     const api = '/chicken-timer/memos';
-    let rev = -1, on = false, queue = Promise.resolve(), retry = null, pending = 0, deferred = false;
+    const shared = ['title', 'name_ko', 'customer_ko', 'source_kind', 'created_at', 'created_order'];
+    let rev = -1, on = false, queue = Promise.resolve(), retry = null, pending = 0, deferred = false, first = true;
+    const failedIds = new Set();
     const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const mark = (text, live) => { const el = $('share'); if (el) { el.textContent = text; el.classList.toggle('wk-share-on', !!live); } };
+    const showLive = () => mark(failedIds.size ? '공장 공유 · ' + failedIds.size + '개는 이 기기에만' : '공장 공유', true);
+    const same = (a, b) => shared.every((k) => (a[k] === undefined ? null : a[k]) === (b[k] === undefined ? null : b[k])) &&
+      JSON.stringify(a.temporary_source || null) === JSON.stringify(b.temporary_source || null);
+    const keepHere = (x) => { const o = {}; ['staff_notes', 'staff_meta', 'source_revision'].forEach((k) => { if (x[k] !== undefined) o[k] = x[k]; }); return o; };
     async function call(method, body, query) {
       const res = await fetch(api + (query || ''), {method, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
         headers: body ? {'Content-Type': 'application/json'} : undefined, body: body ? JSON.stringify(body) : undefined});
       let data = null; try { data = await res.json(); } catch (_) {}
       return {status: res.status, data};
     }
-    function apply(data) {
-      if (!db || !data || data.ok !== true || !Number.isInteger(data.rev) || data.rev === rev) return;
-      if (pending > 0) { deferred = true; return; }   // 내가 올리는 중이면 다 올린 뒤 새로 받는다(내 변경이 잠깐 사라지지 않게)
-      try { db.replaceAll({fixed: data.fixed, temps: data.temps}); } catch (_) { return; }
-      rev = data.rev;
-      if (current && !editing) current = null;
-      draw();
-    }
-    async function refresh() { try { const r = await call('GET'); if (r.status === 200) apply(r.data); } catch (_) {} }
-    function push(body) {
-      if (!on) return;
+    function send(body) {
       pending += 1;
       queue = queue.then(async () => {
         try {
           const r = await call('POST', body);
-          if (r.status === 409) { await refresh(); report('다른 기기에서 바뀌어 새로 불러왔어요'); }
-          else if (r.status !== 200) mark('공장 공유 끊김(' + r.status + ')', false);
-          else if (r.data && Number.isInteger(r.data.rev)) rev = Math.max(rev, r.data.rev - 1);
-        } catch (_) { mark('공장 공유 끊김', false); }
+          if (r.status === 200) { if (body.op === 'put') failedIds.delete(body.item.id); }
+          else if (r.status === 409) { deferred = true; if (body.base > 0) report('다른 기기에서 바뀌어 새로 불러왔어요'); }
+          else { if (body.op === 'put') failedIds.add(body.item.id); mark('공장 저장 안 됨(' + r.status + ') — 이 기기에는 그대로 있어요', false); }
+        } catch (_) { mark('공장 연결 끊김 — 이 기기에는 그대로 있어요', false); }
         pending -= 1;
         if (pending === 0 && deferred) { deferred = false; await refresh(); }
       });
     }
+    function apply(data) {
+      if (!db || !data || data.ok !== true || !Number.isInteger(data.rev) || !Array.isArray(data.fixed) || !Array.isArray(data.temps)) return;
+      if (data.rev === rev && !first) return;
+      if (pending > 0) { deferred = true; return; }   // 내가 올리는 중이면 다 올린 뒤 새로 받는다
+      let local;
+      try { local = db.snapshot(); } catch (_) { return; }
+      const gone = new Map();
+      (Array.isArray(data.deleted) ? data.deleted : []).forEach((t) => { if (t && typeof t.id === 'string') gone.set(t.kind + ':' + t.id, Number.isInteger(t.revision) ? t.revision : 0); });
+      if (first) {
+        // 사고 때 지워진 고정 메모 되살리기: 이 기기 초안에 저장된 판(1 이상)으로 남아 있고, 목록·공장 어디에도 없고, 공장이 지웠다고 적지 않은 것
+        try {
+          const drafts = db.drafts().filter((d) => d && Number.isInteger(d.revision) && d.revision >= 1 && !local.fixed.some((x) => x.id === d.id) &&
+            !data.fixed.some((x) => x.id === d.id) && !gone.has('fixed:' + d.id));
+          local.fixed = local.fixed.concat(drafts);
+        } catch (_) {}
+      }
+      const sends = [];
+      const merge = (col, kind, remoteRows, localRows) => {
+        const mine = new Map(localRows.map((x) => [x.id, x]));
+        const out = [];
+        remoteRows.forEach((r) => {
+          if (!r || typeof r.id !== 'string') return;
+          const l = mine.get(r.id); mine.delete(r.id);
+          if (l && l.revision > r.revision && !same(l, r)) { out.push(l); if (!failedIds.has(l.id)) sends.push({op: 'put', kind, item: l, base: r.revision}); }
+          else out.push(l ? Object.assign(keepHere(l), r) : r);
+        });
+        mine.forEach((l) => {
+          const g = gone.get(col + ':' + l.id);
+          if (g !== undefined && l.revision <= g) return;   // 다른 기기에서 지운 메모
+          out.push(l);                                       // 공장에 없는 이 기기 메모: 지우지 않고 올린다
+          if (!failedIds.has(l.id)) sends.push({op: 'put', kind, item: Object.assign({}, l, {revision: Math.max(1, l.revision)}), base: 0});
+        });
+        return out;
+      };
+      const fixed = merge('fixed', 'fixed', data.fixed, local.fixed);
+      const temps = merge('temps', 'temporary', data.temps, local.temps);
+      try { db.replaceAll({fixed, temps}); } catch (_) { return; }
+      first = false;
+      rev = data.rev;
+      if (current && !editing) current = null;
+      draw();
+      sends.forEach(send);
+    }
+    async function refresh() { try { const r = await call('GET'); if (r.status === 200) apply(r.data); } catch (_) {} }
     async function loop() {
       while (on) {
         try {
           const r = await call('GET', null, '?wait=' + Math.max(rev, 0));
-          if (r.status === 200) { apply(r.data); mark('공장 공유', true); } else { mark('공장 공유 끊김(' + r.status + ')', false); await pause(5000); }
-        } catch (_) { mark('공장 공유 끊김', false); await pause(5000); }
+          if (r.status === 200) { apply(r.data); if (pending > 0) await queue; showLive(); }
+          else { mark('공장 공유 끊김(' + r.status + ') — 이 기기에는 그대로 있어요', false); await pause(5000); }
+        } catch (_) { mark('공장 공유 끊김 — 이 기기에는 그대로 있어요', false); await pause(5000); }
       }
     }
     async function start() {
       clearTimeout(retry);
       try {
-        const first = await call('GET');
-        if (first.status !== 200 || !first.data || first.data.ok !== true) {
-          mark(first.status === 401 ? '이 기기에만 저장(공장 허용 밖)' : '이 기기에만 저장', false);
-          retry = setTimeout(start, first.status === 401 ? 300000 : 60000); return;
+        const r = await call('GET');
+        if (r.status !== 200 || !r.data || r.data.ok !== true) {
+          mark(r.status === 401 ? '이 기기에만 저장(공장 허용 밖)' : '이 기기에만 저장', false);
+          retry = setTimeout(start, r.status === 401 ? 300000 : 60000); return;
         }
         on = true;
-        const remote = first.data, local = db ? db.snapshot() : {fixed: [], temps: []};
-        const known = new Set((remote.fixed || []).concat(remote.temps || []).map((x) => x.id));
-        // 처음 공유할 때 이 기기에만 있던 메모를 공장에 올린다(기존 메모 보존)
-        const uploads = local.fixed.map((x) => ['fixed', x]).concat(local.temps.map((x) => ['temporary', x])).filter(([, x]) => !known.has(x.id));
-        for (const [kind, item] of uploads) await call('POST', {op: 'put', kind, item: Object.assign({}, item, {revision: 1}), base: 0});
-        apply(uploads.length ? (await call('GET')).data : remote);
-        mark('공장 공유', true); loop();
+        apply(r.data);
+        showLive();
+        loop();
       } catch (_) { mark('이 기기에만 저장', false); retry = setTimeout(start, 60000); }
     }
     function wrap(store) {
       if (!store) return store;
       const o = {save: store.save, saveTemporary: store.saveTemporary, clearTemporary: store.clearTemporary, remove: store.remove};
-      store.save = (draft) => { const saved = o.save(draft); if (saved && saved.revision === draft.revision + 1) push({op: 'put', kind: 'fixed', item: saved, base: draft.revision}); return saved; };
-      store.saveTemporary = (draft) => { const saved = o.saveTemporary(draft); if (saved && saved.revision === draft.revision + 1) push({op: 'put', kind: 'temporary', item: saved, base: draft.revision}); return saved; };
-      store.clearTemporary = (id, revision) => { const r = o.clearTemporary(id, revision); push({op: 'delete', kind: 'temporary', id, base: revision}); return r; };
-      store.remove = (id, revision) => { const r = o.remove(id, revision); push({op: 'delete', kind: 'fixed', id, base: revision}); return r; };
+      store.save = (draft) => { const saved = o.save(draft); if (on && saved && saved.revision === draft.revision + 1) send({op: 'put', kind: 'fixed', item: saved, base: draft.revision}); return saved; };
+      store.saveTemporary = (draft) => { const saved = o.saveTemporary(draft); if (on && saved && saved.revision === draft.revision + 1) send({op: 'put', kind: 'temporary', item: saved, base: draft.revision}); return saved; };
+      store.clearTemporary = (id, revision) => { const r = o.clearTemporary(id, revision); if (on) send({op: 'delete', kind: 'temporary', id, base: revision}); return r; };
+      store.remove = (id, revision) => { const r = o.remove(id, revision); if (on) send({op: 'delete', kind: 'fixed', id, base: revision}); return r; };
       return store;
     }
     return {start, wrap};
