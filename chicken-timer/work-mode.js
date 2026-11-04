@@ -511,7 +511,8 @@
     const body = await response.json();
     if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid map result');
     return body.results.filter((item) => item && typeof item.name === 'string' && typeof item.address === 'string')
-      .map((item) => ({name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true, uses: Number.isFinite(item.uses) ? item.uses : null}));
+      .map((item) => ({name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source === 'db' ? 'db' : 'naver', confirmed: item.confirmed === true, uses: Number.isFinite(item.uses) ? item.uses : null,
+        provider: item.provider === 'kakao' || item.provider === 'ncp' ? item.provider : ''}));
   });
   const safeExternal = searchAdapters.safeExternal || ((query) => query);
   // 두 갈래가 같은 곳을 두 번 보이지 않게: 도로명+번지(없으면 공백 뺀 주소)가 같고 이름도 같거나 한쪽 이름이 비었을 때만 같은 곳
@@ -519,6 +520,15 @@
   const placeOf = (candidate) => ({road: addrKey(candidate.address), name: String(candidate.name || '').replace(/\s+/g, '')});
   const samePlace = (a, b) => a.road === b.road && (a.name === b.name || !a.name || !b.name);
   const laneSeen = {}, laneDone = {};
+  // 배달 기록 줄에 '카카오 ✓': 카카오(또는 네이버) 지도도 같은 곳을 찾았다는 표시 — 지도 검색이 실제로 돈다는 것도 보인다
+  function alsoMark(row, provider) {
+    const name = row && row.querySelector('.wk-res-name');
+    if (!name || name.querySelector('.wk-src-also')) return;
+    const also = document.createElement('span'); also.className = 'wk-src wk-src-also';
+    const who = provider === 'ncp' ? '네이버' : '카카오';
+    also.textContent = who + ' ✓'; also.title = who + ' 지도에도 같은 곳';
+    name.appendChild(also);
+  }
   function settleEmpty(query) {
     const done = laneDone[query] || {};
     const finished = (lane) => done[lane] && (done[lane].state === 'ready' || done[lane].state === 'error');
@@ -536,10 +546,11 @@
     cacheSearch,
     externalSearch, safeExternal,
     onChange(update) {
+      if (update.state !== 'ready' && laneSeen[update.query]) laneSeen[update.query][update.lane] = [];   // 다시 찾을 때 옛 줄과 겹침 판정 안 함
       const target = $(update.lane + '-results');
       const statusText = update.lane === 'cache'
         ? ({pending:'찾는 중…', ready:''}[update.state] || '')
-        : ({pending:'지도에서도 찾는 중…'}[update.state] || '');
+        : ({pending:'카카오 지도에서도 찾는 중…', error:'카카오 지도 검색이 안 돼요 — 배달 기록만 보여요'}[update.state] || '');
       if (update.state !== 'ready' && renderedQuery[update.lane] === update.query && laneStatus[update.lane]) {
         laneStatus[update.lane].textContent = statusText;
         return;
@@ -554,14 +565,31 @@
       if (update.lane === 'cache' && Number.isFinite(update.result.backupFileMtime)) {
         $('search-status').textContent = '';
       }
-      const other = (laneSeen[update.query] || {})[update.lane === 'cache' ? 'external' : 'cache'] || [];
-      const mine = [];
+      const seen = (laneSeen[update.query] = laneSeen[update.query] || {cache: [], external: []});
+      const isDb = update.lane === 'cache';
+      const mine = [], alsoOnMap = [];
       const shown = update.result.filter((candidate) => candidate && typeof candidate.name === 'string' && typeof candidate.address === 'string')
-        .filter((candidate) => { const k = placeOf(candidate); if (other.some((x) => samePlace(x, k)) || mine.some((x) => samePlace(x, k))) return false; mine.push(k); return true; })
-        .slice(0, update.lane === 'cache' ? 5 : 3);
-      (laneSeen[update.query] = laneSeen[update.query] || {})[update.lane] = mine;
+        .filter((candidate) => {
+          const k = placeOf(candidate);
+          if (mine.some((x) => samePlace(x.k, k))) return false;
+          if (!isDb) {
+            const db = seen.cache.find((x) => samePlace(x.k, k));
+            if (db) { alsoMark(db.row, candidate.provider); return false; }   // 배달 기록 줄에 합침
+          } else {
+            const map = seen.external.find((x) => samePlace(x.k, k));
+            if (map) { map.row.remove(); seen.external = seen.external.filter((x) => x !== map); alsoOnMap.push([k, map.provider]); }
+          }
+          mine.push({k}); return true;
+        })
+        .slice(0, isDb ? 5 : 3);
       mark(shown.length);
-      if (!shown.length) { if (!title.textContent) target.replaceChildren(); return; }
+      if (!shown.length) {
+        seen[update.lane] = [];
+        if (!isDb && update.result.length === 0) { title.textContent = '카카오 지도: 더 찾은 곳 없음'; return; }
+        if (!title.textContent) target.replaceChildren();
+        return;
+      }
+      seen[update.lane] = [];
       // 1104 사장님 "주소는 구주소 신주소모두뜨게": 지번은 도로명과 같은 시·군 앞부분을 빼고 짧게 붙인다
       const shortJibun = (road, jibun) => {
         let j = String(jibun || '').trim(); if (!j || j === road) return '';
@@ -579,22 +607,26 @@
         frag.appendChild(document.createTextNode(text.slice(at + q.length))); return frag;
       };
       shown.forEach((candidate) => {
+        // 1104 사장님 "주소가 메인인데 메모랑 복사가 절반을 차지해": 주소는 줄 폭 전체, 버튼은 이름 줄 오른쪽에 작게
         const row = document.createElement('div'); row.className = 'work-search-result';
-        const label = document.createElement('span'); label.className = 'work-result-label';
-        const name = document.createElement('strong'); name.appendChild(marked(candidate.name || candidate.address));
+        const top = document.createElement('div'); top.className = 'wk-res-top';
+        const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(marked(candidate.name || candidate.address));
         if (candidate.source === 'db' || candidate.source === 'naver') {
-          // 출처 신뢰: 실제 배달에 쓰인 횟수가 많을수록 믿을 만함, 지도(네이버)는 배달 기록이 없는 추정
+          // 출처 신뢰: 배달 기록 횟수가 많을수록 믿을 만함(초록), 카카오·네이버 지도는 배달 기록이 없는 지도 검색(노랑)
           const src = document.createElement('span'); let cls = 'wk-src', label, tip;
-          if (candidate.source === 'naver') { cls += ' wk-src-map'; label = '지도 · 미확인'; tip = '네이버 지도 추정 — 배달 기록 없음'; }
+          if (candidate.source === 'naver') {
+            cls += ' wk-src-map';
+            label = candidate.provider === 'ncp' ? '네이버 지도' : candidate.provider === 'kakao' ? '카카오 지도' : '지도';
+            tip = label + ' 검색 — 우리 가게 배달 기록 없음';
+          }
           else if (Number.isFinite(candidate.uses) && candidate.uses >= 3) { cls += ' wk-src-hi'; label = '배달 ' + candidate.uses + '회'; tip = '우리 가게 배달 기록 ' + candidate.uses + '회'; }
           else if (Number.isFinite(candidate.uses) && candidate.uses > 0) { label = '배달 ' + candidate.uses + '회'; tip = '배달 기록이 적음'; }
           else { if (candidate.confirmed) cls += ' wk-src-hi'; label = candidate.confirmed ? '확인됨' : 'DB'; tip = candidate.confirmed ? '배달 기록으로 확인된 주소' : '배달 DB 기록'; }
           src.className = cls; src.textContent = label; src.title = tip; name.appendChild(src);
         }
-        const address = document.createElement('span'); address.textContent = candidate.address;
-        label.appendChild(name); label.appendChild(address);
+        const acts = document.createElement('span'); acts.className = 'wk-res-acts';
+        const address = document.createElement('span'); address.className = 'wk-res-addr'; address.textContent = candidate.address;
         const jibunText = shortJibun(candidate.address, candidate.jibun);
-        if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.textContent = '지번 ' + jibunText; label.appendChild(j); }
         const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '메모로';
         add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모로 옮기기'); add.title = '메모로 옮기기';
         add.addEventListener('click', () => {
@@ -607,7 +639,14 @@
           event.stopPropagation();
           if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
         });
-        row.appendChild(label); row.appendChild(copy); row.appendChild(add); target.appendChild(row);
+        acts.appendChild(copy); acts.appendChild(add);
+        top.appendChild(name); top.appendChild(acts);
+        row.appendChild(top); row.appendChild(address);
+        if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.textContent = '지번 ' + jibunText; row.appendChild(j); }
+        target.appendChild(row);
+        const k = placeOf(candidate);
+        seen[update.lane].push({k, row, provider: candidate.provider});
+        if (isDb) alsoOnMap.filter(([mk]) => samePlace(mk, k)).forEach(([, provider]) => alsoMark(row, provider));
       });
       if (update.lane === 'cache') { const foot = document.createElement('p'); foot.className = 'wk-foot'; foot.textContent = '줄을 누르면 메모로 옮겨져요'; target.appendChild(foot); }
       settleEmpty(update.query);
