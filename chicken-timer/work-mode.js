@@ -538,25 +538,32 @@
     name.appendChild(also);
   }
   // 1104 #5561·#5567·#5604: AI 풀이 갈래 — DB·지도 두 갈래가 끝나고 보인 결과가 0~1 이면 한 번만(서버에 없으면 조용히 끔)
-  const aiAsked = new Set(); let aiUnsupported = false;
+  const aiAsked = new Map(); let aiUnsupported = false;
   const looksPrivate = (q) => /(?:\d[\s().-]*){7,}/.test(q) || /(?:010|050\d)/.test(q) || /계좌|전화|비번|비밀번호|현관|password/i.test(q);
   async function aiLane(query) {
-    if (aiUnsupported || aiAsked.has(query) || looksPrivate(query)) return;
-    aiAsked.add(query);
-    const box = $('ai-results'); if (!box) return;
-    const st = document.createElement('p'); st.className = 'wk-lane-status'; st.textContent = 'AI 가 말을 풀어 다시 찾는 중…'; box.replaceChildren(st);
-    try {
-      const r = await fetch('/chicken-timer/search?' + new URLSearchParams({q: query, lane: 'ai'}), {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
-      if (r.status === 400) { aiUnsupported = true; box.replaceChildren(); return; }   // 서버에 AI 갈래가 아직 없음
-      const body = r.ok ? await r.json() : null;
-      if ($('query').value.trim() !== query) return;                                  // 그사이 다른 검색
-      const items = body && body.ok === true && Array.isArray(body.results) ? body.results.filter((x) => x && typeof x.name === 'string' && typeof x.address === 'string') : [];
+    const box = $('ai-results'); if (!box || !query) return;
+    if (aiUnsupported || looksPrivate(query)) { box.replaceChildren(); return; }
+    let items = aiAsked.get(query);
+    if (!items) {
+      const st = document.createElement('p'); st.className = 'wk-lane-status'; st.textContent = 'AI 도 같이 찾는 중…'; box.replaceChildren(st);
+      try {
+        const r = await fetch('/chicken-timer/search?' + new URLSearchParams({q: query, lane: 'ai'}), {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
+        if (r.status === 400) { aiUnsupported = true; box.replaceChildren(); return; }   // 서버에 AI 갈래가 아직 없음
+        const body = r.ok ? await r.json() : null;
+        items = body && body.ok === true && Array.isArray(body.results) ? body.results.filter((x) => x && typeof x.name === 'string' && typeof x.address === 'string') : [];
+        aiAsked.set(query, items);
+      } catch (_) { box.replaceChildren(); return; }
+    }
+    if ($('query').value.trim() !== query) return;                                  // 그사이 다른 검색
+    {
+      const shownHere = laneSeen[query] || {cache: [], external: []};             // DB·지도에 이미 보인 같은 곳은 빼기
+      items = items.filter((x) => { const k = placeOf({name: x.name, address: x.address}); return !shownHere.cache.concat(shownHere.external).some((y) => samePlace(y.k, k)); });
       box.replaceChildren();
-      if (!items.length) { const n = document.createElement('p'); n.className = 'wk-lane-status'; n.textContent = 'AI 풀이로도 더 찾은 곳 없음'; box.appendChild(n); return; }
+      if (!items.length) return;                                                    // AI 가 더 찾은 곳이 없으면 칸을 비워 둔다
       const tokens = query.split(/\s+/).filter(Boolean);
       items.slice(0, 3).forEach((x) => box.appendChild(resultRow({name: x.name, address: x.address, jibun: typeof x.jibun === 'string' ? x.jibun : '', source: 'ai',
         confirmed: false, provider: x.provider, phones: [], matched_tokens: [], matched_alias: '', ai_note: typeof x.interpreted === 'string' ? x.interpreted : ''}, tokens)));
-    } catch (_) { box.replaceChildren(); }
+    }
   }
   function settleEmpty(query) {
     const done = laneDone[query] || {};
@@ -569,8 +576,6 @@
       const tip = document.createElement('span'); tip.textContent = '‘삼익’처럼 이름 일부만 넣거나 도로명으로 찾아 보세요.';
       empty.appendChild(head); empty.appendChild(tip); $('cache-results').appendChild(empty);
     } else if (!none && old) old.remove();
-    const both = finished('cache') && finished('external');
-    if (both && (done.cache.n || 0) + (done.external.n || 0) <= 1 && $('query').value.trim() === query) aiLane(query);
   }
     // 1104 사장님 "주소는 구주소 신주소모두뜨게": 지번은 도로명과 같은 시·군 앞부분을 빼고 짧게 붙인다
     const shortJibun = (road, jibun) => {
@@ -803,6 +808,7 @@
     $('search-status').textContent = '';
     searchGeneration = typeof searchAdapters.generation === 'function' ? searchAdapters.generation() : null;
     searcher.search($('query').value, searchGeneration);
+    aiLane($('query').value.trim());   // 1104 사장님 "ai는 비동기로 동시 돌려": DB·지도와 같이 바로(기다리지 않음)
   });
   try {
     const view = JSON.parse(window.localStorage.getItem(viewKey));
