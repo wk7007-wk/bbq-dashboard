@@ -27,7 +27,7 @@
   panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '메모');
   panel.innerHTML = '<div class="wk-seg" role="tablist" aria-label="화면 전환"><button type="button" role="tab" aria-selected="true" class="wk-seg-on" tabindex="-1">메모</button><button type="button" role="tab" aria-selected="false" data-back>타이머<span class="wk-badge" data-seg-badge hidden></span></button></div>' +
     '<button type="button" class="wk-urgent" data-urgent hidden></button><span data-timer-status role="status" aria-live="polite" hidden></span>' +
-    '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
+    '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-external-results></div><div data-ai-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
     '<section class="work-memos wk-card-box"><h2 class="wk-card-title">메모<span class="wk-share" data-share></span></h2><div class="wk-memo-head"><div class="wk-kind" role="group" aria-label="메모 종류"><button type="button" data-temporary aria-pressed="false">임시 메모</button><button type="button" data-fixed aria-pressed="true">자주 쓰는 문구</button></div><button type="button" class="wk-new" data-new>+ 새 메모</button></div><label class="wk-line-field"><span class="work-sr-only">메모 한 줄</span><input data-line autocomplete="off" enterkeyhint="done" placeholder="메모 한 줄 쓰고 Enter"></label><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div class="wk-undo" data-undo hidden><span data-undo-text></span><button type="button" data-undo-btn>되돌리기</button></div><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
     '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>메모<textarea data-customer rows="2"></textarea></label>' +
     '<details class="work-staff"><summary>직원 설명 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-languages">' +
@@ -467,6 +467,17 @@
     // Do not send an address or feedback to an arbitrary same-origin host.
     throw new Error('private API not connected');
   }
+  const mapDbItem = (item) => {
+        if (!item || typeof item.name !== 'string' || typeof item.address !== 'string' ||
+            !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
+        const strs = (v, n) => Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x).slice(0, n) : [];
+        return {name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null,
+          // 1104 #5604 통합 검색 계약: 전화·원문·최근 배달·맞은 조각·별명·일치 종류(없으면 빈 값 — 예전 서버도 그대로)
+          phones: strs(item.phones, 5), raw_line: typeof item.raw_line === 'string' ? item.raw_line : '',
+          last_delivery_at: typeof item.last_delivery_at === 'string' ? item.last_delivery_at : '',
+          matched_tokens: strs(item.matched_tokens, 8), matched_alias: typeof item.matched_alias === 'string' ? item.matched_alias : '',
+          match_kind: item.match_kind === 'partial' ? 'partial' : item.match_kind === 'all' ? 'all' : ''};
+  };
   const cacheSearch = searchAdapters.cacheSearch || (async (query) => {
     const endpoint = '/chicken-timer/search';
     const note = (text) => { if ($('query').value.trim() === String(query).trim()) $('search-status').textContent = text; };
@@ -491,11 +502,8 @@
       if (!response.ok) { note('주소검색 응답 ' + response.status + ' — 잠시 뒤 다시 찾아 주세요'); throw new Error('address access denied'); }
       const body = await response.json();
       if (body.ok !== true || !Array.isArray(body.results)) throw new Error('invalid address result');
-      const results = body.results.map((item) => {
-        if (!item || typeof item.name !== 'string' || typeof item.address !== 'string' ||
-            !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
-        return {name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null};
-      });
+      const results = body.results.map(mapDbItem);
+      if (Number.isInteger(body.next_offset) && body.next_offset > 0) results.next_offset = body.next_offset;   // 더 보기
       note('');
       return results;
     } catch (error) {
@@ -529,6 +537,27 @@
     also.textContent = who + ' ✓'; also.title = who + ' 지도에도 같은 곳';
     name.appendChild(also);
   }
+  // 1104 #5561·#5567·#5604: AI 풀이 갈래 — DB·지도 두 갈래가 끝나고 보인 결과가 0~1 이면 한 번만(서버에 없으면 조용히 끔)
+  const aiAsked = new Set(); let aiUnsupported = false;
+  const looksPrivate = (q) => /(?:\d[\s().-]*){7,}/.test(q) || /(?:010|050\d)/.test(q) || /계좌|전화|비번|비밀번호|현관|password/i.test(q);
+  async function aiLane(query) {
+    if (aiUnsupported || aiAsked.has(query) || looksPrivate(query)) return;
+    aiAsked.add(query);
+    const box = $('ai-results'); if (!box) return;
+    const st = document.createElement('p'); st.className = 'wk-lane-status'; st.textContent = 'AI 가 말을 풀어 다시 찾는 중…'; box.replaceChildren(st);
+    try {
+      const r = await fetch('/chicken-timer/search?' + new URLSearchParams({q: query, lane: 'ai'}), {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
+      if (r.status === 400) { aiUnsupported = true; box.replaceChildren(); return; }   // 서버에 AI 갈래가 아직 없음
+      const body = r.ok ? await r.json() : null;
+      if ($('query').value.trim() !== query) return;                                  // 그사이 다른 검색
+      const items = body && body.ok === true && Array.isArray(body.results) ? body.results.filter((x) => x && typeof x.name === 'string' && typeof x.address === 'string') : [];
+      box.replaceChildren();
+      if (!items.length) { const n = document.createElement('p'); n.className = 'wk-lane-status'; n.textContent = 'AI 풀이로도 더 찾은 곳 없음'; box.appendChild(n); return; }
+      const tokens = query.split(/\s+/).filter(Boolean);
+      items.slice(0, 3).forEach((x) => box.appendChild(resultRow({name: x.name, address: x.address, jibun: typeof x.jibun === 'string' ? x.jibun : '', source: 'ai',
+        confirmed: false, provider: x.provider, phones: [], matched_tokens: [], matched_alias: '', ai_note: typeof x.interpreted === 'string' ? x.interpreted : ''}, tokens)));
+    } catch (_) { box.replaceChildren(); }
+  }
   function settleEmpty(query) {
     const done = laneDone[query] || {};
     const finished = (lane) => done[lane] && (done[lane].state === 'ready' || done[lane].state === 'error');
@@ -540,6 +569,97 @@
       const tip = document.createElement('span'); tip.textContent = '‘삼익’처럼 이름 일부만 넣거나 도로명으로 찾아 보세요.';
       empty.appendChild(head); empty.appendChild(tip); $('cache-results').appendChild(empty);
     } else if (!none && old) old.remove();
+    const both = finished('cache') && finished('external');
+    if (both && (done.cache.n || 0) + (done.external.n || 0) <= 1 && $('query').value.trim() === query) aiLane(query);
+  }
+    // 1104 사장님 "주소는 구주소 신주소모두뜨게": 지번은 도로명과 같은 시·군 앞부분을 빼고 짧게 붙인다
+    const shortJibun = (road, jibun) => {
+      let j = String(jibun || '').trim(); if (!j || j === road) return '';
+      const parts = j.split(/\s+/), roadParts = String(road || '').split(/\s+/);
+      let i = 0; while (i < parts.length - 1 && i < 2 && (parts[i] === roadParts[i] || parts[i].replace(/도$/, '') === roadParts[i].replace(/도$/, ''))) i += 1;
+      return parts.slice(i).join(' ');
+    };
+    const fullAddress = (c) => { const j = shortJibun(c.address, c.jibun); return j ? c.address + ' (' + j + ')' : c.address; };
+  // 맞은 조각 강조: 빈칸으로 나눈 검색어(또는 서버가 준 matched_tokens)를 글 안에서 모두 칠한다
+  function markTokens(text, tokens) {
+    const frag = document.createDocumentFragment(); text = String(text || '');
+    const toks = (tokens || []).map((t) => String(t || '').trim()).filter(Boolean).sort((a, b) => b.length - a.length);
+    let i = 0;
+    while (i < text.length) {
+      let best = -1, bestTok = '';
+      toks.forEach((t) => { const at = text.indexOf(t, i); if (at > -1 && (best < 0 || at < best)) { best = at; bestTok = t; } });
+      if (best < 0) { frag.appendChild(document.createTextNode(text.slice(i))); break; }
+      if (best > i) frag.appendChild(document.createTextNode(text.slice(i, best)));
+      const m = document.createElement('mark'); m.textContent = text.slice(best, best + bestTok.length); frag.appendChild(m);
+      i = best + bestTok.length;
+    }
+    return frag;
+  }
+  // 전화번호 강조: 숫자 조각은 하이픈·빈칸을 건너 숫자끼리 맞춘다(어느 자리든)
+  function markPhone(phone, tokens) {
+    const s = String(phone || ''), frag = document.createDocumentFragment();
+    const digits = (tokens || []).map((t) => String(t).replace(/\D/g, '')).filter((t) => t.length >= 2);
+    const pos = []; for (let k = 0; k < s.length; k++) if (/\d/.test(s[k])) pos.push(k);
+    const only = pos.map((k) => s[k]).join(''), hit = new Array(s.length).fill(false);
+    digits.forEach((d) => { let from = 0, at; while ((at = only.indexOf(d, from)) > -1) { for (let k = at; k < at + d.length; k++) hit[pos[k]] = true; from = at + 1; } });
+    let buf = '', on = false;
+    const flush = () => { if (!buf) return; if (on) { const m = document.createElement('mark'); m.textContent = buf; frag.appendChild(m); } else frag.appendChild(document.createTextNode(buf)); buf = ''; };
+    for (let k = 0; k < s.length; k++) { const h = hit[k] || (!/\d/.test(s[k]) && !!hit[k - 1] && !!hit[k + 1]); if (h !== on) { flush(); on = h; } buf += s[k]; }
+    flush(); return frag;
+  }
+  const monthDay = (iso) => { const m = String(iso || '').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[2] + '-' + m[3] : ''; };
+  // 결과 한 줄(DB·지도·AI 같은 모양) — 1104 사장님 "주소가 메인 … 버튼은 작게" + 통합 검색(별명·전화·원문)
+  function resultRow(candidate, tokens) {
+    const row = document.createElement('div'); row.className = 'work-search-result';
+    const top = document.createElement('div'); top.className = 'wk-res-top';
+    const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(markTokens(candidate.name || candidate.address, tokens));
+    const src = document.createElement('span'); let cls = 'wk-src', label, tip;
+    if (candidate.source === 'ai') { cls += ' wk-src-ai'; label = 'AI 추정'; tip = 'AI 가 말을 풀어 지도로 다시 찾은 곳 — 배달 기록 없음'; }
+    else if (candidate.source === 'naver') {
+      cls += ' wk-src-map';
+      label = candidate.provider === 'ncp' ? '네이버 지도' : candidate.provider === 'kakao' ? '카카오 지도' : '지도';
+      tip = label + ' 검색 — 우리 가게 배달 기록 없음';
+    }
+    else if (Number.isFinite(candidate.uses) && candidate.uses >= 3) { cls += ' wk-src-hi'; label = '배달 ' + candidate.uses + '회'; tip = '우리 가게 배달 기록 ' + candidate.uses + '회'; }
+    else if (Number.isFinite(candidate.uses) && candidate.uses > 0) { label = '배달 ' + candidate.uses + '회'; tip = '배달 기록이 적음'; }
+    else { if (candidate.confirmed) cls += ' wk-src-hi'; label = candidate.confirmed ? '확인됨' : 'DB'; tip = candidate.confirmed ? '배달 기록으로 확인된 주소' : '배달 DB 기록'; }
+    src.className = cls; src.textContent = label; src.title = tip; name.appendChild(src);
+    if (candidate.matched_alias) { const al = document.createElement('span'); al.className = 'wk-alias'; al.textContent = '‘' + candidate.matched_alias + '’으로 찾음'; name.appendChild(al); }
+    if (candidate.ai_note) { const an = document.createElement('span'); an.className = 'wk-alias wk-ai-note'; an.textContent = 'AI 풀이 ‘' + candidate.ai_note + '’'; name.appendChild(an); }
+    const acts = document.createElement('span'); acts.className = 'wk-res-acts';
+    const address = document.createElement('span'); address.className = 'wk-res-addr'; address.appendChild(markTokens(candidate.address, tokens));
+    const jibunText = shortJibun(candidate.address, candidate.jibun);
+    const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '메모로';
+    add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모로 옮기기'); add.title = '메모로 옮기기';
+    add.addEventListener('click', () => {
+      newMemo(candidate.name, fullAddress(candidate), true, 'selected_result', candidate.name, false);
+      add.textContent = '✓'; row.classList.add('wk-copied'); setTimeout(() => { add.textContent = '메모로'; row.classList.remove('wk-copied'); }, 1200);
+    });
+    const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'wk-copy'; copy.textContent = '복사';
+    copy.setAttribute('aria-label', (candidate.name || candidate.address) + ' 주소 복사'); copy.title = '주소 복사';
+    copy.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
+    });
+    acts.appendChild(copy); acts.appendChild(add);
+    top.appendChild(name); top.appendChild(acts);
+    row.appendChild(top); row.appendChild(address);
+    if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.appendChild(markTokens('지번 ' + jibunText, tokens)); row.appendChild(j); }
+    const phones = candidate.phones || [];
+    if (phones.length || candidate.last_delivery_at) {   // 1104 사장님 "번호도 원문베이스로": 전화(맞은 숫자 강조)·최근 배달
+      const ph = document.createElement('span'); ph.className = 'wk-phone';
+      if (phones.length) { ph.appendChild(document.createTextNode('☎ ')); ph.appendChild(markPhone(phones[0], tokens)); if (phones.length > 1) ph.appendChild(document.createTextNode(' 외 ' + (phones.length - 1))); }
+      const md = monthDay(candidate.last_delivery_at);
+      if (md) ph.appendChild(document.createTextNode((phones.length ? ' · ' : '') + '최근 배달 ' + md));
+      row.appendChild(ph);
+    }
+    if (candidate.raw_line) {   // 원문 한 줄 펼쳐 보기(줄을 눌러 메모로 옮기는 것과 따로)
+      const rb = document.createElement('button'); rb.type = 'button'; rb.className = 'wk-rawbtn'; rb.textContent = '원문 ▾';
+      const rl = document.createElement('span'); rl.className = 'wk-rawline'; rl.hidden = true; rl.appendChild(markTokens(candidate.raw_line, tokens));
+      rb.addEventListener('click', (event) => { event.stopPropagation(); rl.hidden = !rl.hidden; rb.textContent = rl.hidden ? '원문 ▾' : '원문 ▴'; });
+      row.appendChild(rb); row.appendChild(rl);
+    }
+    return row;
   }
   const renderedQuery = {}, laneStatus = {};
   const searcher = window.NotebookWorkSearch && window.NotebookWorkSearch.create({
@@ -547,6 +667,7 @@
     externalSearch, safeExternal,
     onChange(update) {
       if (update.state !== 'ready' && laneSeen[update.query]) laneSeen[update.query][update.lane] = [];   // 다시 찾을 때 옛 줄과 겹침 판정 안 함
+      if (update.lane === 'cache' && update.state === 'pending') { const ai = $('ai-results'); if (ai) ai.replaceChildren(); }
       const target = $(update.lane + '-results');
       const statusText = update.lane === 'cache'
         ? ({pending:'찾는 중…', ready:''}[update.state] || '')
@@ -581,7 +702,7 @@
           }
           mine.push({k}); return true;
         })
-        .slice(0, isDb ? 5 : 3);
+        .slice(0, isDb ? 20 : 3);
       mark(shown.length);
       if (!shown.length) {
         seen[update.lane] = [];
@@ -590,64 +711,34 @@
         return;
       }
       seen[update.lane] = [];
-      // 1104 사장님 "주소는 구주소 신주소모두뜨게": 지번은 도로명과 같은 시·군 앞부분을 빼고 짧게 붙인다
-      const shortJibun = (road, jibun) => {
-        let j = String(jibun || '').trim(); if (!j || j === road) return '';
-        const parts = j.split(/\s+/), roadParts = String(road || '').split(/\s+/);
-        let i = 0; while (i < parts.length - 1 && i < 2 && (parts[i] === roadParts[i] || parts[i].replace(/도$/, '') === roadParts[i].replace(/도$/, ''))) i += 1;
-        return parts.slice(i).join(' ');
-      };
-      const fullAddress = (c) => { const j = shortJibun(c.address, c.jibun); return j ? c.address + ' (' + j + ')' : c.address; };
-      const marked = (text) => {
-        const frag = document.createDocumentFragment(), q = String(update.query || '').trim();
-        const at = q ? text.indexOf(q) : -1;
-        if (at < 0) { frag.appendChild(document.createTextNode(text)); return frag; }
-        frag.appendChild(document.createTextNode(text.slice(0, at)));
-        const hit = document.createElement('mark'); hit.textContent = text.slice(at, at + q.length); frag.appendChild(hit);
-        frag.appendChild(document.createTextNode(text.slice(at + q.length))); return frag;
-      };
+      const qTokens = String(update.query || '').trim().split(/\s+/).filter(Boolean);
+      let partialShown = false;
       shown.forEach((candidate) => {
-        // 1104 사장님 "주소가 메인인데 메모랑 복사가 절반을 차지해": 주소는 줄 폭 전체, 버튼은 이름 줄 오른쪽에 작게
-        const row = document.createElement('div'); row.className = 'work-search-result';
-        const top = document.createElement('div'); top.className = 'wk-res-top';
-        const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(marked(candidate.name || candidate.address));
-        if (candidate.source === 'db' || candidate.source === 'naver') {
-          // 출처 신뢰: 배달 기록 횟수가 많을수록 믿을 만함(초록), 카카오·네이버 지도는 배달 기록이 없는 지도 검색(노랑)
-          const src = document.createElement('span'); let cls = 'wk-src', label, tip;
-          if (candidate.source === 'naver') {
-            cls += ' wk-src-map';
-            label = candidate.provider === 'ncp' ? '네이버 지도' : candidate.provider === 'kakao' ? '카카오 지도' : '지도';
-            tip = label + ' 검색 — 우리 가게 배달 기록 없음';
-          }
-          else if (Number.isFinite(candidate.uses) && candidate.uses >= 3) { cls += ' wk-src-hi'; label = '배달 ' + candidate.uses + '회'; tip = '우리 가게 배달 기록 ' + candidate.uses + '회'; }
-          else if (Number.isFinite(candidate.uses) && candidate.uses > 0) { label = '배달 ' + candidate.uses + '회'; tip = '배달 기록이 적음'; }
-          else { if (candidate.confirmed) cls += ' wk-src-hi'; label = candidate.confirmed ? '확인됨' : 'DB'; tip = candidate.confirmed ? '배달 기록으로 확인된 주소' : '배달 DB 기록'; }
-          src.className = cls; src.textContent = label; src.title = tip; name.appendChild(src);
+        if (isDb && candidate.match_kind === 'partial' && !partialShown) {   // 여러 조각 중 일부만 맞은 기록은 아래로
+          partialShown = true; const ph = document.createElement('p'); ph.className = 'wk-partial'; ph.textContent = '일부만 맞음'; target.appendChild(ph);
         }
-        const acts = document.createElement('span'); acts.className = 'wk-res-acts';
-        const address = document.createElement('span'); address.className = 'wk-res-addr'; address.textContent = candidate.address;
-        const jibunText = shortJibun(candidate.address, candidate.jibun);
-        const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '메모로';
-        add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모로 옮기기'); add.title = '메모로 옮기기';
-        add.addEventListener('click', () => {
-          newMemo(candidate.name, fullAddress(candidate), true, 'selected_result', candidate.name, false);
-          add.textContent = '✓'; row.classList.add('wk-copied'); setTimeout(() => { add.textContent = '메모로'; row.classList.remove('wk-copied'); }, 1200);
-        });
-        const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'wk-copy'; copy.textContent = '복사';
-        copy.setAttribute('aria-label', (candidate.name || candidate.address) + ' 주소 복사'); copy.title = '주소 복사';
-        copy.addEventListener('click', async (event) => {
-          event.stopPropagation();
-          if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
-        });
-        acts.appendChild(copy); acts.appendChild(add);
-        top.appendChild(name); top.appendChild(acts);
-        row.appendChild(top); row.appendChild(address);
-        if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.textContent = '지번 ' + jibunText; row.appendChild(j); }
+        const row = resultRow(candidate, candidate.matched_tokens && candidate.matched_tokens.length ? candidate.matched_tokens : qTokens);
         target.appendChild(row);
         const k = placeOf(candidate);
         seen[update.lane].push({k, row, provider: candidate.provider});
         if (isDb) alsoOnMap.filter(([mk]) => samePlace(mk, k)).forEach(([, provider]) => alsoMark(row, provider));
       });
+      if (isDb && Number.isInteger(update.result.next_offset)) {   // 더 보기(서버가 다음 쪽이 있다고 할 때만)
+        const more = document.createElement('button'); more.type = 'button'; more.className = 'wk-more-results'; more.textContent = '더 보기';
+        let offset = update.result.next_offset;
+        more.addEventListener('click', async () => {
+          more.disabled = true; more.textContent = '불러오는 중…';
+          try {
+            const r = await fetch('/chicken-timer/search?' + new URLSearchParams({q: update.query, lane: 'db', offset: String(offset)}), {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
+            const body = r.ok ? await r.json() : null;
+            const items = body && body.ok === true && Array.isArray(body.results) ? body.results.map(mapDbItem) : [];
+            items.forEach((c) => target.insertBefore(resultRow(c, c.matched_tokens.length ? c.matched_tokens : qTokens), more));
+            if (body && Number.isInteger(body.next_offset) && body.next_offset > offset) { offset = body.next_offset; more.disabled = false; more.textContent = '더 보기'; }
+            else more.remove();
+          } catch (_) { more.disabled = false; more.textContent = '더 보기(다시)'; }
+        });
+        target.appendChild(more);
+      }
       if (update.lane === 'cache') { const foot = document.createElement('p'); foot.className = 'wk-foot'; foot.textContent = '줄을 누르면 메모로 옮겨져요'; target.appendChild(foot); }
       settleEmpty(update.query);
     }

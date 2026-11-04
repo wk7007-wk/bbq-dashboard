@@ -291,3 +291,17 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .work-search-result .wk-jibun { display: block; margin-top: 1px; font-size: 12px; line-height: 1.35; color: var(--wk-text-3); overflow-wrap: anywhere; }
 .wk-src.wk-src-also { color: #c9a640; font-weight: 600; }
 .wk-src.wk-src-also::before { display: none; }
+
+/* 1104 #5604 통합 검색: 별명·전화·원문·일부 일치·더 보기·AI 추정 */
+.wk-src.wk-src-ai { color: #e0b44a; }
+.wk-src.wk-src-ai::before { background: #e0b44a; }
+.wk-alias { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 6px; font: 600 10.5px/1.5 var(--wk-font); color: #7fd3c7; background: rgba(66, 196, 170, .12); vertical-align: 1px; }
+.work-search-result .wk-phone { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: var(--wk-text-2); font-variant-numeric: tabular-nums; }
+.work-search-result mark { background: rgba(88, 166, 255, .18); color: var(--wk-text); border-radius: 3px; padding: 0 1px; }
+.work-panel .work-search-result button.wk-rawbtn { position: relative; z-index: 2; display: inline-block; margin-top: 3px; height: 22px; min-height: 22px; padding: 0 6px; border-radius: 6px; font-size: 11.5px; color: var(--wk-text-3); background: transparent; border: 1px solid var(--wk-hair); width: auto; }
+.work-search-result .wk-rawline { display: block; margin-top: 4px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 255, 255, .04); font-size: 12px; line-height: 1.5; color: var(--wk-text-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+.wk-partial { margin: 8px 12px 2px; font-size: 11.5px; font-weight: 700; color: var(--wk-text-3); letter-spacing: .02em; }
+.work-panel button.wk-more-results { display: block; width: calc(100% - 20px); margin: 6px 10px 8px; height: 32px; min-height: 32px; border-radius: 9px; font-size: 12.5px; color: var(--wk-text-2); background: transparent; border: 1px dashed var(--wk-hair); }
+[data-ai-results]:empty { display: none; }
+[data-ai-results]:not(:empty) { margin-top: 6px; background: var(--wk-bg); border: 1px dashed rgba(224, 180, 74, .45); border-radius: 10px; overflow: hidden; }
+.wk-alias.wk-ai-note { color: #e0b44a; background: rgba(224, 180, 74, .12); }
