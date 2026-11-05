@@ -641,7 +641,8 @@
   function resultRow(candidate, tokens) {
     const row = document.createElement('div'); row.className = 'work-search-result';
     const top = document.createElement('div'); top.className = 'wk-res-top';
-    const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(markTokens(candidate.name || candidate.address, tokens));
+    const displayName = candidate.name || candidate.address;
+    const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(markTokens(displayName, tokens));
     const src = document.createElement('span'); let cls = 'wk-src', label, tip;
     if (candidate.source === 'ai') { cls += ' wk-src-ai'; label = 'AI 추정'; tip = 'AI 가 말을 풀어 지도로 다시 찾은 곳 — 배달 기록 없음'; }
     else if (candidate.source === 'memo') { cls += ' wk-src-memo'; label = '메모'; tip = '메모에 적어 둔 것'; }
@@ -657,7 +658,12 @@
     if (candidate.matched_alias) { const al = document.createElement('span'); al.className = 'wk-alias'; al.textContent = '‘' + candidate.matched_alias + '’으로 찾음'; name.appendChild(al); }
     if (candidate.ai_note) { const an = document.createElement('span'); an.className = 'wk-alias wk-ai-note'; an.textContent = 'AI 풀이 ‘' + candidate.ai_note + '’'; name.appendChild(an); }
     const acts = document.createElement('span'); acts.className = 'wk-res-acts';
-    const address = document.createElement('span'); address.className = 'wk-res-addr'; address.appendChild(markTokens(candidate.address, tokens));
+    const address = document.createElement('span'); address.className = 'wk-res-addr';
+    const addressText = String(candidate.address || '');
+    const nameText = String(candidate.name || '').trim();
+    const comparable = (value) => value.replace(/[\s()（）]/g, '');
+    const duplicateAddress = !!nameText && !!addressText && comparable(nameText) === comparable(addressText);
+    if (!duplicateAddress) address.appendChild(markTokens(addressText, tokens));
     const jibunText = shortJibun(candidate.address, candidate.jibun);
     const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '메모로';
     add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모로 옮기기'); add.title = '메모로 옮기기';
@@ -672,11 +678,16 @@
       if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
     });
     acts.appendChild(copy); if (candidate.source !== 'memo') acts.appendChild(add);   // 메모 결과는 이미 메모라 '메모로' 없음
-    top.appendChild(name); top.appendChild(acts);
+    top.appendChild(name);
     const dongHo = [candidate.dong && !/동$/.test(candidate.dong) ? candidate.dong + '동' : candidate.dong, candidate.ho && !/호$/.test(candidate.ho) ? candidate.ho + '호' : candidate.ho].filter(Boolean).join(' ');
-    if (dongHo && String(candidate.address || '').indexOf(dongHo) < 0) address.appendChild(document.createTextNode(' · ' + dongHo));
-    row.appendChild(top); row.appendChild(address);
+    if (dongHo && (duplicateAddress || addressText.indexOf(dongHo) < 0)) {
+      if (!duplicateAddress && addressText) address.appendChild(document.createTextNode(' · '));
+      address.appendChild(markTokens(dongHo, tokens));
+    }
+    row.appendChild(top);
+    if (!duplicateAddress || dongHo) row.appendChild(address);
     if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.appendChild(markTokens('지번 ' + jibunText, tokens)); row.appendChild(j); }
+    row.appendChild(acts);
     const phones = candidate.phones || [];
     if (phones.length || candidate.last_delivery_at || candidate.last_seen_at) {   // 1104 사장님 "번호도 원문베이스로": 전화(맞은 숫자 강조)·최근 배달
       const ph = document.createElement('span'); ph.className = 'wk-phone';
