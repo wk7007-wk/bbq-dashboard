@@ -22,7 +22,9 @@
 
 /* ---------- 메모 화면 틀 ---------- */
 .work-panel {
-  box-sizing: border-box; position: fixed; inset: 0; z-index: 100; overflow: auto;
+  box-sizing: border-box; position: fixed; inset: 0 0 auto; z-index: 100; overflow: hidden;
+  height: 100vh; height: 100dvh; height: var(--app-vh, 100dvh);
+  display: flex; flex-direction: column;
   width: 100%; max-width: 100vw; min-width: 0;
   background: var(--wk-bg); color: var(--wk-text);
   padding: 12px; font: 15px/1.5 var(--wk-font);
@@ -30,7 +32,7 @@
 }
 .work-panel *, .work-panel *::before, .work-panel *::after { box-sizing: border-box; min-width: 0; }
 .work-panel > * { max-width: 560px; margin-left: auto; margin-right: auto; }
-.work-columns { display: flex; flex-direction: column; gap: 12px; }
+.work-columns { display: flex; flex: 1 1 auto; flex-direction: column; gap: 8px; min-height: 0; overflow: hidden; }
 .work-panel h2 { font-size: 16px; margin: 0 0 8px; }
 .work-panel p { margin: 0; }
 .work-panel :focus-visible { outline: 2px solid var(--wk-accent); outline-offset: 2px; }
@@ -238,6 +240,14 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .wk-card-box .wk-row { background: var(--wk-surface-2); }
 .wk-card-box .wk-row-fixed { background: var(--wk-raise); }
 .work-panel .work-memos.wk-card-box { gap: 8px; }
+.work-panel .work-columns > .work-memos,
+.work-panel .work-columns > .work-search { flex: 1 1 0; min-height: 0; }
+.work-panel .work-columns > .work-memos { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.work-panel .work-columns > .work-search { display: flex; flex-direction: column; overflow: hidden; }
+.work-panel .work-search > .wk-card-title,
+.work-panel .work-search > .work-search-line { flex: none; }
+.work-panel .work-search-line { position: sticky; top: 0; z-index: 2; background: var(--wk-surface); }
+.work-panel .wk-search-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 .work-panel .wk-row > button.wk-pin { flex: none; min-height: 28px; height: 28px; padding: 0 9px; margin-right: 2px; border: 1px solid var(--wk-hair-2); border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--wk-text-2); }
 .work-panel .wk-row > button.wk-pin:hover { color: var(--wk-accent); border-color: rgba(88, 166, 255, .5); }
 .work-panel .work-search-result button.wk-add { color: var(--wk-accent); border-color: rgba(88, 166, 255, .35); }
@@ -316,3 +326,19 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 [data-memo-results]:not(:empty) { margin-top: 6px; background: var(--wk-bg); border: 1px solid rgba(127, 211, 199, .35); border-radius: 10px; overflow: hidden; }
 .wk-src.wk-src-memo { color: #7fd3c7; }
 .wk-src.wk-src-memo::before { background: #7fd3c7; }
+
+/* #6498: the two cards use the available panel width; every visible control is a 44px target. */
+.work-panel > .work-columns { width: 100%; margin-left: 0; margin-right: 0; }
+.work-panel button:not(.work-sr-only) { min-width: 44px; min-height: 44px; }
+.work-panel .wk-seg button { height: 44px; min-height: 44px; }
+.work-panel .wk-field { height: 44px; }
+.work-panel .wk-field input { height: 42px; min-height: 42px; }
+.work-panel .wk-line-field input { height: 44px; min-height: 44px; }
+.work-panel .work-search-result,
+.work-panel .wk-row { min-height: 44px; }
+.work-panel .wk-row > button.wk-row-copy { min-height: 44px; }
+.work-panel .wk-row > button.wk-more,
+.work-panel .wk-row > button.wk-del,
+.work-panel .wk-row > button.wk-pin { width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding-left: 4px; padding-right: 4px; }
+.work-panel .work-search-result button.wk-copy,
+.work-panel .work-search-result button.wk-add { min-width: 44px; height: 44px; min-height: 44px; }

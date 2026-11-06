@@ -36,6 +36,33 @@
     '<div><label>일본어<textarea data-ja></textarea></label><button type="button" data-copy-ja>직원 일본어 복사</button></div></div>' +
     '<button type="button" data-copy-all>직원 세 언어 복사</button><div data-manual hidden><label>직원 설명 · 수동 복사<textarea data-manual-text readonly></textarea></label><button type="button" data-manual-select>직원 문구 전체 선택</button></div></details>' +
     '<div class="work-actions"><button type="button" class="wk-primary" data-save>저장</button><button type="button" data-copy>복사</button><button type="button" data-pin hidden>고정</button><button type="button" data-clear hidden>지우기</button></div><div data-clear-confirm hidden><p>이 임시 메모만 지웁니다.</p><div class="work-actions"><button type="button" class="wk-danger" data-clear-now>지우기</button><button type="button" data-clear-cancel>취소</button></div></div></div><p data-status role="status"></p></section></div></div>';
+  // #6498: keep the memo card and address search as two bounded, equal panels.
+  // The segment/alert belong to the memo half so navigation stays memo first.
+  const columns = panel.querySelector('.work-columns');
+  const memoCard = panel.querySelector('.work-memos');
+  const searchCard = panel.querySelector('.work-search');
+  const workspace = panel.querySelector('.work-workspace');
+  if (columns && memoCard && searchCard) {
+    const segment = panel.querySelector('.wk-seg');
+    const urgent = panel.querySelector('[data-urgent]');
+    const timerStatus = panel.querySelector('[data-timer-status]');
+    if (segment) memoCard.prepend(segment);
+    if (urgent) memoCard.insertBefore(urgent, memoCard.children[1] || null);
+    if (timerStatus) memoCard.insertBefore(timerStatus, urgent ? urgent.nextSibling : memoCard.children[1] || null);
+    const records = panel.querySelector('.work-records');
+    if (records) memoCard.appendChild(records);
+    columns.insertBefore(memoCard, searchCard);
+
+    const searchScroll = document.createElement('div');
+    searchScroll.className = 'wk-search-scroll';
+    searchScroll.setAttribute('aria-label', '주소 검색 결과');
+    [panel.querySelector('[data-search-status]'), panel.querySelector('[data-cache-results]'),
+      panel.querySelector('[data-memo-results]'), panel.querySelector('[data-external-results]'),
+      panel.querySelector('[data-ai-results]'), panel.querySelector('[data-selection]'),
+      panel.querySelector('[data-selected-actions]')].filter(Boolean).forEach((node) => searchScroll.appendChild(node));
+    searchCard.appendChild(searchScroll);
+    if (workspace) workspace.remove();
+  }
   shell.appendChild(panel);
   const $ = (name) => panel.querySelector('[data-' + name + ']');
   function showTimerStatus() {
