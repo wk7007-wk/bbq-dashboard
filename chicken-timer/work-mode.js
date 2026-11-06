@@ -795,9 +795,6 @@
     const reference = document.createElement('div'); reference.className = 'wk-res-reference';
     const refLabel = document.createElement('span'); refLabel.className = 'wk-ref-label'; refLabel.textContent = '참고';
     const refItems = [];
-    if (Number.isFinite(candidate.uses) && candidate.uses >= 0) {
-      const count = document.createElement('span'); count.className = 'wk-ref-uses'; count.textContent = '배달 ' + candidate.uses + '회'; refItems.push(count);
-    }
     const md = monthDay(candidate.last_delivery_at), ms = md ? '' : monthDay(candidate.last_seen_at);
     if (md || ms) {
       const date = document.createElement('span'); date.className = 'wk-ref-date';

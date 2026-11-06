@@ -357,7 +357,7 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .work-panel .work-search-result > .wk-jibun { margin-top: 1px; color: var(--wk-text-3); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
 .work-panel .wk-res-reference { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 10px; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--wk-hair); color: var(--wk-text-3); font-size: 11.5px; line-height: 1.4; }
 .work-panel .wk-ref-label { flex: 0 0 100%; color: var(--wk-text-3); font-size: 10.5px; }
-.work-panel .wk-ref-uses, .work-panel .wk-ref-date, .work-panel .wk-phone { min-width: 0; color: var(--wk-text-3); font-size: 11.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.work-panel .wk-ref-date, .work-panel .wk-phone { min-width: 0; color: var(--wk-text-3); font-size: 11.5px; line-height: 1.4; overflow-wrap: anywhere; }
 .work-panel .wk-phone { display: inline; margin: 0; font-variant-numeric: tabular-nums; }
 .work-panel button.wk-units-toggle, .work-panel button.wk-rawbtn { flex: none; width: auto; min-width: 44px; min-height: 44px; height: 44px; margin: 0; padding: 0 9px; border-radius: 8px; color: var(--wk-text-3); font-size: 11.5px; line-height: 1.2; }
 .work-panel button.wk-rawbtn { border-color: var(--wk-hair); background: transparent; }
