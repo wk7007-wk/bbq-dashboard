@@ -342,3 +342,26 @@ body[data-profile="subnote"] .app-shell.work-timer-shell #board.board { height: 
 .work-panel .wk-row > button.wk-pin { width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding-left: 4px; padding-right: 4px; }
 .work-panel .work-search-result button.wk-copy,
 .work-panel .work-search-result button.wk-add { min-width: 44px; height: 44px; min-height: 44px; }
+
+/* #6498: address rows are one copy target; reference fields stay visually secondary. */
+.work-panel [hidden] { display: none !important; }
+.work-panel .wk-copy-status { flex: none; min-height: 0; max-height: 22px; margin: 0 2px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--wk-ok); font-size: 11.5px; line-height: 22px; }
+.work-panel .wk-copy-status:empty { display: none; }
+.work-panel .work-search-result { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 0; align-items: start; cursor: pointer; }
+.work-panel .work-search-result > .wk-res-top,
+.work-panel .work-search-result > .wk-res-addr,
+.work-panel .work-search-result > .wk-jibun,
+.work-panel .work-search-result > .wk-res-reference { grid-column: 1 / -1; grid-row: auto; min-width: 0; }
+.work-panel .work-search-result > .wk-res-top { display: flex; align-items: flex-start; gap: 8px; }
+.work-panel .work-search-result > .wk-res-addr { margin-top: 3px; color: var(--wk-text); font-size: 13.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.work-panel .work-search-result > .wk-jibun { margin-top: 1px; color: var(--wk-text-3); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+.work-panel .wk-res-reference { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 10px; margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--wk-hair); color: var(--wk-text-3); font-size: 11.5px; line-height: 1.4; }
+.work-panel .wk-ref-label { flex: 0 0 100%; color: var(--wk-text-3); font-size: 10.5px; }
+.work-panel .wk-ref-uses, .work-panel .wk-ref-date, .work-panel .wk-phone { min-width: 0; color: var(--wk-text-3); font-size: 11.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.work-panel .wk-phone { display: inline; margin: 0; font-variant-numeric: tabular-nums; }
+.work-panel button.wk-units-toggle, .work-panel button.wk-rawbtn { flex: none; width: auto; min-width: 44px; min-height: 44px; height: 44px; margin: 0; padding: 0 9px; border-radius: 8px; color: var(--wk-text-3); font-size: 11.5px; line-height: 1.2; }
+.work-panel button.wk-rawbtn { border-color: var(--wk-hair); background: transparent; }
+.work-panel .wk-unit-list, .work-panel .wk-rawline { flex: 0 0 100%; display: grid; gap: 3px; min-width: 0; margin: 0; padding: 6px 8px; border-radius: 8px; background: rgba(255, 255, 255, .035); color: var(--wk-text-3); font-size: 11.5px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.work-panel .wk-unit-list[hidden], .work-panel .wk-rawline[hidden] { display: none !important; }
+.work-panel .wk-unit-item, .work-panel .wk-rawline-item { display: block; min-width: 0; }
+.work-panel .work-search-result:focus-visible { outline: 2px solid var(--wk-accent); outline-offset: -2px; }

@@ -42,6 +42,7 @@
   const memoCard = panel.querySelector('.work-memos');
   const searchCard = panel.querySelector('.work-search');
   const workspace = panel.querySelector('.work-workspace');
+  let resultStatus = null;
   if (columns && memoCard && searchCard) {
     const segment = panel.querySelector('.wk-seg');
     const urgent = panel.querySelector('[data-urgent]');
@@ -56,11 +57,17 @@
     const searchScroll = document.createElement('div');
     searchScroll.className = 'wk-search-scroll';
     searchScroll.setAttribute('aria-label', '주소 검색 결과');
+    searchScroll.setAttribute('role', 'region');
     [panel.querySelector('[data-search-status]'), panel.querySelector('[data-cache-results]'),
       panel.querySelector('[data-memo-results]'), panel.querySelector('[data-external-results]'),
       panel.querySelector('[data-ai-results]'), panel.querySelector('[data-selection]'),
       panel.querySelector('[data-selected-actions]')].filter(Boolean).forEach((node) => searchScroll.appendChild(node));
     searchCard.appendChild(searchScroll);
+    resultStatus = document.createElement('p');
+    resultStatus.className = 'wk-copy-status';
+    resultStatus.setAttribute('role', 'status');
+    resultStatus.setAttribute('aria-live', 'polite');
+    searchCard.insertBefore(resultStatus, searchScroll);
     if (workspace) workspace.remove();
   }
   shell.appendChild(panel);
@@ -441,15 +448,15 @@
     kind = next; current = null; editing = false; fill(); draw(); rememberView();
   }));
   function newMemo(title, text, temporary, sourceKind, name, openEditor = true) {
-    if (!db || !capture()) return;
+    if (!db || !capture()) return false;
     const next = {id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2), revision: 0, title, customer_ko: text, staff_notes: {ko:'',vi:'',ja:''}, staff_meta: {}, created_at: Date.now()};
     if (sourceKind) next.source_kind = sourceKind;
     if (typeof name === 'string') next.name_ko = name;
     try {
       if (temporary) { next.created_order = db.temporaries().reduce((order, item) => Math.max(order, item.created_order || 0), 0) + 1; const saved = db.saveTemporary(next); kind = 'temporary'; current = saved; }
       else { db.saveDraft(next); current = next; }
-      editing = openEditor; fill(); draw(); rememberView(); report(temporary ? '새 임시 항목에 담았습니다' : '새 고정 메모를 편집합니다');
-    } catch (_) { report('새 항목을 저장하지 못했습니다. 기존 항목과 입력값을 보존합니다.'); }
+      editing = openEditor; fill(); draw(); rememberView(); report(temporary ? '새 임시 항목에 담았습니다' : '새 고정 메모를 편집합니다'); return true;
+    } catch (_) { report('새 항목을 저장하지 못했습니다. 기존 항목과 입력값을 보존합니다.'); return false; }
   }
   $('new').addEventListener('click', () => newMemo('', '', kind === 'temporary'));
   let lineComposing = false;
@@ -498,6 +505,9 @@
         if (!item || typeof item.name !== 'string' || typeof item.address !== 'string' ||
             !['db', 'naver'].includes(item.source) || typeof item.confirmed !== 'boolean') throw new Error('invalid address');
         const strs = (v, n) => Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x).slice(0, n) : [];
+        const structuredUnits = Array.isArray(item.units) ? item.units.filter((unit) => unit && typeof unit === 'object' && !Array.isArray(unit)).map((unit) => ({
+          dong: typeof unit.dong === 'string' ? unit.dong : '', ho: typeof unit.ho === 'string' ? unit.ho : '',
+          floor: typeof unit.floor === 'string' ? unit.floor : '', detail: typeof unit.detail === 'string' ? unit.detail : ''})) : [];
         return {name: item.name, address: item.address, jibun: typeof item.jibun === 'string' ? item.jibun : '', source: item.source, confirmed: item.confirmed, uses: Number.isFinite(item.uses) ? item.uses : null,
           // 1104 #5604 통합 검색 계약: 전화·원문·최근 배달·맞은 조각·별명·일치 종류(없으면 빈 값 — 예전 서버도 그대로)
           phones: strs(item.phones, 5), raw_line: typeof item.raw_line === 'string' ? item.raw_line : '',
@@ -507,6 +517,7 @@
           match_kind: ['all', 'partial', 'similar'].includes(item.match_kind) ? item.match_kind : '',
           matched_query: typeof item.matched_query === 'string' ? item.matched_query : '',
           dong: typeof item.dong === 'string' ? item.dong : '', ho: typeof item.ho === 'string' ? item.ho : '',
+          floor: typeof item.floor === 'string' ? item.floor : '', detail: typeof item.detail === 'string' ? item.detail : '', units: structuredUnits,
           last_seen_at: Number.isFinite(item.last_seen_at) || typeof item.last_seen_at === 'string' ? item.last_seen_at : ''};
   };
   const cacheSearch = searchAdapters.cacheSearch || (async (query) => {
@@ -559,6 +570,64 @@
   const addrKey = (text) => { const m = String(text || '').match(/([가-힣0-9]+(?:로|길))\s*(\d+(?:-\d+)?)/); return m ? m[1] + ' ' + m[2] : String(text || '').replace(/\s+/g, ''); };
   const placeOf = (candidate) => ({road: addrKey(candidate.address), name: String(candidate.name || '').replace(/\s+/g, '')});
   const samePlace = (a, b) => a.road === b.road && (a.name === b.name || !a.name || !b.name);
+  function structuredDetails(candidate) {
+    const details = [];
+    const add = (value) => {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+      const item = {dong: typeof value.dong === 'string' ? value.dong.trim() : '', ho: typeof value.ho === 'string' ? value.ho.trim() : '',
+        floor: typeof value.floor === 'string' ? value.floor.trim() : '', detail: typeof value.detail === 'string' ? value.detail.trim() : ''};
+      if (item.dong || item.ho || item.floor || item.detail) details.push(item);
+    };
+    if (Array.isArray(candidate && candidate.units)) candidate.units.forEach(add);
+    add(candidate);
+    const unique = new Map();
+    details.forEach((item) => unique.set(JSON.stringify(item), item));
+    return Array.from(unique.values());
+  }
+  function addressGroup(items) {
+    const rows = [];
+    items.forEach((item) => {
+      if (Array.isArray(item && item._groupItems)) rows.push.apply(rows, item._groupItems);
+      else rows.push(item);
+    });
+    const preferred = rows.find((item) => typeof item.name === 'string' && item.name.trim()) || rows[0] || {};
+    const allDetails = [];
+    rows.forEach((item) => allDetails.push.apply(allDetails, structuredDetails(item)));
+    const grouped = Object.assign({}, preferred, {_groupItems: rows, _displayUnits: structuredDetails({units: allDetails})});
+    const counts = rows.map((item) => item.uses);
+    grouped.uses = counts.length && counts.every((count) => Number.isFinite(count) && count >= 0) ? counts.reduce((sum, count) => sum + count, 0) : null;
+    const dateMs = (value) => {
+      if (Number.isFinite(value)) return value > 0 ? value * 1000 : NaN;
+      if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})?)?$/.test(value)) return NaN;
+      return Date.parse(value.length === 10 ? value + 'T00:00:00Z' : value);
+    };
+    const latestValue = (key) => {
+      let latest = null;
+      rows.forEach((item) => {
+        const value = item[key], ms = dateMs(value);
+        if (Number.isFinite(ms) && (!latest || ms > latest.ms)) latest = {value, ms};
+      });
+      return latest ? latest.value : '';
+    };
+    grouped.last_delivery_at = latestValue('last_delivery_at');
+    const seen = latestValue('last_seen_at');
+    grouped.last_seen_at = seen;
+    grouped.phones = rows.map((item) => Array.isArray(item.phones) ? item.phones.find((phone) => typeof phone === 'string' && phone.trim()) : '')
+      .filter(Boolean).slice(0, 1);
+    grouped.jibun = rows.map((item) => typeof item.jibun === 'string' ? item.jibun.trim() : '').find(Boolean) || '';
+    grouped._rawLines = Array.from(new Set(rows.map((item) => typeof item.raw_line === 'string' ? item.raw_line.trim() : '').filter(Boolean)));
+    return grouped;
+  }
+  function groupAddressResults(items) {
+    const groups = [];
+    (Array.isArray(items) ? items : []).forEach((item) => {
+      const found = groups.find((group) => samePlace(placeOf(group), placeOf(item)));
+      if (found) Object.assign(found, addressGroup([found, item]));
+      else groups.push(addressGroup([item]));
+    });
+    if (Array.isArray(items) && Number.isInteger(items.next_offset)) groups.next_offset = items.next_offset;
+    return groups;
+  }
   const laneSeen = {}, laneDone = {};
   // 배달 기록 줄에 '카카오 ✓': 카카오(또는 네이버) 지도도 같은 곳을 찾았다는 표시 — 지도 검색이 실제로 돈다는 것도 보인다
   function alsoMark(row, provider) {
@@ -632,7 +701,34 @@
       let i = 0; while (i < parts.length - 1 && i < 2 && (parts[i] === roadParts[i] || parts[i].replace(/도$/, '') === roadParts[i].replace(/도$/, ''))) i += 1;
       return parts.slice(i).join(' ');
     };
-    const fullAddress = (c) => { const j = shortJibun(c.address, c.jibun); return j ? c.address + ' (' + j + ')' : c.address; };
+    const addressBody = (candidate) => {
+      const road = String(candidate && candidate.address || '').trim();
+      const jibun = shortJibun(road, candidate && candidate.jibun);
+      return road + (jibun ? ' (' + jibun + ')' : '');
+    };
+    const copyableAddress = (candidate) => {
+      const body = addressBody(candidate), name = String(candidate && candidate.name || '').trim();
+      const norm = (value) => String(value || '').replace(/[\s()（）]/g, '');
+      const address = String(candidate && candidate.address || '').trim();
+      return name && body && norm(name) !== norm(address) ? name + ' ' + body : body || name;
+    };
+  function upsertSelectedMemo(candidate, body) {
+    if (!db) return false;
+    let temporaries;
+    try { temporaries = db.temporaries(); } catch (_) { report('임시 메모를 확인하지 못했습니다. 기존 자료를 보존합니다.'); return false; }
+    const key = placeOf(candidate);
+    const existing = temporaries.find((item) => samePlace(placeOf({name: item.name_ko || item.title || '', address: item.customer_ko || ''}), key));
+    if (!existing) return newMemo(candidate.name, body, true, 'selected_result', candidate.name, false);
+    if (!capture()) return false;
+    try {
+      const order = temporaries.reduce((max, item) => Math.max(max, Number(item.created_order) || 0), 0) + 1;
+      const next = Object.assign({}, existing, {name_ko: candidate.name || existing.name_ko || '', customer_ko: body,
+        source_kind: 'selected_result', created_order: order});
+      if (sourceKey(next) !== sourceKey(existing)) next.source_revision = (Number(existing.source_revision) || 0) + 1;
+      current = db.saveTemporary(next); kind = 'temporary'; editing = false; fill(); draw(); rememberView();
+      report('기존 주소 메모를 갱신했습니다'); return true;
+    } catch (_) { report('기존 메모를 갱신하지 못했습니다. 원문을 보존합니다.'); return false; }
+  }
   // 맞은 조각 강조: 빈칸으로 나눈 검색어(또는 서버가 준 matched_tokens)를 글 안에서 모두 칠한다
   function markTokens(text, tokens) {
     const frag = document.createDocumentFragment(); text = String(text || '');
@@ -664,9 +760,10 @@
     if (Number.isFinite(v) && v > 0) { const d = new Date(v * 1000); return String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
     const m = String(v || '').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[2] + '-' + m[3] : '';
   };
-  // 결과 한 줄(DB·지도·AI 같은 모양) — 1104 사장님 "주소가 메인 … 버튼은 작게" + 통합 검색(별명·전화·원문)
+  // 결과 한 줄: 복사 대상 주소와 참고 정보를 분리한다. 동·호는 구조화 필드만 쓴다.
   function resultRow(candidate, tokens) {
-    const row = document.createElement('div'); row.className = 'work-search-result';
+    const row = document.createElement('article'); row.className = 'work-search-result';
+    row.setAttribute('role', 'group'); row.tabIndex = 0;
     const top = document.createElement('div'); top.className = 'wk-res-top';
     const displayName = candidate.name || candidate.address;
     const name = document.createElement('strong'); name.className = 'wk-res-name'; name.appendChild(markTokens(displayName, tokens));
@@ -684,7 +781,6 @@
     src.className = cls; src.textContent = label; src.title = tip; name.appendChild(src);
     if (candidate.matched_alias) { const al = document.createElement('span'); al.className = 'wk-alias'; al.textContent = '‘' + candidate.matched_alias + '’으로 찾음'; name.appendChild(al); }
     if (candidate.ai_note) { const an = document.createElement('span'); an.className = 'wk-alias wk-ai-note'; an.textContent = 'AI 풀이 ‘' + candidate.ai_note + '’'; name.appendChild(an); }
-    const acts = document.createElement('span'); acts.className = 'wk-res-acts';
     const address = document.createElement('span'); address.className = 'wk-res-addr';
     const addressText = String(candidate.address || '');
     const nameText = String(candidate.name || '').trim();
@@ -692,44 +788,83 @@
     const duplicateAddress = !!nameText && !!addressText && comparable(nameText) === comparable(addressText);
     if (!duplicateAddress) address.appendChild(markTokens(addressText, tokens));
     const jibunText = shortJibun(candidate.address, candidate.jibun);
-    const add = document.createElement('button'); add.type = 'button'; add.className = 'wk-add'; add.textContent = '메모로';
-    add.setAttribute('aria-label', (candidate.name || candidate.address) + ' 메모로 옮기기'); add.title = '메모로 옮기기';
-    add.addEventListener('click', () => {
-      newMemo(candidate.name, fullAddress(candidate), true, 'selected_result', candidate.name, false);
-      add.textContent = '✓'; row.classList.add('wk-copied'); setTimeout(() => { add.textContent = '메모로'; row.classList.remove('wk-copied'); }, 1200);
-    });
-    const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'wk-copy'; copy.textContent = '복사';
-    copy.setAttribute('aria-label', (candidate.name || candidate.address) + ' 주소 복사'); copy.title = '주소 복사';
-    copy.addEventListener('click', async (event) => {
-      event.stopPropagation();
-      if (await copyListText(fullAddress(candidate))) { copy.textContent = '✓'; setTimeout(() => { copy.textContent = '복사'; }, 1200); }
-    });
-    acts.appendChild(copy); if (candidate.source !== 'memo') acts.appendChild(add);   // 메모 결과는 이미 메모라 '메모로' 없음
     top.appendChild(name);
-    const dongHo = [candidate.dong && !/동$/.test(candidate.dong) ? candidate.dong + '동' : candidate.dong, candidate.ho && !/호$/.test(candidate.ho) ? candidate.ho + '호' : candidate.ho].filter(Boolean).join(' ');
-    if (dongHo && (duplicateAddress || addressText.indexOf(dongHo) < 0)) {
-      if (!duplicateAddress && addressText) address.appendChild(document.createTextNode(' · '));
-      address.appendChild(markTokens(dongHo, tokens));
-    }
     row.appendChild(top);
-    if (!duplicateAddress || dongHo) row.appendChild(address);
+    if (!duplicateAddress || !jibunText) row.appendChild(address);
     if (jibunText) { const j = document.createElement('span'); j.className = 'wk-jibun'; j.appendChild(markTokens('지번 ' + jibunText, tokens)); row.appendChild(j); }
-    row.appendChild(acts);
+    const reference = document.createElement('div'); reference.className = 'wk-res-reference';
+    const refLabel = document.createElement('span'); refLabel.className = 'wk-ref-label'; refLabel.textContent = '참고';
+    const refItems = [];
+    if (Number.isFinite(candidate.uses) && candidate.uses >= 0) {
+      const count = document.createElement('span'); count.className = 'wk-ref-uses'; count.textContent = '배달 ' + candidate.uses + '회'; refItems.push(count);
+    }
+    const md = monthDay(candidate.last_delivery_at), ms = md ? '' : monthDay(candidate.last_seen_at);
+    if (md || ms) {
+      const date = document.createElement('span'); date.className = 'wk-ref-date';
+      date.textContent = md ? '최근 배달 ' + md : '최근 기록 ' + ms; refItems.push(date);
+    }
     const phones = candidate.phones || [];
-    if (phones.length || candidate.last_delivery_at || candidate.last_seen_at) {   // 1104 사장님 "번호도 원문베이스로": 전화(맞은 숫자 강조)·최근 배달
-      const ph = document.createElement('span'); ph.className = 'wk-phone';
-      if (phones.length) { ph.appendChild(document.createTextNode('☎ ')); ph.appendChild(markPhone(phones[0], tokens)); if (phones.length > 1) ph.appendChild(document.createTextNode(' 외 ' + (phones.length - 1))); }
-      const md = monthDay(candidate.last_delivery_at), ms = md ? '' : monthDay(candidate.last_seen_at);
-      if (md) ph.appendChild(document.createTextNode((phones.length ? ' · ' : '') + '최근 배달 ' + md));
-      else if (ms) ph.appendChild(document.createTextNode((phones.length ? ' · ' : '') + '최근 기록 ' + ms));
-      row.appendChild(ph);
+    if (phones.length && typeof phones[0] === 'string') {
+      const phone = document.createElement('span'); phone.className = 'wk-phone';
+      phone.appendChild(document.createTextNode('☎ ')); phone.appendChild(markPhone(phones[0], tokens)); refItems.push(phone);
     }
-    if (candidate.raw_line) {   // 원문 한 줄 펼쳐 보기(줄을 눌러 메모로 옮기는 것과 따로)
-      const rb = document.createElement('button'); rb.type = 'button'; rb.className = 'wk-rawbtn'; rb.textContent = '원문 ▾';
-      const rl = document.createElement('span'); rl.className = 'wk-rawline'; rl.hidden = true; rl.appendChild(markTokens(candidate.raw_line, tokens));
-      rb.addEventListener('click', (event) => { event.stopPropagation(); rl.hidden = !rl.hidden; rb.textContent = rl.hidden ? '원문 ▾' : '원문 ▴'; });
-      row.appendChild(rb); row.appendChild(rl);
+    const details = Array.isArray(candidate._displayUnits) ? candidate._displayUnits : structuredDetails(candidate);
+    if (details.length) {
+      const hasUnits = details.some((item) => item.dong || item.ho);
+      const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'wk-units-toggle';
+      toggle.textContent = hasUnits ? '동·호 ▾' : '상세 ▾'; toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', hasUnits ? '동·호 참고 정보 펼치기' : '층·상세 참고 정보 펼치기');
+      const list = document.createElement('div'); list.className = 'wk-unit-list'; list.hidden = true;
+      details.forEach((item) => {
+        const parts = [];
+        if (item.dong) parts.push(item.dong.endsWith('동') ? item.dong : item.dong + '동');
+        if (item.ho) parts.push(item.ho.endsWith('호') ? item.ho : item.ho + '호');
+        if (item.floor) parts.push('층 ' + item.floor);
+        if (item.detail) parts.push(item.detail);
+        const text = document.createElement('span'); text.className = 'wk-unit-item'; text.textContent = parts.join(' · '); list.appendChild(text);
+      });
+      toggle.addEventListener('click', (event) => {
+        event.stopPropagation(); list.hidden = !list.hidden;
+        toggle.setAttribute('aria-expanded', String(!list.hidden)); toggle.textContent = (hasUnits ? '동·호 ' : '상세 ') + (list.hidden ? '▾' : '▴');
+      });
+      refItems.push(toggle, list);
     }
+    const rawLines = Array.isArray(candidate._rawLines) ? candidate._rawLines : (candidate.raw_line ? [candidate.raw_line] : []);
+    if (rawLines.length) {
+      const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'wk-rawbtn'; toggle.textContent = '원문 ▾';
+      toggle.setAttribute('aria-expanded', 'false');
+      const raw = document.createElement('div'); raw.className = 'wk-rawline'; raw.hidden = true;
+      rawLines.forEach((line) => { const text = document.createElement('span'); text.className = 'wk-rawline-item'; text.appendChild(markTokens(line, tokens)); raw.appendChild(text); });
+      toggle.addEventListener('click', (event) => {
+        event.stopPropagation(); raw.hidden = !raw.hidden;
+        toggle.setAttribute('aria-expanded', String(!raw.hidden)); toggle.textContent = raw.hidden ? '원문 ▾' : '원문 ▴';
+      });
+      refItems.push(toggle, raw);
+    }
+    if (refItems.length) { reference.appendChild(refLabel); refItems.forEach((item) => reference.appendChild(item)); row.appendChild(reference); }
+    row.setAttribute('aria-label', (candidate.name || candidate.address || '주소') + (candidate.source === 'memo' ? ' 메모 복사' : ' 복사하고 임시 메모에 담기'));
+    row._notebookCandidate = candidate;
+    let selecting = false;
+    async function selectRow() {
+      if (selecting) return;
+      selecting = true; row.setAttribute('aria-busy', 'true');
+      const memoSource = candidate.source === 'memo';
+      const copiedText = memoSource ? String(candidate.address || '') : copyableAddress(candidate);
+      let copied = false, saved = memoSource;
+      try {
+        copied = await copyListText(copiedText);
+        if (!memoSource) saved = upsertSelectedMemo(candidate, addressBody(candidate));
+        if (resultStatus) resultStatus.textContent = copied ? '복사됨: ' + copiedText : saved ? '복사 실패 · 임시 메모에 담았습니다' : '복사와 메모 저장을 확인해 주세요';
+        if (copied || saved) row.classList.add('wk-copied');
+      } catch (_) {
+        if (resultStatus) resultStatus.textContent = '복사 또는 메모 저장을 확인해 주세요';
+      } finally { row.removeAttribute('aria-busy'); selecting = false; }
+    }
+    row.addEventListener('click', selectRow);
+    row.addEventListener('keydown', (event) => {
+      if (event.target !== row || !['Enter', ' '].includes(event.key)) return;
+      event.preventDefault(); selectRow();
+    });
     return row;
   }
   const renderedQuery = {}, laneStatus = {};
@@ -760,7 +895,9 @@
       const seen = (laneSeen[update.query] = laneSeen[update.query] || {cache: [], external: []});
       const isDb = update.lane === 'cache';
       const mine = [], alsoOnMap = [];
-      const shown = update.result.filter((candidate) => candidate && typeof candidate.name === 'string' && typeof candidate.address === 'string')
+      const validResults = update.result.filter((candidate) => candidate && typeof candidate.name === 'string' && typeof candidate.address === 'string');
+      const groupedResults = groupAddressResults(validResults);
+      const shown = groupedResults
         .filter((candidate) => {
           const k = placeOf(candidate);
           if (mine.some((x) => samePlace(x.k, k))) return false;
@@ -807,7 +944,22 @@
             const r = await fetch('/chicken-timer/search?' + new URLSearchParams({q: update.query, lane: 'db', offset: String(offset)}), {credentials: 'same-origin', cache: 'no-store', redirect: 'error'});
             const body = r.ok ? await r.json() : null;
             const items = body && body.ok === true && Array.isArray(body.results) ? body.results.map(mapDbItem) : [];
-            items.forEach((c) => target.insertBefore(resultRow(c, c.matched_tokens.length ? c.matched_tokens : qTokens), more));
+            groupAddressResults(items).forEach((candidate) => {
+              const k = placeOf(candidate), prior = seen.cache.find((entry) => samePlace(entry.k, k));
+              if (prior) {
+                const merged = addressGroup([prior.row._notebookCandidate, candidate]);
+                const replacement = resultRow(merged, candidate.matched_tokens.length ? candidate.matched_tokens : qTokens);
+                prior.row.replaceWith(replacement); prior.row = replacement; prior.k = placeOf(merged);
+                seen.external.filter((entry) => samePlace(entry.k, prior.k)).forEach((entry) => alsoMark(replacement, entry.provider));
+                return;
+              }
+              const mapMatches = seen.external.filter((entry) => samePlace(entry.k, k));
+              mapMatches.forEach((entry) => { entry.row.remove(); seen.external = seen.external.filter((item) => item !== entry); });
+              const row = resultRow(candidate, candidate.matched_tokens.length ? candidate.matched_tokens : qTokens);
+              target.insertBefore(row, more);
+              mapMatches.forEach((entry) => alsoMark(row, entry.provider));
+              seen.cache.push({k, row, provider: candidate.provider});
+            });
             if (body && Number.isInteger(body.next_offset) && body.next_offset > offset) { offset = body.next_offset; more.disabled = false; more.textContent = '더 보기'; }
             else more.remove();
           } catch (_) { more.disabled = false; more.textContent = '더 보기(다시)'; }
@@ -818,7 +970,7 @@
       settleEmpty(update.query);
     }
   });
-  $('query').addEventListener('input', () => { if (searcher) searcher.invalidate($('query').value); selected = null; $('selected-actions').hidden = true; });
+  $('query').addEventListener('input', () => { if (searcher) searcher.invalidate($('query').value); if (resultStatus) resultStatus.textContent = ''; selected = null; $('selected-actions').hidden = true; });
   $('stage-query').addEventListener('click', () => {
     const text = $('query').value;
     if (!text.trim()) { $('search-status').textContent = '임시로 담을 주소를 입력해 주세요'; return; }
