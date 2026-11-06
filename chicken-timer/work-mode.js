@@ -298,6 +298,8 @@
           kind = rowKind;
           current = rowKind === 'temporary' ? db.temporary(entry.id) : db.drafts().find((x) => x.id === entry.id) || db.list().find((x) => x.id === entry.id);
           editing = true; fill(); rememberView();
+          const editor = $('editor');
+          if (editor && typeof editor.scrollIntoView === 'function') editor.scrollIntoView({block: 'nearest'});
         } catch (_) { report('항목을 읽지 못했습니다. 편집 내용을 보존합니다.'); }
       }
       const value = rowKind === 'fixed' ? (entry.customer_ko || entry.title || '') : (entry.customer_ko || entry.name_ko || entry.title || '');
