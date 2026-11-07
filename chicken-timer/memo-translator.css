@@ -1,4 +1,11 @@
 /* Transient translation and current-schedule tabs inside the subnote memo. */
+/* Keep the memo tool tabs out of the shrinking memo list; translation and
+   schedule content below them remains the flexible, scrollable region. */
+.work-panel .work-memos > .wk-translation-widget[data-current-view="primary"] {
+  flex: 0 0 auto;
+  min-height: 46px;
+}
+.wk-translation-widget > .wk-translation-nav { flex: 0 0 auto; }
 .wk-translation-widget {
   display: flex;
   flex-direction: column;
