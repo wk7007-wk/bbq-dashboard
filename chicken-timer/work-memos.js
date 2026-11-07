@@ -3,6 +3,19 @@
   const key = 'notebook-work:memos:subnote:v1';
   const draftsKey = 'notebook-work:drafts:subnote:v1';
   const temporaryPrefix = 'notebook-work:temporary:subnote:v1:';
+  const TEMPORARY_TTL_MS = 24 * 60 * 60 * 1000;
+  function timestampMs(value) {
+    if (typeof value === 'number' && Number.isFinite(value) && value >= 0) return value;
+    if (typeof value === 'string' && value.length <= 40) {
+      const parsed = Date.parse(value);
+      if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+    }
+    return null;
+  }
+  function lastChangedAt(item) {
+    const updated = timestampMs(item && item.updated_at);
+    return updated === null ? timestampMs(item && item.created_at) : updated;
+  }
   function read(storage, name, fallback) {
     const raw = storage.getItem(name);
     if (raw === null) return fallback;
@@ -23,18 +36,36 @@
     }
     const api = {
       list: () => read(storage, key, []),
-      drafts: () => read(storage, draftsKey, []),
+      drafts() {
+        const list = read(storage, draftsKey, []);
+        const fixed = new Set(api.list().map((item) => item.id));
+        const now = Date.now();
+        let changed = false;
+        const kept = [];
+        list.forEach((item) => {
+          if (fixed.has(item.id)) { kept.push(item); return; }
+          const lastChanged = lastChangedAt(item);
+          if (lastChanged === null) { kept.push(Object.assign({}, item, {updated_at: now})); changed = true; }
+          else if (now - lastChanged < TEMPORARY_TTL_MS) kept.push(item);
+          else changed = true;
+        });
+        if (changed) {
+          try { storage.setItem(draftsKey, JSON.stringify(kept)); } catch (_) {}
+        }
+        return kept;
+      },
       saveDraft(draft) {
         const drafts = read(storage, draftsKey, []);
         const next = drafts.filter((x) => x && x.id !== draft.id);
-        next.push(draft); storage.setItem(draftsKey, JSON.stringify(next));
+        next.push(Object.assign({}, draft, {updated_at: Date.now()}));
+        storage.setItem(draftsKey, JSON.stringify(next));
       },
       save(draft) {
         const list = read(storage, key, []);
         const old = list.find((x) => x && x.id === draft.id);
         if (old && old.revision !== draft.revision) throw new Error('다른 화면에서 수정됐습니다');
         if (!old && draft.revision !== 0) throw new Error('저장 상태를 확인해 주세요');
-        const saved = Object.assign({}, draft, {revision: draft.revision + 1});
+        const saved = Object.assign({}, draft, {revision: draft.revision + 1, updated_at: Date.now()});
         const next = list.filter((x) => x && x.id !== draft.id); next.push(saved);
         storage.setItem(key, JSON.stringify(next));
         return saved;
@@ -80,7 +111,7 @@
         const old = temporary(draft.id);
         if ((old && old.revision !== draft.revision) || (!old && draft.revision !== 0)) throw new Error('다른 화면에서 임시 항목이 바뀌었습니다');
         if (old && JSON.stringify(old) === JSON.stringify(draft)) return old;
-        const saved = Object.assign({}, draft, {revision: draft.revision + 1});
+        const saved = Object.assign({}, draft, {revision: draft.revision + 1, updated_at: Date.now()});
         storage.setItem(temporaryPrefix + encodeURIComponent(draft.id), JSON.stringify([saved]));
         return saved;
       },
@@ -150,5 +181,5 @@
       }
     };
   }
-  global.NotebookWorkMemos = {store, translatorCoordinator};
+  global.NotebookWorkMemos = {store, translatorCoordinator, TEMPORARY_TTL_MS, lastChangedAt};
 })(window);

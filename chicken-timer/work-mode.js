@@ -94,7 +94,7 @@
   // 못 올리면 이 기기에 그대로 둔다. 직원 메모(staff_notes)는 공장에 안 올리고 이 기기에만 둔다(서버가 받지 않음).
   const share = (() => {
     const api = '/chicken-timer/memos';
-    const shared = ['title', 'name_ko', 'customer_ko', 'source_kind', 'created_at', 'created_order'];
+    const shared = ['title', 'name_ko', 'customer_ko', 'source_kind', 'created_at', 'updated_at', 'created_order'];
     let rev = -1, on = false, queue = Promise.resolve(), retry = null, pending = 0, deferred = false, first = true;
     const failedIds = new Set(), retryIds = new Set();   // failed=공장이 받지 않는 모양(400·413, 이번 접속 동안 다시 안 보냄), retry=잠깐 끊김(다시 보냄)
     const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -103,6 +103,29 @@
     const same = (a, b) => shared.every((k) => (a[k] === undefined ? null : a[k]) === (b[k] === undefined ? null : b[k])) &&
       JSON.stringify(a.temporary_source || null) === JSON.stringify(b.temporary_source || null);
     const keepHere = (x) => { const o = {}; ['staff_notes', 'staff_meta', 'source_revision'].forEach((k) => { if (x[k] !== undefined) o[k] = x[k]; }); return o; };
+    const lastChangedAt = (item) => {
+      if (window.NotebookWorkMemos && typeof window.NotebookWorkMemos.lastChangedAt === 'function') return window.NotebookWorkMemos.lastChangedAt(item);
+      const value = item && (item.updated_at !== undefined ? item.updated_at : item.created_at);
+      if (typeof value === 'number' && Number.isFinite(value) && value >= 0) return value;
+      if (typeof value === 'string') { const parsed = Date.parse(value); if (Number.isFinite(parsed)) return parsed; }
+      return null;
+    };
+    const tombstoneMap = (data) => {
+      const gone = new Map();
+      (Array.isArray(data && data.deleted) ? data.deleted : []).forEach((row) => {
+        if (row && typeof row.id === 'string') gone.set(row.kind + ':' + row.id, row);
+      });
+      return gone;
+    };
+    const retiredLocal = (col, item, gone) => {
+      const stone = gone.get(col + ':' + item.id);
+      if (!stone) return false;
+      if (Number.isInteger(stone.deleted_at)) {
+        const changed = lastChangedAt(item);
+        return changed === null || changed <= stone.deleted_at;
+      }
+      return item.revision <= (Number.isInteger(stone.revision) ? stone.revision : 0);
+    };
     async function call(method, body, query) {
       const res = await fetch(api + (query || ''), {method, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
         headers: body ? {'Content-Type': 'application/json'} : undefined, body: body ? JSON.stringify(body) : undefined});
@@ -132,6 +155,16 @@
         let mine; try { mine = db.snapshot(); } catch (_) { return; }
         const remote = new Map();
         data.fixed.forEach((r) => r && remote.set('fixed:' + r.id, r)); data.temps.forEach((r) => r && remote.set('temps:' + r.id, r));
+        const gone = tombstoneMap(data);
+        let removed = false;
+        [['fixed', mine.fixed], ['temps', mine.temps]].forEach(([col, rows]) => {
+          const kept = rows.filter((item) => {
+            if (retiredLocal(col, item, gone)) { retryIds.delete(item.id); removed = true; return false; }
+            return true;
+          });
+          if (col === 'fixed') mine.fixed = kept; else mine.temps = kept;
+        });
+        if (removed) { try { db.replaceAll(mine); draw(); } catch (_) { return; } }
         [['fixed', 'fixed', mine.fixed], ['temps', 'temporary', mine.temps]].forEach(([col, kind, rows]) => rows.forEach((l) => {
           if (!retryIds.has(l.id)) return;
           const r = remote.get(col + ':' + l.id);
@@ -143,8 +176,7 @@
       }
       let local;
       try { local = db.snapshot(); } catch (_) { return; }
-      const gone = new Map();
-      (Array.isArray(data.deleted) ? data.deleted : []).forEach((t) => { if (t && typeof t.id === 'string') gone.set(t.kind + ':' + t.id, Number.isInteger(t.revision) ? t.revision : 0); });
+      const gone = tombstoneMap(data);
       if (first) {
         // 사고 때 지워진 고정 메모 되살리기: 이 기기 초안에 저장된 판(1 이상)으로 남아 있고, 목록·공장 어디에도 없고, 공장이 지웠다고 적지 않은 것
         try {
@@ -164,8 +196,7 @@
           else out.push(l ? Object.assign(keepHere(l), r) : r);
         });
         mine.forEach((l) => {
-          const g = gone.get(col + ':' + l.id);
-          if (g !== undefined && l.revision <= g) return;   // 다른 기기에서 지운 메모
+          if (retiredLocal(col, l, gone)) return;           // 다른 기기에서 지운 메모, 만료된 오프라인 복사본도 재전송하지 않는다
           out.push(l);                                       // 공장에 없는 이 기기 메모: 지우지 않고 올린다
           if (!failedIds.has(l.id)) sends.push({op: 'put', kind, item: Object.assign({}, l, {revision: Math.max(1, l.revision)}), base: 0});
         });
