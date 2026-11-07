@@ -278,7 +278,7 @@
         const secondary = view !== 'primary';
         const panel = card.closest('.work-panel');
         card.dataset.translationActive = String(secondary);
-        if (panel) panel.dataset.notebookScheduleActive = String(view === 'schedule');
+        if (panel) panel.dataset.notebookSecondaryActive = String(view !== 'primary');
         title.hidden = secondary || titleHidden;
         memoNodes.forEach((node) => { node.hidden = secondary ? true : memoHidden.get(node); });
         if (records) records.hidden = secondary || recordsHidden;

@@ -168,8 +168,8 @@
 }
 .wk-translation-state[data-kind="error"] { color: #ffb4aa; }
 .work-panel .work-memos[data-translation-active="true"] > .wk-card-title { display: none; }
-.work-panel[data-notebook-schedule-active="true"] .work-columns > .work-search { display: none !important; }
-.work-panel[data-notebook-schedule-active="true"] .work-columns > .work-memos {
+.work-panel[data-notebook-secondary-active="true"] .work-columns > .work-search { display: none !important; }
+.work-panel[data-notebook-secondary-active="true"] .work-columns > .work-memos {
   flex: 1 1 0;
   overflow: hidden;
   touch-action: auto;
