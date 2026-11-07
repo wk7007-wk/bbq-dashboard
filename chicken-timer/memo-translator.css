@@ -1,11 +1,10 @@
-/* Transient translation and current-schedule tabs inside the subnote memo. */
-/* Keep the memo tool tabs out of the shrinking memo list; translation and
-   schedule content below them remains the flexible, scrollable region. */
+/* Translation/schedule panels share the single navigation row in work-mode.css. */
 .work-panel .work-memos > .wk-translation-widget[data-current-view="primary"] {
-  flex: 0 0 auto;
-  min-height: 46px;
+  flex: 0 0 0;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
 }
-.wk-translation-widget > .wk-translation-nav { flex: 0 0 auto; }
 .wk-translation-widget {
   display: flex;
   flex-direction: column;
@@ -20,22 +19,6 @@
   min-height: 0;
   margin: 0;
 }
-.wk-translation-nav {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 4px;
-  min-width: 0;
-}
-.wk-translation-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2px;
-  min-width: 0;
-  padding: 0;
-  background: var(--wk-surface, var(--card, #172433));
-  border: 1px solid var(--wk-hair, var(--line, #2a3d54));
-  border-radius: 10px;
-}
 .wk-translation-languages {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -47,7 +30,6 @@
   border-radius: 10px;
 }
 .wk-translation-languages[hidden] { display: none !important; }
-.wk-translation-tabs button,
 .wk-translation-languages button {
   min-width: 44px;
   min-height: 44px;
@@ -62,7 +44,6 @@
   font-weight: 650;
   white-space: nowrap;
 }
-.wk-translation-tabs button[aria-selected="true"],
 .wk-translation-languages button[aria-pressed="true"] {
   color: var(--wk-text, var(--text, #f4f8fd));
   background: var(--wk-raise, var(--today, #1e3a5f));

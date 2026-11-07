@@ -9,25 +9,25 @@
   if (!shell || !board || !window.NotebookWorkMemos || window.__notebookWorkMounted) return;
   window.__notebookWorkMounted = true;
   const timerBar = document.createElement('header'); timerBar.className = 'work-timer-bar';
-  const timerLabel = document.createElement('strong'); timerLabel.textContent = '타이머';
-  const button = document.createElement('button');
-  button.type = 'button'; button.className = 'work-mode-open'; button.textContent = '메모';
-  button.setAttribute('aria-label', '메모로 돌아가기');
+  const tabs = document.createElement('div'); tabs.className = 'wk-main-tabs';
+  tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', '화면 전환');
+  const viewButtons = {};
+  [['primary', '메모'], ['translate', '번역'], ['schedule', '근무표'], ['timer', '타이머']].forEach(([view, label], index) => {
+    const tab = document.createElement('button');
+    tab.type = 'button'; tab.className = 'wk-main-tab'; tab.dataset.view = view;
+    tab.setAttribute('role', 'tab'); tab.setAttribute('aria-selected', String(view === 'primary'));
+    tab.tabIndex = index === 0 ? 0 : -1; tab.textContent = label;
+    tabs.appendChild(tab); viewButtons[view] = tab;
+  });
   const timerAlert = document.createElement('button');
   timerAlert.type = 'button'; timerAlert.className = 'work-timer-alert'; timerAlert.hidden = true;
-  timerAlert.addEventListener('click', () => {
-    const target = board.querySelector('.slot-card[data-state="expired"], .split-timer-unit[data-state="expired"]');
-    if (target && typeof target.scrollIntoView === 'function') target.scrollIntoView({block:'center'});
-  });
-  timerBar.appendChild(timerLabel); timerBar.appendChild(timerAlert); timerBar.appendChild(button);
+  timerAlert.setAttribute('aria-live', 'polite');
+  timerBar.appendChild(tabs); timerBar.appendChild(timerAlert);
   shell.insertBefore(timerBar, board);
   shell.classList.add('work-timer-shell');
-  new MutationObserver(() => { refreshHistorySource(); }).observe(board, {childList: true, subtree: true});
   const panel = document.createElement('section');
   panel.className = 'work-panel'; panel.hidden = true; panel.setAttribute('aria-label', '메모');
-  panel.innerHTML = '<div class="wk-seg" role="tablist" aria-label="화면 전환"><button type="button" role="tab" aria-selected="true" class="wk-seg-on" tabindex="-1">메모</button><button type="button" role="tab" aria-selected="false" data-back>타이머<span class="wk-badge" data-seg-badge hidden></span></button></div>' +
-    '<button type="button" class="wk-urgent" data-urgent hidden></button><span data-timer-status role="status" aria-live="polite" hidden></span>' +
-    '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-memo-results></div><div data-external-results></div><div data-ai-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
+    panel.innerHTML = '<div class="work-columns"><section class="work-search wk-card-box"><h2 class="wk-card-title">주소 검색</h2><div class="work-search-line"><label class="wk-field"><svg class="wk-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><span class="work-sr-only">건물 이름이나 주소 일부</span><input data-query autocomplete="off" enterkeyhint="search" placeholder="건물·주소 일부 검색"><kbd class="wk-kbd">Enter</kbd></label><button type="button" class="wk-stage" data-stage-query title="입력한 글자를 그대로 메모에 담기">+ 담기</button><button type="button" class="work-sr-only" data-search tabindex="-1">검색</button></div><p data-search-status aria-live="polite"></p><div data-cache-results></div><div data-memo-results></div><div data-external-results></div><div data-ai-results></div><p data-selection></p><div data-selected-actions hidden><label>고객용 한국어 주소<textarea data-selected-customer readonly></textarea></label><div class="work-actions"><button type="button" data-copy-selection>고객 한국어 복사</button><button type="button" data-stage-selection>선택값 임시 담기</button></div><div><button type="button" data-confirm>맞음</button><button type="button" data-reject>아님</button><button type="button" data-undo>되돌림</button></div><label>주소 수정<input data-correction></label><button type="button" data-correct>수정 반영</button><button type="button" data-retry-feedback hidden>처리 확인 재시도</button><p data-feedback-status role="status"></p></div></section><div class="work-workspace"><aside class="work-records" aria-label="최근 타이머 기록"><div data-history class="work-history-list"></div></aside>' +
     '<section class="work-memos wk-card-box"><h2 class="wk-card-title">메모<span class="wk-share" data-share></span></h2><div class="wk-memo-head"><div class="wk-kind" role="group" aria-label="메모 종류"><button type="button" data-temporary aria-pressed="false">임시 메모</button><button type="button" data-fixed aria-pressed="true">자주 쓰는 문구</button></div><button type="button" class="wk-new" data-new>+ 새 메모</button></div><label class="wk-line-field"><span class="work-sr-only">메모 한 줄</span><input data-line autocomplete="off" enterkeyhint="done" placeholder="메모 한 줄 쓰고 Enter"></label><div class="work-fixed-chips" data-fixed-chips></div><div data-batch hidden><p>목록 순서로 복사 · 카드 안에서는 이름, 주소/문구 순서 · 값 사이는 줄바꿈</p><div class="work-actions"><button type="button" data-copy-batch disabled>선택값 복사 (0)</button><button type="button" data-unselect>선택 해제</button></div><div data-list-manual hidden><label>선택한 한국어 값 · 수동 복사<textarea data-list-manual-text readonly></textarea></label><button type="button" data-list-manual-select>문구 전체 선택</button></div></div><details class="work-help"><summary>직원 사용 안내 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-help-languages"><section lang="ko"><h3>한국어</h3><p>주소·건물명을 입력하거나 검색 결과를 임시 카드에 담습니다. 필요한 값만 선택해 복사한 뒤 포스에 붙여넣습니다. 자주 쓰는 문구는 고정으로 저장합니다. ‘기록’은 타이머를 열고 ‘메모로’는 이 화면으로 돌아옵니다. 주소검색은 매장 연결에서 사용할 수 있습니다.</p></section><section lang="vi"><h3>Tiếng Việt</h3><p>Nhập địa chỉ hoặc tên tòa nhà, rồi thêm vào thẻ tạm. Khi có kết quả tìm kiếm, bạn cũng có thể lưu giá trị đã chọn. Chỉ chọn các giá trị cần dùng, sao chép rồi dán vào POS. Lưu câu thường dùng vào ghi chú cố định. Nhấn “기록” để mở bộ hẹn giờ, nhấn “메모로” để quay lại. Tìm kiếm địa chỉ chỉ dùng trong kết nối của cửa hàng.</p></section><section lang="ja"><h3>日本語</h3><p>住所・建物名の入力値や選択した検索結果を一時カードに保存します。必要な値だけを選んでコピーし、POSに貼り付けます。よく使う文章は固定メモに保存します。「기록」でタイマーを開き、「메모로」でメモに戻ります。住所検索は店舗の接続から利用できます。</p></section></div></details><div class="wk-undo" data-undo hidden><span data-undo-text></span><button type="button" data-undo-btn>되돌리기</button></div><div data-list class="work-list"></div><div data-editor hidden><p data-current-kind></p>' +
     '<label>제목<input data-title></label><label data-name-label hidden>이름 / 건물명<input data-name></label><label>메모<textarea data-customer rows="2"></textarea></label>' +
     '<details class="work-staff"><summary>직원 설명 · 한국어 / Tiếng Việt / 日本語</summary><div class="work-languages">' +
@@ -44,12 +44,6 @@
   const workspace = panel.querySelector('.work-workspace');
   let resultStatus = null;
   if (columns && memoCard && searchCard) {
-    const segment = panel.querySelector('.wk-seg');
-    const urgent = panel.querySelector('[data-urgent]');
-    const timerStatus = panel.querySelector('[data-timer-status]');
-    if (segment) memoCard.prepend(segment);
-    if (urgent) memoCard.insertBefore(urgent, memoCard.children[1] || null);
-    if (timerStatus) memoCard.insertBefore(timerStatus, urgent ? urgent.nextSibling : memoCard.children[1] || null);
     const records = panel.querySelector('.work-records');
     if (records) memoCard.appendChild(records);
     columns.insertBefore(memoCard, searchCard);
@@ -74,10 +68,8 @@
   const $ = (name) => panel.querySelector('[data-' + name + ']');
   function showTimerStatus() {
     const done = board.querySelectorAll('.slot-card[data-state="expired"], .split-timer-unit[data-state="expired"]').length;
-    $('timer-status').textContent = done ? '완료 알림 ' + done + '건' : ''; $('timer-status').hidden = !done; timerAlert.hidden = !done; timerAlert.textContent = done ? '완료 ' + done : '';
+    timerAlert.hidden = !done; timerAlert.textContent = done ? String(done) : '';
     timerAlert.setAttribute('aria-label', done ? '완료 알림 ' + done + '건 보기' : '완료 알림');
-    $('seg-badge').textContent = done ? String(done) : ''; $('seg-badge').hidden = !done;
-    $('urgent').textContent = done ? '완료된 타이머 ' + done + '개 — 눌러서 확인' : ''; $('urgent').hidden = !done;
   }
   new MutationObserver(showTimerStatus).observe(board, {attributes: true, subtree: true, attributeFilter: ['data-state']});
   showTimerStatus();
@@ -1075,13 +1067,13 @@
   let memoScroll = 0;
   function showTimer() {
     memoScroll = panel.scrollTop || 0;
-    panel.hidden = true; timerBar.hidden = false; board.hidden = false;
+    panel.hidden = true; board.hidden = false;
     // Reuse the application's existing resize renderer after un-hiding its
     // original DOM; no start/restore/clear/store method is invoked here.
     if (typeof window.dispatchEvent === 'function' && typeof Event === 'function') window.dispatchEvent(new Event('resize'));
   }
   function showMemo() {
-    board.hidden = true; timerBar.hidden = true; panel.hidden = false; draw(); refreshHistorySource();
+    board.hidden = true; panel.hidden = false; draw(); refreshHistorySource();
     panel.scrollTop = memoScroll;
   }
   let historySource = null, historyObserver = null, historyText = null, historyRows = [];
@@ -1123,9 +1115,52 @@
       renderHistory();
     }
   }
-  button.addEventListener('click', showMemo);
-  $('back').addEventListener('click', showTimer);
-  $('urgent').addEventListener('click', () => { showTimer(); timerAlert.click(); });
+  let viewController = null;
+  let activeView = 'primary';
+  function applyView(view) {
+    activeView = view;
+    if (view === 'timer') {
+      showTimer();
+      return;
+    }
+    if (panel.hidden) showMemo();
+  }
+  const navigation = window.NotebookWorkNavigation = {
+    tabs: viewButtons,
+    attach(controller) {
+      if (typeof controller !== 'function') return false;
+      viewController = controller;
+      viewController(activeView);
+      return true;
+    },
+    select(view) {
+      if (!Object.prototype.hasOwnProperty.call(viewButtons, view)) return false;
+      activeView = view;
+      if (viewController) viewController(view);
+      else applyView(view);
+      return true;
+    },
+    changed(view) {
+      if (!Object.prototype.hasOwnProperty.call(viewButtons, view)) return false;
+      applyView(view);
+      return true;
+    }
+  };
+  Object.entries(viewButtons).forEach(([view, tab]) => tab.addEventListener('click', () => navigation.select(view)));
+  timerAlert.addEventListener('click', () => {
+    navigation.select('timer');
+    const target = board.querySelector('.slot-card[data-state="expired"], .split-timer-unit[data-state="expired"]');
+    if (target && typeof target.scrollIntoView === 'function') target.scrollIntoView({block:'center'});
+  });
+  function syncPanelTop() {
+    const rect = timerBar.getBoundingClientRect();
+    const margin = parseFloat(getComputedStyle(timerBar).marginBottom) || 0;
+    panel.style.setProperty('--work-panel-top', Math.ceil(rect.bottom + margin) + 'px');
+  }
+  syncPanelTop();
+  window.addEventListener('resize', syncPanelTop);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', syncPanelTop);
+  new MutationObserver(() => { refreshHistorySource(); }).observe(board, {childList: true, subtree: true});
   showMemo();
   share.start();
 })();

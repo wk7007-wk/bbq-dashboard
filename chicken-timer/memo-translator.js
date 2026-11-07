@@ -10,26 +10,14 @@
   function mountWidget(host, options) {
     options = options || {};
     if (!host || host.dataset.translationMounted === 'true') return false;
+    const navigation = options.navigation;
+    const mainTabs = options.tabs || (navigation && navigation.tabs);
+    if (!navigation || typeof navigation.attach !== 'function' || !mainTabs ||
+        !mainTabs.primary || !mainTabs.translate || !mainTabs.schedule || !mainTabs.timer) return false;
 
     const widget = global.document.createElement('section');
     widget.className = 'wk-translation-widget';
     widget.dataset.context = options.context || 'memo';
-
-    const nav = global.document.createElement('div');
-    nav.className = 'wk-translation-nav';
-    const tabs = global.document.createElement('div');
-    tabs.className = 'wk-translation-tabs';
-    tabs.setAttribute('role', 'tablist');
-    tabs.setAttribute('aria-label', (options.primaryLabel || '메모') + ' 도구');
-    const primaryTab = global.document.createElement('button');
-    primaryTab.type = 'button'; primaryTab.setAttribute('role', 'tab');
-    primaryTab.textContent = options.primaryLabel || '메모';
-    const translateTab = global.document.createElement('button');
-    translateTab.type = 'button'; translateTab.setAttribute('role', 'tab'); translateTab.textContent = '번역';
-    const scheduleTab = global.document.createElement('button');
-    scheduleTab.type = 'button'; scheduleTab.setAttribute('role', 'tab'); scheduleTab.textContent = '근무표';
-    tabs.appendChild(primaryTab); tabs.appendChild(translateTab); tabs.appendChild(scheduleTab);
-    nav.appendChild(tabs);
 
     const languages = global.document.createElement('div');
     languages.className = 'wk-translation-languages';
@@ -43,12 +31,12 @@
       languages.appendChild(button); languageButtons[code] = button;
     });
     languages.hidden = true;
-    nav.appendChild(languages);
 
     const pane = global.document.createElement('section');
     pane.className = 'wk-translation-pane';
     pane.setAttribute('aria-label', '한국어 문장 번역');
     pane.hidden = true;
+    pane.appendChild(languages);
     const compose = global.document.createElement('div');
     compose.className = 'wk-translation-compose';
     const input = global.document.createElement('textarea');
@@ -78,7 +66,7 @@
     scheduleFrame.loading = 'lazy';
     scheduleFrame.hidden = true;
     schedulePane.appendChild(scheduleStatus); schedulePane.appendChild(scheduleFrame);
-    widget.appendChild(nav); widget.appendChild(pane); widget.appendChild(schedulePane);
+    widget.appendChild(pane); widget.appendChild(schedulePane);
     if (options.before && options.before.parentNode === host) host.insertBefore(widget, options.before);
     else host.appendChild(widget);
 
@@ -188,22 +176,24 @@
     });
 
     function selectView(view) {
+      if (!['primary', 'translate', 'schedule', 'timer'].includes(view)) return false;
+      const previousView = widget.dataset.currentView;
       const translating = view === 'translate';
       const showingSchedule = view === 'schedule';
       widget.dataset.translationActive = String(view !== 'primary');
       widget.dataset.currentView = view;
-      primaryTab.setAttribute('aria-selected', String(view === 'primary'));
-      translateTab.setAttribute('aria-selected', String(translating));
-      scheduleTab.setAttribute('aria-selected', String(showingSchedule));
-      primaryTab.tabIndex = view === 'primary' ? 0 : -1;
-      translateTab.tabIndex = translating ? 0 : -1;
-      scheduleTab.tabIndex = showingSchedule ? 0 : -1;
+      Object.entries(mainTabs).forEach(([name, tab]) => {
+        tab.setAttribute('aria-selected', String(name === view));
+        tab.tabIndex = name === view ? 0 : -1;
+      });
       languages.hidden = !translating;
       pane.hidden = !translating;
       schedulePane.hidden = !showingSchedule;
       if (view !== 'schedule') scheduleRequest += 1;
       if (typeof options.onViewChange === 'function') options.onViewChange(view);
+      if (showingSchedule && previousView !== 'schedule') openSchedule();
       if (view !== 'primary') pruneExpired();
+      return true;
     }
 
     async function openSchedule() {
@@ -246,12 +236,6 @@
 
     languageButtons.vi.addEventListener('click', () => chooseLanguage('vi'));
     languageButtons.ja.addEventListener('click', () => chooseLanguage('ja'));
-    primaryTab.addEventListener('click', () => selectView('primary'));
-    translateTab.addEventListener('click', () => selectView('translate'));
-    scheduleTab.addEventListener('click', () => {
-      if (widget.dataset.currentView === 'schedule') return;
-      selectView('schedule'); openSchedule();
-    });
     input.addEventListener('input', () => { send.disabled = !input.value.trim(); });
     input.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || event.shiftKey || event.isComposing || event.keyCode === 229) return;
@@ -265,7 +249,7 @@
     }, {once: true});
 
     chooseLanguage(language);
-    selectView(options.initialView === 'translate' ? 'translate' : 'primary');
+    navigation.attach(selectView);
     host.dataset.translationMounted = 'true';
     return true;
   }
@@ -274,10 +258,11 @@
     if (!card || card.dataset.translationMounted === 'true') return false;
     const title = Array.from(card.children).find((node) => node.classList && node.classList.contains('wk-card-title'));
     if (!title) return false;
+    const navigation = global.NotebookWorkNavigation;
+    if (!navigation || !navigation.tabs) return false;
     const shared = new Set([title]);
     Array.from(card.children).forEach((node) => {
-      if (node.classList && (node.classList.contains('wk-seg') || node.classList.contains('wk-urgent') ||
-          node.classList.contains('work-records')) || node.hasAttribute('data-timer-status')) shared.add(node);
+      if (node.classList && node.classList.contains('work-records')) shared.add(node);
     });
     const memoNodes = Array.from(card.children).filter((node) => !shared.has(node));
     const memoHidden = new Map(memoNodes.map((node) => [node, node.hidden]));
@@ -287,7 +272,8 @@
     return mountWidget(card, {
       before: title.nextSibling,
       context: 'memo',
-      primaryLabel: '메모',
+      navigation,
+      tabs: navigation.tabs,
       onViewChange(view) {
         const secondary = view !== 'primary';
         const panel = card.closest('.work-panel');
@@ -296,6 +282,7 @@
         title.hidden = secondary || titleHidden;
         memoNodes.forEach((node) => { node.hidden = secondary ? true : memoHidden.get(node); });
         if (records) records.hidden = secondary || recordsHidden;
+        navigation.changed(view);
       }
     });
   }
