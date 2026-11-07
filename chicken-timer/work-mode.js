@@ -12,7 +12,7 @@
   const tabs = document.createElement('div'); tabs.className = 'wk-main-tabs';
   tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', '화면 전환');
   const viewButtons = {};
-  [['primary', '메모'], ['translate', '번역'], ['schedule', '근무표'], ['timer', '타이머']].forEach(([view, label], index) => {
+  [['primary', '메모'], ['timer', '타이머'], ['schedule', '근무표'], ['translate', '번역']].forEach(([view, label], index) => {
     const tab = document.createElement('button');
     tab.type = 'button'; tab.className = 'wk-main-tab'; tab.dataset.view = view;
     tab.setAttribute('role', 'tab'); tab.setAttribute('aria-selected', String(view === 'primary'));
